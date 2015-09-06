@@ -1,14 +1,15 @@
 /*
    Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2015 Roman Volovodov <gr.rPman@gmail.com>
 
-   This file is part of the Luwrain.
+   This file is part of the LUWRAIN.
 
-   Luwrain is free software; you can redistribute it and/or
+   LUWRAIN is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
    License as published by the Free Software Foundation; either
    version 3 of the License, or (at your option) any later version.
 
-   Luwrain is distributed in the hope that it will be useful,
+   LUWRAIN is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
@@ -27,19 +28,19 @@ import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
 import org.apache.poi.xwpf.usermodel.*;
 
-class Docx implements Filter
+public class DocX
 {
     private String fileName = "";
     private String wholeText;
 
-    public Docx(String fileName)
+    public DocX(String fileName)
     {
 	this.fileName = fileName;
 	if (fileName == null)
 	    throw new NullPointerException("fileName may not be null");
     }
 
-    @Override public Document constructDocument()
+    public Document constructDocument()
     {
     	FileInputStream  s = null;
     	try
