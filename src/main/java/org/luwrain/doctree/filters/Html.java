@@ -53,7 +53,7 @@ public class Html
 	    return null;
 	HtmlParse parse = new HtmlParse();
 	new MlReader(parse, parse, src).read();
-	Node root = parse.constructRoot();
+	final NodeImpl root = parse.constructRoot();
 	if (root == null)
 	    return null;
 	Document doc = new Document(parse.getTitle(), root);

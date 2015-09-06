@@ -26,10 +26,10 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 {
     private class Level
     {
-	public Node node;
-	public LinkedList<Node> subnodes = new LinkedList<Node>();
+	public NodeImpl node;
+	public LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 
-	public Level(Node node)
+	public Level(NodeImpl node)
 	{
 	    this.node = node;
 	    if (node == null)
@@ -52,7 +52,7 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 
     public HtmlParse()
     {
-	levels.add(new Level(new Node(Node.ROOT)));
+	levels.add(new Level(new NodeImpl(Node.ROOT)));
     }
 
     @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
@@ -163,10 +163,10 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 	return true;
     }
 
-    public Node constructRoot()
+    public NodeImpl constructRoot()
     {
 	final Level firstLevel = levels.getFirst();
-	firstLevel.node.subnodes = firstLevel.subnodes.toArray(new Node[firstLevel.subnodes.size()]);
+	firstLevel.node.subnodes = firstLevel.subnodes.toArray(new NodeImpl[firstLevel.subnodes.size()]);
 	return firstLevel.node;
     }
 
@@ -179,7 +179,7 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
     {
 	commitPara();
 	final Level lastLevel = levels.getLast();
-	final Node node = constructNode(type);
+	final NodeImpl node = constructNode(type);
 	lastLevel.subnodes.add(node);
 	levels.add(new Level(node));
     }
@@ -188,21 +188,21 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
     {
 	commitPara();
 	final Level lastLevel = levels.pollLast();
-	lastLevel.node.subnodes = lastLevel.subnodes.toArray(new Node[lastLevel.subnodes.size()]);
+	lastLevel.node.subnodes = lastLevel.subnodes.toArray(new NodeImpl[lastLevel.subnodes.size()]);
     }
 
-    private Node constructNode(int type)
+    private NodeImpl constructNode(int type)
     {
 	if (type == Node.TABLE)
 	    return new Table();
-	return new Node(type);
+	return new NodeImpl(type);
     }
 
     private void commitPara()
     {
 	if (runs.isEmpty())
 	    return;
-	final Paragraph para = new Paragraph();
+	final ParagraphImpl para = new ParagraphImpl();
 	para.runs = runs.toArray(new Run[runs.size()]);
 	runs.clear();
 	final int lastLevelType = levels.getLast().node.type;

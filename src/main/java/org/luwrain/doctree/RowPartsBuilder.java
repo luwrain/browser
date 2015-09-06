@@ -25,17 +25,17 @@ class RowPartsBuilder
     private int offset = 0;
     private LinkedList<RowPart> parts = new LinkedList<RowPart>();
     private LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
-    private LinkedList<Paragraph> paragraphs = new LinkedList<Paragraph>();
+    private final LinkedList<ParagraphImpl> paragraphs = new LinkedList<ParagraphImpl>();
 
-    public void onNode(Node node)
+    public void onNode(NodeImpl node)
     {
 	if (node.type == Node.PARAGRAPH)
 	{
 	    offset = 0;
 	    index = 0;
-	    if (!(node instanceof Paragraph))
+	    if (!(node instanceof ParagraphImpl))
 		throw new IllegalArgumentException("node should be an instance of Paragraph");
-	    final Paragraph para = (Paragraph)node;
+	    final ParagraphImpl para = (ParagraphImpl)node;
 	    currentParaParts.clear();
 	    if (para.runs != null)
 		for(Run r: para.runs)
@@ -50,7 +50,7 @@ class RowPartsBuilder
 	    return;
 	}
 	if (node.subnodes != null)
-	    for(Node n: node.subnodes)
+	    for(NodeImpl n: node.subnodes)
 		onNode(n);
     }
 
@@ -142,10 +142,10 @@ class RowPartsBuilder
 	return parts.toArray(new RowPart[parts.size()]);
     }
 
-    public Paragraph[] paragraphs()
+    public ParagraphImpl[] paragraphs()
     {
 	if (paragraphs == null || paragraphs.size() < 1)
-	    return new Paragraph[0];
-	return paragraphs.toArray(new Paragraph[paragraphs.size()]);
+	    return new ParagraphImpl[0];
+	return paragraphs.toArray(new ParagraphImpl[paragraphs.size()]);
     }
 }

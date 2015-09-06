@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-public class Paragraph extends Node
+public class ParagraphImpl extends NodeImpl
 {
     public Run[] runs = new Run[0];
     public RowPart[] rowParts = new RowPart[0];
@@ -25,14 +25,14 @@ public class Paragraph extends Node
     /** Position of the first row in a document*/
     public int topRowIndex = -1;
 
-    public Paragraph()
+    public ParagraphImpl()
     {
-	super(PARAGRAPH);
+	super(Node.PARAGRAPH);
     }
 
-    public Paragraph(Run run)
+    public ParagraphImpl(Run run)
     {
-	super(PARAGRAPH);
+	super(Node.PARAGRAPH);
 	if (run == null)
 	    throw new NullPointerException("run may not be null");
 	runs = new Run[]{run};
@@ -100,7 +100,7 @@ public class Paragraph extends Node
 
     @Override public boolean shouldHaveExtraLine()
     {
-	if (getParentType() == ROOT)
+	if (getParentType() == Node.ROOT)
 	    return true;
 	return false;
 	/*
@@ -114,12 +114,12 @@ public class Paragraph extends Node
 
     public boolean isInListItem()
     {
-	return parentNode != null && parentNode.type == LIST_ITEM;
+	return parentNode != null && parentNode.type == Node.LIST_ITEM;
     }
 
     public boolean isInTableCell()
     {
-	return parentNode != null && parentNode.type == TABLE_CELL;
+	return parentNode != null && parentNode.type == Node.TABLE_CELL;
     }
 
     public int getParaIndex()

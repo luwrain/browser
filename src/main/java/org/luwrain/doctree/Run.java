@@ -22,7 +22,7 @@ public class Run
     public String text = "";
     public String href = "";
     public TextAttr textAttr = new TextAttr();
-    public Paragraph parentParagraph;
+    public ParagraphImpl parentParagraph;
 
     public Run(String text)
     {

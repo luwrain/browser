@@ -24,8 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.luwrain.doctree.Document;
-import org.luwrain.doctree.Node;
+import org.luwrain.doctree.*;
 import org.apache.poi.hwpf.*;
 import org.apache.poi.hwpf.usermodel.*;
 import org.apache.poi.hwpf.extractor.WordExtractor;
@@ -67,11 +66,11 @@ public class Doc
     private Document transform(HWPFDocument doc)
     {
 	wholeText = doc.getDocumentText();
-	LinkedList<Node> subnodes = new LinkedList<Node>();
+	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	Range range = doc.getRange();
 	anyRangeAsParagraph(subnodes,range,0);
-	final Node root = new Node(Node.ROOT);
-	root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+	final NodeImpl root = new NodeImpl(Node.ROOT);
+	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 	final Document res = new Document(root);
 	return res;
     }
@@ -81,7 +80,7 @@ public class Doc
      * @param	range	The range to look through
      * @param	lvl	Current recurse level (must be zero for the root)
      */
-    private void anyRangeAsParagraph(LinkedList<Node> subnodes,
+    private void anyRangeAsParagraph(LinkedList<NodeImpl> subnodes,
 				    Range range,
 				    int lvl)
     {
@@ -96,46 +95,46 @@ public class Doc
 		if(!inTable)
 		{
 		    //We do this processing for the first cell only, skipping all others
-		    final Node table_node = new org.luwrain.doctree.Table();
+		    final NodeImpl table_node = new org.luwrain.doctree.Table();
 		    subnodes.add(table_node);
-		    final LinkedList<Node> rows_subnodes = new LinkedList<Node>();
+		    final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 		    inTable=true;//We came to the table;
-		    final Table table = range.getTable(paragraph);
-		    System.out.println(lvl+", is a table: "+table.numRows()+" rows");
+		    final org.apache.poi.hwpf.usermodel.Table table = range.getTable(paragraph);
+		    //		    System.out.println(lvl+", is a table: "+table.numRows()+" rows");
 		    final int rnum=table.numRows();
 		    for(int r=0;r<rnum;r++)
 		    { // для каждой строки таблицы
 			// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-			final Node rowtable_node=new Node(Node.TABLE_ROW);
+			final NodeImpl rowtable_node=new NodeImpl(Node.TABLE_ROW);
 			rows_subnodes.add(rowtable_node);
-			final LinkedList<Node> cels_subnodes = new LinkedList<Node>();
+			final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
 			final TableRow trow=table.getRow(r);
 			final int cnum=trow.numCells();
 			for(int c=0;c<cnum;c++)
 			{ // для каждой ячейки таблицы
 			    //Creating a node for table cell
-			    final Node celltable_node=new Node(Node.TABLE_CELL);
-			    final LinkedList<Node> incell_subnodes = new LinkedList<Node>();
+			    final NodeImpl celltable_node=new NodeImpl(Node.TABLE_CELL);
+			    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 			    cels_subnodes.add(celltable_node);
-			    System.out.print("* cell["+r+","+c+"]: ");
+			    //			    System.out.print("* cell["+r+","+c+"]: ");
 			    final TableCell cell=trow.getCell(c);
 			    //Trying to figure out that we have just a text in the table cell
 			    if(cell.numParagraphs()>1)
 				anyRangeAsParagraph(incell_subnodes,cell,lvl+1); else
 				parseParagraph(incell_subnodes,cell.getParagraph(0));
-			    celltable_node.subnodes = incell_subnodes.toArray(new Node[incell_subnodes.size()]);
+			    celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
 			    checkNodesNotNull(celltable_node.subnodes);
 			} //for(cells);
-			rowtable_node.subnodes = cels_subnodes.toArray(new Node[cels_subnodes.size()]);
+			rowtable_node.subnodes = cels_subnodes.toArray(new NodeImpl[cels_subnodes.size()]);
 			checkNodesNotNull(rowtable_node.subnodes);
 		    } //for(rows);
-		    table_node.subnodes = rows_subnodes.toArray(new Node[rows_subnodes.size()]);
+		    table_node.subnodes = rows_subnodes.toArray(new NodeImpl[rows_subnodes.size()]);
 		    checkNodesNotNull(table_node.subnodes);
 		} // if(!inTable);
 	    } else //if(paragraph.getTableLevel() > lvl);
 	    {
 		inTable=false;//We are not in table any more
-		System.out.print(lvl+", not table: ");
+		//		System.out.print(lvl+", not table: ");
 		parseParagraph(subnodes,paragraph);
 	    }
 	    i++;
@@ -150,7 +149,7 @@ public class Doc
 	 * @param	subnodes	список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
 	 * @param	paragraph	элемент документа (параграф или элемент списка) или ячейка таблицы
 	 */
-	public void parseParagraph(LinkedList<Node> subnodes,Paragraph paragraph)
+	public void parseParagraph(LinkedList<NodeImpl> subnodes,Paragraph paragraph)
 	{
 		String className=paragraph.getClass().getSimpleName();
 		String paraText="";
@@ -158,7 +157,7 @@ public class Doc
 		{
 			case "ListEntry":
 				// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-				Node node=new Node(Node.LIST_ITEM);
+				NodeImpl node=new NodeImpl(Node.LIST_ITEM);
 				subnodes.add(node);
 				//
 				ListEntry elem=(ListEntry)paragraph;
@@ -184,34 +183,34 @@ public class Doc
 				String numstr="";
 				for(int lvl=0;lvl<=listLvl;lvl++) numstr+=listInfo.get(listId).get(lvl)+".";
 				paraText=paragraph.text().trim();
-				System.out.println("LIST ENTRY:"+listLvl+", "+listId+", "+numstr+"["+paraText+"]");
-				LinkedList<Node> item_subnodes = new LinkedList<Node>();
-				item_subnodes.add(new org.luwrain.doctree.Paragraph(new org.luwrain.doctree.Run(paraText)));
-				node.subnodes = item_subnodes.toArray(new Node[item_subnodes.size()]);
+				//				System.out.println("LIST ENTRY:"+listLvl+", "+listId+", "+numstr+"["+paraText+"]");
+				final LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
+				item_subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
+				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 			break;
 			case "Paragraph":
 				paraText=paragraph.text().trim();
-				System.out.println("PARAGRAPH:["+paraText+"]");
-				subnodes.add(new org.luwrain.doctree.Paragraph(new org.luwrain.doctree.Run(paraText)));
+				//				System.out.println("PARAGRAPH:["+paraText+"]");
+				subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
 				/*
 				// получение стилей текста
 				int nrun=paragraph.numCharacterRuns();
 				if(nrun>1) for(int r=0;r<nrun;r++)
 				{
 					CharacterRun run=paragraph.getCharacterRun(r);
-					System.out.println("RUN: ["+run.text()+"]");
+//					System.out.println("RUN: ["+run.text()+"]");
 				}
 				*/
 			break;
 			default:
 				paraText=paragraph.text().trim();
-				System.out.println(className+"["+paraText+"]");
-				subnodes.add(new org.luwrain.doctree.Paragraph(new org.luwrain.doctree.Run(paraText)));
+				//				System.out.println(className+"["+paraText+"]");
+				subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
 			break;
 		}
 	}
 
-    private void checkNodesNotNull(Node[] nodes)
+    private void checkNodesNotNull(NodeImpl[] nodes)
     {
 	if (nodes == null)
 	    throw new NullPointerException("nodes is null");

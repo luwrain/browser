@@ -21,10 +21,10 @@ class Layout
 {
     private Document document;
 
-    private Node root;
-    private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    private NodeImpl root;
+    private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
-    private Row[] rows;
+    private RowImpl[] rows;
 
     private Line[] lines = new Line[0];
 
@@ -68,7 +68,7 @@ class Layout
 	int maxLineNum = 0;
 	int lastX = 0;
 	int lastY = 0;
-	for(Row r: rows)
+	for(RowImpl r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts;
 	    if (r.partsFrom < 0 || r.partsTo < 0 || r.partsFrom >= r.partsTo)
@@ -78,7 +78,7 @@ class Layout
 		continue;
 	    }
 	    final Run run = rowParts[r.partsFrom].run;
-	    final Paragraph paragraph = run.parentParagraph;
+	    final ParagraphImpl paragraph = run.parentParagraph;
 	    r.x = paragraph.x;
 	    r.y = paragraph.y + rowParts[r.partsFrom].relRowNum;
 	    lastX = r.x;
@@ -100,7 +100,7 @@ class Layout
 	StringBuilder b = new StringBuilder();
 	for(int r: line.rows)
 	{
-	    final Row row = rows[r];
+	    final RowImpl row = rows[r];
 	    while(b.length() < row.x)
 		b.append(" ");
 	    b.append(row.text(rowParts));

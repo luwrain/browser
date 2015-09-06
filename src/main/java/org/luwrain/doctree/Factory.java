@@ -29,7 +29,7 @@ public class Factory
     static public final int DOC = 4;
     static public final int DOCX = 5;
 
-    public Document loadFromFile(int format, String fileName)
+    static public Document loadFromFile(int format, String fileName)
     {
 	NullCheck.notNull(fileName, "fileName");
 	switch (format)
@@ -45,7 +45,7 @@ public class Factory
 	}
     }
 
-    public Document loadFromText(int format, String text)
+    static public Document loadFromText(int format, String text)
     {
 	NullCheck.notNull(text, "text");
 	switch (format)

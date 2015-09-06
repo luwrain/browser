@@ -19,11 +19,11 @@ package org.luwrain.doctree;
 
 class RowsBuilder
 {
-    static public Row[] buildRows(RowPart[] parts)
+    static public RowImpl[] buildRows(RowPart[] parts)
     {
-	Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
+	RowImpl[] rows = new RowImpl[parts[parts.length - 1].absRowNum + 1];
 	for(int i = 0;i < rows.length;++i)
-	    rows[i] = new Row();
+	    rows[i] = new RowImpl();
 	int current = -1;
 	for(int i = 0;i < parts.length;++i)
 	{

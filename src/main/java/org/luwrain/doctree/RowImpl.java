@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-public class Row
+public class RowImpl
 {
     /** Absolute horizontal position in the area*/
     public int x = 0;

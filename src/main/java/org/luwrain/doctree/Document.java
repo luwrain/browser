@@ -17,25 +17,27 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.NullCheck;
+
 public class Document 
 {
-    private Node root;
+    private NodeImpl root;
     private String title;
     private Layout layout = new Layout(this);
 
-    private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
-    private Row[] rows;
+    private RowImpl[] rows;
 
-    public Document(Node root)
+    public Document(NodeImpl root)
     {
 	this.root = root;
-	if (root == null)
-	    throw new NullPointerException("root may not be null");
+	NullCheck.notNull(root, "root");
 	title = null;
+	buildView(80);
     }
 
-    public Document(String title, Node root)
+    public Document(String title, NodeImpl root)
     {
 	this.root = root;
 	this.title = title;
@@ -87,7 +89,7 @@ public class Document
     {
 	boolean ok = true;
 	//All paragraphs must have valid parent node;
-	for(Paragraph p: paragraphs)
+	for(ParagraphImpl p: paragraphs)
 	    if (p.parentNode == null)
 	{
 	    System.out.println("warning::doctree:have a paragraph with an empty parent node");
@@ -108,17 +110,17 @@ public class Document
 	return title != null?title:"";
     }
 
-    public Node getRoot()
+    public NodeImpl getRoot()
     {
 	return root;
     }
 
-    public Paragraph[] getParagraphs()
+    public ParagraphImpl[] getParagraphs()
     {
 	return paragraphs;
     }
 
-    public Row[] getRows()
+    public RowImpl[] getRows()
     {
 	return rows;
     }
@@ -131,7 +133,7 @@ public class Document
     private void calcAbsRowNums()
     {
 	int currentParaTop = 0;
-	for(Paragraph p: paragraphs)
+	for(ParagraphImpl p: paragraphs)
 	{
 	    p.topRowIndex = currentParaTop;
 	    for(RowPart r: p.rowParts)

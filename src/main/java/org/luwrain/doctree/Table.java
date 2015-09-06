@@ -17,46 +17,46 @@
 
 package org.luwrain.doctree;
 
-public class Table extends Node
+public class Table extends NodeImpl
 {
     public Table()
     {
-	super(TABLE);
+	super(Node.TABLE);
     }
 
-    public Table(Node[] subnodes)
+    public Table(NodeImpl[] subnodes)
     {
-	super(TABLE, subnodes);
+	super(Node.TABLE, subnodes);
     }
 
     @Override public void commit()
     {
 	super.commit();
-	for(Node n: subnodes)
+	for(NodeImpl n: subnodes)
 	{
-	    if (n.type != TABLE_ROW)
+	    if (n.type != Node.TABLE_ROW)
 		System.out.println("warning:doctree:table has a subnode with type different than TABLE_ROW");
-	    for(Node nn: n.subnodes)
-		if (nn.type != TABLE_CELL)
+	    for(NodeImpl nn: n.subnodes)
+		if (nn.type != Node.TABLE_CELL)
 		System.out.println("warning:doctree:table row has a subnode with type different than TABLE_CELL");
 	}
     }
 
-    public Node getCell(int col, int row)
+    public NodeImpl getCell(int col, int row)
     {
 	if (row >= subnodes.length || col >= subnodes[row].subnodes.length)
 	    return null;
 	return subnodes[row].subnodes[col];
     }
 
-    public int getColIndexOfCell(Node cell)
+    public int getColIndexOfCell(NodeImpl cell)
     {
 	if (cell == null || cell.parentNode.parentNode != this)
 	    return -1;
 	return cell.getIndexInParentSubnodes();
     }
 
-    public int getRowIndexOfCell(Node cell)
+    public int getRowIndexOfCell(NodeImpl cell)
     {
 	if (cell == null || cell.parentNode.parentNode != this)
 	    return -1;
@@ -71,7 +71,7 @@ public class Table extends Node
     public int getColCount()
     {
 	int maxValue = 0;
-	for(Node n: subnodes)
+	for(NodeImpl n: subnodes)
 	    if (maxValue < n.subnodes.length)
 		maxValue = n.subnodes.length;
 	return maxValue;
@@ -80,10 +80,10 @@ public class Table extends Node
     public int getTableLevel()
     {
 	int count = 1;
-	Node n = parentNode;
+	NodeImpl n = parentNode;
 	while(n != null)
 	{
-	    if (n.type == TABLE)
+	    if (n.type == Node.TABLE)
 		++count;
 	    n = n.parentNode;
 	}
@@ -92,13 +92,13 @@ public class Table extends Node
 
     public boolean isSingleLineRow(int index)
     {
-	for(Node n: subnodes[index].subnodes)
+	for(NodeImpl n: subnodes[index].subnodes)
 	{
 	    if (n.subnodes.length > 1)
 		return false;
-	    if (n.subnodes[0].type != PARAGRAPH || !(n.subnodes[0] instanceof Paragraph))
+	    if (n.subnodes[0].type != Node.PARAGRAPH || !(n.subnodes[0] instanceof ParagraphImpl))
 		return false;
-	    final Paragraph p = (Paragraph)n.subnodes[0];
+	    final ParagraphImpl p = (ParagraphImpl)n.subnodes[0];
 	    if (p.height > 1)
 		return false;
 	}
