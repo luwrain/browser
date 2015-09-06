@@ -23,4 +23,24 @@ class TableCell extends NodeImpl
     {
 	super(Node.TABLE_CELL);
     }
+
+    public Table getTable()
+    {
+	if (parentNode == null || parentNode.parentNode == null)
+	    return null;
+	final NodeImpl tableNode = parentNode.parentNode;
+	if (tableNode == null || !(tableNode instanceof Table))
+	    return null;
+	return (Table)tableNode;
+    }
+
+    public int getColIndex()
+    {
+	return getIndexInParentSubnodes();
+    }
+
+    public int getRowIndex()
+    {
+	return parentNode.getIndexInParentSubnodes();
+    }
 }

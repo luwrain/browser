@@ -29,7 +29,7 @@ public class Iterator
 
     private int current = 0;
 
-    public Iterator(Document document)
+    Iterator(Document document)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
@@ -40,7 +40,7 @@ public class Iterator
 	current = 0;
     }
 
-    public Iterator(Document document, int index)
+    Iterator(Document document, int index)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
@@ -94,9 +94,14 @@ public class Iterator
 	return rowParts[partIndex].run;
     }
 
-    public int getCurrentParagraphIndex()
+    public int getCurrentParaIndex()
     {
 	return getCurrentParagraphImpl().getIndexInParentSubnodes();
+    }
+
+    public boolean isCurrentParaFirst()
+    {
+	return getCurrentParaIndex() == 0;
     }
 
     public String getCurrentText()
@@ -110,38 +115,20 @@ public class Iterator
 	return getCurrentParagraphImpl().parentNode;
     }
 
-    public boolean hasContainerInParents(Node container)
-    {
-	NodeImpl n = getCurrentParagraphImpl();
-	while (n != null && n != container)
-	    n = n.parentNode;
-	return n == container;
-    }
-
     public boolean isCurrentParaContainerTableCell()
     {
 	if (isCurrentRowEmpty())
 	    return false;
 	final NodeImpl container = getCurrentParaContainer();
-	return container.type == Node.TABLE_CELL &&
-	container.parentNode != null && container.parentNode.type == Node.TABLE_ROW &&
-	container.parentNode.parentNode != null && container.parentNode.parentNode.type == Node.TABLE &&
-	container.parentNode.parentNode instanceof Table;
+	return container.type == Node.TABLE_CELL && (container instanceof TableCell);
     }
 
-    public Table getTableOfCurrentParaContainer()
+    public TableCell getTableCell()
     {
-	if (isCurrentRowEmpty())
-	    return null;
 	final NodeImpl container = getCurrentParaContainer();
-	if (container == null || container.type != Node.TABLE_CELL)
+	if (container == null || !(container instanceof TableCell))
 	    return null;
-	if (container.parentNode == null || container.parentNode.parentNode == null)
-	    return null;
-	final NodeImpl tableNode = container.parentNode.parentNode;
-	if (tableNode instanceof Table)
-	    return (Table)tableNode;
-	return null;
+	return (TableCell)container;
     }
 
     public boolean isCurrentParaContainerListItem()
@@ -149,19 +136,23 @@ public class Iterator
 	if (isCurrentRowEmpty())
 	    return false;
 	final NodeImpl container = getCurrentParaContainer();
-	return container.type == Node.LIST_ITEM &&
-	container.parentNode != null &&
-	(container.parentNode.type == Node.ORDERED_LIST || container.parentNode.type == Node.UNORDERED_LIST);
+	return container.type == Node.LIST_ITEM && (container instanceof ListItem);
     }
 
-    public int getListItemIndexOfCurrentParaContainer()
+    public ListItem getListItem()
     {
-	return getCurrentParaContainer().getIndexInParentSubnodes();
+	final NodeImpl container = getCurrentParaContainer();
+	if (container == null || !(container instanceof ListItem))
+	    return null;
+	return (ListItem)container;
     }
 
-    public boolean isListOfCurrentParaContainerOrdered()
+    public boolean hasContainerInParents(Node container)
     {
-	return getCurrentParaContainer().parentNode.type == Node.ORDERED_LIST;
+	NodeImpl n = getCurrentParagraphImpl();
+	while (n != null && n != container)
+	    n = n.parentNode;
+	return n == container;
     }
 
     public boolean moveNext()

@@ -185,7 +185,7 @@ public class NodeImpl implements Node
 	}
     }
 
-    public void commit()
+    void commit()
     {
 	if (type == Node.ROOT)
 	    parentNode = null;

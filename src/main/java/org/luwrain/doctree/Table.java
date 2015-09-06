@@ -24,7 +24,7 @@ public class Table extends NodeImpl
 	super(Node.TABLE);
     }
 
-    @Override public void commit()
+    @Override void commit()
     {
 	super.commit();
 	for(NodeImpl n: subnodes)
@@ -37,25 +37,14 @@ public class Table extends NodeImpl
 	}
     }
 
-    public NodeImpl getCell(int col, int row)
+    TableCell getCell(int col, int row)
     {
 	if (row >= subnodes.length || col >= subnodes[row].subnodes.length)
 	    return null;
-	return subnodes[row].subnodes[col];
-    }
-
-    public int getColIndexOfCell(NodeImpl cell)
-    {
-	if (cell == null || cell.parentNode.parentNode != this)
-	    return -1;
-	return cell.getIndexInParentSubnodes();
-    }
-
-    public int getRowIndexOfCell(NodeImpl cell)
-    {
-	if (cell == null || cell.parentNode.parentNode != this)
-	    return -1;
-	return cell.parentNode.getIndexInParentSubnodes();
+	final NodeImpl cellNode = subnodes[row].subnodes[col];
+	if (cellNode == null || !(cellNode instanceof TableCell))
+	    return null;
+	return (TableCell)cellNode;
     }
 
     public int getRowCount()

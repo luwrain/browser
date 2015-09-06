@@ -17,10 +17,20 @@
 
 package org.luwrain.doctree;
 
-class ListItem extends NodeImpl
+public class ListItem extends NodeImpl
 {
     ListItem()
     {
 	super(Node.LIST_ITEM);
+    }
+
+    public int getListItemIndexOfCurrentParaContainer()
+    {
+	return getIndexInParentSubnodes();
+    }
+
+    public boolean isListOfCurrentParaContainerOrdered()
+    {
+	return parentNode.type == Node.ORDERED_LIST;
     }
 }
