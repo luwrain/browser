@@ -19,14 +19,9 @@ package org.luwrain.doctree;
 
 public class Table extends NodeImpl
 {
-    public Table()
+    Table()
     {
 	super(Node.TABLE);
-    }
-
-    public Table(NodeImpl[] subnodes)
-    {
-	super(Node.TABLE, subnodes);
     }
 
     @Override public void commit()

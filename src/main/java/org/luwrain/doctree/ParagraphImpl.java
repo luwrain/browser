@@ -20,23 +20,14 @@ package org.luwrain.doctree;
 public class ParagraphImpl extends NodeImpl
 {
     public Run[] runs = new Run[0];
-    public RowPart[] rowParts = new RowPart[0];
+    RowPart[] rowParts = new RowPart[0];
 
     /** Position of the first row in a document*/
-    public int topRowIndex = -1;
+    int topRowIndex = -1;
 
-    public ParagraphImpl()
+    ParagraphImpl()
     {
 	super(Node.PARAGRAPH);
-    }
-
-    public ParagraphImpl(Run run)
-    {
-	super(Node.PARAGRAPH);
-	if (run == null)
-	    throw new NullPointerException("run may not be null");
-	runs = new Run[]{run};
-	runs[0].parentParagraph = this;
     }
 
     @Override public void commit()

@@ -52,7 +52,7 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 
     public HtmlParse()
     {
-	levels.add(new Level(new NodeImpl(Node.ROOT)));
+	levels.add(new Level(NodeFactory.create(Node.ROOT)));
     }
 
     @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
@@ -194,15 +194,15 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
     private NodeImpl constructNode(int type)
     {
 	if (type == Node.TABLE)
-	    return new Table();
-	return new NodeImpl(type);
+	    return NodeFactory.create(Node.TABLE);
+	return NodeFactory.create(type);
     }
 
     private void commitPara()
     {
 	if (runs.isEmpty())
 	    return;
-	final ParagraphImpl para = new ParagraphImpl();
+	final ParagraphImpl para = NodeFactory.createPara();
 	para.runs = runs.toArray(new Run[runs.size()]);
 	runs.clear();
 	final int lastLevelType = levels.getLast().node.type;

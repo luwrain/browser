@@ -56,7 +56,7 @@ public class Iterator
 	return new Iterator(document, current);
     }
 
-    public RowImpl getCurrentRow()
+    public Row getCurrentRow()
     {
 	return rows[current];
     }
@@ -68,7 +68,12 @@ public class Iterator
 
     public int getCurrentRowRelIndex()
     {
-	return current - getCurrentParagraph().topRowIndex;
+	return current - getCurrentParagraphImpl().topRowIndex;
+    }
+
+    public boolean isCurrentRowFirst()
+    {
+	return getCurrentRowRelIndex() == 0;
     }
 
     public boolean isCurrentRowEmpty()
@@ -76,32 +81,38 @@ public class Iterator
 	return !rows[current].hasAssociatedText();
     }
 
-    public ParagraphImpl getCurrentParagraph()
+    private ParagraphImpl getCurrentParagraphImpl()
     {
-	return rowParts[rows[current].partsFrom].run.parentParagraph;
+	return getFirstRunOfCurrentRow().parentParagraph;
+    }
+
+    private Run getFirstRunOfCurrentRow()
+    {
+	final int partIndex = rows[current].partsFrom;
+	if (partIndex < 0 || partIndex >= rowParts.length)
+	    throw new IllegalArgumentException("doctree:row " + current + " has negative partsFrom variable;, unable to find a corresponding run");//Maybe it is better to use some another exception type
+	return rowParts[partIndex].run;
     }
 
     public int getCurrentParagraphIndex()
     {
-	return getCurrentParagraph().getIndexInParentSubnodes();
+	return getCurrentParagraphImpl().getIndexInParentSubnodes();
     }
 
     public String getCurrentText()
     {
 	final RowImpl row = rows[current];
-	if (row.partsFrom < 0 || row.partsTo < 0)
-	    return "";
-	return row.text(rowParts);
+	return row.hasAssociatedText()?row.text(rowParts):"";
     }
 
     public NodeImpl getCurrentParaContainer()
     {
-	return getCurrentParagraph().parentNode;
+	return getCurrentParagraphImpl().parentNode;
     }
 
     public boolean hasContainerInParents(Node container)
     {
-	NodeImpl n = getCurrentParagraph();
+	NodeImpl n = getCurrentParagraphImpl();
 	while (n != null && n != container)
 	    n = n.parentNode;
 	return n == container;
@@ -122,7 +133,6 @@ public class Iterator
     {
 	if (isCurrentRowEmpty())
 	    return null;
-
 	final NodeImpl container = getCurrentParaContainer();
 	if (container == null || container.type != Node.TABLE_CELL)
 	    return null;

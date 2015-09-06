@@ -17,40 +17,34 @@
 
 package org.luwrain.doctree;
 
-public class RowImpl implements Row
+public class NodeFactory
 {
-    /** Absolute horizontal position in the area*/
-    public int x = 0;
-
-    /** Absolute vertical position in the area*/
-    public int y = 0;
-
-    public int partsFrom = -1;
-    public int partsTo = -1;
-
-    @Override public int getRowX()
+    static public NodeImpl create(int type)
     {
-	return x;
+	switch(type)
+	{
+	case Node.PARAGRAPH:
+	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
+	case Node.TABLE:
+	    return new Table();
+	case Node.TABLE_CELL:
+	    return new TableCell();
+	case Node.LIST_ITEM:
+	    return new ListItem();
+	default:
+	return new NodeImpl(type);
+	}
     }
 
-    @Override public int getRowY()
+    static public ParagraphImpl createPara()
     {
-	return y;
+	return new ParagraphImpl();
     }
 
-
-    public String text(RowPart[] parts)
+    static public ParagraphImpl createPara(String text)
     {
-	StringBuilder b = new StringBuilder();
-	for(int i = partsFrom;i < partsTo;++i)
-	    b.append(parts[i].text());
-	return b.toString();
-    }
-    {
-    }
-
-    public boolean hasAssociatedText()
-    {
-	return partsFrom >= 0 && partsTo >= 0;
+	final ParagraphImpl para = createPara();
+	para.runs = new Run[]{new Run(text)};
+	return para;
     }
 }

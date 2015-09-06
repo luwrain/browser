@@ -17,40 +17,8 @@
 
 package org.luwrain.doctree;
 
-public class RowImpl implements Row
+public interface Row
 {
-    /** Absolute horizontal position in the area*/
-    public int x = 0;
-
-    /** Absolute vertical position in the area*/
-    public int y = 0;
-
-    public int partsFrom = -1;
-    public int partsTo = -1;
-
-    @Override public int getRowX()
-    {
-	return x;
-    }
-
-    @Override public int getRowY()
-    {
-	return y;
-    }
-
-
-    public String text(RowPart[] parts)
-    {
-	StringBuilder b = new StringBuilder();
-	for(int i = partsFrom;i < partsTo;++i)
-	    b.append(parts[i].text());
-	return b.toString();
-    }
-    {
-    }
-
-    public boolean hasAssociatedText()
-    {
-	return partsFrom >= 0 && partsTo >= 0;
-    }
+    int getRowX();
+    int getRowY();
 }

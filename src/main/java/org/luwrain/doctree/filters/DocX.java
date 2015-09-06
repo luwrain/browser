@@ -67,7 +67,7 @@ public class DocX
 		wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
 		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 		anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
-		final NodeImpl root = new NodeImpl(Node.ROOT);
+		final NodeImpl root = NodeFactory.create(Node.ROOT);
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 return new org.luwrain.doctree.Document(root);
     }
@@ -86,7 +86,7 @@ return new org.luwrain.doctree.Document(root);
 			if (paragraph.getClass() == XWPFTable.class)
 			{
 				// We do this processing for the first cell only, skipping all others
-				final NodeImpl table_node = new org.luwrain.doctree.Table();
+			    final NodeImpl table_node = NodeFactory.create(Node.TABLE);
 				subnodes.add(table_node);
 				final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 				
@@ -99,7 +99,7 @@ return new org.luwrain.doctree.Document(root);
 					r++;
 					// создаем элементы структуры Node и добавляем текущую ноду
 					// в список потомка
-					final NodeImpl rowtable_node = new NodeImpl(Node.TABLE_ROW);
+					final NodeImpl rowtable_node = NodeFactory.create(Node.TABLE_ROW);
 					rows_subnodes.add(rowtable_node);
 					final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
 					int c = 0;
@@ -107,7 +107,7 @@ return new org.luwrain.doctree.Document(root);
 					{ // для каждой ячейки таблицы
 						c++;
 						// Creating a node for table cell
-						final NodeImpl celltable_node = new NodeImpl(Node.TABLE_CELL);
+						final NodeImpl celltable_node = NodeFactory.create(Node.TABLE_CELL);
 						final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 						cels_subnodes.add(celltable_node);
 						System.out.print("* cell[" + r + "," + c + "]: ");
@@ -150,7 +150,7 @@ return new org.luwrain.doctree.Document(root);
 			{ // параграф с установленным уровнем - элемент списка
 				// создаем элементы структуры Node и добавляем текущую ноду в
 				// список потомка
-				final NodeImpl node = new NodeImpl(Node.LIST_ITEM);
+			    final NodeImpl node = NodeFactory.create(Node.LIST_ITEM);
 				subnodes.add(node);
 				//
 				BigInteger listId = paragraph.getNumID();
@@ -180,18 +180,18 @@ return new org.luwrain.doctree.Document(root);
 				paraText = paragraph.getText().trim();
 				System.out.println("LIST ENTRY:" + listLvl + ", " + listId + ", " + numstr + "[" + paraText + "]");
 				LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-				item_subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
+				item_subnodes.add(NodeFactory.createPara(paraText));
 				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 			} else
 			{
 				paraText = paragraph.getText().trim();
 				System.out.println("PARAGRAPH:[" + paraText + "]");
-				subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
+				subnodes.add(NodeFactory.createPara(paraText));
 			}
 		} else
 		{
 			System.out.println(className);
-			subnodes.add(new org.luwrain.doctree.ParagraphImpl(new org.luwrain.doctree.Run(paraText)));
+			subnodes.add(NodeFactory.createPara(paraText));
 		}
 	}
 

@@ -17,36 +17,50 @@
 
 package org.luwrain.doctree;
 
-public class NodeImpl
+public class NodeImpl implements Node
 {
     private static final int MIN_TABLE_CELL_WIDTH = 8;
 
     public int type;
     public NodeImpl[] subnodes = new NodeImpl[0];
-    public NodeImpl parentNode;
+    NodeImpl parentNode;
 
     /** The exact meaning of a level depends on the node type*/
-    public int level = 0;
+    int level = 0;
 
     /**Absolute horizontal position in the area*/
-    public int x = -1;
+    int x = -1;
 
     /**Absolute vertical position in the area*/
-    public int y = -1;
-    public int width = 0;
-    public int height = 0;
+    int y = -1;
+    int width = 0;
+    int height = 0;
 
-    public boolean empty = false;
+    boolean empty = false;
 
-    public NodeImpl(int type)
+    NodeImpl(int type)
     {
 	this.type = type;
     }
 
-    public NodeImpl(int type, NodeImpl[] subnodes)
+    @Override public int getNodeX()
     {
-	this.type = type;
-	this.subnodes = subnodes;
+	return x;
+    }
+
+    @Override public int getNodeY()
+    {
+	return y;
+    }
+
+    @Override public int getNodeWidth()
+    {
+	return width;
+    }
+
+    @Override public int getNodeHeight()
+    {
+	return height;
     }
 
     //Launched before everything, RowPartsBuilder goes next
