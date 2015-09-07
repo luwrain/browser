@@ -24,12 +24,12 @@ public class ListItem extends NodeImpl
 	super(Node.LIST_ITEM);
     }
 
-    public int getListItemIndexOfCurrentParaContainer()
+    public int getListItemIndex()
     {
 	return getIndexInParentSubnodes();
     }
 
-    public boolean isListOfCurrentParaContainerOrdered()
+    public boolean isListOrdered()
     {
 	return parentNode.type == Node.ORDERED_LIST;
     }

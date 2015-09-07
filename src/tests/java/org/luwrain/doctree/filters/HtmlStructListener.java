@@ -15,32 +15,28 @@
    General Public License for more details.
 */
 
-package org.luwrain.doctree;
+package org.luwrain.doctree.filters;
 
-public class TableCell extends NodeImpl
+import java.util.*;
+import org.luwrain.util.*;
+
+class HtmlStructListener implements MlReaderListener
 {
-    TableCell()
+    @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
     {
-	super(Node.TABLE_CELL);
+	System.out.println("* OPEN " + tagName);
     }
 
-    public Table getTable()
+    @Override public void onMlTagClose(String tagName)
     {
-	if (parentNode == null || parentNode.parentNode == null)
-	    return null;
-	final NodeImpl tableNode = parentNode.parentNode;
-	if (tableNode == null || !(tableNode instanceof Table))
-	    return null;
-	return (Table)tableNode;
+	System.out.println("* CLOSE " + tagName);
     }
 
-    public int getColIndex()
+    @Override public void onMlText(String text, LinkedList<String> tagsStack)
     {
-	return getIndexInParentSubnodes();
-    }
-
-    public int getRowIndex()
-    {
-	return parentNode.getIndexInParentSubnodes();
+	final String trimmed = text.trim();
+	if (trimmed.isEmpty())
+	    return;
+	System.out.println(trimmed);
     }
 }

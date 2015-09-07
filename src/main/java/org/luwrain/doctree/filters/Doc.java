@@ -19,12 +19,14 @@ package org.luwrain.doctree.filters;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
-import org.luwrain.doctree.*;
+import org.luwrain.doctree.Document;
+import org.luwrain.doctree.Node;
+import org.luwrain.doctree.NodeImpl;
+import org.luwrain.doctree.NodeFactory;
+import org.luwrain.doctree.ParagraphImpl;
+
 import org.apache.poi.hwpf.*;
 import org.apache.poi.hwpf.usermodel.*;
 import org.apache.poi.hwpf.extractor.WordExtractor;

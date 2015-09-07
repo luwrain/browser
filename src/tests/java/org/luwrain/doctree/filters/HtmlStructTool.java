@@ -22,58 +22,26 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.*;
 
-import org.luwrain.doctree.*;
 import org.luwrain.util.*;
 
-public class Html
+public class HtmlStructTool
 {
-    private String fileName;
-    private String src;
-
-    public Html(boolean shouldRead, String arg)
+    static public void main(String[] args) throws Exception
     {
-	if (arg == null)
-	    throw new NullPointerException("arg may not be null");
-	if (shouldRead)
+	if (args.length < 1)
 	{
-	    fileName = arg;
-	    src = null;
-	} else
-	{
-	    fileName = "";
-	    src = arg;
+	    System.out.println("No file to read");
+	    return;
 	}
+	final String text = read(args[0], StandardCharsets.UTF_8);
+	final HtmlStructListener listener = new HtmlStructListener();
+	new MlReader(new HtmlConfig(), listener, text).read();
     }
 
-    public Document constructDocument()
+    static private String read(String fileName, Charset encoding) throws IOException
     {
-	if (src == null)
-	read(StandardCharsets.UTF_8);
-	if (src == null)
-	    return null;
-	HtmlParse parse = new HtmlParse();
-	new MlReader(new HtmlConfig(), parse, src).read();
-	final NodeImpl root = parse.constructRoot();
-return new Document(parse.getTitle(), root);
-    }
-
-    private void read(Charset encoding)
-    {
-	try {
-	    readImpl(encoding);
-	}
-	catch (IOException e)
-	{
-		e.printStackTrace();
-		src = null;
-		return;
-	}
-    }
-
-    private void readImpl(Charset encoding) throws IOException
-    {
-	StringBuilder b = new StringBuilder();
-	Path path = Paths.get(fileName);
+	final StringBuilder b = new StringBuilder();
+	final Path path = Paths.get(fileName);
 	try (Scanner scanner =  new Scanner(path, encoding.name())) {
 		while (scanner.hasNextLine())
 		{
@@ -81,6 +49,6 @@ return new Document(parse.getTitle(), root);
 		    b.append("\n");
 		}
 	    }
-	src = b.toString();
+	return b.toString();
     }
 }

@@ -18,37 +18,34 @@
 package org.luwrain.doctree.filters;
 
 import java.util.*;
-
+import org.luwrain.core.NullCheck;
 import org.luwrain.util.*;
 import org.luwrain.doctree.*;
 
-class HtmlParse implements MlReaderListener, MlReaderConfig
+class HtmlParse implements MlReaderListener
 {
-    private class Level
+    static private class Level
     {
 	public NodeImpl node;
-	public LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	public final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 
-	public Level(NodeImpl node)
+	Level(NodeImpl node)
 	{
 	    this.node = node;
-	    if (node == null)
-		throw new NullPointerException("node may not be null");
+	    NullCheck.notNull(node, "node");
+	}
+
+	void saveSubnodes()
+	{
+	    node.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 	}
     }
 
-    final String[] nonClosingTags = new String[]{
-	"!doctype",
-	"input",
-	"br",
-	"link",
-	"img",
-	"meta"
-    }; 
-
-    public LinkedList<Level> levels = new LinkedList<Level>();
-    private LinkedList<Run> runs = new LinkedList<Run>();
-    private String title;
+    private final LinkedList<String> errors = new LinkedList<String>();
+    private final LinkedList<Level> levels = new LinkedList<Level>();
+    private final LinkedList<Run> runs = new LinkedList<Run>();
+    private String title = "";
+    private boolean printErrors = true;
 
     public HtmlParse()
     {
@@ -59,6 +56,17 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
     {
 	switch (tagName)
 	{
+	case "html":
+	case "body":
+	case "head":
+	case "link":
+	case "meta":
+	case "script":
+	case "form":
+	case "input":
+	case "button":
+	case "noscript":
+	    return;
 	case "span":
 	case "sup":
 	case "a":
@@ -66,8 +74,15 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 	case "b":
 	case "i":
 	    return;
+	case "p":
+	case "div":
+	    savePara();
+	    return;
+	case "img":
+	    runs.add(new Run("[img]"));
+	    return;
 	case "br":
-	    runs.add(new Run(" "));
+	    savePara();
 	    return;
 	case "table":
 	    startLevel(Node.TABLE);
@@ -88,14 +103,15 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 	    startLevel(Node.LIST_ITEM);
 	    return;
 	default:
-	    commitPara();
-	    System.out.println("html:unhandled tag:" + tagName);
+	    savePara();
+	    error("unhandled tag:" + tagName);
 	}
     }
 
     @Override public void onMlTagClose(String tagName)
     {
-	switch(tagName)
+	final String adjusted = tagName.toLowerCase().trim();
+	switch(adjusted)
 	{
 	case "span":
 	case "a":
@@ -113,92 +129,76 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 	    commitLevel();
 	return;
 	default:
-	    commitPara();
+	    savePara();
 	    return;
 	}
     }
 
     @Override public void onMlText(String text, LinkedList<String> tagsStack)
     {
+	if (text == null)
+	    return;
 	if (tagsStack.contains("script") ||
-	    tagsStack.contains("style"))
+	    tagsStack.contains("style") ||
+	    tagsStack.contains("form"))
 	    return;
 	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("title"))
 	{
 	    title = text.trim();
 	    return;
 	}
-	if (text == null || text.isEmpty())
+	addText(text);
+    }
+
+    private void addText(String text)
+    {
+	final StringBuilder b = new StringBuilder();
+	for(int i = 0;i < text.length();++i)
+	{
+	    final char c = text.charAt(i);
+	    if (Character.isISOControl(c))
+		b.append(" "); else
+		b.append(c);
+	}
+	final String text2 = b.toString();
+	if (text2.trim().isEmpty())
+	{
+	    if (!text2.isEmpty() && !runs.isEmpty())
+		runs.add(new Run(" "));
 	    return;
-	String prepared = text.replaceAll("\n", " ");
-	if (runs.isEmpty())
-	{
-	    int firstNonSpace = 0;
-	    while (firstNonSpace < prepared.length() && Character.isSpace(prepared.charAt(firstNonSpace)))
-		++firstNonSpace;
-	    if (firstNonSpace >= prepared.length())
-		return;
-	    prepared = prepared.substring(firstNonSpace);
 	}
-	runs.add(new Run(text));
+	runs.add(new Run(text2.trim()));
     }
 
-    @Override public boolean mlTagMustBeClosed(String tag)
-    {
-	final String adjusted = tag.toLowerCase().trim();
-	for(String s: nonClosingTags)
-	    if (s.equals(adjusted))
-		return false;
-	return true;
-    }
-
-    @Override public boolean mlAdmissibleTag(String tagName)
-    {
-	for(int i = 0;i < tagName.length();++i)
-	{
-	    final char c = tagName.charAt(i);
-	    if (!Character.isLetter(c) && !Character.isDigit(c))
-		return false;
-	}
-	return true;
-    }
-
-    public NodeImpl constructRoot()
+    NodeImpl constructRoot()
     {
 	final Level firstLevel = levels.getFirst();
-	firstLevel.node.subnodes = firstLevel.subnodes.toArray(new NodeImpl[firstLevel.subnodes.size()]);
+	firstLevel.saveSubnodes();
 	return firstLevel.node;
     }
 
-    public String getTitle()
+    String getTitle()
     {
 	return title != null?title:"";
     }
 
     private void startLevel(int type)
     {
-	commitPara();
+	savePara();
 	final Level lastLevel = levels.getLast();
-	final NodeImpl node = constructNode(type);
+	final NodeImpl node = NodeFactory.create(type);
 	lastLevel.subnodes.add(node);
 	levels.add(new Level(node));
     }
 
     private void commitLevel()
     {
-	commitPara();
+	savePara();
 	final Level lastLevel = levels.pollLast();
-	lastLevel.node.subnodes = lastLevel.subnodes.toArray(new NodeImpl[lastLevel.subnodes.size()]);
+	lastLevel.saveSubnodes();
     }
 
-    private NodeImpl constructNode(int type)
-    {
-	if (type == Node.TABLE)
-	    return NodeFactory.create(Node.TABLE);
-	return NodeFactory.create(type);
-    }
-
-    private void commitPara()
+    private void savePara()
     {
 	if (runs.isEmpty())
 	    return;
@@ -206,14 +206,19 @@ class HtmlParse implements MlReaderListener, MlReaderConfig
 	para.runs = runs.toArray(new Run[runs.size()]);
 	runs.clear();
 	final int lastLevelType = levels.getLast().node.type;
-	if (lastLevelType == Node.TABLE ||
-	    lastLevelType == Node.TABLE_ROW ||
-	    lastLevelType == Node.ORDERED_LIST ||
-	    lastLevelType == Node.UNORDERED_LIST)
+	if (lastLevelType == Node.TABLE || lastLevelType == Node.TABLE_ROW ||
+	    lastLevelType == Node.ORDERED_LIST || lastLevelType == Node.UNORDERED_LIST)
 	{
-	    //	    System.out.println("reader:warning:ignoring to put a paragraph into a level with inappropriate type " + lastLevelType);
+	    error("unable to save a paragraph because last level type is " + lastLevelType);
 	    return;
 	}
 	levels.getLast().subnodes.add(para);
+    }
+
+    private void error(String msg)
+    {
+	errors.add(msg);
+	if (printErrors)
+	    System.out.println(msg);
     }
 }

@@ -37,7 +37,7 @@ public class Table extends NodeImpl
 	}
     }
 
-    TableCell getCell(int col, int row)
+    public TableCell getCell(int col, int row)
     {
 	if (row >= subnodes.length || col >= subnodes[row].subnodes.length)
 	    return null;

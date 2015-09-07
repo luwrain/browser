@@ -33,7 +33,7 @@ public class Document
     {
 	this.root = root;
 	NullCheck.notNull(root, "root");
-	title = null;
+	title = "";
 	buildView(80);
     }
 
@@ -41,10 +41,9 @@ public class Document
     {
 	this.root = root;
 	this.title = title;
-	if (root == null)
-	    throw new NullPointerException("root may not be null");
-	if (title == null)
-	    throw new NullPointerException("title may not be null");
+	NullCheck.notNull(root, "root");
+	NullCheck.notNull(title, "title");
+	buildView(80);
     }
 
     public void buildView(int width)

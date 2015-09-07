@@ -29,7 +29,7 @@ import java.nio.charset.CharsetEncoder;
 
 import org.luwrain.util.*;
 
-class HtmlEncoding implements MlReaderListener, MlReaderConfig
+public class HtmlEncoding implements MlReaderListener, MlReaderConfig
 {
     final String[] nonClosingTags = new String[]{
 	"!doctype",
@@ -81,7 +81,7 @@ class HtmlEncoding implements MlReaderListener, MlReaderConfig
 	return true;
     }
 
-    @Override public boolean mlAdmissibleTag(String tagName)
+    @Override public boolean mlAdmissibleTag(String tagName, LinkedList<String> tagsStack)
     {
 	for(int i = 0;i < tagName.length();++i)
 	{
