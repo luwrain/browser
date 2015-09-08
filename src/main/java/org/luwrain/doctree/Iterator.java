@@ -88,10 +88,7 @@ public class Iterator
 
     private Run getFirstRunOfCurrentRow()
     {
-	final int partIndex = rows[current].partsFrom;
-	if (partIndex < 0 || partIndex >= rowParts.length)
-	    throw new IllegalArgumentException("doctree:row " + current + " has negative partsFrom variable;, unable to find a corresponding run");//Maybe it is better to use some another exception type
-	return rowParts[partIndex].run;
+	return rows[current].getFirstPart(rowParts).run;
     }
 
     public int getCurrentParaIndex()

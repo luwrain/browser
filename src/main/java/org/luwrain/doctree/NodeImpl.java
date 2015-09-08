@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 public class NodeImpl implements Node
 {
-    private static final int MIN_TABLE_CELL_WIDTH = 8;
+    protected static final int MIN_TABLE_CELL_WIDTH = 8;
 
     public int type;
     public NodeImpl[] subnodes = new NodeImpl[0];
@@ -64,124 +64,73 @@ public class NodeImpl implements Node
     }
 
     //Launched before everything, RowPartsBuilder goes next
-    public void calcWidth(int recommended)
+    void calcWidth(int recommended)
     {
-	width = 0;
 	switch (type)
 	{
-	case Node.TABLE_CELL:
-	    if (subnodes == null || subnodes.length < 1)
-	    {
-		width = recommended >= MIN_TABLE_CELL_WIDTH?recommended:MIN_TABLE_CELL_WIDTH;
-		break;
-	    }
-	    for(NodeImpl n: subnodes)
-	    {
-		n.calcWidth(recommended >= MIN_TABLE_CELL_WIDTH?recommended:MIN_TABLE_CELL_WIDTH);
-		if (width < n.width)
-		    width = n.width;
-	    }
-	    break;
-	case Node.TABLE_ROW:
-	    for(NodeImpl n: subnodes)
-		n.calcWidth((recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1);
-	    for(NodeImpl n: subnodes)
-		width += n.width;
-	    width += (subnodes.length - 1);//One additional empty column after each cell;
-	    if (width < recommended)
-		width = recommended;
-	    break;
-	case Node.PARAGRAPH:
-	    width = recommended;
-	    break;
 	case Node.ROOT:
 	case Node.SECTION:
 	case Node.UNORDERED_LIST:
 	case Node.ORDERED_LIST:
-	case Node.LIST_ITEM:
-	case Node.TABLE:
-	    if (subnodes == null || subnodes.length < 1)
-	    {
-		width = recommended;
-		break;
-	    }
-	    for(NodeImpl n: subnodes)
-	    {
-		n.calcWidth(recommended);
-		if (width < n.width)
-		    width = n.width;
-	    }
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
+	}
+	width = recommended;
+	if (subnodes == null || subnodes.length < 1)
+	    return;
+	for(NodeImpl n: subnodes)
+	{
+	    n.calcWidth(recommended);
+	    if (width < n.width)
+		width = n.width;
 	}
     }
 
     //Launched after RowPartsBuilder;
-    public void calcHeight()
+    void calcHeight()
     {
-	for(NodeImpl n: subnodes)
-	    n.calcHeight();
-	height = 0;
 	switch (type)
 	{
-	case Node.TABLE_ROW:
-	    for(NodeImpl n: subnodes)
-		if (height < n.height)
-		    height = n.height;
-	    break;
 	case Node.ROOT:
 	case Node.SECTION:
-	case Node.TABLE:
-	case Node.TABLE_CELL:
 	case Node.UNORDERED_LIST:
 	case Node.ORDERED_LIST:
-	case Node.LIST_ITEM:
-	    for(NodeImpl n: subnodes)
-		height += n.height;
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
 	}
+	height = 0;
+	if (subnodes == null)
+	    return;
+	for(NodeImpl n: subnodes)
+	    n.calcHeight();
+	for(NodeImpl n: subnodes)
+	    height += n.height;
     }
 
     //Launched after calcHeight;
-    public void calcPosition()
+    void calcPosition()
     {
-	int offset = 0;
 	switch (type)
 	{
-	case Node.TABLE_ROW:
-	    offset = 0;
-	    for(NodeImpl n: subnodes)
-	    {
-		n.x = x + offset;
-		offset += (n.width + 1);
-		n.y = y;
-		n.calcPosition();
-	    }
-	    break;
-	case Node.PARAGRAPH:
-	    break;
 	case Node.ROOT:
 	    x = 0;
 	    y = 0;
 	case Node.SECTION:
-	case Node.TABLE:
-	case Node.TABLE_CELL:
 	case Node.UNORDERED_LIST:
 	case Node.ORDERED_LIST:
-	case Node.LIST_ITEM:
-	    for(NodeImpl n: subnodes)
-	    {
-		n.x = x;
-		n.y = y + offset;
-		offset += (n.height + (n.shouldHaveExtraLine()?1:0));
-		n.calcPosition();
-	    }
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
+	}
+	int offset = 0;
+	for(NodeImpl n: subnodes)
+	{
+	    n.x = x;
+	    n.y = y + offset;
+	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    n.calcPosition();
 	}
     }
 

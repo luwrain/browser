@@ -27,6 +27,8 @@ public class NodeFactory
 	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
 	case Node.TABLE:
 	    return new Table();
+	case Node.TABLE_ROW:
+	    return new TableRow();
 	case Node.TABLE_CELL:
 	    return new TableCell();
 	case Node.LIST_ITEM:

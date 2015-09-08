@@ -24,6 +24,42 @@ public class ListItem extends NodeImpl
 	super(Node.LIST_ITEM);
     }
 
+    @Override void calcWidth(int recommended)
+    {
+	width = recommended;
+	if (subnodes == null || subnodes.length < 1)
+	    return;
+	for(NodeImpl n: subnodes)
+	{
+	    n.calcWidth(recommended);
+	    if (width < n.width)
+		width = n.width;
+	}
+    }
+
+    @Override void calcHeight()
+    {
+	height = 0;
+	if (subnodes == null)
+	    return;
+	for(NodeImpl n: subnodes)
+	    n.calcHeight();
+	for(NodeImpl n: subnodes)
+	    height += n.height;
+    }
+
+    @Override void calcPosition()
+    {
+	int offset = 0;
+	for(NodeImpl n: subnodes)
+	{
+	    n.x = x;
+	    n.y = y + offset;
+	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    n.calcPosition();
+	}
+    }
+
     public int getListItemIndex()
     {
 	return getIndexInParentSubnodes();

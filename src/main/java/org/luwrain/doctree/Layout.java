@@ -17,25 +17,29 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.NullCheck;
+
 class Layout
 {
-    private Document document;
+    static private class Line
+    {
+	public int[] rows = new int[0];
+    }
 
+    private Document document;
     private NodeImpl root;
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private RowImpl[] rows;
-
     private Line[] lines = new Line[0];
 
-    public Layout(Document document)
+    Layout(Document document)
     {
 	this.document = document;
-	if (document == null)
-	    throw new NullPointerException("document may not be null");
+	NullCheck.notNull(document, "document");
     }
 
-    public void init()
+    void init()
     {
 	root = document.getRoot();
 	paragraphs = document.getParagraphs();
@@ -43,7 +47,7 @@ class Layout
 	rows = document.getRows();
     }
 
-    public void calc()
+    void calc()
     {
 	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
@@ -51,7 +55,7 @@ class Layout
 	    lines[i] = new Line();
 	for(int k = 0;k < rows.length;++k)
 	{
-	    if (rows[k].partsFrom < 0 || rows[k].partsTo < 0)
+	    if (!rows[k].hasAssociatedText())
 		continue;
 	    final Line line = lines[rows[k].y];
 	    //	    System.out.println("y=" + rows[k].y);
@@ -71,16 +75,16 @@ class Layout
 	for(RowImpl r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts;
-	    if (r.partsFrom < 0 || r.partsTo < 0 || r.partsFrom >= r.partsTo)
+	    if (!r.hasAssociatedText())
 	    {
 		r.x = lastX;
 		r.y = lastY + 1;
 		continue;
 	    }
-	    final Run run = rowParts[r.partsFrom].run;
+	    final Run run = r.getFirstPart(rowParts).run;
 	    final ParagraphImpl paragraph = run.parentParagraph;
 	    r.x = paragraph.x;
-	    r.y = paragraph.y + rowParts[r.partsFrom].relRowNum;
+	    r.y = paragraph.y + r.getFirstPart(rowParts).relRowNum;
 	    lastX = r.x;
 	    lastY = r.y;
 	    if (r.y > maxLineNum)
@@ -89,12 +93,12 @@ class Layout
 	return maxLineNum + 1;
     }
 
-    public int getLineCount()
+    int getLineCount()
     {
 	return lines != null?lines.length:0;
     }
 
-    public String getLine(int index)
+    String getLine(int index)
     {
 	final Line line = lines[index];
 	StringBuilder b = new StringBuilder();

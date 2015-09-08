@@ -25,8 +25,8 @@ public class RowImpl implements Row
     /** Absolute vertical position in the area*/
     public int y = 0;
 
-    public int partsFrom = -1;
-    public int partsTo = -1;
+    private int partsFrom = -1;
+    private int partsTo = -1;
 
     @Override public int getRowX()
     {
@@ -52,5 +52,37 @@ public class RowImpl implements Row
     public boolean hasAssociatedText()
     {
 	return partsFrom >= 0 && partsTo >= 0;
+    }
+
+    /*
+    int getFirstPartIndex()
+    {
+	return partsFrom;
+    }
+    */
+
+    RowPart getFirstPart(RowPart[] parts)
+    {
+	return parts[partsFrom];
+    }
+
+    void mustIncludePart(int index)
+    {
+	//We are registering only a first part;
+	if (partsFrom < 0)
+	    partsFrom = index;
+	if (partsTo < index + 1)
+	    partsTo = index + 1;
+    }
+
+    static RowImpl[] buildRows(RowPart[] parts)
+    {
+	final RowImpl[] rows = new RowImpl[parts[parts.length - 1].absRowNum + 1];
+	for(int i = 0;i < rows.length;++i)
+	    rows[i] = new RowImpl();
+	int current = -1;
+	for(int i = 0;i < parts.length;++i)
+	    rows[parts[i].absRowNum].mustIncludePart(i);
+	return rows;
     }
 }

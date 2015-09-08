@@ -75,6 +75,11 @@ public class ParagraphImpl extends NodeImpl
 	stat.numRuns += (runs != null?runs.length:0);
     }
 
+    @Override void calcWidth(int recommended)
+    {
+	width = recommended;
+    }
+
     @Override public void calcHeight()
     {
 	if (rowParts == null || rowParts.length < 1)
@@ -87,6 +92,10 @@ public class ParagraphImpl extends NodeImpl
 	    if (p.relRowNum > maxRelRowNum)
 		maxRelRowNum = p.relRowNum;
 	height = maxRelRowNum + 1;
+    }
+
+    @Override void calcPosition()
+    {
     }
 
     @Override public boolean shouldHaveExtraLine()

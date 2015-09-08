@@ -63,7 +63,7 @@ public class Document
 	root.calcHeight();
 	calcAbsRowNums();
 	root.calcPosition();
-	rows = RowsBuilder.buildRows(rowParts);
+	rows = RowImpl.buildRows(rowParts);
 	layout.init();
 	layout.calc();
     }

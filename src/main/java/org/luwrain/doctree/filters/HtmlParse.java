@@ -61,6 +61,7 @@ class HtmlParse implements MlReaderListener
 	case "head":
 	case "link":
 	case "meta":
+	case "style":
 	case "script":
 	case "form":
 	case "input":
@@ -70,6 +71,8 @@ class HtmlParse implements MlReaderListener
 	case "span":
 	case "sup":
 	case "a":
+	case "center":
+	case "u":
 	case "font":
 	case "b":
 	case "i":
@@ -91,6 +94,9 @@ class HtmlParse implements MlReaderListener
 	    startLevel(Node.TABLE_ROW);
 	    return;
 	case "th":
+	    startLevel(Node.TABLE_CELL);
+	    return;
+	case "td":
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "ul":
@@ -115,12 +121,15 @@ class HtmlParse implements MlReaderListener
 	{
 	case "span":
 	case "a":
+	case "center":
+	case "u":
 	case "sup":
 	case "font":
 	case "b":
 	case "i":
 	    return;
 	case "th":
+	case "td":
 	case 	    "tr":
 	case "table":
 	case "ol":

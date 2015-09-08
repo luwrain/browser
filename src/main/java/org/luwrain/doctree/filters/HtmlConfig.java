@@ -78,6 +78,7 @@ class HtmlConfig implements MlReaderConfig
 	"meta",
 	"meter",
 	"nav",
+	"nobr",
 	"noframes",
 	"noscript",
 	"object",

@@ -17,25 +17,24 @@
 
 package org.luwrain.doctree;
 
-public class TableCell extends NodeImpl
+class TableRow extends NodeImpl
 {
-    TableCell()
+    TableRow()
     {
-	super(Node.TABLE_CELL);
+	super(Node.TABLE_ROW);
     }
 
     @Override void calcWidth(int recommended)
     {
-	final int minWidth = recommended >= MIN_TABLE_CELL_WIDTH?recommended:MIN_TABLE_CELL_WIDTH;
-	width = minWidth;
-	if (subnodes == null || subnodes.length < 1)
-	    return;
+	final int cellWidth = (recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1;
+	width = 0;
 	for(NodeImpl n: subnodes)
-	{
-	    n.calcWidth(minWidth);
-	    if (width < n.width)
-		width = n.width;
-	}
+	    n.calcWidth(cellWidth);
+	for(NodeImpl n: subnodes)
+	    width += n.width;
+	width += (subnodes.length - 1);//One additional empty column after each cell
+	if (width < recommended)
+	    width = recommended;
     }
 
     @Override void calcHeight()
@@ -46,7 +45,8 @@ public class TableCell extends NodeImpl
 	for(NodeImpl n: subnodes)
 	    n.calcHeight();
 	for(NodeImpl n: subnodes)
-	    height += n.height;
+	    if (height < n.height)
+		height = n.height;
     }
 
     @Override void calcPosition()
@@ -54,30 +54,10 @@ public class TableCell extends NodeImpl
 	int offset = 0;
 	for(NodeImpl n: subnodes)
 	{
-	    n.x = x;
-	    n.y = y + offset;
-	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    n.x = x + offset;
+	    offset += (n.width + 1);
+	    n.y = y;
 	    n.calcPosition();
 	}
-    }
-
-    public Table getTable()
-    {
-	if (parentNode == null || parentNode.parentNode == null)
-	    return null;
-	final NodeImpl tableNode = parentNode.parentNode;
-	if (tableNode == null || !(tableNode instanceof Table))
-	    return null;
-	return (Table)tableNode;
-    }
-
-    public int getColIndex()
-    {
-	return getIndexInParentSubnodes();
-    }
-
-    public int getRowIndex()
-    {
-	return parentNode.getIndexInParentSubnodes();
     }
 }
