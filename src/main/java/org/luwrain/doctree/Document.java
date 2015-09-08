@@ -137,7 +137,8 @@ public class Document
 	    p.topRowIndex = currentParaTop;
 	    for(RowPart r: p.rowParts)
 		r.absRowNum = r.relRowNum + currentParaTop;
-	    currentParaTop += (p.height + (p.shouldHaveExtraLine()?1:0));
+	    //currentParaTop += (p.height + (p.shouldHaveExtraLine()?1:0));
+currentParaTop += p.height;
 	}
     }
 }

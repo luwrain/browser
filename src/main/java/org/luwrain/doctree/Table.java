@@ -68,12 +68,12 @@ public class Table extends NodeImpl
 	{
 	    n.x = x;
 	    n.y = y + offset;
-	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    offset += n.height;
 	    n.calcPosition();
 	}
     }
 
-    TableCell getCell(int col, int row)
+    public TableCell getCell(int col, int row)
     {
 	if (row >= subnodes.length || col >= subnodes[row].subnodes.length)
 	    return null;

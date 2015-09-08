@@ -55,7 +55,7 @@ public class ListItem extends NodeImpl
 	{
 	    n.x = x;
 	    n.y = y + offset;
-	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    offset += n.height;
 	    n.calcPosition();
 	}
     }

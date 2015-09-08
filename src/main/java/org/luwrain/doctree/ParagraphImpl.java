@@ -30,7 +30,7 @@ public class ParagraphImpl extends NodeImpl
 	super(Node.PARAGRAPH);
     }
 
-    @Override public void commit()
+    @Override void commit()
     {
 	subnodes = null;
 	if (runs == null)
@@ -39,7 +39,7 @@ public class ParagraphImpl extends NodeImpl
 	    r.parentParagraph = this;
     }
 
-    @Override public void setEmptyMark()
+    @Override void setEmptyMark()
     {
 	empty = true;
 	if (runs == null || runs.length < 1)
@@ -49,7 +49,7 @@ public class ParagraphImpl extends NodeImpl
 		empty = false;
     }
 
-    @Override public void removeEmpty()
+    @Override void removeEmpty()
     {
 	if (runs == null)
 	    return;
@@ -68,7 +68,7 @@ public class ParagraphImpl extends NodeImpl
 	}
     }
 
-    @Override public void saveStatistics(Statistics stat)
+    @Override void saveStatistics(Statistics stat)
     {
 	++stat.numNodes;
 	++stat.numParagraphs;
@@ -98,7 +98,8 @@ public class ParagraphImpl extends NodeImpl
     {
     }
 
-    @Override public boolean shouldHaveExtraLine()
+/*
+    @Override boolean shouldHaveExtraLine()
     {
 	if (getParentType() == Node.ROOT)
 	    return true;
@@ -109,20 +110,24 @@ public class ParagraphImpl extends NodeImpl
 	    (isInTableCell() || isInListItem()))
 	    return;
 	++height;
-	*/
     }
+*/
 
+/*
     public boolean isInListItem()
     {
 	return parentNode != null && parentNode.type == Node.LIST_ITEM;
     }
+*/
 
+/*
     public boolean isInTableCell()
     {
 	return parentNode != null && parentNode.type == Node.TABLE_CELL;
     }
+*/
 
-    public int getParaIndex()
+    int getParaIndex()
     {
 	return getIndexInParentSubnodes();
     }

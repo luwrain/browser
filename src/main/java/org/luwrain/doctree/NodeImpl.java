@@ -129,7 +129,7 @@ public class NodeImpl implements Node
 	{
 	    n.x = x;
 	    n.y = y + offset;
-	    offset += (n.height + (n.shouldHaveExtraLine()?1:0));
+	    offset += n.height;
 	    n.calcPosition();
 	}
     }
@@ -147,7 +147,7 @@ public class NodeImpl implements Node
 	}
     }
 
-    public void setEmptyMark()
+    void setEmptyMark()
     {
 	empty = true;
 	if (subnodes == null || subnodes.length < 1)
@@ -160,7 +160,7 @@ public class NodeImpl implements Node
 	}
     }
 
-    public void removeEmpty()
+    void removeEmpty()
     {
 	if (subnodes == null)
 	    return;
@@ -195,7 +195,7 @@ public class NodeImpl implements Node
 	return s;
     }
 
-    public void saveStatistics(Statistics stat)
+    void saveStatistics(Statistics stat)
     {
 	++stat.numNodes;
 	if (subnodes != null)
@@ -204,20 +204,19 @@ public class NodeImpl implements Node
     }
 
     /** @return -1 if there is no a parent node or there is a consistency error*/
-    public int getParentType()
+    int getParentType()
     {
 	return parentNode != null && parentNode.subnodes != null?parentNode.type:-1;
     }
 
-
     /** @return -1 if there is no a parent node or there is a consistency error*/
-    public int getParentSubnodeCount()
+    int getParentSubnodeCount()
     {
 	return parentNode != null && parentNode.subnodes != null?parentNode.subnodes.length:-1;
     }
 
     /** @return -1 if it is impossible to understand;*/
-    public int getIndexInParentSubnodes()
+    int getIndexInParentSubnodes()
     {
 	if (parentNode == null || parentNode.subnodes == null)
 	    return -1;
@@ -227,10 +226,11 @@ public class NodeImpl implements Node
 	return -1;
     }
 
+    /*
     public boolean shouldHaveExtraLine()
     {
 	//Meaningful only for paragraphs;
 	return false;
     }
-
+    */
 }

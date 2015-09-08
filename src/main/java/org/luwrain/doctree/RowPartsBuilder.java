@@ -18,23 +18,26 @@
 package org.luwrain.doctree;
 
 import java.util.*;
+import org.luwrain.core.NullCheck;
 
 class RowPartsBuilder
 {
-    private int index = 0;
-    private int offset = 0;
-    private LinkedList<RowPart> parts = new LinkedList<RowPart>();
-    private LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
+    private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
+    private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
     private final LinkedList<ParagraphImpl> paragraphs = new LinkedList<ParagraphImpl>();
 
-    public void onNode(NodeImpl node)
+    /** The index of the next row to be added to the current paragraph*/
+    private int index = 0;
+
+    /** Number of characters in current incomplete row*/
+    private int offset = 0;
+
+    void onNode(NodeImpl node)
     {
-	if (node.type == Node.PARAGRAPH)
+	if (node.type == Node.PARAGRAPH && (node instanceof ParagraphImpl))
 	{
 	    offset = 0;
 	    index = 0;
-	    if (!(node instanceof ParagraphImpl))
-		throw new IllegalArgumentException("node should be an instance of Paragraph");
 	    final ParagraphImpl para = (ParagraphImpl)node;
 	    currentParaParts.clear();
 	    if (para.runs != null)
@@ -55,11 +58,10 @@ class RowPartsBuilder
     }
 
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars;
-    public void onRun(Run run, int maxRowLen)
+    private void onRun(Run run, int maxRowLen)
     {
 	final String text = run.text;
-	if (text == null)
-	    throw new NullPointerException("text may not be null");
+	NullCheck.notNull(text, "text");
 	if (text.isEmpty())
 	    return;
 	int posFrom = 0;
@@ -77,7 +79,7 @@ class RowPartsBuilder
 	    if (remains <= available)
 	    {
 		//We have a chunk for the last row for this run;
-		save(makeRunPart(run, posFrom, text.length()));
+		currentParaParts.add(makeRunPart(run, posFrom, text.length()));
 		offset = remains;
 		posFrom = text.length();
 		continue;
@@ -103,7 +105,7 @@ class RowPartsBuilder
 		}
 		posTo = posFrom + available;
 	    }
-	    save(makeRunPart(run, posFrom, posTo));
+	    currentParaParts.add(makeRunPart(run, posFrom, posTo));
 	    ++index;
 	    offset = 0;
 	    posFrom = posTo;
@@ -117,10 +119,9 @@ class RowPartsBuilder
     }
 
     private RowPart makeRunPart(Run run,
-				 int posFrom,
-				 int posTo)
+				int posFrom, int posTo)
     {
-	RowPart part = new RowPart();
+	final RowPart part = new RowPart();
 	part.run = run;
 	part.relRowNum = index;
 	part.posFrom = posFrom;
@@ -128,24 +129,13 @@ class RowPartsBuilder
 	return part;
     }
 
-    private void save(RowPart part)
+    RowPart[] parts()
     {
-	if (part == null)
-	    throw new NullPointerException("part may not be null");
-	currentParaParts.add(part);
-    }
-
-    public RowPart[] parts()
-    {
-	if (parts == null || parts.isEmpty())
-	    return new RowPart[0];
 	return parts.toArray(new RowPart[parts.size()]);
     }
 
-    public ParagraphImpl[] paragraphs()
+    ParagraphImpl[] paragraphs()
     {
-	if (paragraphs == null || paragraphs.size() < 1)
-	    return new ParagraphImpl[0];
 	return paragraphs.toArray(new ParagraphImpl[paragraphs.size()]);
     }
 }
