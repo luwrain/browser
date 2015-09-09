@@ -25,6 +25,8 @@ public class NodeFactory
 	{
 	case Node.PARAGRAPH:
 	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
+	case Node.SECTION:
+	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
 	case Node.TABLE:
 	    return new Table();
 	case Node.TABLE_ROW:
@@ -36,6 +38,11 @@ public class NodeFactory
 	default:
 	return new NodeImpl(type);
 	}
+    }
+
+    static public NodeImpl createSection(int level)
+    {
+	return new Section(level);
     }
 
     static public ParagraphImpl createPara()

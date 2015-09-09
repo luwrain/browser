@@ -81,6 +81,11 @@ public class Iterator
 	return !rows[current].hasAssociatedText();
     }
 
+    public ParagraphImpl getCurrentParagraph()//FIXME:Should be simply Paragraph, not "Impl"
+    {
+	return getCurrentParagraphImpl();
+    }
+
     private ParagraphImpl getCurrentParagraphImpl()
     {
 	return getFirstRunOfCurrentRow().parentParagraph;
@@ -142,6 +147,22 @@ public class Iterator
 	if (container == null || !(container instanceof ListItem))
 	    return null;
 	return (ListItem)container;
+    }
+
+    public boolean isCurrentParaContainerSection()
+    {
+	if (isCurrentRowEmpty())
+	    return false;
+	final NodeImpl container = getCurrentParaContainer();
+	return container.type == Node.SECTION && (container instanceof Section);
+    }
+
+    public Section getSection()
+    {
+	final NodeImpl container = getCurrentParaContainer();
+	if (container == null || !(container instanceof Section))
+	    return null;
+	return (Section)container;
     }
 
     public boolean hasContainerInParents(Node container)

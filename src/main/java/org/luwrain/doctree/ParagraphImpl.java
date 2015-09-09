@@ -30,6 +30,11 @@ public class ParagraphImpl extends NodeImpl
 	super(Node.PARAGRAPH);
     }
 
+    public boolean hasSingleLineOnly()
+    {
+	return height == 1;
+    }
+
     @Override void commit()
     {
 	subnodes = null;
@@ -97,35 +102,6 @@ public class ParagraphImpl extends NodeImpl
     @Override void calcPosition()
     {
     }
-
-/*
-    @Override boolean shouldHaveExtraLine()
-    {
-	if (getParentType() == Node.ROOT)
-	    return true;
-	return false;
-	/*
-	final int parentSubnodeCount = getParentSubnodeCount();
-	if (parentSubnodeCount == 1 &&
-	    (isInTableCell() || isInListItem()))
-	    return;
-	++height;
-    }
-*/
-
-/*
-    public boolean isInListItem()
-    {
-	return parentNode != null && parentNode.type == Node.LIST_ITEM;
-    }
-*/
-
-/*
-    public boolean isInTableCell()
-    {
-	return parentNode != null && parentNode.type == Node.TABLE_CELL;
-    }
-*/
 
     int getParaIndex()
     {

@@ -59,34 +59,76 @@ class HtmlParse implements MlReaderListener
 	case "html":
 	case "body":
 	case "head":
+	case "title":
 	case "link":
 	case "meta":
 	case "style":
 	case "script":
+	case "noscript":
+
 	case "form":
 	case "input":
 	case "button":
-	case "noscript":
+	case "label":
+
 	    return;
+
 	case "span":
 	case "sup":
 	case "a":
 	case "center":
+	case "big":
+	case "small":
+	case "strong":
 	case "u":
 	case "font":
 	case "b":
 	case "i":
 	    return;
+
 	case "p":
+	case "blockquote":
+	case "cite":
 	case "div":
 	    savePara();
 	    return;
+
 	case "img":
 	    runs.add(new Run("[img]"));
 	    return;
+
 	case "br":
 	    savePara();
 	    return;
+
+	case "h1":
+	    startSection(1);
+	    return;
+	case "h2":
+	    startSection(2);
+	    return;
+	case "h3":
+	    startSection(3);
+	    return;
+	case "h4":
+	    startSection(4);
+	    return;
+	case "h5":
+	    startSection(5);
+	    return;
+	case "h6":
+	    startSection(6);
+	    return;
+	case "h7":
+	    startSection(7);
+	    return;
+	case "h8":
+	    startSection(8);
+	    return;
+	case "h9":
+	    startSection(9);
+	    return;
+
 	case "table":
 	    startLevel(Node.TABLE);
 	    return;
@@ -119,15 +161,48 @@ class HtmlParse implements MlReaderListener
 	final String adjusted = tagName.toLowerCase().trim();
 	switch(adjusted)
 	{
+	    case "title":
+	case "style":
+	case "script":
+	case "noscript":
+	case "head":
+	case "body":
+	case "html":
+
+	case "form":
+	case "input":
+	case "button":
+	case "label":
+
 	case "span":
 	case "a":
 	case "center":
+	case "big":
+	case "small":
+	case "strong":
 	case "u":
 	case "sup":
 	case "font":
 	case "b":
 	case "i":
 	    return;
+
+	case "p":
+	case "blockquote":
+	case "cite":
+	case "div":
+	    savePara();
+return;
+
+	case "h1":
+	case "h2":
+	case "h3":
+	case "h4":
+	case "h5":
+	case "h6":
+	case "h7":
+	case "h8":
+	case "h9":
 	case "th":
 	case "td":
 	case 	    "tr":
@@ -137,8 +212,9 @@ class HtmlParse implements MlReaderListener
 	case "li":
 	    commitLevel();
 	return;
+
 	default:
-	    savePara();
+	    System.out.println("Unhandled closing tag: " + adjusted);
 	    return;
 	}
     }
@@ -196,6 +272,15 @@ class HtmlParse implements MlReaderListener
 	savePara();
 	final Level lastLevel = levels.getLast();
 	final NodeImpl node = NodeFactory.create(type);
+	lastLevel.subnodes.add(node);
+	levels.add(new Level(node));
+    }
+
+    private void startSection(int level)
+    {
+	savePara();
+	final Level lastLevel = levels.getLast();
+	final NodeImpl node = NodeFactory.createSection(level);
 	lastLevel.subnodes.add(node);
 	levels.add(new Level(node));
     }

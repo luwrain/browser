@@ -21,7 +21,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.util.*;
 
-class DocTreeArea implements Area
+public class DocTreeArea implements Area
 {
     private ControlEnvironment environment;
     private final Region region = new Region(new LinesRegionProvider(this));
@@ -381,11 +381,16 @@ class DocTreeArea implements Area
 	environment.onAreaNewHotPoint(this);
     }
 
+    protected void noContentMessage()
+    {
+	    environment.hint(Hints.NO_CONTENT);
+    }
+
     private boolean noContentCheck()
     {
 	if (document == null)
 	{
-	    environment.hint(Hints.NO_CONTENT);
+	    noContentMessage();
 	    return true;
 	}
 	return false;
