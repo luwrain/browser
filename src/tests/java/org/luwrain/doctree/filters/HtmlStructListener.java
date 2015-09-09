@@ -32,6 +32,37 @@ class HtmlStructListener implements MlReaderListener
 	System.out.println("* CLOSE " + tagName);
     }
 
+    @Override public boolean isMlAutoClosingNeededOnTagOpen(String newTagName, LinkedList<String> tagsStack)
+    {
+	if (tagsStack.isEmpty())//Actually, never happens
+	    return false;
+	final String adjusted1 = newTagName.toLowerCase().trim();
+	final String adjusted2 = tagsStack.getLast().toLowerCase().trim();
+	if (adjusted1.equals("p") && adjusted2.equals("p"))
+	    return true;
+	if (adjusted1.equals("li") && adjusted2.equals("li"))
+	    return true;
+	return false;
+    }
+
+    @Override public boolean mayMlAnticipatoryTagClose(String tagName,
+						   LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
+    {
+	System.out.println("anticipatory: " + tagName + ", " + anticipatoryTags);
+	if (anticipatoryTags.size() != 1)
+	    return false;
+	final String adjusted1 = tagName.toLowerCase().trim();
+	final String adjusted2 = anticipatoryTags.getLast().toLowerCase().trim();
+	//	System.out.println("anticipatory: " + adjusted1 + ", " + adjusted2);
+	if (adjusted2.equals("p"))
+	    return true;
+	if (adjusted1.equals("ul") && adjusted2.equals("li"))
+	    return true;
+	if (adjusted1.equals("ol") && adjusted2.equals("li"))
+	    return true;
+	return false;
+    }
+
     @Override public void onMlText(String text, LinkedList<String> tagsStack)
     {
 	final String trimmed = text.trim();

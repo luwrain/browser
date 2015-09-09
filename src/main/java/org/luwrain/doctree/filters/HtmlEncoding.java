@@ -64,6 +64,30 @@ public class HtmlEncoding implements MlReaderListener, MlReaderConfig
 	}
     }
 
+    @Override public boolean isMlAutoClosingNeededOnTagOpen(String newTagName, LinkedList<String> tagsStack)
+    {
+	if (tagsStack.isEmpty())//Actually, never happens
+	    return false;
+	final String adjusted1 = newTagName.toLowerCase().trim();
+	final String adjusted2 = tagsStack.getLast().toLowerCase().trim();
+	if (adjusted1.equals("p"))
+	    return adjusted2.equals("p");
+	return false;
+    }
+
+@Override public boolean mayMlAnticipatoryTagClose(String tagName,
+LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
+    {
+	if (anticipatoryTags.size() != 1)
+	    return false;
+	final String adjusted = anticipatoryTags.getLast().toLowerCase().trim();
+	if (adjusted.equals("p"))
+	    return true;
+	return false;
+    }
+
+    
+
     @Override public void onMlTagClose(String tagName)
     {
     }

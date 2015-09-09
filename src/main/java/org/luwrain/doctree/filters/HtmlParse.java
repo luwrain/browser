@@ -54,6 +54,7 @@ class HtmlParse implements MlReaderListener
 
     @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
     {
+	//	System.out.println("+" + tagName);
 	switch (tagName)
 	{
 	case "html":
@@ -71,8 +72,6 @@ class HtmlParse implements MlReaderListener
 	case "button":
 	case "label":
 
-	    return;
-
 	case "span":
 	case "sup":
 	case "a":
@@ -84,12 +83,21 @@ class HtmlParse implements MlReaderListener
 	case "font":
 	case "b":
 	case "i":
+	case "em":
+	case "code":
+	case "tt":
+
+	case "dt":
+	case "dd":
 	    return;
 
 	case "p":
 	case "blockquote":
 	case "cite":
 	case "div":
+	case "dl":
+	case "pre":
+	case "hr":
 	    savePara();
 	    return;
 
@@ -132,13 +140,21 @@ class HtmlParse implements MlReaderListener
 	case "table":
 	    startLevel(Node.TABLE);
 	    return;
+	case "caption":
+	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
+	    startLevel(Node.TABLE_ROW);
+	    startLevel(Node.TABLE_CELL);
+	    return;
 	case "tr":
+	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
 	    startLevel(Node.TABLE_ROW);
 	    return;
 	case "th":
+	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "td":
+	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "ul":
@@ -158,6 +174,7 @@ class HtmlParse implements MlReaderListener
 
     @Override public void onMlTagClose(String tagName)
     {
+	//	System.out.println("-" + tagName);
 	final String adjusted = tagName.toLowerCase().trim();
 	switch(adjusted)
 	{
@@ -185,14 +202,22 @@ class HtmlParse implements MlReaderListener
 	case "font":
 	case "b":
 	case "i":
+	case "em":
+	case "code":
+	case "tt":
+
+	case "dt":
+	case "dd":
 	    return;
 
 	case "p":
 	case "blockquote":
 	case "cite":
 	case "div":
+	case "pre":
+	case "dl":
 	    savePara();
-return;
+	return;
 
 	case "h1":
 	case "h2":
@@ -203,6 +228,16 @@ return;
 	case "h7":
 	case "h8":
 	case "h9":
+	    commitLevel();
+	return;
+
+	case "caption":
+	    commitLevel();
+	    commitLevel();
+	return;
+
+
+
 	case "th":
 	case "td":
 	case 	    "tr":
@@ -219,14 +254,79 @@ return;
 	}
     }
 
+    @Override public boolean isMlAutoClosingNeededOnTagOpen(String newTagName, LinkedList<String> tagsStack)
+    {
+	if (tagsStack.isEmpty())//Actually, never happens
+	    return false;
+	final String adjusted1 = newTagName.toLowerCase().trim();
+	final String adjusted2 = tagsStack.getLast().toLowerCase().trim();
+	if (adjusted1.equals("p") && adjusted2.equals("p"))
+	    return true;
+	if (adjusted1.equals("li") && adjusted2.equals("li"))
+	    return true;
+	return false;
+    }
+
+    @Override public boolean mayMlAnticipatoryTagClose(String tagName,
+						   LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
+    {
+	if (anticipatoryTags.size() != 1)
+	    return false;
+	final String adjusted1 = tagName.toLowerCase().trim();
+	final String adjusted2 = anticipatoryTags.getLast().toLowerCase().trim();
+	//	System.out.println("anticipatory: " + adjusted1 + ", " + adjusted2);
+	if (adjusted2.equals("p"))
+	    return true;
+	if (adjusted1.equals("ul") && adjusted2.equals("li"))
+	    return true;
+	if (adjusted1.equals("ol") && adjusted2.equals("li"))
+	    return true;
+	return false;
+    }
+
     @Override public void onMlText(String text, LinkedList<String> tagsStack)
     {
 	if (text == null)
 	    return;
+
+	    if (text.indexOf("</li>")>= 0)
+	    {
+		System.out.println("found:" + text);
+		for(String s: tagsStack)
+		    System.out.println("*" + s);
+	    }
+	    
+
+
 	if (tagsStack.contains("script") ||
 	    tagsStack.contains("style") ||
 	    tagsStack.contains("form"))
 	    return;
+
+	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("table"))
+	{
+	    if (!text.trim().isEmpty())
+	    System.out.println("Direct text inside of <table>:" + text);
+	    return;
+	}
+
+	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ul"))
+	{
+	    if (!text.trim().isEmpty())
+	    System.out.println("Direct text inside of <ul>:" + text);
+	    return;
+	}
+
+	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ol"))
+	{
+	    if (!text.trim().isEmpty())
+	    System.out.println("Direct text inside of <ol>:" + text);
+	    return;
+	}
+
+
+
+
 	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("title"))
 	{
 	    title = text.trim();
@@ -238,25 +338,26 @@ return;
     private void addText(String text)
     {
 	final StringBuilder b = new StringBuilder();
+	boolean lastSpace = runs.isEmpty();
 	for(int i = 0;i < text.length();++i)
 	{
 	    final char c = text.charAt(i);
-	    if (Character.isISOControl(c))
-		b.append(" "); else
-		b.append(c);
+	    final char r = Character.isISOControl(c)?' ':c;
+	    if (lastSpace && Character.isSpace(r))
+		continue;
+	    b.append(r);
+	    lastSpace = Character.isSpace(r);
 	}
 	final String text2 = b.toString();
-	if (text2.trim().isEmpty())
-	{
-	    if (!text2.isEmpty() && !runs.isEmpty())
-		runs.add(new Run(" "));
+	if (text2.isEmpty())
 	    return;
-	}
-	runs.add(new Run(text2.trim()));
+	runs.add(new Run(text2));
     }
 
     NodeImpl constructRoot()
     {
+	if (levels.size() > 1)
+	error("Expecting that levels has only one item on constructRoot, but there are " + levels.size());
 	final Level firstLevel = levels.getFirst();
 	firstLevel.saveSubnodes();
 	return firstLevel.node;
@@ -265,6 +366,28 @@ return;
     String getTitle()
     {
 	return title != null?title:"";
+    }
+
+    private int lastLevelType()
+    {
+	if (levels.isEmpty())
+	    return -1;
+	return levels.getLast().node.type;
+    }
+
+    private void expectingCurrentLevel(int levelType, int expectingFor)
+    {
+	if (levels.isEmpty())
+	{
+	    error("Expecting current level to be of type " + levelType + ", but there are no levels at all");
+	    return;
+	}
+	final Level lastLevel = levels.getLast();
+	if (lastLevel.node.type != levelType)
+	{
+	    error("Expecting last level to be of type " + levelType + " (trying to open " + expectingFor + "), but it is of type " + lastLevel.node.type);
+	    return;
+	}
     }
 
     private void startLevel(int type)
@@ -303,7 +426,7 @@ return;
 	if (lastLevelType == Node.TABLE || lastLevelType == Node.TABLE_ROW ||
 	    lastLevelType == Node.ORDERED_LIST || lastLevelType == Node.UNORDERED_LIST)
 	{
-	    error("unable to save a paragraph because last level type is " + lastLevelType);
+	    error("unable to save a paragraph because last level type is " + lastLevelType + ", lost text:" + para.toString());
 	    return;
 	}
 	levels.getLast().subnodes.add(para);

@@ -112,13 +112,9 @@ public class ParagraphImpl extends NodeImpl
     {
 	if (runs == null)
 	    return "";
-	String s = "";
+	final StringBuilder sb = new StringBuilder();
 	for(Run r: runs)
-	{
-	    if (!s.isEmpty())
-		s += " ";
-	    s += r.toString();
-	}
-	return s;
+	    sb.append(r.toString());
+	return sb.toString();
     }
 }

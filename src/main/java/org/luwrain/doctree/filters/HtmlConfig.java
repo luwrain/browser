@@ -6,7 +6,7 @@ import org.luwrain.util.*;
 
 class HtmlConfig implements MlReaderConfig
 {
-    private final String[] validTags = new String[]{
+    static private final String[] validTags = new String[]{
 	"a",
 	"abbr",
 	"acronym",
@@ -133,10 +133,11 @@ class HtmlConfig implements MlReaderConfig
 	"video",
 	"wbr"};
 
-    final String[] nonClosingTags = new String[]{
+    static private final String[] nonClosingTags = new String[]{
 	"!doctype",
 	"input",
 	"br",
+	"hr",
 	"link",
 	"img",
 	"meta"
