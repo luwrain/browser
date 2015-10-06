@@ -2,10 +2,8 @@
 package org.luwrain.util;
 
 import org.junit.*;
-
-//import org.luwrain.util.MlTagStrip;
-
-public class TagsStripTest extends Assert
+@Ignore
+public class MlTagsStripTest extends Assert
 {
     @Test public void simple()
     {
@@ -18,10 +16,10 @@ public class TagsStripTest extends Assert
 	assertTrue(MlTagStrip.run("123<image src=\"abc\"/>456").equals("123456"));
     }
 
-
     @Test public void cdata()
     {
 	assertTrue(MlTagStrip.run("abc<![cdata[123]]>abc").equals("abc123abc"));
+	assertTrue(MlTagStrip.run("abc<![cdata[ <![cdata[ 123]]>").equals("abc <![cdata[ 123"));
 	assertTrue(MlTagStrip.run("abc<![cdata[<p>]]>abc").equals("abc<p>abc"));
 	assertTrue(MlTagStrip.run("abc<![cdata[ <p> ]]>abc").equals("abc <p> abc"));
 	assertTrue(MlTagStrip.run("abc<![cDaTa[ <p> ]]>abc").equals("abc <p> abc"));

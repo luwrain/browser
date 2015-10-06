@@ -18,7 +18,7 @@ package org.luwrain.util;
 
 import java.util.*;
 
-public class MlTagStrip
+class TestingMlReader
 {
     static private final String[] nonClosingTags = new String[]{
 	"!doctype",
@@ -32,15 +32,7 @@ public class MlTagStrip
 
     static private class Strip implements MlReaderConfig, MlReaderListener
     {
-	private final StringBuilder builder = new StringBuilder();
-	private int currentLineLen = 0;
-	private int maxLineLen = 60;
-	private boolean  tagJustOpened = true;//FIXME:Spaces around words not always needed;
-
-	Strip(int maxLineLen)
-	{
-	    this.maxLineLen = maxLineLen;
-	}
+	final StringBuilder builder = new StringBuilder();
 
 	@Override public boolean mlTagMustBeClosed(String tag)
 	{
@@ -53,7 +45,7 @@ public class MlTagStrip
 
 	@Override public boolean mlAdmissibleTag(String tagName, LinkedList<String> tagsStack)
 	{
-	    //May not open a tag inside of a script;
+	    //May not open a tag inside of a script
 	    if (!tagsStack.isEmpty() &&tagsStack.getLast().toLowerCase().trim().equals("script"))
 		return false;
 	    final String adjusted = tagName.toLowerCase().trim();
@@ -69,42 +61,15 @@ public class MlTagStrip
 
 	@Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
 	{
-	    final String adjusted = tagName.toLowerCase().trim();
-	    switch(adjusted)
-	    {
-	    case "P":
-		newPara();
-		break;
-	    case "br":
-		newPara();
-		break;
-	    }
-	    tagJustOpened = true;
 	}
 
 	@Override public void onMlText(String text, LinkedList<String> tagsStack)
 	{
-	    final String adjusted = text.trim();
-	    if (adjusted.isEmpty())
-		return;
-	    int pos = 0;
-	    while (pos < adjusted.length())
-	    {
-		int i = pos + 1;
-		while (i < adjusted.length() && !Character.isSpace(adjusted.charAt(i)))
-		    ++i;
-		final String s = adjusted.substring(pos, i).trim();
-		if (!s.isEmpty())
-		    newWord(s);
-		pos = i;
-	    }
+	    builder.append(text);
 	}
 
 	@Override public void onMlTagClose(String tagName)
 	{
-	    final String adjusted = tagName.toLowerCase().trim();
-	    if (adjusted.equals("p"))
-		newPara();
 	}
 
 	@Override public boolean isMlAutoClosingNeededOnTagOpen(String newTagName, LinkedList<String> tagsStack)
@@ -118,42 +83,21 @@ public class MlTagStrip
 	    return false;
 	}
 
-	private void newWord(String word)
-	{
-	    if (currentLineLen + word.length() + 1 > maxLineLen)
-	    {
-		builder.append("\n");
-		currentLineLen = 0;
-	    }
-	    if (currentLineLen > 0)
-	    {
-		builder.append(" ");
-		++currentLineLen;
-	    }
-	    builder.append(word);
-	    currentLineLen += word.length();
-	}
-
-	private void newPara()
-	{
-	    if (currentLineLen < 1)
-		return;
-	    builder.append("\n\n");
-	    currentLineLen = 0;
-	}
-
 	@Override public String toString()
 	{
 	    return builder.toString();
 	}
     }
 
-    static public String run(String text)
+    final Strip s = new Strip();
+
+    void run(String text)
     {
-	if (text == null || text.trim().isEmpty())
-	    return "";
-	final Strip s = new Strip(60);
 	new MlReader(s, s, text).read();
+    }
+
+    String result()
+    {
 	return s.toString();
     }
 }

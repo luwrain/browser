@@ -17,30 +17,34 @@
 package org.luwrain.util;
 
 import java.util.*;
+import java.io.*;
+import java.net.URL;
+
+import org.luwrain.core.NullCheck;
 
 public class MlReader
 {
+    static private final int MAX_ENTITY_LEN = 10;
+    static private final String ENTITIES_RESOURCE = "org/luwrain/util/ml-entities.properties";
+
     private MlReaderConfig config;
     private MlReaderListener listener;
+    private Properties entities = null;
 
     private String text = "";
     private int pos;
 
     private final LinkedList<String> openedTagStack = new LinkedList<String>();
 
-    public MlReader(MlReaderConfig config,
-		   MlReaderListener listener,
-		   String text)
+    public MlReader(MlReaderConfig config, MlReaderListener listener,
+		    String text)
     {
 	this.config = config;
 	this.listener = listener;
 	this.text = text;
-	if (config == null)
-	    throw new NullPointerException("config may not be null");
-	if (listener == null)
-	    throw new NullPointerException("listener may not be null");
-	if (text == null)
-	    throw new NullPointerException("text may not be null");
+	NullCheck.notNull(config, "config");
+	NullCheck.notNull(listener, "listener");
+	NullCheck.notNull(text, "text");
     }
 
     public void read()
@@ -48,10 +52,8 @@ public class MlReader
 	pos = 0;
 	while (pos < text.length())
 	{
-	    //	    System.out.println("+step");
-
 	    final char c = text.charAt(pos);
-	    int newPos = checkAtPos(pos, "<![cdata[");
+	    int newPos = expecting(pos, "<![cdata[");
 	    if (newPos > pos)
 	    {
 		pos = newPos;
@@ -59,7 +61,7 @@ public class MlReader
 		continue;
 	    }
 
-	    newPos = checkAtPos(pos, "<!doctype");
+	    newPos = expecting(pos, "<!doctype");
 	    if (newPos > pos)
 	    {
 		pos = newPos;
@@ -67,7 +69,7 @@ public class MlReader
 		continue;
 	    }
 
-	    newPos = checkAtPos(pos, "<!--");
+	    newPos = expecting(pos, "<!--");
 	    if (newPos > pos)
 	    {
 		pos = newPos;
@@ -83,14 +85,12 @@ public class MlReader
 		    continue;
 	    }
 
-	    /*
 	    if (c == '&')
 	    {
 		++pos;
 		onEntity();
 		continue;
 	    }
-	    */
 
 	    onText();
 	} //while();
@@ -99,43 +99,40 @@ public class MlReader
     public boolean isTagOpened(String tag)
     {
 	final String adjusted = tag.toLowerCase().trim();
-	for(String s: openedTagStack)
-	    if (s.equals(adjusted))
-		return true;
-	return false;
+	return openedTagStack.contains(adjusted);
     }
 
     private boolean  onOpenTag()
     {
 	try {
-	StringIterator it = new StringIterator(text, pos);
-	it.moveNext();
-	it.skipBlank();
-	final String tagName = it.getUntilBlankOr(">/").toLowerCase();
-	if (!config.mlAdmissibleTag(tagName, openedTagStack))
-	    return false;
-	it.skipBlank();
+	    StringIterator it = new StringIterator(text, pos);
+	    it.moveNext();
+	    it.skipBlank();
+	    final String tagName = it.getUntilBlankOr(">/").toLowerCase();
+	    if (!config.mlAdmissibleTag(tagName, openedTagStack))
+		return false;
+	    it.skipBlank();
 	    if (it.currentChar() == '/' || it.currentChar() == '>')
-	{
-	    //No attributes;
-	    if (it.currentChar() == '>')
 	    {
-		performAutoClosing(tagName);
-		if (config.mlTagMustBeClosed(tagName))
-	    openedTagStack.add(tagName);
-	    listener.onMlTagOpen(tagName, null);
+		//No attributes
+		if (it.currentChar() == '>')
+		{
+		    performAutoClosing(tagName);
+		    if (config.mlTagMustBeClosed(tagName))
+			openedTagStack.add(tagName);
+		    listener.onMlTagOpen(tagName, null);
 		    pos = it.pos() + 1;
-		return true;
-	    }
-	    if (it.isStringHere("/>"))
-	    {
-		performAutoClosing(tagName);
-	    listener.onMlTagOpen(tagName, null);
+		    return true;
+		}
+		if (it.isStringHere("/>"))
+		{
+		    performAutoClosing(tagName);
+		    listener.onMlTagOpen(tagName, null);
 		    pos = it.pos() + 2;
-		return true;
-	    }
-	    return false;
-	} //No attributes;
+		    return true;
+		}
+		return false;
+	    } //No attributes;
 	    TreeMap<String, String> attr = new TreeMap<String, String>();
 	    while(it.currentChar() != '>' && it.currentChar() != '/')
 	    {
@@ -147,16 +144,16 @@ public class MlReader
 	    {
 		performAutoClosing(tagName);
 		if (config.mlTagMustBeClosed(tagName))
-	    openedTagStack.add(tagName);
-	    listener.onMlTagOpen(tagName, attr);
-		    pos = it.pos() + 1;
+		    openedTagStack.add(tagName);
+		listener.onMlTagOpen(tagName, attr);
+		pos = it.pos() + 1;
 		return true;
 	    }
 	    if (it.isStringHere("/>"))
 	    {
 		performAutoClosing(tagName);
-	    listener.onMlTagOpen(tagName, attr);
-		    pos = it.pos() + 2;
+		listener.onMlTagOpen(tagName, attr);
+		pos = it.pos() + 2;
 		return true;
 	    }
 	    return false;
@@ -176,50 +173,48 @@ public class MlReader
 	}
     }
 
-	private boolean onOpenTagAttr(StringIterator it, TreeMap<String, String> attr) throws StringIterator.OutOfBoundsException
+    private boolean onOpenTagAttr(StringIterator it, TreeMap<String, String> attr) throws StringIterator.OutOfBoundsException
+    {
+	final String attrName = it.getUntilBlankOr("=>/");
+	it.skipBlank();
+	if (it.currentChar() != '=')
 	{
-	    final String attrName = it.getUntilBlankOr("=>/");
-	    it.skipBlank();
-	    if (it.currentChar() != '=')
-	    {
-		attr.put(attrName, "");
-		return true;
-	    }
-	    //	    System.out.println("+attrName=" + attrName);
-	    it.moveNext();
-	    it.skipBlank();
-	    String value = "";
-	    while (!it.isCurrentBlank() &&
-		   it.currentChar() != '/' && it.currentChar() != '>')
-		   {
-		       //		       System.out.println("+char=" + it.currentChar());
-		       if (it.currentChar() == '\'')
-		       {
-			   it.moveNext();
-			   value += it.getUntil("\'");
-			   it.moveNext();
-			   continue;
-		       }
-		       		       if (it.currentChar() == '\"')
-		       {
-			   it.moveNext();
-			   value += it.getUntil("\"");
-			   //			   System.out.println("+value=" + value);
-			   it.moveNext();
-			   continue;
-		       }
-				       value += it.getUntilBlankOr(">/\'\"");
-		   }
-	    //FIXME:entity processing;
-	    attr.put(attrName, value);
+	    attr.put(attrName, "");
 	    return true;
 	}
+	it.moveNext();
+	it.skipBlank();
+	String value = "";
+	while (!it.isCurrentBlank() &&
+	       it.currentChar() != '/' && 
+	       it.currentChar() != '>')
+	{
+	    if (it.currentChar() == '\'')
+	    {
+		it.moveNext();
+		value += it.getUntil("\'");
+		it.moveNext();
+		continue;
+	    }
+	    if (it.currentChar() == '\"')
+	    {
+		it.moveNext();
+		value += it.getUntil("\"");
+		it.moveNext();
+		continue;
+	    }
+	    value += it.getUntilBlankOr(">/\'\"");
+	}
+	//FIXME:entity processing;
+	attr.put(attrName, value);
+	return true;
+    }
 
     private boolean onClosingTag()
     {
 	if (openedTagStack.isEmpty())
 	    return false;
-	int newPos = checkAtPos(pos, constructClosingTag(openedTagStack.getLast()));
+	int newPos = expecting(pos, constructClosingTag(openedTagStack.getLast()));
 	if (newPos > pos)
 	{
 	    listener.onMlTagClose(openedTagStack.pollLast());
@@ -228,7 +223,7 @@ public class MlReader
 	}
 	if (openedTagStack.size() < 2)
 	    return false;
-	//Trying anticipatory tags closing (usually for </p>, </li>, etc);
+	//Trying anticipatory tags closing (usually for </p>, </li>, etc)
 	final LinkedList<String> tagsToClose = new LinkedList<String>();
 	final Iterator it = openedTagStack.descendingIterator();
 	if (!it.hasNext())
@@ -237,7 +232,7 @@ public class MlReader
 	while (it.hasNext())
 	{
 	    final String tagName = (String)it.next();
-	    newPos = checkAtPos(pos, constructClosingTag(tagName));
+	    newPos = expecting(pos, constructClosingTag(tagName));
 	    if (newPos <= pos)
 	    {
 		tagsToClose.addFirst(tagName);
@@ -253,7 +248,6 @@ public class MlReader
 	    {
 		final String removed = 		openedTagStack.pollLast();
 		listener.onMlTagClose(removed);
-
 	    }
 	    pos = newPos;
 	    return true;
@@ -268,24 +262,24 @@ public class MlReader
 
     private void onCdata()
     {
-	if (pos >= text.length())
+	if (!validState())
 	    return;
-	String value = "";
+	final StringBuilder value = new StringBuilder();
 	while (pos < text.length())
 	{
 	    if (text.charAt(pos) == ']')
 	    {
-		final int newPos = checkAtPos(pos, "]]>");
+		final int newPos = expecting(pos, "]]>");
 		if (newPos > pos)
 		{
-		    onCdata();
+		    listener.onMlText(value.toString(), openedTagStack);
 		    pos = newPos;
 		    return;
 		}
 	    }
-	    value += text.charAt(pos++);
+	    value.append(text.charAt(pos++));
 	}
-	listener.onMlText(value, openedTagStack);
+	listener.onMlText(value.toString(), openedTagStack);
     }
 
     private void onComments()
@@ -294,7 +288,7 @@ public class MlReader
 	{
 	    if (text.charAt(pos) == '-')
 	    {
-		final int newPos = checkAtPos(pos, "-->");
+		final int newPos = expecting(pos, "-->");
 		if (newPos > pos)
 		{
 		    pos = newPos;
@@ -315,14 +309,16 @@ public class MlReader
 
     private void onEntity()
     {
-	if (pos >= text.length())
+	if (!validState())
 	    return;
-	String name = "";
-	while (pos < text.length() && text.charAt(pos) != ';')
-	    name += text.charAt(pos++);
-	if (pos < text.length())
-	    ++pos;
-	//	onEntity(name.trim());
+	int ending = pos;
+	while (ending < text.length() && ending - pos <= MAX_ENTITY_LEN &&
+	       text.charAt(ending) != ';')
+	    ++ending;
+	if (ending > text.length() || text.charAt(ending) != ';')
+	    return;
+	parseEntity(text.substring(pos, ending));
+	pos = ending + 1;
     }
 
     private void onText()
@@ -349,11 +345,10 @@ public class MlReader
      * @param substr A substring to check
      * @return The position immediately after the encountered substring
      */
-    private int checkAtPos(int posFrom, String substr)
+    private int expecting(int posFrom, String substr)
     {
-	//	System.out.println("check substr: " + pos + ", " + substr);
 	if (substr.isEmpty())
-	    throw new NullPointerException("substr may not be empty");
+	    throw new IllegalArgumentException("substr may not be empty");
 	int posInText = posFrom;
 	for(int i = 0;i < substr.length();++i)
 	{
@@ -370,76 +365,85 @@ public class MlReader
 	return posInText;
     }
 
-    /*
-    private int skipBlank(int pos)
-    {
-	int i = pos;
-	while (i < text.length() && blankChar(text.charAt(i)))
-	    ++i;
-	return i;
-    }
-    */
-
-    /*
-    private String getCurrentTag()
-    {
-	if (openedTagStack == null || openedTagStack.isEmpty())
-	    return "";
-	return openedTagStack.getLast();
-    }
-    */
-
-    /*
-    private boolean outOfBounds()
-    {
-	return pos >= text.length();
-    }
-    */
-
-
-    public static String translateEntity(String entity)
+    private void parseEntity(String entity)
     {
 	final String name = entity.trim().toLowerCase();
+	if (name.isEmpty())
+	    return;
 	if (name.charAt(0) == '#')
 	{
-	    if (name.length() < 2)
-		return "";
-	    if (name.charAt(1) != 'x')//Decimal;
-	    {
-		int value;
-		try {
-		    value = Integer.parseInt(name.substring(1));
-		}
-		catch(NumberFormatException ee)
-		{
-		    return "";
-		}
-		return "" + (char)value;
-	    } 
-	    //Hex;
-	    final String str = name.substring(2).trim();
-	    if (str.isEmpty())
-		    return "";
-	    //fixme:
-	    return "";
-	} //By code;
-	return "" + (char)getCodeOfEntity(name.toLowerCase().trim());
+	    parseNumEntity(name);
+	    return;
+	}
+	listener.onMlText("" + (char)getCodeOfEntity(name), openedTagStack);
     }
 
-    public static int getCodeOfEntity(String name)
+    private void parseNumEntity(String name)
+    {
+	if (name.length() < 2)
+	    return;
+	if (name.charAt(1) == 'x')
+	{
+	    parseHexEntity(name.substring(1));
+	    return;
+	}
+	int value;
+	try {
+	    value = Integer.parseInt(name.substring(1));
+	}
+	catch(NumberFormatException ee)
+	{
+	    listener.onMlText("&" + name + ";", openedTagStack);
+	    return;
+	}
+	listener.onMlText("" + (char)value, openedTagStack);
+    } 
+
+    private void parseHexEntity(String name)
     {
 	//FIXME:
-	return 32;
+	listener.onMlText("&#" + name + ";", openedTagStack);
     }
 
-    /*
-    protected int currentLine()
+    private int getCodeOfEntity(String name)
     {
-	int count = 1;
-	for(int i = 0;i < pos;++i)
-	    if (text.charAt(i) == '\n')
-		++count;
-	return count;
+	if (!isEntitiesReady())
+	    return 32;
+	final String value = entities.getProperty("entity." + name);
+	if (value == null)
+	    return 32;
+	try {
+	    return Integer.parseInt(value);
+	}
+	catch (NumberFormatException e)
+	{
+	    e.printStackTrace();
+	    return 32;
+	}
     }
-    */
+
+    private boolean isEntitiesReady()
+    {
+	if (entities != null)
+	    return true;
+	final URL url = ClassLoader.getSystemResource(ENTITIES_RESOURCE);
+	if (url == null)
+	    return false;
+	entities = new Properties();
+	try {
+	    entities.load(url.openStream());
+	}
+	catch (IOException e)
+	{
+	    e.printStackTrace();
+	    entities = null;
+	    return false;
+	}
+	return true;
+    }
+
+    private boolean validState()
+    {
+	return pos < text.length();
+    }
 }
