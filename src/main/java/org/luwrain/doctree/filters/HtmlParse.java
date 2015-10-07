@@ -54,7 +54,6 @@ class HtmlParse implements MlReaderListener
 
     @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
     {
-	//	System.out.println("+" + tagName);
 	switch (tagName)
 	{
 	case "html":
@@ -102,7 +101,7 @@ class HtmlParse implements MlReaderListener
 	    return;
 
 	case "img":
-	    runs.add(new Run("[img]"));
+	    //	    runs.add(new Run("[img]"));
 	    return;
 
 	case "br":
@@ -256,32 +255,13 @@ class HtmlParse implements MlReaderListener
 
     @Override public boolean isMlAutoClosingNeededOnTagOpen(String newTagName, LinkedList<String> tagsStack)
     {
-	if (tagsStack.isEmpty())//Actually, never happens
-	    return false;
-	final String adjusted1 = newTagName.toLowerCase().trim();
-	final String adjusted2 = tagsStack.getLast().toLowerCase().trim();
-	if (adjusted1.equals("p") && adjusted2.equals("p"))
-	    return true;
-	if (adjusted1.equals("li") && adjusted2.equals("li"))
-	    return true;
-	return false;
+	return tagsAutoClosingPolicy(newTagName, tagsStack);
     }
 
     @Override public boolean mayMlAnticipatoryTagClose(String tagName,
 						   LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
     {
-	if (anticipatoryTags.size() != 1)
-	    return false;
-	final String adjusted1 = tagName.toLowerCase().trim();
-	final String adjusted2 = anticipatoryTags.getLast().toLowerCase().trim();
-	//	System.out.println("anticipatory: " + adjusted1 + ", " + adjusted2);
-	if (adjusted2.equals("p"))
-	    return true;
-	if (adjusted1.equals("ul") && adjusted2.equals("li"))
-	    return true;
-	if (adjusted1.equals("ol") && adjusted2.equals("li"))
-	    return true;
-	return false;
+	return anticipatoryTagsPolicy(tagName, anticipatoryTags, tagsStack);
     }
 
     @Override public void onMlText(String text, LinkedList<String> tagsStack)
@@ -356,8 +336,8 @@ class HtmlParse implements MlReaderListener
 
     NodeImpl constructRoot()
     {
-	if (levels.size() > 1)
-	error("Expecting that levels has only one item on constructRoot, but there are " + levels.size());
+	while (levels.size() > 1)
+	    commitLevel();
 	final Level firstLevel = levels.getFirst();
 	firstLevel.saveSubnodes();
 	return firstLevel.node;
@@ -379,13 +359,13 @@ class HtmlParse implements MlReaderListener
     {
 	if (levels.isEmpty())
 	{
-	    error("Expecting current level to be of type " + levelType + ", but there are no levels at all");
+	    error("Expecting current level to be of type " + NodeImpl.typeStr(levelType) + ", but there are no levels at all");
 	    return;
 	}
 	final Level lastLevel = levels.getLast();
 	if (lastLevel.node.type != levelType)
 	{
-	    error("Expecting last level to be of type " + levelType + " (trying to open " + expectingFor + "), but it is of type " + lastLevel.node.type);
+	    error("Expecting last level to be of type " + NodeImpl.typeStr(levelType) + " (trying to open " + NodeImpl.typeStr(expectingFor) + "), but it is of type " + NodeImpl.typeStr(lastLevel.node.type));
 	    return;
 	}
     }
@@ -411,8 +391,7 @@ class HtmlParse implements MlReaderListener
     private void commitLevel()
     {
 	savePara();
-	final Level lastLevel = levels.pollLast();
-	lastLevel.saveSubnodes();
+	levels.pollLast().saveSubnodes();
     }
 
     private void savePara()
@@ -437,5 +416,47 @@ class HtmlParse implements MlReaderListener
 	errors.add(msg);
 	if (printErrors)
 	    System.out.println(msg);
+    }
+
+
+    static boolean tagsAutoClosingPolicy(String newTagName, LinkedList<String> tagsStack)
+    {
+	if (tagsStack.isEmpty())//Actually, never happens
+	    return false;
+	final String adjusted1 = newTagName.toLowerCase().trim();
+	final String adjusted2 = tagsStack.getLast().toLowerCase().trim();
+	if (adjusted1.equals("p") && adjusted2.equals("p"))
+	    return true;
+	if (adjusted1.equals("li") && adjusted2.equals("li"))
+	    return true;
+	if (adjusted1.equals("option") && adjusted2.equals("option"))
+	    return true;
+	return false;
+    }
+
+    static     boolean anticipatoryTagsPolicy(String tagName,
+					      LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
+    {
+	final String adjusted1 = tagName.toLowerCase().trim();
+	if (adjusted1.equals("html"))
+	    return true;
+
+
+	if (adjusted1.equals("form") ||
+adjusted1.equals("table") ||
+	    adjusted1.equals("div"))
+	    return true;
+	if (anticipatoryTags.size() != 1)
+	    return false;
+	final String adjusted2 = anticipatoryTags.getLast().toLowerCase().trim();
+	if (adjusted2.equals("p"))
+	    return true;
+	if (/*adjusted1.equals("ul") &&*/ adjusted2.equals("li"))
+	    return true;
+	if (/*adjusted1.equals("ol") &&*/ adjusted2.equals("li"))
+	    return true;
+	if (adjusted2.equals("option"))
+	    return true;
+	return false;
     }
 }

@@ -26,15 +26,17 @@ public class Table extends NodeImpl
 
     @Override void commit()
     {
-	super.commit();
-	for(NodeImpl n: subnodes)
+	for(int i = 0;i < subnodes.length;++i)
 	{
-	    if (n.type != Node.TABLE_ROW)
-		System.out.println("warning:doctree:table has a subnode with type different than TABLE_ROW");
-	    for(NodeImpl nn: n.subnodes)
-		if (nn.type != Node.TABLE_CELL)
-		System.out.println("warning:doctree:table row has a subnode with type different than TABLE_CELL");
+	    if (subnodes[i].type != Node.TABLE_ROW)
+	    {
+		final NodeImpl n = NodeFactory.create(TABLE_ROW);
+		n.subnodes = new NodeImpl[]{subnodes[i]};
+		subnodes[i] = n;
+	    }
 	}
+	super.commit();
+
     }
 
     @Override void calcWidth(int recommended)

@@ -24,6 +24,20 @@ class TableRow extends NodeImpl
 	super(Node.TABLE_ROW);
     }
 
+    @Override void commit()
+    {
+	for(int i = 0;i < subnodes.length;++i)
+	{
+	    if (subnodes[i].type != Node.TABLE_CELL)
+	    {
+		final NodeImpl n = NodeFactory.create(TABLE_CELL);
+		n.subnodes = new NodeImpl[]{subnodes[i]};
+		subnodes[i] = n;
+	    }
+	}
+	super.commit();
+    }
+
     @Override void calcWidth(int recommended)
     {
 	final int cellWidth = (recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1;

@@ -139,7 +139,19 @@ public class NodeImpl implements Node
 	if (type == Node.ROOT)
 	    parentNode = null;
 	if (subnodes == null)
-	    return;
+	    subnodes = new NodeImpl[0];
+	if (type == ORDERED_LIST || type == UNORDERED_LIST)
+	{
+	    for(int i = 0;i < subnodes.length;++i)
+	    {
+		if (subnodes[i].type != Node.LIST_ITEM)
+		{
+		    final NodeImpl n = NodeFactory.create(LIST_ITEM);
+		    n.subnodes = new NodeImpl[]{subnodes[i]};
+		    subnodes[i] = n;
+		}
+	    }
+	}
 	for(NodeImpl n: subnodes)
 	{
 	    n.parentNode = this;
@@ -233,4 +245,31 @@ public class NodeImpl implements Node
 	return false;
     }
     */
+
+    static public String typeStr(int type)
+    {
+	switch(type)
+	{
+	case ROOT:
+	    return "ROOT";
+	case SECTION:
+	    return "SECTION";
+	case PARAGRAPH:
+	    return "PARAGRAPH";
+	case TABLE:
+	    return "TABLE";
+	case TABLE_ROW:
+	    return "TABLE_ROW";
+	case TABLE_CELL:
+	    return "TABLE_CELL";
+	case UNORDERED_LIST:
+	    return "UNORDERED_LIST";
+	case ORDERED_LIST:
+	    return "ORDERED_LIST";
+	case LIST_ITEM:
+	    return "LIST_ITEM";
+	default:
+	    return "";
+	}
+    }
 }

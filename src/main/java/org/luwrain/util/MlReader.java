@@ -105,15 +105,17 @@ public class MlReader
     private boolean  onOpenTag()
     {
 	try {
-	    StringIterator it = new StringIterator(text, pos);
-	    it.moveNext();
+	    final StringIterator it = new StringIterator(text, pos);
+	    it.moveNext();//Passing open '<'
 	    it.skipBlank();
 	    final String tagName = it.getUntilBlankOr(">/").toLowerCase();
 	    if (!config.mlAdmissibleTag(tagName, openedTagStack))
 		return false;
 	    it.skipBlank();
-	    if (it.currentChar() == '/' || it.currentChar() == '>')
+	    //	    if (it.isStringHere("/>") || it.currentChar() == '>')
+	    if (it.currentChar() == '/'  || it.currentChar() == '>')
 	    {
+
 		//No attributes
 		if (it.currentChar() == '>')
 		{
@@ -132,14 +134,15 @@ public class MlReader
 		    return true;
 		}
 		return false;
-	    } //No attributes;
-	    TreeMap<String, String> attr = new TreeMap<String, String>();
-	    while(it.currentChar() != '>' && it.currentChar() != '/')
+	    } //No attributes
+
+	    final TreeMap<String, String> attr = new TreeMap<String, String>();
+	    while(it.currentChar() != '>' && !it.isStringHere("/>"))
 	    {
 		if (!onOpenTagAttr(it, attr))
 		    return false;
 		it.skipBlank();
-	    } //No attributes;
+	    } //Attributes are processed
 	    if (it.currentChar() == '>')
 	    {
 		performAutoClosing(tagName);
@@ -153,6 +156,8 @@ public class MlReader
 	    {
 		performAutoClosing(tagName);
 		listener.onMlTagOpen(tagName, attr);
+		if (tagName.toLowerCase().equals("a"))//FIXME:
+		    openedTagStack.add(tagName);
 		pos = it.pos() + 2;
 		return true;
 	    }
@@ -161,15 +166,6 @@ public class MlReader
 	catch(StringIterator.OutOfBoundsException e)
 	{
 	    return false;
-	}
-    }
-
-    private void performAutoClosing(String newTagName)
-    {
-	while(!openedTagStack.isEmpty() && listener.isMlAutoClosingNeededOnTagOpen(newTagName, openedTagStack))
-	{
-	    final String lastTag = openedTagStack.pollLast();
-	    listener.onMlTagClose(lastTag);
 	}
     }
 
@@ -182,13 +178,21 @@ public class MlReader
 	    attr.put(attrName, "");
 	    return true;
 	}
-	it.moveNext();
+	it.moveNext();//Passing equals
 	it.skipBlank();
 	String value = "";
 	while (!it.isCurrentBlank() &&
-	       it.currentChar() != '/' && 
+	       //	       it.currentChar() != '/' && 
+	       !it.isStringHere("/>") &&
 	       it.currentChar() != '>')
 	{
+	    //	System.out.println("value=" + value);
+	    if (it.currentChar() == '/')
+	    {
+value += "/";
+it.moveNext();
+continue;
+}
 	    if (it.currentChar() == '\'')
 	    {
 		it.moveNext();
@@ -204,21 +208,32 @@ public class MlReader
 		continue;
 	    }
 	    value += it.getUntilBlankOr(">/\'\"");
-	}
+    }
 	//FIXME:entity processing;
 	attr.put(attrName, value);
 	return true;
+    }
+
+    private void performAutoClosing(String newTagName)
+    {
+	while(!openedTagStack.isEmpty() && listener.isMlAutoClosingNeededOnTagOpen(newTagName, openedTagStack))
+	{
+	    final String lastTag = openedTagStack.pollLast();
+	    listener.onMlTagClose(lastTag);
+	}
     }
 
     private boolean onClosingTag()
     {
 	if (openedTagStack.isEmpty())
 	    return false;
+	//	System.out.println("checking " + constructClosingTag(openedTagStack.getLast()));
 	int newPos = expecting(pos, constructClosingTag(openedTagStack.getLast()));
 	if (newPos > pos)
 	{
 	    listener.onMlTagClose(openedTagStack.pollLast());
 	    pos = newPos;
+	    //	    System.out.println("found");
 	    return true;
 	}
 	if (openedTagStack.size() < 2)
