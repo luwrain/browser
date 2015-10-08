@@ -416,8 +416,16 @@ continue;
 
     private void parseHexEntity(String name)
     {
-	//FIXME:
+	int v;
+	try {
+   v= Integer.decode("0" + name).intValue();
+    }
+    catch(NumberFormatException e)
+    {
 	listener.onMlText("&#" + name + ";", openedTagStack);
+	return;
+    }
+    listener.onMlText("" + (char)v, openedTagStack);
     }
 
     private int getCodeOfEntity(String name)
