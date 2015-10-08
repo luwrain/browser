@@ -19,6 +19,7 @@ package org.luwrain.doctree;
 
 import java.util.*;
 import org.luwrain.core.NullCheck;
+import org.luwrain.core.Log;
 
 class RowPartsBuilder
 {
@@ -67,20 +68,21 @@ class RowPartsBuilder
 	int posFrom = 0;
 	while (posFrom < text.length())
 	{
-	    final int available = maxRowLen - offset;
+	    final int available = maxRowLen - offset;//Available space on current line
 	    if (available <= 0)
 	    {
+		//Try again on the next line
 		++index;
 		offset = 0;
 		continue;
 	    }
 	    final int remains = text.length() - posFrom;
-	    //Both remains and available are greater than zero;
+	    //Both remains and available are greater than zero
 	    if (remains <= available)
 	    {
-		//We have a chunk for the last row for this run;
+		//We have a chunk for the last row for this run
 		currentParaParts.add(makeRunPart(run, posFrom, text.length()));
-		offset = remains;
+		offset += remains;
 		posFrom = text.length();
 		continue;
 	    }
@@ -88,28 +90,33 @@ class RowPartsBuilder
 	    int nextWordEnd = posTo;
 	    while (nextWordEnd - posFrom <= available)
 	    {
-		posTo = nextWordEnd;//It is definitely before the row end;
-		while (nextWordEnd < text.length() && Character.isSpace(text.charAt(nextWordEnd)))
+		posTo = nextWordEnd;//It is definitely before the row end
+		while (nextWordEnd < text.length() && Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
 		    ++nextWordEnd;
-		while (nextWordEnd < text.length() && !Character.isSpace(text.charAt(nextWordEnd)))
+		while (nextWordEnd < text.length() && !Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
 		    ++nextWordEnd;
 	    }
-	    if (posTo == posFrom)//No word ends before the row end;
+	    if (posTo == posFrom)//No word ends before the end of the row
 	    {
 		if (offset > 0)
 		{
-		    //Trying to do the same once again from the beginning of the next line;
+		    //Trying to do the same once again from the beginning of the next line in hope a whole line is enough
 		    offset = 0;
 		    ++index;
 		    continue;
 		}
+		//The only thing we can do is split the line in the middle of the word, no another way
 		posTo = posFrom + available;
 	    }
+	    if (posFrom == posTo)
+		Log.warning("doctree", "having posFrom equal to posTo (" + posFrom + ")");
+	    if (posTo - posFrom > available)
+		Log.warning("doctree", "getting the line with length greater than line length limit");
 	    currentParaParts.add(makeRunPart(run, posFrom, posTo));
 	    ++index;
 	    offset = 0;
 	    posFrom = posTo;
-	    //Trying to find the beginning of the next word;
+	    //Trying to find the beginning of the next word
 	    final int rollBack = posFrom;
 	    while (posFrom < text.length() && Character.isSpace(text.charAt(posFrom)))
 		++posFrom;
