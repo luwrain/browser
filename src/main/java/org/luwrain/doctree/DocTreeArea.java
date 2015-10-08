@@ -221,14 +221,30 @@ public class DocTreeArea implements Area
 
     private boolean onPageDown(KeyboardEvent event, boolean briefIntroduction)
     {
-	//FIXME:
-	return false;
+	if (noContentCheck())
+	    return true;
+	if (!iterator.moveNext())
+	{
+	    environment.hint(Hints.NO_LINES_BELOW);
+	    return true;
+	}
+	while(!iterator.isCurrentParaContainerSection() && iterator.moveNext());
+	onNewHotPointY( briefIntroduction );
+	return true;
     }
 
     private boolean onPageUp(KeyboardEvent event, boolean briefIntroduction)
     {
-	//FIXME:
-	return false;
+	if (noContentCheck())
+	    return true;
+	if (!iterator.movePrev())
+	{
+	    environment.hint(Hints.NO_LINES_ABOVE);
+	    return true;
+	}
+	while(!iterator.isCurrentParaContainerSection() && iterator.movePrev());
+	onNewHotPointY( briefIntroduction );
+	return true;
     }
 
     private boolean onArrowLeft(KeyboardEvent event)

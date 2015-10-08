@@ -130,6 +130,8 @@ public class NodeImpl implements Node
 	    n.x = x;
 	    n.y = y + offset;
 	    offset += n.height;
+	    if (type == ROOT)
+		++offset;
 	    n.calcPosition();
 	}
     }
@@ -215,7 +217,9 @@ public class NodeImpl implements Node
 		n.saveStatistics(stat);
     }
 
-    /** @return -1 if there is no a parent node or there is a consistency error*/
+    /** 
+     * @return -1 if there is no a parent node or there is a consistency error
+     */
     int getParentType()
     {
 	return parentNode != null && parentNode.subnodes != null?parentNode.type:-1;
@@ -238,11 +242,15 @@ public class NodeImpl implements Node
 	return -1;
     }
 
+    /** @return -1 if it is impossible to understand;*/
     /*
-    public boolean shouldHaveExtraLine()
+    int getNodeIndexInRoot()
     {
-	//Meaningful only for paragraphs;
-	return false;
+	if (parentNode == null || parentNode.subnodes == null
+	    return -1;
+	    if (parentNode.type == ROOT)
+		return getIndexInParentSubnodes();
+	    return parentNode.getNodeIndexInRoot();
     }
     */
 

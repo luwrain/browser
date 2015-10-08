@@ -64,7 +64,7 @@ public class Document
 	calcAbsRowNums();
 	root.calcPosition();
 	rows = RowImpl.buildRows(rowParts);
-	layout.init();
+	//	layout.init();
 	layout.calc();
     }
 

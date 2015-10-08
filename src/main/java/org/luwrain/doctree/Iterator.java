@@ -175,7 +175,7 @@ public class Iterator
 
     public boolean moveNext()
     {
-	if (rowParts.length == 0 || current + 1 >= rowParts.length)
+	if (current + 1 >= rows.length)
 	    return false;
 	++current;
 	return true;
@@ -213,7 +213,7 @@ public class Iterator
 
     public boolean canMoveNext()
     {
-	return current + 1 < rowParts.length;
+	return current + 1 < rows.length;
     }
 
     public boolean canMovePrev()

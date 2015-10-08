@@ -23,7 +23,7 @@ class Layout
 {
     static private class Line
     {
-	public int[] rows = new int[0];
+	int[] rows = new int[0];
     }
 
     private Document document;
@@ -39,7 +39,7 @@ class Layout
 	NullCheck.notNull(document, "document");
     }
 
-    void init()
+    private void init()
     {
 	root = document.getRoot();
 	paragraphs = document.getParagraphs();
@@ -49,6 +49,7 @@ class Layout
 
     void calc()
     {
+	init();
 	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
 	for(int i = 0;i < lines.length;++i)
@@ -79,6 +80,7 @@ class Layout
 	    {
 		r.x = lastX;
 		r.y = lastY + 1;
+		++lastX;
 		continue;
 	    }
 	    final Run run = r.getFirstPart(rowParts).run;
