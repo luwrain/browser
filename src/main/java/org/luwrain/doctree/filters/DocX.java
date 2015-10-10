@@ -34,6 +34,10 @@ public class DocX
     private String fileName = "";
     private String wholeText;
 
+    // listInfo[id of list][level]=counter;
+    private HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
+    private int lastLvl = -1;
+
     public DocX(String fileName)
     {
 	this.fileName = fileName;
@@ -129,79 +133,74 @@ public class DocX
 	} // for(body elements)
     }
 
-    // listInfo[id of list][level]=counter;
-    HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
-    int lastLvl = -1;
-
-	/*
-	 * Анализирует тип параграфа и выделяет в соответствии с ним данные
-	 * @param subnodes список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
-	 * @param paragraph элемент документа (параграф или элемент списка) или ячейка таблицы
-	 */
-	public void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement element)
-	{
-		String className = element.getClass().getSimpleName();
-		String paraText = "";
-		if (element.getClass() == XWPFParagraph.class)
-		{ // все есть параграф
-			final XWPFParagraph paragraph = (XWPFParagraph) element;
-			wholeText+=paragraph.getText();
-			if (paragraph.getNumIlvl() != null)
-			{ // параграф с установленным уровнем - элемент списка
-				// создаем элементы структуры Node и добавляем текущую ноду в
-				// список потомка
-			    final NodeImpl node = NodeFactory.create(Node.LIST_ITEM);
-				subnodes.add(node);
-				//
-				BigInteger listId = paragraph.getNumID();
-				int listLvl = paragraph.getNumIlvl().intValue();
-				// если это новый список, то добавим пустой подсписок его
-				// счетчиков
-				if (!listInfo.containsKey(listId))
-					listInfo.put(listId, new HashMap<Integer, Integer>());
-				// если уровень списка уменьшился, то очищаем счетчики выше
-				// уровнем
-				if (lastLvl > listLvl)
-				{
-					for (Entry<Integer, Integer> lvls : listInfo.get(listId).entrySet())
-						if (lvls.getKey() > listLvl)
-							listInfo.get(listId).put(lvls.getKey(), 1);
-				}
-				lastLvl = listLvl;
-				// если в списке счетчиков значения нет, то иннициализируем его
-				// 0 (позже он будет обязательно увеличен на 1)
-				if (!listInfo.get(listId).containsKey(listLvl))listInfo.get(listId).put(listLvl, 0);
-				// так как это очередной элемент списка, то увеличиваем его
-				// счетчик на 1
-				listInfo.get(listId).put(listLvl,listInfo.get(listId).get(listLvl) + 1);
-				// формируем строку-номер
-				String numstr = "";
-				for (int lvl = 0; lvl <= listLvl; lvl++) numstr += listInfo.get(listId).get(lvl) + ".";
-				paraText = paragraph.getText().trim();
-				System.out.println("LIST ENTRY:" + listLvl + ", " + listId + ", " + numstr + "[" + paraText + "]");
-				LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-				item_subnodes.add(NodeFactory.createPara(paraText));
-				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
-			} else
-			{
-				paraText = paragraph.getText().trim();
-				System.out.println("PARAGRAPH:[" + paraText + "]");
-				subnodes.add(NodeFactory.createPara(paraText));
-			}
-		} else
+    /*
+     * Анализирует тип параграфа и выделяет в соответствии с ним данные
+     * @param subnodes список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
+     * @param paragraph элемент документа (параграф или элемент списка) или ячейка таблицы
+     */
+    void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement element)
+    {
+	String className = element.getClass().getSimpleName();
+	String paraText = "";
+	if (element.getClass() == XWPFParagraph.class)
+	{ // все есть параграф
+	    final XWPFParagraph paragraph = (XWPFParagraph) element;
+	    wholeText+=paragraph.getText();
+	    if (paragraph.getNumIlvl() != null)
+	    { // параграф с установленным уровнем - элемент списка
+		// создаем элементы структуры Node и добавляем текущую ноду в
+		// список потомка
+		final NodeImpl node = NodeFactory.create(Node.LIST_ITEM);
+		subnodes.add(node);
+		//
+		BigInteger listId = paragraph.getNumID();
+		int listLvl = paragraph.getNumIlvl().intValue();
+		// если это новый список, то добавим пустой подсписок его
+		// счетчиков
+		if (!listInfo.containsKey(listId))
+		    listInfo.put(listId, new HashMap<Integer, Integer>());
+		// если уровень списка уменьшился, то очищаем счетчики выше
+		// уровнем
+		if (lastLvl > listLvl)
 		{
-			System.out.println(className);
-			subnodes.add(NodeFactory.createPara(paraText));
+		    for (Entry<Integer, Integer> lvls : listInfo.get(listId).entrySet())
+			if (lvls.getKey() > listLvl)
+			    listInfo.get(listId).put(lvls.getKey(), 1);
 		}
-	}
-
-	private void checkNodesNotNull(NodeImpl[] nodes)
+		lastLvl = listLvl;
+		// если в списке счетчиков значения нет, то иннициализируем его
+		// 0 (позже он будет обязательно увеличен на 1)
+		if (!listInfo.get(listId).containsKey(listLvl))listInfo.get(listId).put(listLvl, 0);
+		// так как это очередной элемент списка, то увеличиваем его
+		// счетчик на 1
+		listInfo.get(listId).put(listLvl,listInfo.get(listId).get(listLvl) + 1);
+		// формируем строку-номер
+		String numstr = "";
+		for (int lvl = 0; lvl <= listLvl; lvl++) numstr += listInfo.get(listId).get(lvl) + ".";
+		paraText = paragraph.getText().trim();
+		//		System.out.println("LIST ENTRY:" + listLvl + ", " + listId + ", " + numstr + "[" + paraText + "]");
+		LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
+		item_subnodes.add(NodeFactory.createPara(paraText));
+		node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
+	    } else
+	    {
+		paraText = paragraph.getText().trim();
+		System.out.println("PARAGRAPH:[" + paraText + "]");
+		subnodes.add(NodeFactory.createPara(paraText));
+	    }
+	} else
 	{
-		if (nodes == null)
-			throw new NullPointerException("nodes is null");
-		for (int i = 0; i < nodes.length; ++i)
-			if (nodes[i] == null)
-				throw new NullPointerException("nodes[" + i + "] is null");
+	    System.out.println(className);
+	    subnodes.add(NodeFactory.createPara(paraText));
 	}
+    }
 
+    private void checkNodesNotNull(NodeImpl[] nodes)
+    {
+	if (nodes == null)
+	    throw new NullPointerException("nodes is null");
+	for (int i = 0; i < nodes.length; ++i)
+	    if (nodes[i] == null)
+		throw new NullPointerException("nodes[" + i + "] is null");
+    }
 }

@@ -191,7 +191,7 @@ public class DocTreeArea implements Area
 	if (!iterator.moveNext())
 	{
 	    environment.hint(Hints.NO_LINES_BELOW);
-	    return false;
+	    return true;
 	}
 	onNewHotPointY( briefIntroduction );
 	return true;
