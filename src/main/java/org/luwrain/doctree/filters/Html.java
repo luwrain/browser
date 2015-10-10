@@ -45,7 +45,7 @@ public class Html
 	}
     }
 
-    public Document constructDocument()
+    public Document constructDocument(int width)
     {
 	if (src == null)
 	read(StandardCharsets.UTF_8);
@@ -54,7 +54,7 @@ public class Html
 	HtmlParse parse = new HtmlParse();
 	new MlReader(new HtmlConfig(), parse, src).read();
 	final NodeImpl root = parse.constructRoot();
-return new Document(parse.getTitle(), root);
+	return new Document(parse.getTitle(), root, width);
     }
 
     private void read(Charset encoding)

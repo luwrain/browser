@@ -24,34 +24,41 @@ public class Factory
 {
     static public final int UNRECOGNIZED = 0;
     static public final int TEXT_PARA_EMPTY_LINE = 1;
-    static public final int TEXT_PARA_EACH_LINE = 2;
-    static public final int HTML = 3;
-    static public final int DOC = 4;
-    static public final int DOCX = 5;
+    static public final int TEXT_PARA_INDENT = 2;
+    static public final int TEXT_PARA_EACH_LINE = 3;
+    static public final int HTML = 4;
+    static public final int DOC = 5;
+    static public final int DOCX = 6;
 
-    static public Document loadFromFile(int format, String fileName)
+    static public Document loadFromFile(int format, String fileName, int width, String encoding)
     {
 	NullCheck.notNull(fileName, "fileName");
 	switch (format)
 	{
+	case TEXT_PARA_INDENT:
+	    return new TxtParaIndent(fileName).constructDocument(encoding, width);
+	case TEXT_PARA_EMPTY_LINE:
+	    return new TxtParaEmptyLine(fileName).constructDocument(encoding, width);
+	case TEXT_PARA_EACH_LINE:
+	    return new TxtParaEachLine(fileName).constructDocument(encoding, width);
 	case DOC:
-	    return new Doc(fileName).constructDocument();
+	    return new Doc(fileName).constructDocument(width);
 	case DOCX:
-	    return new DocX(fileName).constructDocument();
+	    return new DocX(fileName).constructDocument(width);
 	case HTML:
-	    return new Html(true, fileName).constructDocument();
+	    return new Html(true, fileName).constructDocument(width);
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
     }
 
-    static public Document loadFromText(int format, String text)
+    static public Document loadFromText(int format, String text, int width)
     {
 	NullCheck.notNull(text, "text");
 	switch (format)
 	{
 	case HTML:
-	    return new Html(false, text).constructDocument();
+	    return new Html(false, text).constructDocument(width);
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
@@ -68,6 +75,8 @@ public class Factory
 	ext = ext.toLowerCase();
 	switch(ext)
 	{
+	case "txt":
+	    return TEXT_PARA_INDENT;
 	case "doc":
 	    return DOC;
 	case "docx":
@@ -75,8 +84,6 @@ public class Factory
 	case "html":
 	case "htm":
 	    return HTML;
-	case "txt":
-	    return TEXT_PARA_EMPTY_LINE;
 	default:
 	    return UNRECOGNIZED;
 	}

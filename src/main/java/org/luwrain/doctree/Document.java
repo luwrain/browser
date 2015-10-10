@@ -29,21 +29,21 @@ public class Document
     public RowPart[] rowParts;
     private RowImpl[] rows;
 
-    public Document(NodeImpl root)
+    public Document(NodeImpl root, int width)
     {
 	this.root = root;
 	NullCheck.notNull(root, "root");
 	title = "";
-	buildView(80);
+	buildView(width);
     }
 
-    public Document(String title, NodeImpl root)
+    public Document(String title, NodeImpl root, int width)
     {
 	this.root = root;
 	this.title = title;
 	NullCheck.notNull(root, "root");
 	NullCheck.notNull(title, "title");
-	buildView(80);
+	buildView(width);
     }
 
     public void buildView(int width)

@@ -27,6 +27,8 @@ import java.math.BigInteger;
 import org.luwrain.doctree.*;
 import org.apache.poi.xwpf.usermodel.*;
 
+import org.luwrain.core.NullCheck;
+
 public class DocX
 {
     private String fileName = "";
@@ -35,67 +37,65 @@ public class DocX
     public DocX(String fileName)
     {
 	this.fileName = fileName;
-	if (fileName == null)
-	    throw new NullPointerException("fileName may not be null");
+	NullCheck.notNull(fileName, "fileName");
     }
 
-    public org.luwrain.doctree.Document constructDocument()
+    public org.luwrain.doctree.Document constructDocument(int width)
     {
     	FileInputStream  s = null;
     	try
     	{
-    		File docFile=new File(fileName);
-    		s = new FileInputStream(docFile.getAbsolutePath());
-    		XWPFDocument doc = new XWPFDocument(s);
-		final org.luwrain .doctree.Document res = transform(doc);
-    		s.close(); //closing fileinputstream
-    		return res;
+	    File docFile=new File(fileName);
+	    s = new FileInputStream(docFile.getAbsolutePath());
+	    XWPFDocument doc = new XWPFDocument(s);
+	    final org.luwrain .doctree.Document res = transform(doc, width);
+	    s.close(); //closing fileinputstream
+	    return res;
     	} catch (IOException e)
     	{
-    		e.printStackTrace();
-    		try
-    		{
-    			if (s != null) s.close();
-    		}
-    		catch (IOException ee) {}
-    		return null;
+	    e.printStackTrace();
+	    try {
+		if (s != null)
+		    s.close();
+	    }
+	    catch (IOException ee) {}
+	    return null;
     	}
     }
 
-    private org.luwrain.doctree.Document transform(XWPFDocument doc)
+    private org.luwrain.doctree.Document transform(XWPFDocument doc, int width)
     {
-		wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
-		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-		anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
-		final NodeImpl root = NodeFactory.create(Node.ROOT);
-		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-return new org.luwrain.doctree.Document(root);
+	wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
+	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
+	final NodeImpl root = NodeFactory.create(Node.ROOT);
+	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	return new org.luwrain.doctree.Document(root, width);
     }
 
-	/* рекурсивный метод, вызывается для любого места в документе, способного содержать несколько элементов, представляя их как список параграфов
-	 * @param subnodes The list of nodes to get all new on current level
-	 * @param range The range to look through
-	 * @param lvl Current recurse level (must be zero for the root)
-	 */
-	private void anyRangeAsParagraph(LinkedList<NodeImpl> subnodes,
-			List<IBodyElement> range, int lvl)
+    /* рекурсивный метод, вызывается для любого места в документе, способного содержать несколько элементов, представляя их как список параграфов
+     * @param subnodes The list of nodes to get all new on current level
+     * @param range The range to look through
+     * @param lvl Current recurse level (must be zero for the root)
+     */
+    private void anyRangeAsParagraph(LinkedList<NodeImpl> subnodes,
+				     List<IBodyElement> range, int lvl)
+    {
+	int i = 0;
+	for (IBodyElement paragraph : range)
 	{
-		int i = 0;
-		for (IBodyElement paragraph : range)
-		{
-			if (paragraph.getClass() == XWPFTable.class)
-			{
-				// We do this processing for the first cell only, skipping all others
-			    final NodeImpl table_node = NodeFactory.create(Node.TABLE);
-				subnodes.add(table_node);
-				final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
-				
-				final XWPFTable table = (XWPFTable) paragraph;
-				wholeText+=table.getText();
-				System.out.println(lvl + ", is a table: " + table.getRows().size() + " rows");
-				int r = 0;
-				for (final XWPFTableRow trow : table.getRows())
-				{ // для каждой строки таблицы
+	    if (paragraph.getClass() == XWPFTable.class)
+	    {
+		// We do this processing for the first cell only, skipping all others
+		final NodeImpl table_node = NodeFactory.create(Node.TABLE);
+		subnodes.add(table_node);
+		final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
+		final XWPFTable table = (XWPFTable) paragraph;
+		wholeText+=table.getText();
+		//		System.out.println(lvl + ", is a table: " + table.getRows().size() + " rows");
+		int r = 0;
+		for (final XWPFTableRow trow : table.getRows())
+		{ // для каждой строки таблицы
 					r++;
 					// создаем элементы структуры Node и добавляем текущую ноду
 					// в список потомка
@@ -105,33 +105,33 @@ return new org.luwrain.doctree.Document(root);
 					int c = 0;
 					for (final XWPFTableCell cell : trow.getTableCells())
 					{ // для каждой ячейки таблицы
-						c++;
-						// Creating a node for table cell
-						final NodeImpl celltable_node = NodeFactory.create(Node.TABLE_CELL);
-						final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
-						cels_subnodes.add(celltable_node);
-						System.out.print("* cell[" + r + "," + c + "]: ");
-						anyRangeAsParagraph(incell_subnodes, cell.getBodyElements(), lvl + 1);
-						celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
-						checkNodesNotNull(celltable_node.subnodes);
+					    c++;
+					    // Creating a node for table cell
+					    final NodeImpl celltable_node = NodeFactory.create(Node.TABLE_CELL);
+					    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
+					    cels_subnodes.add(celltable_node);
+					    System.out.print("* cell[" + r + "," + c + "]: ");
+					    anyRangeAsParagraph(incell_subnodes, cell.getBodyElements(), lvl + 1);
+					    celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
+					    checkNodesNotNull(celltable_node.subnodes);
 					} // for(cells);
 					rowtable_node.subnodes = cels_subnodes.toArray(new NodeImpl[cels_subnodes.size()]);
 					checkNodesNotNull(rowtable_node.subnodes);
-				} // for(trows);
-				table_node.subnodes = rows_subnodes.toArray(new NodeImpl[rows_subnodes.size()]);
-				checkNodesNotNull(table_node.subnodes);
-			} else
-			{
-				System.out.print(lvl + ", not table: ");
-				parseParagraph(subnodes, paragraph);
-			}
-			i++;
-		} // for(body elements)
-	}
+		} // for(trows);
+		table_node.subnodes = rows_subnodes.toArray(new NodeImpl[rows_subnodes.size()]);
+		checkNodesNotNull(table_node.subnodes);
+	    } else
+	    {
+		//		System.out.print(lvl + ", not table: ");
+		parseParagraph(subnodes, paragraph);
+	    }
+	    i++;
+	} // for(body elements)
+    }
 
-	// listInfo[id of list][level]=counter;
-	public HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
-	public int lastLvl = -1;
+    // listInfo[id of list][level]=counter;
+    HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
+    int lastLvl = -1;
 
 	/*
 	 * Анализирует тип параграфа и выделяет в соответствии с ним данные
