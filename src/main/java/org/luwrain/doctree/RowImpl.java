@@ -17,13 +17,13 @@
 
 package org.luwrain.doctree;
 
-public class RowImpl implements Row
+class RowImpl implements Row
 {
     /** Absolute horizontal position in the area*/
-    public int x = 0;
+int x = 0;
 
     /** Absolute vertical position in the area*/
-    public int y = 0;
+    int y = 0;
 
     private int partsFrom = -1;
     private int partsTo = -1;
@@ -38,18 +38,48 @@ public class RowImpl implements Row
 	return y;
     }
 
-
-    public String text(RowPart[] parts)
+    String text(RowPart[] parts)
     {
 	StringBuilder b = new StringBuilder();
 	for(int i = partsFrom;i < partsTo;++i)
 	    b.append(parts[i].text());
 	return b.toString();
     }
+
+    String textWithHrefs(RowPart[] parts, String hrefPrefix)
     {
+	boolean wasHref = false;
+	final StringBuilder b = new StringBuilder();
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final RowPart p = parts[i];
+	    final String href = p.href();
+	    if (!wasHref &&
+		href != null && !href.trim().isEmpty())
+		b.append(hrefPrefix);
+	    b.append(parts[i].text());
+	    wasHref = (href != null && !href.trim().isEmpty());
+	}
+	return b.toString();
     }
 
-    public boolean hasAssociatedText()
+String href(RowPart[] parts, int pos)
+    {
+	int offset = 0;
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final RowPart p = parts[i];
+	    final String text = p.text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    if (pos >= offset && pos < offset + text.length())
+		return p.href();
+	    offset += text.length();
+	}
+	return null;
+    }
+
+    boolean hasAssociatedText()
     {
 	return partsFrom >= 0 && partsTo >= 0;
     }

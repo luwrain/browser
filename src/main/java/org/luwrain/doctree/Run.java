@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.NullCheck;
+
 public class Run
 {
     public String text = "";
@@ -27,8 +29,14 @@ public class Run
     public Run(String text)
     {
 	this.text = text;
-	if (text == null)
-	    throw new NullPointerException("text may not be null");
+	NullCheck.notNull(text, "text");
+    }
+
+    public Run(String text, String href)
+    {
+	this.text = text;
+	this.href = href;
+	NullCheck.notNull(text, "text");
     }
 
     @Override public String toString()

@@ -19,31 +19,39 @@ package org.luwrain.doctree;
 
 class RowPart
 {
-    public Run run;
+    Run run;
 
     /** Starting position in the text of the corresponding run*/
-    public int posFrom = 0;
+    int posFrom = 0;
 
     /** Ending position in the text of the corresponding run*/
-    public int posTo = 0;
+    int posTo = 0;
 
     /** Absolute row index in a document*/
-    public int absRowNum = 0;
+    int absRowNum = 0;
 
     /** Index in the corresponding paragraph*/
-    public int relRowNum = 0;
+    int relRowNum = 0;
 
-    public String text()
+    String text()
     {
 	if (run == null)
 	    throw new NullPointerException("run may not be null");
 	return run.text.substring(posFrom, posTo);
     }
 
-    public TextAttr textAttr()
+    TextAttr textAttr()
     {
 	if (run == null)
 	    throw new NullPointerException("node may not be null");
 	return run.textAttr;
     }
+
+    String href()
+    {
+	if (run == null)
+	    throw new NullPointerException("node may not be null");
+	return run.href;
+    }
+
 }

@@ -45,6 +45,7 @@ class HtmlParse implements MlReaderListener
     private final LinkedList<Level> levels = new LinkedList<Level>();
     private final LinkedList<Run> runs = new LinkedList<Run>();
     private String title = "";
+    private String href = null;
     private boolean printErrors = true;
 
     public HtmlParse()
@@ -54,8 +55,21 @@ class HtmlParse implements MlReaderListener
 
     @Override public void onMlTagOpen(String tagName, Map<String, String> attrs)
     {
-	switch (tagName)
+	switch (tagName.toLowerCase().trim())
 	{
+	case "a":
+	if (attrs != null && attrs.containsKey("href"))
+href = attrs.get("href");
+	return;
+	case "img":
+	    if (attrs != null && attrs.containsKey("alt"))
+	    {
+		final String value = attrs.get("alt");
+		if (value != null && !value.trim().isEmpty())
+		    runs.add(new Run(value.trim(), href));
+	    }
+	    return;
+
 	case "html":
 	case "body":
 	case "head":
@@ -73,7 +87,6 @@ class HtmlParse implements MlReaderListener
 
 	case "span":
 	case "sup":
-	case "a":
 	case "center":
 	case "big":
 	case "small":
@@ -85,7 +98,6 @@ class HtmlParse implements MlReaderListener
 	case "em":
 	case "code":
 	case "tt":
-
 	case "dt":
 	case "dd":
 	    return;
@@ -98,10 +110,6 @@ class HtmlParse implements MlReaderListener
 	case "pre":
 	case "hr":
 	    savePara();
-	    return;
-
-	case "img":
-	    //	    runs.add(new Run("[img]"));
 	    return;
 
 	case "br":
@@ -140,20 +148,20 @@ class HtmlParse implements MlReaderListener
 	    startLevel(Node.TABLE);
 	    return;
 	case "caption":
-	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
+	    //	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
 	    startLevel(Node.TABLE_ROW);
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "tr":
-	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
+	    //	    expectingCurrentLevel(Node.TABLE, Node.TABLE_ROW);
 	    startLevel(Node.TABLE_ROW);
 	    return;
 	case "th":
-	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
+	    //	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "td":
-	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
+	    //	    expectingCurrentLevel(Node.TABLE_ROW, Node.TABLE_CELL);
 	    startLevel(Node.TABLE_CELL);
 	    return;
 	case "ul":
@@ -173,10 +181,11 @@ class HtmlParse implements MlReaderListener
 
     @Override public void onMlTagClose(String tagName)
     {
-	//	System.out.println("-" + tagName);
-	final String adjusted = tagName.toLowerCase().trim();
-	switch(adjusted)
+	switch(tagName.toLowerCase().trim())
 	{
+	case "a":
+	    href = null;
+	    return;
 	    case "title":
 	case "style":
 	case "script":
@@ -191,7 +200,6 @@ class HtmlParse implements MlReaderListener
 	case "label":
 
 	case "span":
-	case "a":
 	case "center":
 	case "big":
 	case "small":
@@ -204,7 +212,6 @@ class HtmlParse implements MlReaderListener
 	case "em":
 	case "code":
 	case "tt":
-
 	case "dt":
 	case "dd":
 	    return;
@@ -235,8 +242,6 @@ class HtmlParse implements MlReaderListener
 	    commitLevel();
 	return;
 
-
-
 	case "th":
 	case "td":
 	case 	    "tr":
@@ -248,7 +253,6 @@ class HtmlParse implements MlReaderListener
 	return;
 
 	default:
-	    System.out.println("Unhandled closing tag: " + adjusted);
 	    return;
 	}
     }
@@ -268,52 +272,26 @@ class HtmlParse implements MlReaderListener
     {
 	if (text == null)
 	    return;
-
-	    if (text.indexOf("</li>")>= 0)
-	    {
-		System.out.println("found:" + text);
-		for(String s: tagsStack)
-		    System.out.println("*" + s);
-	    }
-	    
-
-
-	if (tagsStack.contains("script") ||
+	if (tagsStack.contains("script") ||//FIXME:not effective checking
 	    tagsStack.contains("style") ||
 	    tagsStack.contains("form"))
 	    return;
-
-	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("table"))
-	{
-	    if (!text.trim().isEmpty())
-	    System.out.println("Direct text inside of <table>:" + text);
+	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("table") &&
+	    !text.trim().isEmpty())
 	    return;
-	}
-
-	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ul"))
-	{
-	    if (!text.trim().isEmpty())
-	    System.out.println("Direct text inside of <ul>:" + text);
-	    return;
-	}
-
-	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ol"))
-	{
-	    if (!text.trim().isEmpty())
-	    System.out.println("Direct text inside of <ol>:" + text);
-	    return;
-	}
-
-
-
-
-	if (!tagsStack.isEmpty() && tagsStack.getLast().equals("title"))
-	{
-	    title = text.trim();
-	    return;
-	}
-	addText(text);
+    if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ul") &&
+	!text.trim().isEmpty())
+	return;
+    if (!tagsStack.isEmpty() && tagsStack.getLast().equals("ol") &&
+	!text.trim().isEmpty())
+	return;
+    if (!tagsStack.isEmpty() && tagsStack.getLast().equals("title"))
+    {
+	title = text.trim();
+	return;
     }
+    addText(text);
+}
 
     private void addText(String text)
     {
@@ -331,7 +309,7 @@ class HtmlParse implements MlReaderListener
 	final String text2 = b.toString();
 	if (text2.isEmpty())
 	    return;
-	runs.add(new Run(text2));
+	runs.add(new Run(text2, href));
     }
 
     NodeImpl constructRoot()

@@ -61,6 +61,15 @@ public class DocTreeArea implements Area
 	return document;
     }
 
+    public String getHref()
+    {
+	if (document == null || iterator == null)
+	    return null;
+	if (iterator.isCurrentRowEmpty())
+	    return null;
+	return iterator.getHref(hotPointX);
+    }
+
     @Override public int getLineCount()
     {
 	return document != null?document.getLineCount() + 1:1;

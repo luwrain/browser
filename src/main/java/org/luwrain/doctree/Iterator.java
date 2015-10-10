@@ -112,6 +112,21 @@ public class Iterator
 	return row.hasAssociatedText()?row.text(rowParts):"";
     }
 
+    public String getCurrentTextWithHref(String hrefPrefix)
+    {
+	final RowImpl row = rows[current];
+	return row.hasAssociatedText()?row.textWithHrefs(rowParts, hrefPrefix):"";
+    }
+
+    //May return null if there is no href at the specified position
+    public String getHref(int pos)
+    {
+	final RowImpl row = rows[current];
+	return row.hasAssociatedText()?row.href(rowParts, pos):null;
+    }
+
+
+
     public NodeImpl getCurrentParaContainer()
     {
 	return getCurrentParagraphImpl().parentNode;
