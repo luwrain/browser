@@ -209,8 +209,7 @@ continue;
 	    }
 	    value += it.getUntilBlankOr(">/\'\"");
     }
-	//FIXME:entity processing;
-	attr.put(attrName, value);
+	attr.put(attrName, processEntitiesInString(value));
 	return true;
     }
 
@@ -332,7 +331,9 @@ continue;
 	    ++ending;
 	if (ending > text.length() || text.charAt(ending) != ';')
 	    return;
-	parseEntity(text.substring(pos, ending));
+	final String res = parseEntity(text.substring(pos, ending));
+	if (res != null)
+	    listener.onMlText(res, openedTagStack);
 	pos = ending + 1;
     }
 
@@ -380,41 +381,62 @@ continue;
 	return posInText;
     }
 
-    private void parseEntity(String entity)
+    private String processEntitiesInString(String str)
+    {
+	final StringBuilder res = new StringBuilder();
+	int pos = 0;
+	while (pos < str.length())
+	{
+	    final int before = pos;
+	    while(pos < str.length() && str.charAt(pos) != '&')
+		++pos;
+	    if (pos > before)
+		res.append(str.substring(before, pos));
+	    if (pos >= str.length())
+		continue;
+	    int ending = pos + 1;
+	    while(ending < str.length() && str.charAt(ending) != ';')
+		++ending;
+	    if (ending >= str.length() || ending - pos < 2)
+	    {
+		res.append(str.substring(pos, ending));
+		pos = ending;
+		continue;
+	    }
+	    res.append(parseEntity(str.substring(pos + 1, ending)));
+	    pos = ending + 1;
+	}
+	return res.toString();
+    }
+
+    private String parseEntity(String entity)
     {
 	final String name = entity.trim().toLowerCase();
 	if (name.isEmpty())
-	    return;
+	    return "&" + entity;
 	if (name.charAt(0) == '#')
-	{
-	    parseNumEntity(name);
-	    return;
-	}
-	listener.onMlText("" + (char)getCodeOfEntity(name), openedTagStack);
+	    return parseNumEntity(name);
+	return "" + (char)getCodeOfEntity(name);
     }
 
-    private void parseNumEntity(String name)
+    private String parseNumEntity(String name)
     {
 	if (name.length() < 2)
-	    return;
+	    return "&" + name + ";";
 	if (name.charAt(1) == 'x')
-	{
-	    parseHexEntity(name.substring(1));
-	    return;
-	}
+	    return parseHexEntity(name.substring(1));
 	int value;
 	try {
 	    value = Integer.parseInt(name.substring(1));
 	}
 	catch(NumberFormatException ee)
 	{
-	    listener.onMlText("&" + name + ";", openedTagStack);
-	    return;
+return "&" + name + ";";
 	}
-	listener.onMlText("" + (char)value, openedTagStack);
+	return "" + (char)value;
     } 
 
-    private void parseHexEntity(String name)
+    private String parseHexEntity(String name)
     {
 	int v;
 	try {
@@ -422,10 +444,9 @@ continue;
     }
     catch(NumberFormatException e)
     {
-	listener.onMlText("&#" + name + ";", openedTagStack);
-	return;
+return "&#" + name + ";";
     }
-    listener.onMlText("" + (char)v, openedTagStack);
+return "" + (char)v;
     }
 
     private int getCodeOfEntity(String name)
