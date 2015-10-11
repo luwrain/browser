@@ -86,8 +86,6 @@ LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
 	return false;
     }
 
-    
-
     @Override public void onMlTagClose(String tagName)
     {
     }
@@ -121,26 +119,10 @@ LinkedList<String> anticipatoryTags, LinkedList<String> tagsStack)
 	return encoding != null?encoding:"";
     }
 
-    /*
-
-    public static String decode(String charsetName, String text)
+    static public String getEncoding(String text)
     {
-	if (charsetName.toLowerCase().equals("utf-8"))
-	    return text;
-	try {
-	    final Charset charset = Charset.forName(charsetName);
-	    if (charset == null)
-		return "bad charset";//FIXME:
-	    final CharsetDecoder decoder = charset.newDecoder();
-	    ByteBuffer buf = CharBuffer.wrap(text);
-	    CharBuffer res = decoder.decode(buf);
-	    return res.toString();
-	}
-	catch (CharacterCodingException e)
-	{
-	    e.printStackTrace();
-	    return text;
-	}
+	final HtmlEncoding encoding = new HtmlEncoding();
+	new MlReader(encoding, encoding, text).read();
+	return encoding.getEncoding();
     }
-    */
 }

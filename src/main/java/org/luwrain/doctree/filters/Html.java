@@ -24,6 +24,7 @@ import java.nio.charset.*;
 
 import org.luwrain.doctree.*;
 import org.luwrain.util.*;
+import org.luwrain.core.NullCheck;
 
 public class Html
 {
@@ -32,8 +33,7 @@ public class Html
 
     public Html(boolean shouldRead, String arg)
     {
-	if (arg == null)
-	    throw new NullPointerException("arg may not be null");
+	NullCheck.notNull(arg, "arg");
 	if (shouldRead)
 	{
 	    fileName = arg;
@@ -45,10 +45,19 @@ public class Html
 	}
     }
 
-    public Document constructDocument(int width)
+    public Document constructDocument(int width, String charset)
     {
 	if (src == null)
-	read(StandardCharsets.UTF_8);
+	{
+	    read(StandardCharsets.UTF_8);
+	    if (src == null)
+		return null;
+	    final String res = HtmlEncoding.getEncoding(src);
+	    if (res != null && !res.trim().isEmpty())
+		read(Charset.forName(res));
+	    if (src == null)
+		return null;
+	}
 	if (src == null)
 	    return null;
 	HtmlParse parse = new HtmlParse();

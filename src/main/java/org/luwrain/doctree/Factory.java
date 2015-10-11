@@ -46,7 +46,7 @@ public class Factory
 	case DOCX:
 	    return new DocX(fileName).constructDocument(width);
 	case HTML:
-	    return new Html(true, fileName).constructDocument(width);
+	    return new Html(true, fileName).constructDocument(width, encoding);
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
@@ -58,7 +58,7 @@ public class Factory
 	switch (format)
 	{
 	case HTML:
-	    return new Html(false, text).constructDocument(width);
+	    return new Html(false, text).constructDocument(width, "");
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
