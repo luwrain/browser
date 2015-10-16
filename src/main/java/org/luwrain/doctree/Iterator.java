@@ -235,4 +235,12 @@ public class Iterator
     {
 	return current > 0;
     }
+
+    @Override public boolean equals(Object o)
+    {
+	if (o == null || !(o instanceof Iterator))
+	    return false;
+	final Iterator it2 = (Iterator)o;
+	return document == it2.document && current == it2.current;
+    }
 }

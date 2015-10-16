@@ -88,6 +88,8 @@ public class DocTreeArea implements Area
 	if (event.isCommand() && !event.isModified())
 	    switch(event.getCommand())
 	    {
+	    case KeyboardEvent.TAB:
+		return onTab(event, false);
 	    case KeyboardEvent.ARROW_DOWN:
 		return onArrowDown(event, false);
 	    case KeyboardEvent.ARROW_UP:
@@ -168,26 +170,27 @@ public class DocTreeArea implements Area
 	return "";
     }
 
+    private boolean onTab(KeyboardEvent event, boolean briefIntroduction)
+    {
+	if (noContentCheck())
+	    return true;
+	final SmartJump jump = new SmartJump((Iterator)iterator.clone(), true);
+	if (!jump.jumpForward())
+	{
+	    environment.hint(Hints.NO_LINES_BELOW);
+	    return true;
+	}
+	iterator = jump.it;
+	announceFragment((Iterator)iterator.clone(), jump.speakToIt);
+	environment.onAreaNewHotPoint(this);
+	//onNewHotPointY() should not be called
+	return true;
+    }
+
     private boolean onArrowDown(KeyboardEvent event, boolean briefIntroduction)
     {
 	if (noContentCheck())
 	    return true;
-	if (iterator.isCurrentParaContainerTableCell())
-	{
-	    final TableCell cell = iterator.getTableCell();
-	    final Table table = cell.getTable();
-	    final int col = cell.getColIndex();
-	    final int row = cell.getRowIndex();
-	    if (table.isSingleLineRow(row) && row + 1 < table.getRowCount())
-	    {
-		final Node nextRowCell = table.getCell(0, row + 1);
-		if (iterator.moveNextUntilContainer(nextRowCell))
-		{
-	onNewHotPointY( briefIntroduction );
-	return true;
-		}
-	    }
-	}
 	if (!iterator.moveNext())
 	{
 	    environment.hint(Hints.NO_LINES_BELOW);
@@ -404,6 +407,21 @@ public class DocTreeArea implements Area
 	    environment.hint(Hints.EMPTY_LINE); else
 	    introduction.introduce(iterator, briefIntroduction);
 	environment.onAreaNewHotPoint(this);
+    }
+
+    protected 	void announceFragment(Iterator itFrom, Iterator itTo)
+    {
+	final StringBuilder b = new StringBuilder();
+	Iterator it = itFrom;
+	while(!it.equals(itTo))
+	{
+	    if (!it.isCurrentRowEmpty())
+		b.append(it.getCurrentText());
+	    if (!it.moveNext())
+		break;
+	}
+	environment.say(b.toString());
+
     }
 
     protected void noContentMessage()
