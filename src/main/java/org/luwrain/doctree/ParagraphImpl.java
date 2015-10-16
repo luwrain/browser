@@ -41,7 +41,10 @@ public class ParagraphImpl extends NodeImpl
 	if (runs == null)
 	    return;
 	for(Run r: runs)
+	{
 	    r.parentParagraph = this;
+	    r.prepareText();
+	}
     }
 
     @Override void setEmptyMark()
@@ -50,7 +53,7 @@ public class ParagraphImpl extends NodeImpl
 	if (runs == null || runs.length < 1)
 	    return;
 	for(Run r: runs)
-	    if (r.text != null && !r.text.isEmpty())
+	    if (!r.toString().trim().isEmpty())
 		empty = false;
     }
 

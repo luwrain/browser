@@ -21,10 +21,10 @@ import org.luwrain.core.NullCheck;
 
 public class Run
 {
-    public String text = "";
-    public String href = "";
-    public TextAttr textAttr = new TextAttr();
-    public ParagraphImpl parentParagraph;
+    String text = "";
+    String href = "";
+    TextAttr textAttr = new TextAttr();
+    ParagraphImpl parentParagraph;
 
     public Run(String text)
     {
@@ -42,5 +42,24 @@ public class Run
     @Override public String toString()
     {
 	return text != null?text:"";
+    }
+
+    void prepareText()
+    {
+	final StringBuilder b = new StringBuilder();
+	boolean wasSpace = false;
+	for(int i = 0;i < text.length();++i)
+	{
+	    char c = text.charAt(i);
+	    if (c == '\n' || c == '\t' || c == ' ')
+		c = ' ';
+	    if (Character.isISOControl(c))
+		continue;
+	    if (wasSpace && Character.isSpace(c))
+		continue;
+	    b.append(c);
+	    wasSpace = Character.isSpace(c);
+	}
+	text = b.toString();
     }
 }
