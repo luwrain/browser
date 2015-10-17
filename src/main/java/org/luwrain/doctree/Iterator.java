@@ -101,6 +101,20 @@ public class Iterator
 	return getCurrentParagraphImpl().getIndexInParentSubnodes();
     }
 
+    public boolean coversPos(int x, int y)
+    {
+	if (isCurrentRowEmpty())
+	    return false;
+	final Row r = getCurrentRow();
+	if (r.getRowY() != y)
+	    return false;
+	if (x < r.getRowX())
+	    return false;
+	if (x > r.getRowX() + getCurrentText().length())
+	    return false;
+	return true;
+    }
+
     public boolean isCurrentParaFirst()
     {
 	return getCurrentParaIndex() == 0;

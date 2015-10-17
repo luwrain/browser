@@ -131,7 +131,15 @@ public class DocTreeArea implements Area
     @Override public boolean onEnvironmentEvent(EnvironmentEvent event)
     {
 	NullCheck.notNull(event, "event");
-	return region.onEnvironmentEvent(event, getHotPointX(), getHotPointY());
+	switch(event.getCode())
+	{
+	case EnvironmentEvent.MOVE_HOT_POINT:
+	    if (event instanceof MoveHotPointEvent)
+		return onMoveHotPoint((MoveHotPointEvent)event);
+	    return false;
+	default:
+	    return region.onEnvironmentEvent(event, getHotPointX(), getHotPointY());
+	}
     }
 
     @Override public Action[] getAreaActions()
@@ -168,6 +176,25 @@ public class DocTreeArea implements Area
 	    return title != null?title:"";
 	}
 	return "";
+    }
+
+    private boolean onMoveHotPoint(MoveHotPointEvent event)
+    {
+	System.out.println("begin");
+	if (document == null)
+	    return false;
+	final Iterator it2 = (Iterator)iterator.clone();
+	final int x = event.getNewHotPointX();
+	final int y = event.getNewHotPointY();
+	System.out.println("" + x + "," + y);
+	while (it2.canMoveNext() && !it2.coversPos(x, y))
+	    it2.moveNext();
+	if (!it2.canMoveNext())
+	    return false;
+	System.out.println("here");
+	iterator = it2;
+	hotPointX = x - iterator.getCurrentRow().getRowX();
+	return true;
     }
 
     private boolean onTab(KeyboardEvent event, boolean briefIntroduction)
