@@ -24,7 +24,7 @@ public class NodeImpl implements Node
     public int type;
     public NodeImpl[] subnodes = new NodeImpl[0];
     NodeImpl parentNode;
-
+    
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
 
@@ -38,7 +38,28 @@ public class NodeImpl implements Node
 
     boolean empty = false;
 
-    NodeImpl(int type)
+	public String id=null;
+    @Override public String getId()
+	{
+		return id;
+	}
+    public void setId(String id)
+    {
+    	this.id=id;
+    }
+    
+    public String smil=null;
+    public String getSmil()
+	{
+		return smil;
+	}
+	public void setSmil(String smil)
+	{
+		this.smil=smil;
+	}
+	
+	
+	NodeImpl(int type)
     {
 	this.type = type;
     }
@@ -276,6 +297,8 @@ public class NodeImpl implements Node
 	    return "ORDERED_LIST";
 	case LIST_ITEM:
 	    return "LIST_ITEM";
+	case SMIL_PAR:
+	    return "SMIL_PAR";
 	default:
 	    return "";
 	}
