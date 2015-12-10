@@ -242,18 +242,6 @@ public class NodeImpl implements Node
 	return -1;
     }
 
-    /** @return -1 if it is impossible to understand;*/
-    /*
-    int getNodeIndexInRoot()
-    {
-	if (parentNode == null || parentNode.subnodes == null
-	    return -1;
-	    if (parentNode.type == ROOT)
-		return getIndexInParentSubnodes();
-	    return parentNode.getNodeIndexInRoot();
-    }
-    */
-
     static public String typeStr(int type)
     {
 	switch(type)
