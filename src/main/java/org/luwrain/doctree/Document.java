@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import java.util.HashMap;
+
 import org.luwrain.core.NullCheck;
 
 public class Document 
@@ -29,6 +31,8 @@ public class Document
     public RowPart[] rowParts;
     private RowImpl[] rows;
 
+    public HashMap<String,NodeImpl> idx=new HashMap<String,NodeImpl>();
+    
     public Document(NodeImpl root, int width)
     {
 	this.root = root;
@@ -138,7 +142,21 @@ public class Document
 	    for(RowPart r: p.rowParts)
 		r.absRowNum = r.relRowNum + currentParaTop;
 	    //currentParaTop += (p.height + (p.shouldHaveExtraLine()?1:0));
-currentParaTop += p.height;
+	    currentParaTop += p.height;
 	}
+    }
+    
+    // recreate hash map index for all node's ids
+    public void makeIndex()
+    {
+    	idx=new HashMap<String,NodeImpl>();
+    	makeIndex(root);
+    }
+    public void makeIndex(NodeImpl node)
+    {
+    	// TODO: duplicate id in document, it would but can not be supported, make decision, what to do with this
+    	if(node.id!=null) idx.put(node.id,node);
+    	for(NodeImpl n:node.subnodes)
+    		makeIndex(n);
     }
 }
