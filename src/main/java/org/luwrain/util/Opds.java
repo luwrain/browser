@@ -44,7 +44,7 @@ public class Opds
 
 	@Override public String toString()
 	{
-	    return title + "(" + link + ")"
+	    return title;
 	}
 
 	public String id()
@@ -116,8 +116,14 @@ public class Opds
 	final LinkedList<Entry> res = new LinkedList<Entry>();
 	Document doc = null;
 	try {
+
+	final URLConnection con = url.openConnection();
+con.setRequestProperty("User-Agent", "Mozilla/4.0");
+//	    inputStream = ;
+	
+
 	    final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	    doc = builder.parse(new InputSource(url.openStream()));
+	    doc = builder.parse(new InputSource(con.getInputStream() ));
 	}
 	catch (Exception e)
 	{
