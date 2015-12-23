@@ -62,7 +62,7 @@ public class DTBook
 	}
 	
 	
-	// test to disable dtd loading
+	// to disable dtd loading from internet while use DocumentBuilder.parse xml
 	public static class NoOpEntityResolver implements EntityResolver
 	{
 		public InputSource resolveEntity(String publicId, String systemId)
