@@ -32,6 +32,7 @@ import org.luwrain.util.*;
 public class HtmlEncoding implements MlReaderListener, MlReaderConfig
 {
     final String[] nonClosingTags = new String[]{
+    "?xml",
 	"!doctype",
 	"input",
 	"br",
@@ -51,6 +52,11 @@ public class HtmlEncoding implements MlReaderListener, MlReaderConfig
 	if (attrs.containsKey("charset"))
 	{
 	    encoding = attrs.get("charset");
+	    return;
+	}
+	if (attrs.containsKey("encoding"))
+	{
+	    encoding = attrs.get("encoding");
 	    return;
 	}
 	if (attrs.containsKey("content"))

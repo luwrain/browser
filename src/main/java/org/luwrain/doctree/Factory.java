@@ -29,6 +29,8 @@ public class Factory
     static public final int HTML = 4;
     static public final int DOC = 5;
     static public final int DOCX = 6;
+    static public final int EPUB = 7;
+	static public final int ZIPTEXT = 8;
 
     static public Document loadFromFile(int format, String fileName, int width, String encoding)
     {
@@ -47,6 +49,10 @@ public class Factory
 	    return new DocX(fileName).constructDocument(width);
 	case HTML:
 	    return new Html(true, fileName).constructDocument(width, encoding);
+	case EPUB:
+		return new Epub(fileName).constructDocument(width);
+	case ZIPTEXT:
+		return new ZipText(fileName).constructDocument(width);
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
@@ -75,6 +81,8 @@ public class Factory
 	ext = ext.toLowerCase();
 	switch(ext)
 	{
+	case "epub":
+	    return EPUB;
 	case "txt":
 	    return TEXT_PARA_INDENT;
 	case "doc":
@@ -83,7 +91,10 @@ public class Factory
 	    return DOCX;
 	case "html":
 	case "htm":
+	case "fb2":
 	    return HTML;
+	case "zip":
+	    return ZIPTEXT;
 	default:
 	    return UNRECOGNIZED;
 	}

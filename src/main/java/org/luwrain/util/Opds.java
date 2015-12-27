@@ -17,15 +17,27 @@
 package org.luwrain.util;
 
 import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
-import org.xml.sax.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
+import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.luwrain.core.NullCheck;
 
 public class Opds
 {
+	final static private int BUFFER_SIZE=32*1024;
+	
     static public class Entry 
     {
 	private String id;
@@ -81,15 +93,20 @@ public class Opds
 
     static public class Result
     {
-	public enum Errors {FETCH, PARSE, NOERROR};
+	public enum Errors {FETCH, PARSE, NOERROR, NEEDPAY};
 
 	private Directory dir;
 	private Errors error;
+	// file link if result is not a directory entry and mime type of it
+	private String filename;
+	private String mime;
 
 	Result(Errors error)
 	{
 	    this.error = error;
 	    this.dir = null;
+	    this.filename=null;
+	    this.mime=null;
 	}
 
 	Result(Directory dir)
@@ -97,6 +114,23 @@ public class Opds
 	    NullCheck.notNull(dir, "dir");
 	    this.error = Errors.NOERROR;
 	    this.dir = dir;
+	}
+	Result(String filename, String mime)
+	{
+	    this.error=Errors.NOERROR;
+	    this.dir=null;
+	    this.filename=filename;
+	    this.mime=mime;
+	}
+
+	public String getFileName()
+	{
+		return filename;
+	}
+
+	public String getMimeType()
+	{
+		return mime;
 	}
 
 	public Directory directory()
@@ -108,22 +142,97 @@ public class Opds
 	{
 	    return error;
 	}
+
+	public boolean isDirectory()
+	{
+		return (error==Errors.NOERROR&&dir!=null);
+	}
+	public boolean isBook()
+	{
+		return (error==Errors.NOERROR&&filename!=null);
+	}
+	
     }
 
     static public Result fetch(URL url)
     {
 	NullCheck.notNull(url, "url");
 	final LinkedList<Entry> res = new LinkedList<Entry>();
-	Document doc = null;
+	org.jsoup.nodes.Document doc = null;
 	try {
 
-	final URLConnection con = url.openConnection();
-con.setRequestProperty("User-Agent", "Mozilla/4.0");
-//	    inputStream = ;
-	
-
-	    final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	    doc = builder.parse(new InputSource(con.getInputStream() ));
+		//final URLConnection con = url.openConnection();
+		//con.setRequestProperty("User-Agent", "Mozilla/4.0");
+		
+		final Connection con=Jsoup.connect(url.toString());
+		con.userAgent("Mozilla/4.0");
+		con.timeout(60000);
+		doc = con.get();
+	}
+	catch(UnsupportedMimeTypeException e)
+	{
+		String mime=e.getMimeType();
+		String path=e.getUrl().trim();
+		if(path.isEmpty()) path=url.toString();
+		//System.out.println("* "+path);
+		String p="";
+		while(p.isEmpty()&&path.length()>0)
+		{
+			p=path.substring(path.lastIndexOf('/')+1,path.length());
+			if(p.isEmpty())
+				path=path.substring(0,path.length()-1);
+			if(p.equals("download"))
+			{
+				p="";
+				path=path.substring(0,path.length()-9);
+			}
+		}
+		if(p.isEmpty())
+		{
+			
+		} else
+		if(p.indexOf('.')==-1)
+		{ // add file name extension by mime type
+			path=p;
+			if(mime.equals("application/zip")) path+=".zip"; 
+			if(mime.equals("application/rar")) path+=".rar"; 
+			if(mime.equals("application/epub+zip")) path+=".epub";
+			if(mime.equals("application/rtf")) path+=".rtf";
+			// FIXME: remake app-reader to accept mime type
+		}
+		System.out.println("* "+path);
+		String filename=path.replaceAll("[^a-zA-Z0-9\\.\\-\\\\\\/]","_");
+		if(!(new File(filename).exists()))
+		{ // not downloaded later
+			try
+			{
+				final URLConnection con = url.openConnection();
+				con.setRequestProperty("User-Agent", "Mozilla/4.0");
+				System.out.println("* store to file: '"+filename+"' from '"+path+"'");
+				FileWriter fw=new FileWriter(filename);
+				FileOutputStream os = new FileOutputStream(filename);
+				InputStream is=con.getInputStream();
+				int bytesRead = -1;
+				byte[] buffer = new byte[BUFFER_SIZE];
+				while ((bytesRead = is.read(buffer)) != -1)
+					os.write(buffer, 0, bytesRead);
+				os.close();
+				is.close();
+				// open document
+			} catch(IOException e1)
+			{
+			    e1.printStackTrace();
+			    return new Result(Result.Errors.FETCH);
+			}
+		}
+		return new Result(filename,mime);
+	}
+	catch (HttpStatusException e)
+	{
+		if(e.getStatusCode()==402)
+			return new Result(Result.Errors.NEEDPAY);
+	    e.printStackTrace();
+	    return new Result(Result.Errors.FETCH);
 	}
 	catch (Exception e)
 	{
@@ -131,24 +240,13 @@ con.setRequestProperty("User-Agent", "Mozilla/4.0");
 	    return new Result(Result.Errors.FETCH);
 	}
 	try {
-	    final NodeList nodes = doc.getElementsByTagName("entry");
-	    for (int i = 0;i < nodes.getLength();++i)
-	    {
-		final Node node = nodes.item(i);
-		if (node == null || node.getNodeType() != Node.ELEMENT_NODE)
-		    continue;
-		final Entry entry = parseEntry((Element)node);
-		//		System.out.println(el.toString());
-		if (entry != null)
-		    res.add(entry);
-		/*
-		  final NamedNodeMap attr = el.getAttributes();
-		  final Node title = attr.getNamedItem("title");
-		  final Node snippet = attr.getNamedItem("snippet");
-		  if (title != null)
-		  res.add(new Page(lang, title.getTextContent(), snippet != null?MlTagStrip.run(snippet.getTextContent()):""));
-		*/
-	    }
+
+		for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
+		{
+			final Entry entry = parseEntry(node);
+			if (entry != null)
+			    res.add(entry);
+		}
 	}
 	catch (Exception e)
 	{
@@ -167,19 +265,17 @@ con.setRequestProperty("User-Agent", "Mozilla/4.0");
 	    String link = "";
 
 	    //Title
-	    NodeList nodes = el.getElementsByTagName("title");
-	    for (int i = 0;i < nodes.getLength();++i)
-		title = nodes.item(i).getTextContent();
+	    for(Element node:el.getElementsByTag("title"))
+	    	title = node.text();
 
 	    //ID
-	    nodes = el.getElementsByTagName("id");
-	    for (int i = 0;i < nodes.getLength();++i)
-		id = nodes.item(i).getTextContent();
+	    for(Element node:el.getElementsByTag("id"))
+	    	id = node.text();
 
 	    //Link
-	    nodes = el.getElementsByTagName("link");
-	    for (int i = 0;i < nodes.getLength();++i)
-		link = nodes.item(i).getAttributes().getNamedItem("href").getTextContent();
+	    for(Element node:el.getElementsByTag("link"))
+	    	link = node.attributes().get("href");
+
 	    if (id != null && title != null && link != null)
 		return new Entry(id, title, link);
 	    return null;
