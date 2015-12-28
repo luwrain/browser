@@ -55,6 +55,11 @@ public class ZipText
 			int format=Factory.suggestFormat(entry.getName());
 			if(format==Factory.UNRECOGNIZED) continue;
 			
+			Document subdoc=Factory.loadFromStream(format,zip,null,width);
+			for(NodeImpl node:subdoc.getRoot().subnodes)
+				subnodes.add(node);
+
+			/*
 			byte[] buffer=new byte[(int)entry.getSize()]; // FEXME: make inmemory file load better
 			int len=zip.read(buffer);
 			// FIXME: make better encoding detection
@@ -68,6 +73,7 @@ System.out.println(content.substring(0,Math.min(64,content.length())));
 			Document subdoc=Factory.loadFromText(format,content,width);
 			for(NodeImpl node:subdoc.getRoot().subnodes)
 				subnodes.add(node);
+			*/
 			entry = zip.getNextEntry();
 		}
 		zip.close();
