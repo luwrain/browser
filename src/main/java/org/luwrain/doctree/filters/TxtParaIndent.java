@@ -36,13 +36,13 @@ public class TxtParaIndent
 	NullCheck.notNull(fileName, "fileName");
     }
 
-    public Document constructDocument(String encoding, int width)
+    public Document constructDocument(String encoding)
     {
 	final Path path = Paths.get(fileName);
 	final String[] lines = read(path, encoding);
 	if (lines == null)
 	    return null;
-	return format(lines, width);
+	return format(lines);
     }
 
     static String[] read(Path path, String encoding)
@@ -59,7 +59,7 @@ public class TxtParaIndent
 	}
     }
 
-    private Document format(String[] lines, int width)
+    private Document format(String[] lines)
     {
 	final LinkedList<String> paraLines = new LinkedList<String>();
 	final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
@@ -90,7 +90,7 @@ public class TxtParaIndent
 	    nodes.add(para);
 	final NodeImpl root = NodeFactory.create(Node.ROOT); 
 	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
-	return new Document(root, width);
+	return new Document(root);
     }
 
     private ParagraphImpl createPara(LinkedList<String> linesList)

@@ -35,16 +35,16 @@ public class TxtParaEachLine
 	NullCheck.notNull(fileName, "fileName");
     }
 
-    public Document constructDocument(String encoding, int width)
+    public Document constructDocument(String encoding)
     {
 	final Path path = Paths.get(fileName);
 	final String[] lines = TxtParaIndent.read(path, encoding);
 	if (lines == null)
 	    return null;
-	return format(lines, width);
+	return format(lines);
     }
 
-    private Document format(String[] lines, int width)
+    private Document format(String[] lines)
     {
 	final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
 	for(String line: lines)
@@ -55,6 +55,6 @@ public class TxtParaEachLine
 	}
 	final NodeImpl root = NodeFactory.create(Node.ROOT); 
 	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
-	return new Document(root, width);
+	return new Document(root);
     }
 }

@@ -17,8 +17,11 @@
 
 package org.luwrain.doctree;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.*;
+import java.io.*;
+import java.nio.file.*;
+import java.nio.charset.*;
+import java.util.*;
 
 import org.apache.poi.util.IOUtils;
 import org.luwrain.core.*;
@@ -37,35 +40,132 @@ public class Factory
 	static public final int ZIPTEXT = 8;
 	static public final int FICTIONBOOK2 = 9;
 
-    static public Document loadFromFile(int format, String fileName, int width, String encoding)
+    static private final String USER_AGENT = "Mozilla/4.0";
+
+    static public Document loadFromFile(int format, String fileName, String encoding)
     {
 	NullCheck.notNull(fileName, "fileName");
 	switch (format)
 	{
 	case TEXT_PARA_INDENT:
-	    return new TxtParaIndent(fileName).constructDocument(encoding, width);
+	    return new TxtParaIndent(fileName).constructDocument(encoding);
 	case TEXT_PARA_EMPTY_LINE:
-	    return new TxtParaEmptyLine(fileName).constructDocument(encoding, width);
+	    return new TxtParaEmptyLine(fileName).constructDocument(encoding);
 	case TEXT_PARA_EACH_LINE:
-	    return new TxtParaEachLine(fileName).constructDocument(encoding, width);
+	    return new TxtParaEachLine(fileName).constructDocument(encoding);
 	case DOC:
-	    return new Doc(fileName).constructDocument(width);
+	    return new Doc(fileName).constructDocument();
 	case DOCX:
-	    return new DocX(fileName).constructDocument(width);
+	    return new DocX(fileName).constructDocument();
 	case HTML:
-	    return new Html(true, fileName).constructDocument(width, encoding);
+	    //	    return new Html(true, fileName).constructDocument(encoding);
+
+	    try {
+		new HtmlJsoup(Paths.get(fileName), encoding).constructDocument();
+	    }
+	    catch(Exception e)
+	    {
+		e.printStackTrace(); 
+		return null;
+	    }
+
 	case EPUB:
-		return new Epub(fileName).constructDocument(width);
+		return new Epub(fileName).constructDocument();
 	case ZIPTEXT:
-		return new ZipText(fileName).constructDocument(width);
+		return new Zip(fileName).constructDocument();
 	case FICTIONBOOK2 :
-		return new FictionBook2(fileName).constructDocument(width);
+	    //		return new FictionBook2(fileName).constructDocument();
+	    return null;
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
     }
 
-    static public Document loadFromStream(int format, InputStream stream, String charset, int width)
+    static public Document fromUrl(URL url, int format, 
+				   String charset)
+    {
+	NullCheck.notNull(url, "url");
+	NullCheck.notNull(charset, "charset");
+	URLConnection con = null;
+	URL resultUrl = null;
+	InputStream is = null;
+	String contentTypeCharset = null;
+	try {
+	    con = url.openConnection();
+	    con.setRequestProperty("User-Agent", USER_AGENT);
+	    if (charset.isEmpty())
+	    contentTypeCharset = con.getContentType(); else
+		contentTypeCharset = charset;
+	    is = con.getInputStream();
+	    resultUrl = con.getURL();
+	}
+	catch(IOException e)
+	{
+	    //	    if (is != null)
+	    //		is.close();
+	    //	    if (tmpFile != null)
+	    //		tmpFile.delete();
+	    return null;
+	}
+	if (contentTypeCharset != null && !contentTypeCharset.trim().isEmpty())
+	    switch(format)
+	{
+	case HTML:
+	    try {
+		final Document doc = new HtmlJsoup(is, contentTypeCharset, resultUrl.toString()).constructDocument();
+is.close();
+is = null;
+return doc;
+	    }
+	    catch(Exception e)
+	    {
+		//		is.close();
+		e.printStackTrace();
+		return null;
+	    }
+	default:
+	    //	    is.close();
+	    Log.error("doctree", "unknown format:" + format );
+	    return null;
+	}
+	Path path = null;
+	try {
+	    path = downloadToTmpFile(is);
+	is.close();
+	is = null;
+	contentTypeCharset = extractCharsetInfo(path);
+	}
+	catch(IOException e)
+	{
+	    //	    if (is != null)
+		//		is.close();
+	    e.printStackTrace();
+	    return null;
+	}
+	if (contentTypeCharset == null || contentTypeCharset.trim().isEmpty())
+	{
+	    Log.error("doctree", "unable to get a charset information for " + url.toString());
+	    return null;
+	}
+	switch(format)
+	{
+	case HTML:
+	    try {
+		return new HtmlJsoup(path, contentTypeCharset).constructDocument();
+	    }
+	    catch(Exception e)
+	    {
+		e.printStackTrace(); 
+		return null;
+	    }
+	default:
+	    Log.error("doctree", "unknown format:" + format);
+	    return null;
+	}
+    }
+
+
+    static public Document loadFromStream(int format, InputStream stream, String charset)
     {
     	switch (format)
     	{
@@ -81,26 +181,43 @@ public class Factory
 			{
 				byte[] data;
 				data=IOUtils.toByteArray(stream);
-	    		return loadFromText(format,new String(data,"UTF-8"),width);
+	    		return loadFromText(format,new String(data,"UTF-8"));
 			} catch(IOException e)
 			{
 				e.printStackTrace();
 				return null;
 			}
     	case FICTIONBOOK2 :
-    		return new FictionBook2(stream,charset).constructDocument(width);
+	    try {
+    		return new FictionBook2(stream,charset).constructDocument();
+	    }
+	    catch(Exception e)
+	    {
+		e.printStackTrace();
+		return null;
+	    }
     	default:
     	    throw new IllegalArgumentException("unknown format " + format);
     	}
     }
 
-    static public Document loadFromText(int format, String text, int width)
+    static public Document loadFromText(int format, String text)
     {
 	NullCheck.notNull(text, "text");
 	switch (format)
 	{
 	case HTML:
-	    return new Html(false, text).constructDocument(width, "");
+	    //	    return new Html(false, text).constructDocument("");
+
+	    try {
+		return new HtmlJsoup(text).constructDocument();
+	    }
+	    catch(Exception e)
+	    {
+		e.printStackTrace(); 
+		return null;
+	    }
+
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
@@ -135,5 +252,22 @@ public class Factory
 	default:
 	    return UNRECOGNIZED;
 	}
+    }
+
+    static private Path downloadToTmpFile(InputStream s) throws IOException
+    {
+	final Path path = Files.createTempFile("lwrdoctree-download", "");
+	    Files.copy(s, path, StandardCopyOption.REPLACE_EXISTING);
+	    return path;
+    }
+
+    static String extractCharsetInfo(Path path) throws IOException
+    {
+	final List<String> lines = Files.readAllLines(path, StandardCharsets.US_ASCII);
+	final StringBuilder b = new StringBuilder();
+	for(String s: lines)
+	    b.append(s + "\n");
+	final String res = HtmlEncoding.getEncoding(new String(b));
+	return res != null?res:"";
     }
 }

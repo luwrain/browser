@@ -60,6 +60,7 @@ public class Run
 	    b.append(c);
 	    wasSpace = Character.isSpace(c);
 	}
-	text = b.toString();
+	text = new String(b);
+	//	System.out.println("text:" + text);
     }
 }

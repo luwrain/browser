@@ -50,19 +50,27 @@ jsoupDoc = Jsoup.parse(url, 60000);
 jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
     }
 
+    public HtmlJsoup(InputStream is, String charset,
+String baseUrl) throws IOException
+    {
+	NullCheck.notNull(is, "is");
+	jsoupDoc = Jsoup.parse(is, charset, baseUrl);
+    }
+
+
     public HtmlJsoup(String text) throws IOException
     {
 	NullCheck.notNull(text, "text");
 jsoupDoc = Jsoup.parse(text);
     }
 
-    public org.luwrain.doctree.Document constructDocument(int width)
+    public org.luwrain.doctree.Document constructDocument()
     {
 	//	final org.luwrain.doctree.NodeImpl rootNode = onNode(jsoupDoc.body(), NodeImpl.ROOT);
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.create(NodeImpl.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
 	System.out.println("" + res.subnodes.length + " root subnodes");
-return new org.luwrain.doctree.Document(jsoupDoc.title(), res, width);
+return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
     }
 
     private NodeImpl[] onNode(Node node)

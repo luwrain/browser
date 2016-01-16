@@ -39,7 +39,7 @@ public class ParagraphImpl extends NodeImpl
     {
 	subnodes = null;
 	if (runs == null)
-	    return;
+	    runs = new Run[0];
 	for(Run r: runs)
 	{
 	    r.parentParagraph = this;

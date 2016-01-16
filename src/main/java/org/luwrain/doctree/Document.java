@@ -20,6 +20,7 @@ package org.luwrain.doctree;
 import java.util.HashMap;
 
 import org.luwrain.core.NullCheck;
+import org.luwrain.core.Log;
 
 public class Document 
 {
@@ -32,44 +33,51 @@ public class Document
     private RowImpl[] rows;
 
     public HashMap<String,NodeImpl> idx=new HashMap<String,NodeImpl>();
-    
-    public Document(NodeImpl root, int width)
+
+    public Document(NodeImpl root)
     {
 	this.root = root;
 	NullCheck.notNull(root, "root");
 	title = "";
-	buildView(width);
     }
 
-    public Document(String title, NodeImpl root, int width)
+    public Document(String title, NodeImpl root)
     {
 	this.root = root;
 	this.title = title;
 	NullCheck.notNull(root, "root");
 	NullCheck.notNull(title, "title");
-	buildView(width);
     }
 
     public void buildView(int width)
     {
-	root.commit();
-	root.setEmptyMark();
-	root.removeEmpty();
-	root.calcWidth(width);
-	RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
-	rowPartsBuilder.onNode(root);
-	rowParts = rowPartsBuilder.parts();
-	if (rowParts == null)
-	    rowParts = new RowPart[0];
-	if (rowParts.length <= 0)
-	    return;
-	paragraphs = rowPartsBuilder.paragraphs();
-	root.calcHeight();
-	calcAbsRowNums();
-	root.calcPosition();
-	rows = RowImpl.buildRows(rowParts);
-	//	layout.init();
-	layout.calc();
+	try {
+	    Log.debug("doctree", "building view for width=" + width);
+	    root.commit();
+	    root.setEmptyMark();
+	    root.removeEmpty();
+	    root.calcWidth(width);
+	    final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
+	    rowPartsBuilder.onNode(root);
+	    rowParts = rowPartsBuilder.parts();
+	    if (rowParts == null)
+		rowParts = new RowPart[0];
+	    Log.debug("doctree", "" + rowParts.length + " row parts prepared");
+	    if (rowParts.length <= 0)
+		return;
+	    paragraphs = rowPartsBuilder.paragraphs();
+	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
+	    root.calcHeight();
+	    calcAbsRowNums();
+	    root.calcPosition();
+	    rows = RowImpl.buildRows(rowParts);
+	    Log.debug("doctree", "" + rows.length + " rows prepared");
+	    layout.calc();
+	}
+	catch(Exception e)
+	{
+	    e.printStackTrace();
+	}
     }
 
     public int getLineCount()
@@ -80,12 +88,6 @@ public class Document
     public String getLine(int index)
     {
 	return layout.getLine(index);
-    }
-
-    public void saveStatistics(Statistics stat)
-    {
-	if (root != null)
-	    root.saveStatistics(stat);
     }
 
     public boolean checkConsistency(boolean stopImmediately)

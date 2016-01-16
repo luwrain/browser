@@ -26,7 +26,7 @@ public class NodeFactory
 	case Node.PARAGRAPH:
 	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
 	case Node.SECTION:
-	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
+	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.create(), use NodeFactory.createSection() instead");
 	case Node.TABLE:
 	    return new Table();
 	case Node.TABLE_ROW:

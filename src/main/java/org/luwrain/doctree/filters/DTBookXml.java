@@ -51,7 +51,7 @@ public class DTBookXml
 		}
 	}
 
-	public Document constructDocument(int width) throws Exception
+	public Document constructDocument() throws Exception
 	{
 		org.w3c.dom.Document xmlDoc=null;
 		File file = new File(fileName);
@@ -81,8 +81,7 @@ public class DTBookXml
 		parseNode(subnodes,bookBody.item(0));
 		final NodeImpl root = NodeFactory.create(Node.ROOT);
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-
-		Document luwrainDoc=new Document(root, width);
+		Document luwrainDoc=new Document(root);
 		
 		return luwrainDoc;
 	}

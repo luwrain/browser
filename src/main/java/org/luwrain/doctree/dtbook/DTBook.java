@@ -135,14 +135,14 @@ public class DTBook
 			if(dtbf.type.equals("application/smil"))
 			{ // smil
 				Smil parser=new Smil(false,realPath(dtbf.name).toString());
-				dtbf.document=parser.constructDocument(DEFAULT_WIDTH);
+				dtbf.document=parser.constructDocument();
 				System.out.println(dtbf.name+": "+dtbf.document.getRoot().subnodes[0].subnodes.length);
 				//System.exit(0);
 			} else
 			if(dtbf.type.equals("application/x-dtbook+xml"))
 			{ // dtbook xml
 				DTBookXml parser=new DTBookXml(false,realPath(dtbf.name).toString());
-				dtbf.document=parser.constructDocument(DEFAULT_WIDTH);
+				dtbf.document=parser.constructDocument();
 				System.out.println(dtbf.name+": "+dtbf.document.getRoot().subnodes.length);
 			} else
 			if(dtbf.type.equals("application/x-dtbncx+xml"))

@@ -45,7 +45,7 @@ public class Html
 	}
     }
 
-    public Document constructDocument(int width, String charset)
+    public Document constructDocument(String charset)
     {
 	if (src == null)
 	{
@@ -63,7 +63,7 @@ public class Html
 	HtmlParse parse = new HtmlParse();
 	new MlReader(new HtmlConfig(), parse, src).read();
 	final NodeImpl root = parse.constructRoot();
-	return new Document(parse.getTitle(), root, width);
+	return new Document(parse.getTitle(), root);
     }
 
     private void read(Charset encoding)

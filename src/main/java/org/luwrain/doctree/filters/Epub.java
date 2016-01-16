@@ -48,12 +48,11 @@ public class Epub
 	    throw new NullPointerException("fileName may not be null");
     }
 
-    public Document constructDocument(int width)
+    public Document constructDocument()
     {
 	try {
 		final NodeImpl root = NodeFactory.create(Node.ROOT);
 		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-
 		EpubReader epubReader = new EpubReader();
 		Book book = epubReader.readEpub(new FileInputStream(fileName));
 		List<String> titles = book.getMetadata().getTitles();
@@ -75,15 +74,14 @@ public class Epub
 		    	if(line.startsWith("<?xml")) continue; // FIXME: make this fix inside Html parser
 		    	result+=line+"\n";
 		    }
-		    	
-			Html html=new Html(false,result);
-			Document subdoc=html.constructDocument(width,"UTF-8");
+		    				Html html=new Html(false,result);
+			Document subdoc=html.constructDocument("UTF-8");
 			for(NodeImpl node:subdoc.getRoot().subnodes)
 				subnodes.add(node);
 		}
 		//Range range = doc.getRange();
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-		return new Document(root, width);
+		return new Document(root);
 	} catch (IOException e)
 	{
 	    e.printStackTrace();

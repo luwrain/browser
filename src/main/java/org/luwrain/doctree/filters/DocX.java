@@ -44,7 +44,7 @@ public class DocX
 	NullCheck.notNull(fileName, "fileName");
     }
 
-    public org.luwrain.doctree.Document constructDocument(int width)
+    public org.luwrain.doctree.Document constructDocument()
     {
     	FileInputStream  s = null;
     	try
@@ -52,7 +52,7 @@ public class DocX
 	    File docFile=new File(fileName);
 	    s = new FileInputStream(docFile.getAbsolutePath());
 	    XWPFDocument doc = new XWPFDocument(s);
-	    final org.luwrain .doctree.Document res = transform(doc, width);
+	    final org.luwrain .doctree.Document res = transform(doc);
 	    s.close(); //closing fileinputstream
 	    return res;
     	} catch (IOException e)
@@ -67,14 +67,14 @@ public class DocX
     	}
     }
 
-    private org.luwrain.doctree.Document transform(XWPFDocument doc, int width)
+    private org.luwrain.doctree.Document transform(XWPFDocument doc)
     {
 	wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
 	final NodeImpl root = NodeFactory.create(Node.ROOT);
 	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-	return new org.luwrain.doctree.Document(root, width);
+	return new org.luwrain.doctree.Document(root);
     }
 
     /* рекурсивный метод, вызывается для любого места в документе, способного содержать несколько элементов, представляя их как список параграфов

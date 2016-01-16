@@ -17,41 +17,168 @@
 package org.luwrain.util;
 
 import java.util.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+//import java.io.File;
+//import java.io.FileOutputStream;
+//import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.net.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import javax.activation.*;
 
-import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
-import org.jsoup.nodes.Element;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
+
 import org.luwrain.core.NullCheck;
 
+/**
+ * OPDS (Open Publication Distribution System) parser. This class
+ * contains a number of utilities to fetch and parse data provided by
+ * OPDS resources (usually digital libraries). Basically, it just reads
+ * XML and saves necessary data in corresponding classes for further
+ * using in client applications.
+ */
 public class Opds
 {
-	final static private int BUFFER_SIZE=32*1024;
-	
+    final static private int BUFFER_SIZE=32*1024;
+
+    static public class Link
+    {
+	static public final String PROFILE_CATALOG = "opds-catalog";
+	static public final String BASE_TYPE_CATALOG = "application/atom+xml";
+
+	private String url;
+	private String rel;
+	private String type;
+	private String profile;
+
+	Link(String url, String rel,
+	     String type, String profile)
+	{
+	    this.url = url;
+	    this.rel = rel;
+	    this.type = type;
+	    this.profile = profile;
+	    NullCheck.notNull(url, "url");
+	}
+
+	public boolean isCatalog()
+	{
+	    if (getTypeProfile().toLowerCase().equals(PROFILE_CATALOG))
+		return true;
+	    return getBaseType().equals(BASE_TYPE_CATALOG);
+	}
+
+	//Never returns null
+	public String getBaseType()
+	{
+	    if (type == null)
+		return "";
+	    try {
+		final MimeType mime = new MimeType(type);
+		final String value = mime.getBaseType();
+		return value != null?value:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
+	}
+
+	//Never returns null
+	public String getPrimaryType()
+	{
+	    if (type == null)
+		return "";
+	    try {
+		final MimeType mime = new MimeType(type);
+		final String value = mime.getPrimaryType();
+		return value != null?value:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
+	}
+
+	//Never returns null
+	public String getSubType()
+	{
+	    if (type == null)
+		return "";
+	    try {
+		final MimeType mime = new MimeType(type);
+		final String value = mime.getSubType();
+		return value != null?value:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
+	}
+
+
+	//Never returns null
+	public String getTypeProfile()
+	{
+	    if (type == null)
+		return "";
+	    try {
+		final MimeType mime = new MimeType(type);
+		final String value = mime.getParameter("profile");
+		return value != null?value:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
+	}
+
+	@Override public String toString()
+	{
+	    return "url=" + url + ",rel=" + rel + ",type=" + type + ",profile=" + getTypeProfile();
+	}
+
+	public String url(){return url;}
+	public String rel(){return rel;};
+	public String type(){return type;}
+	public String profile(){return profile;}
+    }
+
     static public class Entry 
     {
 	private String id;
 	private String title;
-	private String link;
+	private Link[] links;
 
-	Entry(String id, String title, String link)
+	Entry(String id, String title, Link[] links)
 	{
 	    this.id = id;
 	    this.title = title;
-	    this.link = link;
+	    this.links = links != null?links:new Link[0];
 	    NullCheck.notNull(id, "id");
 	    NullCheck.notNull(title, "title");
-	    NullCheck.notNull(link, "link");
+	    NullCheck.notNullItems(links, "links");
+	}
+
+	public Link getCatalogLink()
+	{
+	    for(Link link: links)
+		if (link.isCatalog())
+		    return link;
+	    return null;
+	}
+
+	public boolean isCatalogOnly()
+	{
+	    for(Link link: links)
+		if (!link.isCatalog())
+		    return false;
+	    return true;
 	}
 
 	@Override public String toString()
@@ -59,20 +186,9 @@ public class Opds
 	    return title;
 	}
 
-	public String id()
-	{
-	    return id;
-	}
-
-	public String link()
-	{
-	    return link;
-	}
-
-	public String title()
-	{
-	    return title;
-	}
+	public String id(){return id;}
+	public String title(){return title;}
+	public Link[] links(){return links;}
     }
 
     static public class Directory
@@ -85,10 +201,7 @@ public class Opds
 	    NullCheck.notNullItems(entries, "entries");
 	}
 
-	public Entry[] entries()
-	{
-	    return entries;
-	}
+	public Entry[] entries(){return entries;}
     }
 
     static public class Result
@@ -98,23 +211,25 @@ public class Opds
 	private Directory dir;
 	private Errors error;
 	// file link if result is not a directory entry and mime type of it
-	private String filename;
-	private String mime;
+	//	private String filename;
+	//	private String mime;
 
 	Result(Errors error)
 	{
 	    this.error = error;
 	    this.dir = null;
-	    this.filename=null;
-	    this.mime=null;
+	    //	    this.filename=null;
+	    //	    this.mime=null;
 	}
 
 	Result(Directory dir)
 	{
-	    NullCheck.notNull(dir, "dir");
 	    this.error = Errors.NOERROR;
 	    this.dir = dir;
-	}
+	    NullCheck.notNull(dir, "dir");
+    	}
+
+	/*
 	Result(String filename, String mime)
 	{
 	    this.error=Errors.NOERROR;
@@ -122,36 +237,34 @@ public class Opds
 	    this.filename=filename;
 	    this.mime=mime;
 	}
+	*/
 
+	/*
 	public String getFileName()
 	{
 		return filename;
 	}
+	*/
 
+	/*
 	public String getMimeType()
 	{
 		return mime;
 	}
+	*/
 
-	public Directory directory()
-	{
-	    return dir;
-	}
-
-	public Errors error()
-	{
-	    return error;
-	}
+	public Directory directory(){return dir;}
+	public Errors error(){return error;}
 
 	public boolean isDirectory()
 	{
 		return (error==Errors.NOERROR&&dir!=null);
 	}
+
 	public boolean isBook()
 	{
-		return (error==Errors.NOERROR&&filename!=null);
+	    return (error==Errors.NOERROR);//&&filename!=null);
 	}
-	
     }
 
     static public Result fetch(URL url)
@@ -160,130 +273,51 @@ public class Opds
 	final LinkedList<Entry> res = new LinkedList<Entry>();
 	org.jsoup.nodes.Document doc = null;
 	try {
-
-		//final URLConnection con = url.openConnection();
-		//con.setRequestProperty("User-Agent", "Mozilla/4.0");
-		
-		final Connection con=Jsoup.connect(url.toString());
-		con.userAgent("Mozilla/4.0");
-		con.timeout(60000);
-		doc = con.get();
+	    final Connection con=Jsoup.connect(url.toString());
+	    con.userAgent("Mozilla/4.0");
+	    con.timeout(30000);
+	    doc = con.get();
 	}
 	catch(UnsupportedMimeTypeException e)
 	{
-		String mime=e.getMimeType();
-		String path=e.getUrl().trim();
-		if(path.isEmpty()) path=url.toString();
-		//System.out.println("* "+path);
-		String p="";
-		while(p.isEmpty()&&path.length()>0)
-		{
-			p=path.substring(path.lastIndexOf('/')+1,path.length());
-			if(p.isEmpty())
-				path=path.substring(0,path.length()-1);
-			if(p.equals("download"))
-			{
-				p="";
-				path=path.substring(0,path.length()-9);
-			}
-		}
-		if(p.isEmpty())
-		{
-			
-		} else
-		if(p.indexOf('.')==-1)
-		{ // add file name extension by mime type
-			path=p;
-			if(mime.equals("application/zip")) path+=".zip"; 
-			if(mime.equals("application/rar")) path+=".rar"; 
-			if(mime.equals("application/epub+zip")) path+=".epub";
-			if(mime.equals("application/rtf")) path+=".rtf";
-			// FIXME: remake app-reader to accept mime type
-		}
-		System.out.println("* "+path);
-		String filename=path.replaceAll("[^a-zA-Z0-9\\.\\-\\\\\\/]","_");
-		if(!(new File(filename).exists()))
-		{ // not downloaded later
-			try
-			{
-				final URLConnection con = url.openConnection();
-				con.setRequestProperty("User-Agent", "Mozilla/4.0");
-				System.out.println("* store to file: '"+filename+"' from '"+path+"'");
-				FileWriter fw=new FileWriter(filename);
-				FileOutputStream os = new FileOutputStream(filename);
-				InputStream is=con.getInputStream();
-				int bytesRead = -1;
-				byte[] buffer = new byte[BUFFER_SIZE];
-				while ((bytesRead = is.read(buffer)) != -1)
-					os.write(buffer, 0, bytesRead);
-				os.close();
-				is.close();
-				// open document
-			} catch(IOException e1)
-			{
-			    e1.printStackTrace();
-			    return new Result(Result.Errors.FETCH);
-			}
-		}
-		return new Result(filename,mime);
-	}
-	catch (HttpStatusException e)
-	{
-		if(e.getStatusCode()==402)
-			return new Result(Result.Errors.NEEDPAY);
-	    e.printStackTrace();
+	    e.printStackTrace(); 
 	    return new Result(Result.Errors.FETCH);
 	}
-	catch (Exception e)
+	catch(IOException e)
 	{
-	    e.printStackTrace();
+	    e.printStackTrace(); 
 	    return new Result(Result.Errors.FETCH);
 	}
-	try {
-
-		for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
-		{
-			final Entry entry = parseEntry(node);
-			if (entry != null)
-			    res.add(entry);
-		}
-	}
-	catch (Exception e)
-	{
-	    e.printStackTrace();
-	    return new Result(Result.Errors.PARSE);
-	}
+	for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
+	    try {
+		final Entry entry = parseEntry(node);
+		if (entry != null)
+		    res.add(entry);
+	    }
+	    catch (Exception e)
+	    {
+		e.printStackTrace();
+	    }
 	return new Result(new Directory(res.toArray(new Entry[res.size()])));
     }
 
-    static private Entry parseEntry(Element el)
+    static private Entry parseEntry(Element el) throws Exception
     {
 	NullCheck.notNull(el, "el");
-	try {
-	    String id = "";
-	    String title = "";
-	    String link = "";
-
-	    //Title
-	    for(Element node:el.getElementsByTag("title"))
-	    	title = node.text();
-
-	    //ID
-	    for(Element node:el.getElementsByTag("id"))
-	    	id = node.text();
-
-	    //Link
-	    for(Element node:el.getElementsByTag("link"))
-	    	link = node.attributes().get("href");
-
-	    if (id != null && title != null && link != null)
-		return new Entry(id, title, link);
-	    return null;
-	}
-	catch(Exception e)
-	{
-	    e.printStackTrace();
-	    return null;
-	}
+	String id = "";
+	String title = "";
+	final LinkedList<Link> links = new LinkedList<Link>();
+	for(Element node:el.getElementsByTag("title"))
+	    title = node.text();
+	for(Element node:el.getElementsByTag("id"))
+	    id = node.text();
+	for(Element node:el.getElementsByTag("link"))
+	    links.add(new Link(node.attributes().get("href"),
+			       node.attributes().get("rel"),
+			       node.attributes().get("type"),
+			       node.attributes().get("profile")));
+	if (id != null && title != null && !links.isEmpty())
+	    return new Entry(id, title, links.toArray(new Link[links.size()]));
+	return null;
     }
 }

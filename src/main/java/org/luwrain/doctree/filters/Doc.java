@@ -43,14 +43,14 @@ public class Doc
 	    throw new NullPointerException("fileName may not be null");
     }
 
-    public Document constructDocument(int width)
+    public Document constructDocument()
     {
 	FileInputStream  s = null;
 	try {
 	    File docFile=new File(fileName);
 	    s = new FileInputStream(docFile.getAbsolutePath());
 	    HWPFDocument doc = new HWPFDocument(s);
-	    Document res = transform(doc, width);
+	    Document res = transform(doc);
 	    s.close(); //closing fileinputstream
 	    return res;
 	} catch (IOException e)
@@ -65,7 +65,7 @@ public class Doc
 	}
     }
 
-    private Document transform(HWPFDocument doc, int width)
+    private Document transform(HWPFDocument doc)
     {
 	wholeText = doc.getDocumentText();
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
@@ -73,7 +73,7 @@ public class Doc
 	anyRangeAsParagraph(subnodes,range,0);
 	final NodeImpl root = NodeFactory.create(Node.ROOT);
 	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-	return new Document(root, width);
+	return new Document(root);
     }
 
     /* рекурсивный метод, вызывается для любого места в документе, способного содержать несколько элементов, представляя их как список параграфов
