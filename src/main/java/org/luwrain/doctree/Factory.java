@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.*;
 import java.util.*;
+import javax.activation.*;
 
 import org.apache.poi.util.IOUtils;
 import org.luwrain.core.*;
@@ -41,6 +42,7 @@ public class Factory
 	static public final int FICTIONBOOK2 = 9;
 
     static private final String USER_AGENT = "Mozilla/4.0";
+    static private final String DEFAULT_CHARSET = "UTF-8";
 
     static public Document loadFromFile(int format, String fileName, String encoding)
     {
@@ -81,89 +83,92 @@ public class Factory
 	}
     }
 
-    static public Document fromUrl(URL url, int format, 
-				   String charset)
+    static public Document fromUrl(URL url, String contentType, String charset)
     {
 	NullCheck.notNull(url, "url");
+	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
-	URLConnection con = null;
-	URL resultUrl = null;
-	InputStream is = null;
-	String contentTypeCharset = null;
 	try {
-	    con = url.openConnection();
-	    con.setRequestProperty("User-Agent", USER_AGENT);
-	    if (charset.isEmpty())
-	    contentTypeCharset = con.getContentType(); else
-		contentTypeCharset = charset;
-	    is = con.getInputStream();
-	    resultUrl = con.getURL();
+	    return fromUrlImpl(url, contentType, charset);
 	}
-	catch(IOException e)
+	catch(Exception e)
 	{
-	    //	    if (is != null)
-	    //		is.close();
-	    //	    if (tmpFile != null)
-	    //		tmpFile.delete();
-	    return null;
-	}
-	if (contentTypeCharset != null && !contentTypeCharset.trim().isEmpty())
-	    switch(format)
-	{
-	case HTML:
-	    try {
-		final Document doc = new HtmlJsoup(is, contentTypeCharset, resultUrl.toString()).constructDocument();
-is.close();
-is = null;
-return doc;
-	    }
-	    catch(Exception e)
-	    {
-		//		is.close();
-		e.printStackTrace();
-		return null;
-	    }
-	default:
-	    //	    is.close();
-	    Log.error("doctree", "unknown format:" + format );
-	    return null;
-	}
-	Path path = null;
-	try {
-	    path = downloadToTmpFile(is);
-	is.close();
-	is = null;
-	contentTypeCharset = extractCharsetInfo(path);
-	}
-	catch(IOException e)
-	{
-	    //	    if (is != null)
-		//		is.close();
 	    e.printStackTrace();
-	    return null;
-	}
-	if (contentTypeCharset == null || contentTypeCharset.trim().isEmpty())
-	{
-	    Log.error("doctree", "unable to get a charset information for " + url.toString());
-	    return null;
-	}
-	switch(format)
-	{
-	case HTML:
-	    try {
-		return new HtmlJsoup(path, contentTypeCharset).constructDocument();
-	    }
-	    catch(Exception e)
-	    {
-		e.printStackTrace(); 
-		return null;
-	    }
-	default:
-	    Log.error("doctree", "unknown format:" + format);
 	    return null;
 	}
     }
 
+    static public Document fromPath(Path path , String contentType, String charset)
+    {
+	System.out.println("222");
+	return null;
+    }
+
+    static public Document fromUrlImpl(URL url,
+String contentType, String charset) throws Exception
+    {
+	NullCheck.notNull(url, "url");
+	NullCheck.notNull(charset, "charset");
+	InputStream is = null;
+	try {
+	    final URLConnection con = url.openConnection();
+	    con.setRequestProperty("User-Agent", USER_AGENT);
+	    is = con.getInputStream();
+	    final URL resultUrl = con.getURL();
+	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
+final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
+//System.out.println(effectiveContentType);
+//System.out.println(effectiveCharset);
+return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString());
+	}
+	finally
+	       {
+		   is.close();
+	       }
+    }
+
+    static Document fromInputStream(InputStream stream, String contentType,
+				    String charset, String baseUrl) throws Exception
+    {
+	NullCheck.notNull(stream, "stream");
+	NullCheck.notNull(contentType, "contentType");
+	NullCheck.notNull(charset, "charset");
+	final int filter = chooseFilterByContentType(contentType);
+	if (filter == UNRECOGNIZED)
+	    return null;
+	InputStream effectiveStream = stream;
+	String effectiveCharset = null;
+	Path tmpFile = null;
+	try {
+	if (charset.trim().isEmpty())
+	{
+	    switch(filter)
+	    {
+	    case HTML:
+tmpFile = downloadToTmpFile(stream);
+effectiveCharset = extractCharsetInfo(tmpFile);
+effectiveStream = Files.newInputStream(tmpFile);
+	    }
+	} else
+	    effectiveCharset = charset;
+	if (effectiveCharset == null && effectiveCharset.trim().isEmpty())
+	    effectiveCharset = DEFAULT_CHARSET;
+	switch(filter)
+	{
+	case HTML:
+	    return new HtmlJsoup(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+	default:
+	    return null;
+	}
+	}
+	finally
+	{
+	    if (effectiveStream != stream)
+		effectiveStream.close();
+	    if (tmpFile != null)
+		Files.delete(tmpFile);
+	}
+    }
 
     static public Document loadFromStream(int format, InputStream stream, String charset)
     {
@@ -201,6 +206,7 @@ return doc;
     	}
     }
 
+
     static public Document loadFromText(int format, String text)
     {
 	NullCheck.notNull(text, "text");
@@ -208,7 +214,6 @@ return doc;
 	{
 	case HTML:
 	    //	    return new Html(false, text).constructDocument("");
-
 	    try {
 		return new HtmlJsoup(text).constructDocument();
 	    }
@@ -217,7 +222,6 @@ return doc;
 		e.printStackTrace(); 
 		return null;
 	    }
-
 	default:
 	    throw new IllegalArgumentException("unknown format " + format);
 	}
@@ -269,5 +273,47 @@ return doc;
 	    b.append(s + "\n");
 	final String res = HtmlEncoding.getEncoding(new String(b));
 	return res != null?res:"";
+    }
+
+    static private int chooseFilterByContentType(String contentType)
+    {
+	NullCheck.notNull(contentType, "contentType");
+	switch(contentType.toLowerCase().trim())
+	{
+	case "text/html":
+	    return HTML;
+	default:
+	    return UNRECOGNIZED;
+	}
+    }
+
+    static private String getBaseContentType(String value)
+    {
+	NullCheck.notNull(value, "value");
+	    try {
+		final MimeType mime = new MimeType(value);
+		final String res = mime.getBaseType();
+		return res != null?res:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
+    }
+
+    static private String getCharset(String value)
+    {
+	NullCheck.notNull(value, "value");
+	    try {
+		final MimeType mime = new MimeType(value);
+		final String res = mime.getParameter("charset");
+		return res != null?res:"";
+	    }
+	    catch(MimeTypeParseException e)
+	    {
+		e.printStackTrace();
+		return "";
+	    }
     }
 }

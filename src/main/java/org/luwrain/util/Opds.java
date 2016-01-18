@@ -120,7 +120,6 @@ public class Opds
 	    }
 	}
 
-
 	//Never returns null
 	public String getTypeProfile()
 	{
