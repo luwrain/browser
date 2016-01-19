@@ -97,8 +97,7 @@ public class Factory
 	NullCheck.notNull(url, "url");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
-	System.out.println(url.toString());
-	System.out.println(contentType.toString());
+	Log.debug("doctree", "fetching url " + url.toString() + " (content type=" + contentType + ")");
 	try {
 	    return fromUrlImpl(url, contentType, charset);
 	}
@@ -128,8 +127,6 @@ String contentType, String charset) throws Exception
 	    final URL resultUrl = con.getURL();
 	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
 final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
-//System.out.println(effectiveContentType);
-//System.out.println(effectiveCharset);
 return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString());
 	}
 	finally
@@ -141,6 +138,7 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
     static public Document fromInputStream(InputStream stream, String contentType,
 				    String charset, String baseUrl) throws Exception
     {
+	//	System.out.println("charset=" + charset);
 	NullCheck.notNull(stream, "stream");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
@@ -148,7 +146,6 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
 	final int filter = chooseFilterByContentType(contentType);
 	if (filter == UNRECOGNIZED)
 	    return null;
-	System.out.println("filter=" + filter);
 	InputStream effectiveStream = stream;
 	String effectiveCharset = null;
 	Path tmpFile = null;
@@ -158,9 +155,15 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
 	    switch(filter)
 	    {
 	    case FB2:
+tmpFile = downloadToTmpFile(stream);
+effectiveCharset = XmlEncoding.getEncoding(tmpFile);
+Log.debug("doctree", "XML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
+effectiveStream = Files.newInputStream(tmpFile);
+break;
 	    case HTML:
 tmpFile = downloadToTmpFile(stream);
 effectiveCharset = extractCharsetInfo(tmpFile);
+Log.debug("doctree", "HTML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
 effectiveStream = Files.newInputStream(tmpFile);
 break;
 	    }
@@ -168,7 +171,6 @@ break;
 	    effectiveCharset = charset;
 	if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
 	    effectiveCharset = DEFAULT_CHARSET;
-	System.out.println("effectiveCharset=" + effectiveCharset);
 	switch(filter)
 	{
 	case HTML:
@@ -176,7 +178,7 @@ break;
 	case FB2:
 	    return new org.luwrain.doctree.filters.FictionBook2(effectiveStream, effectiveCharset).createDoc();
 	case FB2_ZIP:
-	    return new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", effectiveCharset, baseUrl).createDoc();
+	    return new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", charset, baseUrl).createDoc();
 	default:
 	    return null;
 	}
@@ -186,7 +188,10 @@ break;
 	    if (effectiveStream != stream)
 		effectiveStream.close();
 	    if (tmpFile != null)
+	    {
+		Log.debug("doctree", "deleting temporary file " + tmpFile.toString());
 		Files.delete(tmpFile);
+	    }
 	}
     }
 
@@ -281,7 +286,7 @@ break;
     static private Path downloadToTmpFile(InputStream s) throws IOException
     {
 	final Path path = Files.createTempFile("lwrdoctree-download", "");
-	Log.debug("doctree", "Temporary file " + path.toString() + " created");
+	Log.debug("doctree", "creating temporary file " + path.toString());
 	    Files.copy(s, path, StandardCopyOption.REPLACE_EXISTING);
 	    return path;
     }
