@@ -30,65 +30,72 @@ import org.luwrain.doctree.filters.*;
 
 public class Factory
 {
-    static public final int UNRECOGNIZED = 0;
-    static public final int TEXT_PARA_EMPTY_LINE = 1;
-    static public final int TEXT_PARA_INDENT = 2;
-    static public final int TEXT_PARA_EACH_LINE = 3;
-    static public final int HTML = 4;
-    static public final int DOC = 5;
-    static public final int DOCX = 6;
-    static public final int EPUB = 7;
-	static public final int ZIPTEXT = 8;
-	static public final int FB2 = 9;
-
-	static public final int FB2_ZIP = 20;
+    enum Format {
+	UNRECOGNIZED,
+	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
+	HTML,
+	DOC, DOCX,
+	FB2,
+	EPUB,
+	ZIPTEXT,
+	FB2_ZIP,
+    };
 
     static private final String USER_AGENT = "Mozilla/4.0";
     static private final String DEFAULT_CHARSET = "UTF-8";
 
-    static public Document loadFromFile(int format, String fileName, String encoding)
+    static public Document fromPath(Path path, String contentType, String charset)
     {
-	NullCheck.notNull(fileName, "fileName");
-	switch (format)
+	NullCheck.notNull(path, "path");
+	NullCheck.notNull(contentType, "contentType");
+	NullCheck.notNull(charset, "charset");
+	Format filter = Format.UNRECOGNIZED;
+	if (!contentType.trim().isEmpty())
+	    filter = chooseFilterByContentType(contentType);
+	if (filter == Format.UNRECOGNIZED)
+	    filter = suggestFilterByExtension(path.toString());
+	if (filter == Format.UNRECOGNIZED)
 	{
-	case TEXT_PARA_INDENT:
-	    return new TxtParaIndent(fileName).constructDocument(encoding);
-	case TEXT_PARA_EMPTY_LINE:
-	    return new TxtParaEmptyLine(fileName).constructDocument(encoding);
-	case TEXT_PARA_EACH_LINE:
-	    return new TxtParaEachLine(fileName).constructDocument(encoding);
-	case DOC:
-	    return new Doc(fileName).constructDocument();
-	case DOCX:
-	    return new DocX(fileName).constructDocument();
-	case HTML:
-	    //	    return new Html(true, fileName).constructDocument(encoding);
+	    Log.warning("doctree", "unable to find a suitable filter for a file, content type is \'" + contentType + "\', path is \'" + path.toString() + "\'");
+	    return null;
+	}
+	return fromPath(path, filter, charset);
+    }
 
-	    try {
-		new HtmlJsoup(Paths.get(fileName), encoding).constructDocument();
-	    }
-	    catch(Exception e)
+    static public Document fromPath(Path path,
+				    Format format, String encoding)
+    {
+	NullCheck.notNull(path, "path");
+	try {
+	    switch (format)
 	    {
-		e.printStackTrace(); 
-		return null;
-	    }
-
+	    case TEXT_PARA_INDENT:
+		return new TxtParaIndent(path.toString()).constructDocument(encoding);
+	    case TEXT_PARA_EMPTY_LINE:
+		return new TxtParaEmptyLine(path.toString()).constructDocument(encoding);
+	    case TEXT_PARA_EACH_LINE:
+		return new TxtParaEachLine(path.toString()).constructDocument(encoding);
+	    case DOC:
+		return new Doc(path.toString()).constructDocument();
+	    case DOCX:
+		return new DocX(path.toString()).constructDocument();
+	    case HTML:
+		return new Html(path, encoding).constructDocument();
 	case EPUB:
-		return new Epub(fileName).constructDocument();
+	    return new Epub(path.toString()).constructDocument();
 	case ZIPTEXT:
-	    try {
-		return new Zip(fileName).createDoc();
-	    }
-	    catch(Exception e)
-	    {
-		e.printStackTrace();
-		return null;
-	    }
+	    return new Zip(path.toString()).createDoc();
 	case FB2:
 	    //		return new FictionBook2(fileName).constructDocument();
 	    return null;
 	default:
-	    throw new IllegalArgumentException("unknown format " + format);
+	    throw new IllegalArgumentException("Unknown format " + format);
+	}
+	}
+	catch(Exception e)
+	{
+	    e.printStackTrace();
+	    return null;
 	}
     }
 
@@ -106,12 +113,6 @@ public class Factory
 	    e.printStackTrace();
 	    return null;
 	}
-    }
-
-    static public Document fromPath(Path path , String contentType, String charset)
-    {
-	System.out.println("222");
-	return null;
     }
 
     static public Document fromUrlImpl(URL url,
@@ -138,14 +139,14 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
     static public Document fromInputStream(InputStream stream, String contentType,
 				    String charset, String baseUrl) throws Exception
     {
-	//	System.out.println("charset=" + charset);
 	NullCheck.notNull(stream, "stream");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
 	NullCheck.notNull(baseUrl, "baseUrl");
-	final int filter = chooseFilterByContentType(contentType);
-	if (filter == UNRECOGNIZED)
+	final Format filter = chooseFilterByContentType(contentType);
+	if (filter == Format.UNRECOGNIZED)
 	    return null;
+	Log.debug("doctree", "reading input stream using " + filter + " filter");
 	InputStream effectiveStream = stream;
 	String effectiveCharset = null;
 	Path tmpFile = null;
@@ -174,7 +175,7 @@ break;
 	switch(filter)
 	{
 	case HTML:
-	    return new HtmlJsoup(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+	    return new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
 	case FB2:
 	    return new org.luwrain.doctree.filters.FictionBook2(effectiveStream, effectiveCharset).createDoc();
 	case FB2_ZIP:
@@ -195,7 +196,7 @@ break;
 	}
     }
 
-    static public Document loadFromStream(int format, InputStream stream, String charset)
+    static public Document loadFromStream(Format format, InputStream stream, String charset)
     {
     	switch (format)
     	{
@@ -232,7 +233,7 @@ break;
     }
 
 
-    static public Document loadFromText(int format, String text)
+    static public Document loadFromText(Format format, String text)
     {
 	NullCheck.notNull(text, "text");
 	switch (format)
@@ -240,7 +241,7 @@ break;
 	case HTML:
 	    //	    return new Html(false, text).constructDocument("");
 	    try {
-		return new HtmlJsoup(text).constructDocument();
+		return new Html(text).constructDocument();
 	    }
 	    catch(Exception e)
 	    {
@@ -252,34 +253,34 @@ break;
 	}
     }
 
-    static public int suggestFormat(String path)
+    static public Format suggestFilterByExtension(String path)
     {
 	NullCheck.notNull(path, "path");
 	if (path.isEmpty())
 	    throw new IllegalArgumentException("path may not be empty");
 	String ext = FileTypes.getExtension(path);
 	if (ext == null || path.isEmpty())
-	    return UNRECOGNIZED;
+	    return Format.UNRECOGNIZED;
 	ext = ext.toLowerCase();
 	switch(ext)
 	{
 	case "epub":
-	    return EPUB;
+	    return Format.EPUB;
 	case "txt":
-	    return TEXT_PARA_INDENT;
+	    return Format.TEXT_PARA_INDENT;
 	case "doc":
-	    return DOC;
+	    return Format.DOC;
 	case "docx":
-	    return DOCX;
+	    return Format.DOCX;
 	case "html":
 	case "htm":
-	    return HTML;
+	    return Format.HTML;
 	case "zip":
-	    return ZIPTEXT;
+	    return Format.ZIPTEXT;
 	case "fb2":
-		return FB2;
+		return Format.FB2;
 	default:
-	    return UNRECOGNIZED;
+	    return Format.UNRECOGNIZED;
 	}
     }
 
@@ -301,20 +302,20 @@ break;
 	return res != null?res:"";
     }
 
-    static private int chooseFilterByContentType(String contentType)
+    static private Format chooseFilterByContentType(String contentType)
     {
 	NullCheck.notNull(contentType, "contentType");
 	switch(contentType.toLowerCase().trim())
 	{
 	case "text/html":
-	    return HTML;
+	    return Format.HTML;
 	case "application/fb2":
-	    return FB2;
+	    return Format.FB2;
 	case "application/fb2+zip":
-	    return FB2_ZIP;
+	    return Format.FB2_ZIP;
 	default:
 	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
-	    return UNRECOGNIZED;
+	    return Format.UNRECOGNIZED;
 	}
     }
 

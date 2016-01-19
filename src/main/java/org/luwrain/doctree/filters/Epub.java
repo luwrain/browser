@@ -74,8 +74,9 @@ public class Epub
 		    	if(line.startsWith("<?xml")) continue; // FIXME: make this fix inside Html parser
 		    	result+=line+"\n";
 		    }
-		    				Html html=new Html(false,result);
-			Document subdoc=html.constructDocument("UTF-8");
+		    //FIXME:
+		    //		    				Html html=new Html(false,result);
+		    Document subdoc = null;//html.constructDocument("UTF-8");
 			for(NodeImpl node:subdoc.getRoot().subnodes)
 				subnodes.add(node);
 		}

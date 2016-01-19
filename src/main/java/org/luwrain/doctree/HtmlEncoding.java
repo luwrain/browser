@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.doctree.filters;
+package org.luwrain.doctree;
 
 import java.util.*;
 /*
@@ -29,7 +29,7 @@ import java.nio.charset.CharsetEncoder;
 
 import org.luwrain.util.*;
 
-public class HtmlEncoding implements MlReaderListener, MlReaderConfig
+class HtmlEncoding implements MlReaderListener, MlReaderConfig
 {
     final String[] nonClosingTags = new String[]{
     "?xml",
