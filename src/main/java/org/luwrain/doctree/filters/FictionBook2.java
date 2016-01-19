@@ -34,29 +34,16 @@ import org.luwrain.doctree.*;
 
 public class FictionBook2
 {
-    //    private String data=""; 
 	    private Document jdoc = null;
 
-    // charset may be null - autodetect from stream
     public FictionBook2(InputStream stream,String charset) throws IOException
     {
 	NullCheck.notNull(stream, "stream");
-	/*
-	final byte[] content=IOUtils.toByteArray(stream);
-		// load all to memory
-	if(charset==null||charset.isEmpty())
-	{ // determine charset
-	    charset=HtmlEncoding.getEncoding(new String(data)); // FIXME: remake getEncoding to use byte[] 
-	    if(charset==null||charset.isEmpty()) 
-		charset="UTF-8";
-	}
-	data=new String(content,charset);
-	jd
-oc = Jsoup.parse(data,"",Parser.xmlParser());
-	*/
+	NullCheck.notNull(charset, "charset");
+	jdoc = Jsoup.parse(stream, charset, "", Parser.xmlParser());
     }
 
-    public org.luwrain.doctree.Document constructDocument()
+    public org.luwrain.doctree.Document createDoc()
     {
 	try {
 	    final NodeImpl root = NodeFactory.create(Node.ROOT);

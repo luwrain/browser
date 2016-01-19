@@ -46,6 +46,7 @@ public class Opds
     {
 	static public final String PROFILE_CATALOG = "opds-catalog";
 	static public final String BASE_TYPE_CATALOG = "application/atom+xml";
+	static public final String PRIMARY_TYPE_IMAGE = "image";
 
 	private String url;
 	private String rel;
@@ -67,6 +68,11 @@ public class Opds
 	    if (getTypeProfile().toLowerCase().equals(PROFILE_CATALOG))
 		return true;
 	    return getBaseType().equals(BASE_TYPE_CATALOG);
+	}
+
+	public boolean isImage()
+	{
+	    return getPrimaryType().toLowerCase().trim().equals(PRIMARY_TYPE_IMAGE);
 	}
 
 	//Never returns null

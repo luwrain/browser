@@ -27,45 +27,66 @@ import org.luwrain.core.Log;
 
 public class Zip
 {
-        private String fileName = "";
+    //        private String fileName = "";
     //    private String wholeText;
+    private InputStream is = null;
+    private boolean needToClose = false;
+    private String itemsContentType = "";
+    private String itemsCharset = "";
+    private String itemsBaseUrl = "";
 
-    public Zip(String fileName)
+    public Zip(String fileName) throws IOException
     {
-	this.fileName = fileName;
+	//	this.fileName = fileName;
 	NullCheck.notNull(fileName, "fileName");
+	is = new FileInputStream(fileName);
+	needToClose = true;
     }
 
-    public Document constructDocument()
+    public Zip(InputStream is, String itemsContentType,
+	       String itemsCharset, String itemsBaseUrl)
+    {
+	NullCheck.notNull(is, "is");
+	NullCheck.notNull(itemsContentType, "itemsContentType");
+	NullCheck.notNull(itemsCharset, "itemsCharset");
+	NullCheck.notNull(itemsBaseUrl, "itemsBaseurl");
+	this.is = is;
+	this.itemsContentType = itemsContentType;
+	this.itemsCharset = itemsCharset;
+	this.itemsBaseUrl = itemsBaseUrl;
+    }
+
+    public Document createDoc() throws Exception
     {
 	try {
 	    final NodeImpl root = NodeFactory.create(Node.ROOT);
 	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-	    FileInputStream input = new FileInputStream(fileName);
-	    ZipInputStream zip=new ZipInputStream(input);
+	    final ZipInputStream zip = new ZipInputStream(is);
 	    ZipEntry entry = zip.getNextEntry();
-	    while (entry!= null)
-	    { // read all zip file content and merge into single document as is
+	    while (entry != null)
+	    {
 		if(entry.isDirectory()) 
 		    continue;
+		/*
 		int format=Factory.suggestFormat(entry.getName());
 		if(format==Factory.UNRECOGNIZED)
 		    continue;
-		Document subdoc=Factory.loadFromStream(format,zip,null);
-		for(NodeImpl node:subdoc.getRoot().subnodes)
+		*/
+
+		final Document subdoc = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl);
+		//		Document subdoc=Factory.loadFromStream(format,zip,null);
+		for(NodeImpl node: subdoc.getRoot().subnodes)
 		    subnodes.add(node);
 		entry = zip.getNextEntry();
 	    }
 	    zip.close();
-	    input.close();
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 		return new Document(root);
-	} 
-	catch (IOException e)
-	
+	}
+	finally 
 	{
-	    e.printStackTrace();
-	    return null;
+	    if (needToClose)
+		is.close();
 	}
     }
 }

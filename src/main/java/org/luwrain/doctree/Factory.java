@@ -39,7 +39,9 @@ public class Factory
     static public final int DOCX = 6;
     static public final int EPUB = 7;
 	static public final int ZIPTEXT = 8;
-	static public final int FICTIONBOOK2 = 9;
+	static public final int FB2 = 9;
+
+	static public final int FB2_ZIP = 20;
 
     static private final String USER_AGENT = "Mozilla/4.0";
     static private final String DEFAULT_CHARSET = "UTF-8";
@@ -74,8 +76,15 @@ public class Factory
 	case EPUB:
 		return new Epub(fileName).constructDocument();
 	case ZIPTEXT:
-		return new Zip(fileName).constructDocument();
-	case FICTIONBOOK2 :
+	    try {
+		return new Zip(fileName).createDoc();
+	    }
+	    catch(Exception e)
+	    {
+		e.printStackTrace();
+		return null;
+	    }
+	case FB2:
 	    //		return new FictionBook2(fileName).constructDocument();
 	    return null;
 	default:
@@ -88,6 +97,8 @@ public class Factory
 	NullCheck.notNull(url, "url");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
+	System.out.println(url.toString());
+	System.out.println(contentType.toString());
 	try {
 	    return fromUrlImpl(url, contentType, charset);
 	}
@@ -127,15 +138,17 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
 	       }
     }
 
-    static Document fromInputStream(InputStream stream, String contentType,
+    static public Document fromInputStream(InputStream stream, String contentType,
 				    String charset, String baseUrl) throws Exception
     {
 	NullCheck.notNull(stream, "stream");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
+	NullCheck.notNull(baseUrl, "baseUrl");
 	final int filter = chooseFilterByContentType(contentType);
 	if (filter == UNRECOGNIZED)
 	    return null;
+	System.out.println("filter=" + filter);
 	InputStream effectiveStream = stream;
 	String effectiveCharset = null;
 	Path tmpFile = null;
@@ -144,19 +157,26 @@ return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != 
 	{
 	    switch(filter)
 	    {
+	    case FB2:
 	    case HTML:
 tmpFile = downloadToTmpFile(stream);
 effectiveCharset = extractCharsetInfo(tmpFile);
 effectiveStream = Files.newInputStream(tmpFile);
+break;
 	    }
 	} else
 	    effectiveCharset = charset;
-	if (effectiveCharset == null && effectiveCharset.trim().isEmpty())
+	if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
 	    effectiveCharset = DEFAULT_CHARSET;
+	System.out.println("effectiveCharset=" + effectiveCharset);
 	switch(filter)
 	{
 	case HTML:
 	    return new HtmlJsoup(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+	case FB2:
+	    return new org.luwrain.doctree.filters.FictionBook2(effectiveStream, effectiveCharset).createDoc();
+	case FB2_ZIP:
+	    return new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", effectiveCharset, baseUrl).createDoc();
 	default:
 	    return null;
 	}
@@ -192,9 +212,9 @@ effectiveStream = Files.newInputStream(tmpFile);
 				e.printStackTrace();
 				return null;
 			}
-    	case FICTIONBOOK2 :
+    	case FB2:
 	    try {
-    		return new FictionBook2(stream,charset).constructDocument();
+    		return new FictionBook2(stream,charset).createDoc();
 	    }
 	    catch(Exception e)
 	    {
@@ -252,7 +272,7 @@ effectiveStream = Files.newInputStream(tmpFile);
 	case "zip":
 	    return ZIPTEXT;
 	case "fb2":
-		return FICTIONBOOK2;
+		return FB2;
 	default:
 	    return UNRECOGNIZED;
 	}
@@ -261,6 +281,7 @@ effectiveStream = Files.newInputStream(tmpFile);
     static private Path downloadToTmpFile(InputStream s) throws IOException
     {
 	final Path path = Files.createTempFile("lwrdoctree-download", "");
+	Log.debug("doctree", "Temporary file " + path.toString() + " created");
 	    Files.copy(s, path, StandardCopyOption.REPLACE_EXISTING);
 	    return path;
     }
@@ -282,7 +303,12 @@ effectiveStream = Files.newInputStream(tmpFile);
 	{
 	case "text/html":
 	    return HTML;
+	case "application/fb2":
+	    return FB2;
+	case "application/fb2+zip":
+	    return FB2_ZIP;
 	default:
+	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
 	    return UNRECOGNIZED;
 	}
     }
