@@ -41,7 +41,9 @@ public class Factory
 	FB2_ZIP,
     };
 
-    static private final String USER_AGENT = "Mozilla/4.0";
+    static private final String USER_AGENT = "Mozilla/5.0";
+    //static private final String USER_AGENT =      "Emacs-w3m/1.4.466 w3m/0.5.2";
+
     static private final String DEFAULT_CHARSET = "UTF-8";
 
     static public Document fromPath(Path path, String contentType, String charset)

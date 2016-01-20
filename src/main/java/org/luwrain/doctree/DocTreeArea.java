@@ -78,7 +78,7 @@ public class DocTreeArea implements Area
     @Override public String getLine(int index)
     {
 	if (document == null)
-	    return "";
+	    return index == 0?noContentStr():"";
 	return index < document.getLineCount()?document.getLine(index):"";
     }
 
@@ -451,16 +451,16 @@ public class DocTreeArea implements Area
 
     }
 
-    protected void noContentMessage()
+    protected String noContentStr()
     {
-	    environment.hint(Hints.NO_CONTENT);
+	return environment.staticStr(LangStatic.DOCUMENT_NO_CONTENT);
     }
 
     private boolean noContentCheck()
     {
 	if (document == null)
 	{
-	    noContentMessage();
+	    environment.hint(noContentStr(), Hints.NO_CONTENT);
 	    return true;
 	}
 	return false;

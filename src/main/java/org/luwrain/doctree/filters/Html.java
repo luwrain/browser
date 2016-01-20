@@ -37,12 +37,8 @@ import org.luwrain.core.Log;
 public class Html
 {
     private Document jsoupDoc;
-
-    public Html(URL url) throws IOException
-    {
-	NullCheck.notNull(url, "url");
-jsoupDoc = Jsoup.parse(url, 60000);
-    }
+    private URL hrefBaseUrl = null;
+    private final LinkedList<String> hrefStack = new LinkedList<String>();
 
     public Html(Path path, String charset) throws IOException
     {
@@ -51,12 +47,12 @@ jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
     }
 
     public Html(InputStream is, String charset,
-String baseUrl) throws IOException
+		String baseUrl) throws IOException, MalformedURLException
     {
 	NullCheck.notNull(is, "is");
 	jsoupDoc = Jsoup.parse(is, charset, baseUrl);
+	hrefBaseUrl = new URL(baseUrl);
     }
-
 
     public Html(String text) throws IOException
     {
@@ -69,7 +65,7 @@ jsoupDoc = Jsoup.parse(text);
 	//	final org.luwrain.doctree.NodeImpl rootNode = onNode(jsoupDoc.body(), NodeImpl.ROOT);
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.create(NodeImpl.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
-	System.out.println("" + res.subnodes.length + " root subnodes");
+	//	System.out.println("" + res.subnodes.length + " root subnodes");
 return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
     }
 
@@ -107,11 +103,48 @@ if (n instanceof Element)
 return resNodes.toArray(new NodeImpl[resNodes.size()]);
     }
 
-    private void onNodeInPara(Node node,
+    private void onElementInPara(Element el,
 			      LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
-	NullCheck.notNull(node, "node");
-	final List<Node> nn = node.childNodes();
+	NullCheck.notNull(el, "el");
+	final String tagName = el.nodeName();
+	String href = null;
+
+	//img
+if (tagName.toLowerCase().trim().equals("img"))
+{
+	    final String value = el.attr("alt");
+	    if (value != null && !value.isEmpty())
+	runs.add(new org.luwrain.doctree.Run("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():""));
+		//Do nothing else here	    }
+		return;
+}
+
+	//a
+if (tagName.toLowerCase().trim().equals("a"))
+	{
+	    final String value = el.attr("href");
+	    if (value != null)
+	    {
+		try {
+		href = new URL(hrefBaseUrl, value).toString();
+		}
+		catch(MalformedURLException e)
+		{
+		    e.printStackTrace();
+		    href = value;
+		}
+	    } else
+		href = value;
+	} else
+    //	System.out.println(tagName);
+
+
+if (href != null)
+    hrefStack.add(href);
+
+try {
+	final List<Node> nn = el.childNodes();
 	for(Node n: nn)
 	{
 if (n instanceof TextNode)
@@ -121,11 +154,18 @@ if (n instanceof TextNode)
 }
 if (n instanceof Element)
 {
-    Log.debug("html-jsoup", "encountering  element \'" + n.nodeName() + "\' in place where expecting text nodes only");
+    //    Log.debug("html-jsoup", "encountering  element \'" + n.nodeName() + "\' in place where expecting text nodes only");
 	onElement((Element)n, nodes, runs);
 	continue;
 }
+Log.warning("doctree-html", "encountering unexpected node of class " + n.getClass().getName());
 	}
+}
+finally
+{
+    if (href != null)
+	hrefStack.pollLast();
+}
     }
 
     private void onElement(Element el,
@@ -137,6 +177,10 @@ if (name == null || name.trim().isEmpty())
 switch(name.toLowerCase().trim())
 {
 case "script":
+case "style":
+case "input":
+case "nobr":
+case "wbr":
     return;
 }
 //Log.debug("jsoup", "processing tag:" + name);
@@ -146,12 +190,26 @@ NodeImpl[] nn = null;
 
 switch(name.toLowerCase().trim())
 {
+case "br":
+    commitPara(nodes, runs);
+    break;
 
 case "p":
 case "div":
 case "noscript":
-    //case "header":
+case "header":
+case "footer":
+case "center":
+case "blockquote":
 case "tbody":
+case "figure":
+case "figcaption":
+case "address":
+case "nav":
+case "article":
+case "noindex":
+case "iframe":
+case "form":
     commitPara(nodes, runs);
     nn = onNode(el);
     for(NodeImpl i: nn)
@@ -169,54 +227,33 @@ n = NodeFactory.createSection(1);
 
 case "ul":
 case "ol":
-    commitPara(nodes, runs);
-n = NodeFactory.create(name.equals("ul")?NodeImpl.UNORDERED_LIST:NodeImpl.ORDERED_LIST);
-    n.subnodes = onNode(el);
-	nodes.add(n);
-    break;
 case "li":
-    commitPara(nodes, runs);
-n = NodeFactory.create(NodeImpl.LIST_ITEM);
-    n.subnodes = onNode(el);
-	nodes.add(n);
-    break;
-
 case "table":
-    commitPara(nodes, runs);
-n = NodeFactory.create(NodeImpl.TABLE);
-    n.subnodes = onNode(el);
-	nodes.add(n);
-    break;
-
+case "th":
 case "tr":
-    commitPara(nodes, runs);
-n = NodeFactory.create(NodeImpl.TABLE_ROW);
-    n.subnodes = onNode(el);
-	nodes.add(n);
-    break;
-
 case "td":
     commitPara(nodes, runs);
-n = NodeFactory.create(NodeImpl.TABLE_CELL);
+n = NodeFactory.create(getNodeType(name));
     n.subnodes = onNode(el);
 	nodes.add(n);
     break;
 
-
-
-
-
+case "img":
 case "a":
 case "b":
+case "ins":
 case "i":
+case "big":
+case "small":
+case "strong":
 case "span":
-    onNodeInPara(el, nodes, runs);
+case "cite":
+case "font":
+    onElementInPara(el, nodes, runs);
     break;
 
-
-
 default:
-    Log.debug("html-jsoup", "unprocessed tag:" + name);
+    Log.warning("doctree-html", "unprocessed tag:" + name);
 }
     }
 
@@ -224,7 +261,7 @@ default:
     {
     final String text = textNode.text();
     if (text != null && !text.isEmpty())
-    runs.add(new org.luwrain.doctree.Run(text));
+	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
     }
 
     private void commitPara(LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
@@ -237,4 +274,25 @@ default:
 	runs.clear();
     }
 
+    private int getNodeType(String tagName)
+    {
+	switch(tagName)
+	{
+case "ul":
+    return NodeImpl.UNORDERED_LIST;
+case "ol":
+    return NodeImpl.ORDERED_LIST;
+case "li":
+    return NodeImpl.LIST_ITEM;
+case "table":
+    return NodeImpl.TABLE;
+	case "th":
+case "tr":
+    return NodeImpl.TABLE_ROW;
+case "td":
+    return NodeImpl.TABLE_CELL;
+    default:
+    return -1;//FIXME:
+	}
+    }
 }
