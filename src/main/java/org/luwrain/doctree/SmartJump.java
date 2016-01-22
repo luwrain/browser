@@ -18,7 +18,7 @@ class SmartJump
 
     boolean jumpForward()
     {
-	if (it.isCurrentParaContainerTableCell())
+	if (it.isContainerTableCell())
 	{
 	    final TableCell cell = it.getTableCell();
 	    final Table table = cell.getTable();
@@ -36,7 +36,7 @@ class SmartJump
     {
 	while (true)
 	{
-	    if (!it.isCurrentParaContainerTableCell())
+	    if (!it.isContainerTableCell())
 		return false;
 	    final TableCell cell = it.getTableCell();
 	    final Table table = cell.getTable();

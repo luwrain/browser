@@ -96,7 +96,7 @@ public class Iterator
 	return rows[current].getFirstPart(rowParts).run;
     }
 
-    public int getCurrentParaIndex()
+    public int getParaIndex()
     {
 	return getCurrentParagraphImpl().getIndexInParentSubnodes();
     }
@@ -117,7 +117,7 @@ public class Iterator
 
     public boolean isCurrentParaFirst()
     {
-	return getCurrentParaIndex() == 0;
+	return getParaIndex() == 0;
     }
 
     public String getCurrentText()
@@ -146,7 +146,7 @@ public class Iterator
 	return getCurrentParagraphImpl().parentNode;
     }
 
-    public boolean isCurrentParaContainerTableCell()
+    public boolean isContainerTableCell()
     {
 	if (isCurrentRowEmpty())
 	    return false;
@@ -162,7 +162,7 @@ public class Iterator
 	return (TableCell)container;
     }
 
-    public boolean isCurrentParaContainerListItem()
+    public boolean isContainerListItem()
     {
 	if (isCurrentRowEmpty())
 	    return false;
@@ -178,7 +178,7 @@ public class Iterator
 	return (ListItem)container;
     }
 
-    public boolean isCurrentParaContainerSection()
+    public boolean isContainerSection()
     {
 	if (isCurrentRowEmpty())
 	    return false;

@@ -69,4 +69,11 @@ public class ListItem extends NodeImpl
     {
 	return parentNode.type == Node.ORDERED_LIST;
     }
+
+    public int getParentListItemCount()
+    {
+	if (parentNode == null || parentNode.subnodes == null)
+	    return 0;
+	return parentNode.subnodes.length;
+    }
 }

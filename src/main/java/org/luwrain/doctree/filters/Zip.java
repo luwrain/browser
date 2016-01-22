@@ -73,7 +73,7 @@ public class Zip
 		    continue;
 		*/
 
-		final Document subdoc = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl);
+		final Document subdoc = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl, Factory.Format.UNRECOGNIZED);
 		//		Document subdoc=Factory.loadFromStream(format,zip,null);
 		for(NodeImpl node: subdoc.getRoot().subnodes)
 		    subnodes.add(node);

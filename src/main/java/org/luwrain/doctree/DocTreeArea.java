@@ -56,6 +56,11 @@ public class DocTreeArea implements Area
 	environment.onAreaNewHotPoint(this);
     }
 
+    public boolean hasDocument()
+    {
+	return document != null && iterator != null;
+    }
+
     public Document getDocument()
     {
 	return document;
@@ -267,7 +272,7 @@ public class DocTreeArea implements Area
 	    environment.hint(Hints.NO_LINES_BELOW);
 	    return true;
 	}
-	while(!iterator.isCurrentParaContainerSection() && iterator.moveNext());
+	while(!iterator.isContainerSection() && iterator.moveNext());
 	onNewHotPointY( briefIntroduction );
 	return true;
     }
@@ -281,7 +286,7 @@ public class DocTreeArea implements Area
 	    environment.hint(Hints.NO_LINES_ABOVE);
 	    return true;
 	}
-	while(!iterator.isCurrentParaContainerSection() && iterator.movePrev());
+	while(!iterator.isContainerSection() && iterator.movePrev());
 	onNewHotPointY( briefIntroduction );
 	return true;
     }

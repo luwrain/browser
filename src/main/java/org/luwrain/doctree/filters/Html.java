@@ -30,7 +30,7 @@ import org.jsoup.select.*;
 
 import org.luwrain.doctree.NodeImpl;
 import org.luwrain.doctree.NodeFactory;
-//import org.luwrain.util.*;
+import org.luwrain.doctree.ExtraInfo;
 import org.luwrain.core.NullCheck;
 import org.luwrain.core.Log;
 
@@ -39,6 +39,7 @@ public class Html
     private Document jsoupDoc;
     private URL hrefBaseUrl = null;
     private final LinkedList<String> hrefStack = new LinkedList<String>();
+    private final LinkedList<ExtraInfo> extraInfoStack = new LinkedList<ExtraInfo>();
 
     public Html(Path path, String charset) throws IOException
     {
@@ -85,9 +86,8 @@ if (n instanceof TextNode)
 {
     final TextNode textNode = (TextNode)n;
     final String text = textNode.text();
-    //stem.out.println(text);
     if (text != null && !text.isEmpty())
-    runs.add(new org.luwrain.doctree.Run(text));
+	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
     continue;
 }
 if (n instanceof Element)
@@ -124,6 +124,7 @@ if (tagName.toLowerCase().trim().equals("img"))
 if (tagName.toLowerCase().trim().equals("a"))
 	{
 	    final String value = el.attr("href");
+	    //	    System.out.println(value);
 	    if (value != null)
 	    {
 		try {
@@ -136,7 +137,8 @@ if (tagName.toLowerCase().trim().equals("a"))
 		}
 	    } else
 		href = value;
-	} else
+	    //	    System.out.println("+" + href.toString());
+	}
     //	System.out.println(tagName);
 
 
@@ -178,7 +180,9 @@ switch(name.toLowerCase().trim())
 {
 case "script":
 case "style":
+case "hr":
 case "input":
+case "button":
 case "nobr":
 case "wbr":
     return;
@@ -210,6 +214,7 @@ case "article":
 case "noindex":
 case "iframe":
 case "form":
+case "section":
     commitPara(nodes, runs);
     nn = onNode(el);
     for(NodeImpl i: nn)
@@ -233,6 +238,10 @@ case "th":
 case "tr":
 case "td":
     commitPara(nodes, runs);
+//System.out.println(el.nodeName());
+//System.out.println(el.attributes());
+//if (el.attr("id").equals("gbzc"))
+//    break;
 n = NodeFactory.create(getNodeType(name));
     n.subnodes = onNode(el);
 	nodes.add(n);
@@ -241,7 +250,9 @@ n = NodeFactory.create(getNodeType(name));
 case "img":
 case "a":
 case "b":
+case "s":
 case "ins":
+case "em":
 case "i":
 case "big":
 case "small":
@@ -249,6 +260,7 @@ case "strong":
 case "span":
 case "cite":
 case "font":
+case "label":
     onElementInPara(el, nodes, runs);
     break;
 
@@ -294,5 +306,31 @@ case "td":
     default:
     return -1;//FIXME:
 	}
+    }
+
+    private void addExtraInfoItem(Element el)
+    {
+	NullCheck.notNull(el, "el");
+	final ExtraInfo info = new ExtraInfo();
+	info.name = el.nodeName();
+	final Attributes attrs = el.attributes();
+	if (attrs != null)
+	    for(Attribute a: attrs.asList())
+	    {
+		final String key = a.getKey();
+		final String value = a.getValue();
+		if (key != null && value != null)
+		    info.attrs.put(key, value);
+	    }
+	if (!extraInfoStack.isEmpty())
+	    info.parent = extraInfoStack.getLast(); else
+	    info.parent = null;
+	extraInfoStack.add(info);
+    }
+
+    private void releaseExtraInfo()
+    {
+	if (!extraInfoStack.isEmpty())
+	    extraInfoStack.pollLast();
     }
 }

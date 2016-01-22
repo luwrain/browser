@@ -19,12 +19,15 @@ package org.luwrain.doctree;
 
 public class NodeImpl implements Node
 {
+    static public final int IMPORTANCE_REGULAR = 50;
     protected static final int MIN_TABLE_CELL_WIDTH = 8;
 
     public int type;
+    public ExtraInfo extraInfo = null;
+    public int importance = IMPORTANCE_REGULAR;
     public NodeImpl[] subnodes = new NodeImpl[0];
     NodeImpl parentNode;
-    
+
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
 
@@ -47,7 +50,7 @@ public class NodeImpl implements Node
     {
     	this.id=id;
     }
-    
+
     public String smil=null;
     public String getSmil()
 	{
@@ -57,8 +60,7 @@ public class NodeImpl implements Node
 	{
 		this.smil=smil;
 	}
-	
-	
+
 	NodeImpl(int type)
     {
 	this.type = type;

@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-class TableRow extends NodeImpl
+public class TableRow extends NodeImpl
 {
     TableRow()
     {

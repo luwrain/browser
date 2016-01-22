@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.zip.*;
 import javax.activation.*;
 
 import org.apache.poi.util.IOUtils;
@@ -30,7 +31,7 @@ import org.luwrain.doctree.filters.*;
 
 public class Factory
 {
-    enum Format {
+    public enum Format {
 	UNRECOGNIZED,
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
 	HTML,
@@ -123,31 +124,78 @@ String contentType, String charset) throws Exception
 	NullCheck.notNull(url, "url");
 	NullCheck.notNull(charset, "charset");
 	InputStream is = null;
+	InputStream effectiveIs = null;
+	URLConnection con;
 	try {
-	    final URLConnection con = url.openConnection();
+	    con = url.openConnection();
 	    con.setRequestProperty("User-Agent", USER_AGENT);
+	    con.connect();
+	    while(true)
+	    {
+		if (!(con instanceof HttpURLConnection))
+		    break;
+		final HttpURLConnection httpCon = (HttpURLConnection)con;
+final int code = httpCon.getResponseCode();
+if (code >= 400 && code < 200)
+{
+    Log.warning("doctree", "HTTP responce code is " + code);
+    return null;
+}
+if (code >= 200 && code <= 299)
+    break;
+final String location = httpCon.getHeaderField("location");
+if (location == null || location.isEmpty())
+{
+    Log.warning("doctree", "HTTP responce code is " + code + " but \'location\' field is empty");
+    return null;
+}
+Log.debug("doctree", "trying to follow redirect to " + location);
+final URL locationUrl = new URL(location);
+	    con = locationUrl.openConnection();
+	    con.setRequestProperty("User-Agent", USER_AGENT);
+	    con.connect();
+	    }
 	    is = con.getInputStream();
 	    final URL resultUrl = con.getURL();
 	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
 final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
-return fromInputStream(is, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString());
+final String encoding = con.getContentEncoding();
+if (encoding != null && encoding.toLowerCase().trim().equals("gzip"))
+    effectiveIs = new GZIPInputStream(is); else
+    effectiveIs = is;
+return fromInputStream(effectiveIs, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString(), Format.HTML);
 	}
 	finally
 	       {
-		   is.close();
+		   if (effectiveIs != null)
+		   {
+		       effectiveIs.close();
+effectiveIs = null;
+		   }
+		   if (is != null)
+		   {
+		       is.close();
+		       is = null;
+		   }
 	       }
     }
 
     static public Document fromInputStream(InputStream stream, String contentType,
-				    String charset, String baseUrl) throws Exception
+					   String charset, String baseUrl,
+Format defaultFilter) throws Exception
     {
 	NullCheck.notNull(stream, "stream");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
 	NullCheck.notNull(baseUrl, "baseUrl");
-	final Format filter = chooseFilterByContentType(contentType);
+	Format filter = chooseFilterByContentType(contentType);
 	if (filter == Format.UNRECOGNIZED)
+	    filter = defaultFilter;
+	if (filter == Format.UNRECOGNIZED)
+	{
+	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
 	    return null;
+	}
 	Log.debug("doctree", "reading input stream using " + filter + " filter");
 	InputStream effectiveStream = stream;
 	String effectiveCharset = null;
@@ -174,6 +222,7 @@ break;
 	    effectiveCharset = charset;
 	if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
 	    effectiveCharset = DEFAULT_CHARSET;
+	//	System.out.println("effectiveCharset=" + effectiveCharset);
 	switch(filter)
 	{
 	case HTML:
@@ -296,7 +345,7 @@ break;
 
     static String extractCharsetInfo(Path path) throws IOException
     {
-	final List<String> lines = Files.readAllLines(path, StandardCharsets.US_ASCII);
+	final List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
 	final StringBuilder b = new StringBuilder();
 	for(String s: lines)
 	    b.append(s + "\n");
@@ -316,14 +365,14 @@ break;
 	case "application/fb2+zip":
 	    return Format.FB2_ZIP;
 	default:
-	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
 	    return Format.UNRECOGNIZED;
 	}
     }
 
     static private String getBaseContentType(String value)
     {
-	NullCheck.notNull(value, "value");
+	if (value == null)
+	    return "";
 	    try {
 		final MimeType mime = new MimeType(value);
 		final String res = mime.getBaseType();
@@ -338,7 +387,8 @@ break;
 
     static private String getCharset(String value)
     {
-	NullCheck.notNull(value, "value");
+	if (value == null)
+	    return "";
 	    try {
 		final MimeType mime = new MimeType(value);
 		final String res = mime.getParameter("charset");
