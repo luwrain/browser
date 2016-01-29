@@ -21,7 +21,7 @@ import java.util.*;
 import org.luwrain.core.NullCheck;
 import org.luwrain.core.Log;
 
-class RowPartsBuilder
+public class RowPartsBuilder
 {
     private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
     private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
@@ -35,6 +35,12 @@ class RowPartsBuilder
 
     void onNode(NodeImpl node)
     {
+	onNode(node, 0);
+    }
+
+    private void onNode(NodeImpl node, int width)
+    {
+	NullCheck.notNull(node, "node");
 	if (node.type == Node.PARAGRAPH && (node instanceof ParagraphImpl))
 	{
 	    offset = 0;
@@ -43,7 +49,7 @@ class RowPartsBuilder
 	    currentParaParts.clear();
 	    if (para.runs != null)
 		for(Run r: para.runs)
-		    onRun(r, para.width);
+		    onRun(r, width > 0?width:para.width);
 	    if (!currentParaParts.isEmpty())
 	    {
 		para.rowParts = currentParaParts.toArray(new RowPart[currentParaParts.size()]);
@@ -144,5 +150,20 @@ class RowPartsBuilder
     ParagraphImpl[] paragraphs()
     {
 	return paragraphs.toArray(new ParagraphImpl[paragraphs.size()]);
+    }
+
+    static public String[] paraToLines(ParagraphImpl para, int width)
+    {
+	NullCheck.notNull(para, "para");
+	final RowPartsBuilder builder = new RowPartsBuilder();
+	builder.onNode(para, width);
+	final RowPart[] parts = builder.parts();
+	    for(RowPart r: parts)
+		r.absRowNum = r.relRowNum;
+	final RowImpl[] rows = RowImpl.buildRows(parts);
+	final LinkedList<String> lines = new LinkedList<String>();
+	for(RowImpl r: rows)
+	    lines.add(r.text(parts));
+	return lines.toArray(new String[lines.size()]);
     }
 }

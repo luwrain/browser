@@ -260,6 +260,7 @@ case "strong":
 case "span":
 case "cite":
 case "font":
+case "sup":
 case "label":
     onElementInPara(el, nodes, runs);
     break;

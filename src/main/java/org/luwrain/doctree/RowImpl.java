@@ -63,7 +63,7 @@ int x = 0;
 	return b.toString();
     }
 
-String href(RowPart[] parts, int pos)
+    String href(RowPart[] parts, int pos)
     {
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
@@ -83,13 +83,6 @@ String href(RowPart[] parts, int pos)
     {
 	return partsFrom >= 0 && partsTo >= 0;
     }
-
-    /*
-    int getFirstPartIndex()
-    {
-	return partsFrom;
-    }
-    */
 
     RowPart getFirstPart(RowPart[] parts)
     {

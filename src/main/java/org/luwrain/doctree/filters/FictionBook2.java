@@ -65,7 +65,7 @@ public class FictionBook2
 		final Elements genre=descr.first().getElementsByTag("genre");
 		if(!genre.isEmpty())
 		{
-		    String str="Genre:";
+		    String str="";
 		    for(org.jsoup.nodes.Element e:genre) str+=" "+e.text();
 		    subnodes.add(NodeFactory.createPara(str));
 		}

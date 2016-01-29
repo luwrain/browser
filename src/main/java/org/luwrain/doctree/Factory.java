@@ -102,12 +102,23 @@ public class Factory
 	}
     }
 
-    static public Document fromUrl(URL url, String contentType, String charset)
+    static public Document fromUrl(URL unpreparedUrl, 
+String contentType, String charset)
     {
-	NullCheck.notNull(url, "url");
+	NullCheck.notNull(unpreparedUrl, "unpreparedUrl");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
-	Log.debug("doctree", "fetching url " + url.toString() + " (content type=" + contentType + ")");
+	Log.debug("doctree", "fetching url " + unpreparedUrl.toString() + " (content type=" + contentType + ")");
+	URL url = null;
+	try {
+	    url = new URL(unpreparedUrl.getProtocol(), IDN.toASCII(unpreparedUrl.getHost()),
+			  unpreparedUrl.getPort(), unpreparedUrl.getFile());
+	}
+	catch(MalformedURLException e)
+	{
+	    e.printStackTrace();
+	    return null;
+	}
 	try {
 	    return fromUrlImpl(url, contentType, charset);
 	}
