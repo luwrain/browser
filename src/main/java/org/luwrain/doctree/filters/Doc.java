@@ -71,7 +71,7 @@ public class Doc
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	Range range = doc.getRange();
 	anyRangeAsParagraph(subnodes,range,0);
-	final NodeImpl root = NodeFactory.create(Node.ROOT);
+	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 	return new Document(root);
     }
@@ -96,7 +96,7 @@ public class Doc
 		if(!inTable)
 		{
 		    //We do this processing for the first cell only, skipping all others
-		    final NodeImpl table_node = NodeFactory.create(Node.TABLE);
+		    final NodeImpl table_node = NodeFactory.newNode(Node.Type.TABLE);
 		    subnodes.add(table_node);
 		    final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 		    inTable=true;//We came to the table;
@@ -106,7 +106,7 @@ public class Doc
 		    for(int r=0;r<rnum;r++)
 		    { // для каждой строки таблицы
 			// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-			final NodeImpl rowtable_node = NodeFactory.create(Node.TABLE_ROW);
+			final NodeImpl rowtable_node = NodeFactory.newNode(Node.Type.TABLE_ROW);
 			rows_subnodes.add(rowtable_node);
 			final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
 			final TableRow trow=table.getRow(r);
@@ -114,7 +114,7 @@ public class Doc
 			for(int c=0;c<cnum;c++)
 			{ // для каждой ячейки таблицы
 			    //Creating a node for table cell
-			    final NodeImpl celltable_node = NodeFactory.create(Node.TABLE_CELL);
+			    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
 			    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 			    cels_subnodes.add(celltable_node);
 			    //			    System.out.print("* cell["+r+","+c+"]: ");
@@ -158,7 +158,7 @@ public class Doc
 		{
 			case "ListEntry":
 				// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-				NodeImpl node = NodeFactory.create(Node.LIST_ITEM);
+				NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
 				subnodes.add(node);
 				//
 				ListEntry elem=(ListEntry)paragraph;
@@ -186,13 +186,13 @@ public class Doc
 				paraText=paragraph.text().trim();
 				//				System.out.println("LIST ENTRY:"+listLvl+", "+listId+", "+numstr+"["+paraText+"]");
 				final LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-				item_subnodes.add(NodeFactory.createPara(paraText));
+				item_subnodes.add(NodeFactory.newPara(paraText));
 				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 			break;
 			case "Paragraph":
 				paraText=paragraph.text().trim();
 				//				System.out.println("PARAGRAPH:["+paraText+"]");
-				subnodes.add(NodeFactory.createPara(paraText));
+				subnodes.add(NodeFactory.newPara(paraText));
 				/*
 				// получение стилей текста
 				int nrun=paragraph.numCharacterRuns();
@@ -206,7 +206,7 @@ public class Doc
 			default:
 				paraText=paragraph.text().trim();
 				//				System.out.println(className+"["+paraText+"]");
-				subnodes.add(NodeFactory.createPara(paraText));
+				subnodes.add(NodeFactory.newPara(paraText));
 			break;
 		}
 	}

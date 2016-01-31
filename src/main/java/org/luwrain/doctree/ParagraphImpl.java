@@ -27,7 +27,7 @@ public class ParagraphImpl extends NodeImpl
 
     ParagraphImpl()
     {
-	super(Node.PARAGRAPH);
+	super(Node.Type.PARAGRAPH);
     }
 
     public boolean hasSingleLineOnly()

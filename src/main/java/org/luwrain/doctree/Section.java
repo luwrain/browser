@@ -23,13 +23,13 @@ public class Section extends NodeImpl
 
     Section()
     {
-	super(Node.SECTION);
+	super(Node.Type.SECTION);
 	level = 1;
     }
 
     Section(int level)
     {
-	super(Node.SECTION);
+	super(Node.Type.SECTION);
 	this.level = level;
     }
 

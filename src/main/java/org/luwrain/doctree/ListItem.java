@@ -21,7 +21,7 @@ public class ListItem extends NodeImpl
 {
     ListItem()
     {
-	super(Node.LIST_ITEM);
+	super(Node.Type.LIST_ITEM);
     }
 
     @Override void calcWidth(int recommended)
@@ -67,7 +67,7 @@ public class ListItem extends NodeImpl
 
     public boolean isListOrdered()
     {
-	return parentNode.type == Node.ORDERED_LIST;
+	return parentNode.type == Node.Type.ORDERED_LIST;
     }
 
     public int getParentListItemCount()

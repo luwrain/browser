@@ -41,7 +41,7 @@ public class RowPartsBuilder
     private void onNode(NodeImpl node, int width)
     {
 	NullCheck.notNull(node, "node");
-	if (node.type == Node.PARAGRAPH && (node instanceof ParagraphImpl))
+	if (node.type == Node.Type.PARAGRAPH && (node instanceof ParagraphImpl))
 	{
 	    offset = 0;
 	    index = 0;

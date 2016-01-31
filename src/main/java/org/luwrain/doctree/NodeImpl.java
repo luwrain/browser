@@ -22,7 +22,7 @@ public class NodeImpl implements Node
     static public final int IMPORTANCE_REGULAR = 50;
     protected static final int MIN_TABLE_CELL_WIDTH = 8;
 
-    public int type;
+    public Type type;
     public ExtraInfo extraInfo = null;
     public int importance = IMPORTANCE_REGULAR;
     public NodeImpl[] subnodes = new NodeImpl[0];
@@ -61,7 +61,7 @@ public class NodeImpl implements Node
 		this.smil=smil;
 	}
 
-	NodeImpl(int type)
+	NodeImpl(Type type)
     {
 	this.type = type;
     }
@@ -91,10 +91,10 @@ public class NodeImpl implements Node
     {
 	switch (type)
 	{
-	case Node.ROOT:
-	case Node.SECTION:
-	case Node.UNORDERED_LIST:
-	case Node.ORDERED_LIST:
+	case ROOT:
+	case SECTION:
+	case UNORDERED_LIST:
+	case ORDERED_LIST:
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
@@ -115,10 +115,10 @@ public class NodeImpl implements Node
     {
 	switch (type)
 	{
-	case Node.ROOT:
-	case Node.SECTION:
-	case Node.UNORDERED_LIST:
-	case Node.ORDERED_LIST:
+	case ROOT:
+	case SECTION:
+	case UNORDERED_LIST:
+	case ORDERED_LIST:
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
@@ -137,12 +137,12 @@ public class NodeImpl implements Node
     {
 	switch (type)
 	{
-	case Node.ROOT:
+	case ROOT:
 	    x = 0;
 	    y = 0;
-	case Node.SECTION:
-	case Node.UNORDERED_LIST:
-	case Node.ORDERED_LIST:
+	case SECTION:
+	case UNORDERED_LIST:
+	case ORDERED_LIST:
 	    break;
 	default:
 	    throw new IllegalArgumentException("unknown node type " + type);
@@ -153,7 +153,7 @@ public class NodeImpl implements Node
 	    n.x = x;
 	    n.y = y + offset;
 	    offset += n.height;
-	    if (type == ROOT)
+	    if (type == Type.ROOT)
 		++offset;
 	    n.calcPosition();
 	}
@@ -161,17 +161,17 @@ public class NodeImpl implements Node
 
     void commit()
     {
-	if (type == Node.ROOT)
+	if (type == Type.ROOT)
 	    parentNode = null;
 	if (subnodes == null)
 	    subnodes = new NodeImpl[0];
-	if (type == ORDERED_LIST || type == UNORDERED_LIST)
+	if (type == Type.ORDERED_LIST || type == Type.UNORDERED_LIST)
 	{
 	    for(int i = 0;i < subnodes.length;++i)
 	    {
-		if (subnodes[i].type != Node.LIST_ITEM)
+		if (subnodes[i].type != Node.Type.LIST_ITEM)
 		{
-		    final NodeImpl n = NodeFactory.create(LIST_ITEM);
+		    final NodeImpl n = NodeFactory.newNode(Type.LIST_ITEM);
 		    n.subnodes = new NodeImpl[]{subnodes[i]};
 		    subnodes[i] = n;
 		}
@@ -243,9 +243,9 @@ public class NodeImpl implements Node
     /** 
      * @return -1 if there is no a parent node or there is a consistency error
      */
-    int getParentType()
+    Node.Type getParentType()
     {
-	return parentNode != null && parentNode.subnodes != null?parentNode.type:-1;
+	return parentNode != null && parentNode.subnodes != null?parentNode.type:null;
     }
 
     /** @return -1 if there is no a parent node or there is a consistency error*/
@@ -263,34 +263,5 @@ public class NodeImpl implements Node
 	    if (parentNode.subnodes[i] == this)
 		return i;
 	return -1;
-    }
-
-    static public String typeStr(int type)
-    {
-	switch(type)
-	{
-	case ROOT:
-	    return "ROOT";
-	case SECTION:
-	    return "SECTION";
-	case PARAGRAPH:
-	    return "PARAGRAPH";
-	case TABLE:
-	    return "TABLE";
-	case TABLE_ROW:
-	    return "TABLE_ROW";
-	case TABLE_CELL:
-	    return "TABLE_CELL";
-	case UNORDERED_LIST:
-	    return "UNORDERED_LIST";
-	case ORDERED_LIST:
-	    return "ORDERED_LIST";
-	case LIST_ITEM:
-	    return "LIST_ITEM";
-	case SMIL_PAR:
-	    return "SMIL_PAR";
-	default:
-	    return "";
-	}
     }
 }

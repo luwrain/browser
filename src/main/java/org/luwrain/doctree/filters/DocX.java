@@ -72,7 +72,7 @@ public class DocX
 	wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
-	final NodeImpl root = NodeFactory.create(Node.ROOT);
+	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 	return new org.luwrain.doctree.Document(root);
     }
@@ -91,7 +91,7 @@ public class DocX
 	    if (paragraph.getClass() == XWPFTable.class)
 	    {
 		// We do this processing for the first cell only, skipping all others
-		final NodeImpl table_node = NodeFactory.create(Node.TABLE);
+		final NodeImpl table_node = NodeFactory.newNode(Node.Type.TABLE);
 		subnodes.add(table_node);
 		final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 		final XWPFTable table = (XWPFTable) paragraph;
@@ -103,7 +103,7 @@ public class DocX
 					r++;
 					// создаем элементы структуры Node и добавляем текущую ноду
 					// в список потомка
-					final NodeImpl rowtable_node = NodeFactory.create(Node.TABLE_ROW);
+					final NodeImpl rowtable_node = NodeFactory.newNode(Node.Type.TABLE_ROW);
 					rows_subnodes.add(rowtable_node);
 					final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
 					int c = 0;
@@ -111,7 +111,7 @@ public class DocX
 					{ // для каждой ячейки таблицы
 					    c++;
 					    // Creating a node for table cell
-					    final NodeImpl celltable_node = NodeFactory.create(Node.TABLE_CELL);
+					    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
 					    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 					    cels_subnodes.add(celltable_node);
 					    System.out.print("* cell[" + r + "," + c + "]: ");
@@ -150,7 +150,7 @@ public class DocX
 	    { // параграф с установленным уровнем - элемент списка
 		// создаем элементы структуры Node и добавляем текущую ноду в
 		// список потомка
-		final NodeImpl node = NodeFactory.create(Node.LIST_ITEM);
+		final NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
 		subnodes.add(node);
 		//
 		BigInteger listId = paragraph.getNumID();
@@ -180,18 +180,18 @@ public class DocX
 		paraText = paragraph.getText().trim();
 		//		System.out.println("LIST ENTRY:" + listLvl + ", " + listId + ", " + numstr + "[" + paraText + "]");
 		LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-		item_subnodes.add(NodeFactory.createPara(paraText));
+		item_subnodes.add(NodeFactory.newPara(paraText));
 		node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 	    } else
 	    {
 		paraText = paragraph.getText().trim();
 		System.out.println("PARAGRAPH:[" + paraText + "]");
-		subnodes.add(NodeFactory.createPara(paraText));
+		subnodes.add(NodeFactory.newPara(paraText));
 	    }
 	} else
 	{
 	    System.out.println(className);
-	    subnodes.add(NodeFactory.createPara(paraText));
+	    subnodes.add(NodeFactory.newPara(paraText));
 	}
     }
 

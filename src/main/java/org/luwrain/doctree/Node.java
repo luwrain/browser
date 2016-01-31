@@ -19,6 +19,20 @@ package org.luwrain.doctree;
 
 public interface Node
 {
+    public enum Type {
+	ROOT,
+	SECTION,
+	PARAGRAPH,
+	TABLE,
+	TABLE_ROW,
+	TABLE_CELL,
+	UNORDERED_LIST,
+	ORDERED_LIST,
+	LIST_ITEM,
+	SMIL_PARA // daisy dtbook: Parallel time grouping in which multiple elements (e.g., text, audio, and image) play back simultaneously
+    };
+
+    /*
     static public final int ROOT = 1;
     static public final int SECTION = 2;
     static public final int PARAGRAPH = 3;
@@ -29,11 +43,11 @@ public interface Node
     static public final int ORDERED_LIST = 8;
     static public final int LIST_ITEM = 9;
     static public final int SMIL_PAR = 10; // daisy dtbook: Parallel time grouping in which multiple elements (e.g., text, audio, and image) play back simultaneously.
+    */
 
     int getNodeX();
     int getNodeY();
     int getNodeWidth();
     int getNodeHeight();
-    
     String getId();
 }

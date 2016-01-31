@@ -21,16 +21,16 @@ public class Table extends NodeImpl
 {
     Table()
     {
-	super(Node.TABLE);
+	super(Node.Type.TABLE);
     }
 
     @Override void commit()
     {
 	for(int i = 0;i < subnodes.length;++i)
 	{
-	    if (subnodes[i].type != Node.TABLE_ROW)
+	    if (subnodes[i].type != Node.Type.TABLE_ROW)
 	    {
-		final NodeImpl n = NodeFactory.create(TABLE_ROW);
+		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 		subnodes[i] = n;
 	    }
@@ -105,7 +105,7 @@ public class Table extends NodeImpl
 	NodeImpl n = parentNode;
 	while(n != null)
 	{
-	    if (n.type == Node.TABLE)
+	    if (n.type == Node.Type.TABLE)
 		++count;
 	    n = n.parentNode;
 	}
@@ -118,7 +118,7 @@ public class Table extends NodeImpl
 	{
 	    if (n.subnodes.length > 1)
 		return false;
-	    if (n.subnodes[0].type != Node.PARAGRAPH || !(n.subnodes[0] instanceof ParagraphImpl))
+	    if (n.subnodes[0].type != Node.Type.PARAGRAPH || !(n.subnodes[0] instanceof ParagraphImpl))
 		return false;
 	    final ParagraphImpl p = (ParagraphImpl)n.subnodes[0];
 	    if (p.height > 1)

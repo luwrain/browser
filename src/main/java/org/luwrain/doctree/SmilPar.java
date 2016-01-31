@@ -26,7 +26,7 @@ public class SmilPar extends NodeImpl
 
     public SmilPar(String[] text,AudioInfo[] audio)
     {
-    	super(Node.SMIL_PAR);
+    	super(Node.Type.SMIL_PARA);
     	textSrcs=text;
     	audioPar=audio;
     }

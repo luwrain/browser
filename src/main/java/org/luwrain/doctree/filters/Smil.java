@@ -78,7 +78,7 @@ public class Smil
 		
 		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 		parseNode(subnodes,smilBody.item(0));
-		final NodeImpl root = NodeFactory.create(Node.ROOT);
+		final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 
 		Document luwrainDoc=new Document(root);
@@ -110,7 +110,7 @@ public class Smil
 				}
 				if(nodes==null)
 					throw new Exception("Bad SMIL format. Node SEQ can not be used here");
-			    final NodeImpl section_node = NodeFactory.createSection(0);
+				final NodeImpl section_node = NodeFactory.newSection(0);//FIXME:0
 			    section_node.setId(id);
 			    nodes.add(section_node);
 			    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();

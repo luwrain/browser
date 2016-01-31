@@ -19,40 +19,40 @@ package org.luwrain.doctree;
 
 public class NodeFactory
 {
-    static public NodeImpl create(int type)
+    static public NodeImpl newNode(Node.Type type)
     {
 	switch(type)
 	{
-	case Node.PARAGRAPH:
-	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.create(), use NodeFactory.createPara() instead");
-	case Node.SECTION:
-	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.create(), use NodeFactory.createSection() instead");
-	case Node.TABLE:
+	case PARAGRAPH:
+	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.newNode(), use NodeFactory.newPara() instead");
+	case SECTION:
+	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.newNode(), use NodeFactory.newSection() instead");
+	case TABLE:
 	    return new Table();
-	case Node.TABLE_ROW:
+	case TABLE_ROW:
 	    return new TableRow();
-	case Node.TABLE_CELL:
+	case TABLE_CELL:
 	    return new TableCell();
-	case Node.LIST_ITEM:
+	case LIST_ITEM:
 	    return new ListItem();
 	default:
 	return new NodeImpl(type);
 	}
     }
 
-    static public NodeImpl createSection(int level)
+    static public NodeImpl newSection(int level)
     {
 	return new Section(level);
     }
 
-    static public ParagraphImpl createPara()
+    static public ParagraphImpl newPara()
     {
 	return new ParagraphImpl();
     }
 
-    static public ParagraphImpl createPara(String text)
+    static public ParagraphImpl newPara(String text)
     {
-	final ParagraphImpl para = createPara();
+	final ParagraphImpl para = newPara();
 	para.runs = new Run[]{new Run(text)};
 	return para;
     }

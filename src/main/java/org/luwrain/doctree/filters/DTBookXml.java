@@ -79,7 +79,7 @@ public class DTBookXml
 		
 		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 		parseNode(subnodes,bookBody.item(0));
-		final NodeImpl root = NodeFactory.create(Node.ROOT);
+		final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 		Document luwrainDoc=new Document(root);
 		
@@ -126,7 +126,7 @@ public class DTBookXml
 					}
 				}
 				// TODO: create image doctree elements
-				final NodeImpl p_node = NodeFactory.createPara("image:"+text);
+				final NodeImpl p_node = NodeFactory.newPara("image:"+text);
 				p_node.setId(id);
 				p_node.setSmil(smilref);
 				nodes.add(p_node);
@@ -139,7 +139,7 @@ public class DTBookXml
 			{
 				//int lvl=Integer.parseInt(nodeName.substring(5));
 				int lvl=Integer.parseInt(nodeName.substring(1));
-				final NodeImpl p_node = NodeFactory.createSection(lvl);
+				final NodeImpl p_node = NodeFactory.newSection(lvl);
 				p_node.setId(id);
 				p_node.setSmil(smilref);
 				nodes.add(p_node);
@@ -155,10 +155,10 @@ public class DTBookXml
 					org.w3c.dom.Node xmlType=nm.getNamedItem("type");
 					if(xmlType!=null) type=xmlType.getNodeValue().toLowerCase();
 				}
-				int nodeType=NodeImpl.UNORDERED_LIST;
-				if(type.equals("ol")) nodeType=NodeImpl.ORDERED_LIST; 
+				Node.Type nodeType = Node.Type.UNORDERED_LIST;
+				if(type.equals("ol")) nodeType=Node.Type.ORDERED_LIST; 
 				
-				final NodeImpl p_node = NodeFactory.create(nodeType);
+				final NodeImpl p_node = NodeFactory.newNode(nodeType);
 				p_node.setId(id);
 				p_node.setSmil(smilref);
 				nodes.add(p_node);
@@ -168,11 +168,13 @@ public class DTBookXml
 			} else
 			if(nodeName.equals("table")||nodeName.equals("tr")||nodeName.equals("td"))
 			{
-				int nodeType=NodeImpl.TABLE;
+				Node.Type nodeType = Node.Type.TABLE;
 				//if(nodeName.equals("table")) nodeType=NodeImpl.TABLE;else
-				if(nodeName.equals("tr")) nodeType=NodeImpl.TABLE_ROW;else
-				if(nodeName.equals("td")) nodeType=NodeImpl.TABLE_CELL;
-				final NodeImpl p_node = NodeFactory.create(nodeType);
+				if(nodeName.equals("tr")) 
+				    nodeType = Node.Type.TABLE_ROW;else
+				if(nodeName.equals("td")) 
+nodeType = Node.Type.TABLE_CELL;
+				final NodeImpl p_node = NodeFactory.newNode(nodeType);
 				p_node.setId(id);
 				p_node.setSmil(smilref);
 				nodes.add(p_node);
@@ -184,7 +186,7 @@ public class DTBookXml
 				// if have no information, skip
 				if(id==null&&smilref==null&&hasChild==false&&text.isEmpty()) continue;
 				//
-				final NodeImpl p_node = text.isEmpty()?NodeFactory.createPara():NodeFactory.createPara(text);
+				final NodeImpl p_node = text.isEmpty()?NodeFactory.newPara():NodeFactory.newPara(text);
 				p_node.setId(id);
 				p_node.setSmil(smilref);
 				nodes.add(p_node);

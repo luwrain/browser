@@ -201,7 +201,7 @@ public class Iterator
 	if (isEmptyRow())
 	    return false;
 	final NodeImpl container = getParaContainer();
-	return container.type == Node.TABLE_CELL && (container instanceof TableCell);
+	return container.type == Node.Type.TABLE_CELL && (container instanceof TableCell);
     }
 
     public TableCell getTableCell()
@@ -221,7 +221,7 @@ public class Iterator
 	if (isEmptyRow())
 	    return false;
 	final NodeImpl container = getParaContainer();
-	return container.type == Node.LIST_ITEM && (container instanceof ListItem);
+	return container.type == Node.Type.LIST_ITEM && (container instanceof ListItem);
     }
 
     public ListItem getListItem()
@@ -241,7 +241,7 @@ public class Iterator
 	if (isEmptyRow())
 	    return false;
 	final NodeImpl container = getParaContainer();
-	return container.type == Node.SECTION && (container instanceof Section);
+	return container.type == Node.Type.SECTION && (container instanceof Section);
     }
 
     public Section getSection()

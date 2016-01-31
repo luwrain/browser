@@ -51,9 +51,9 @@ public class TxtParaEachLine
 	{
 	    if (line.trim().isEmpty())
 		continue;
-	    nodes.add(NodeFactory.createPara(line.trim()));
+	    nodes.add(NodeFactory.newPara(line.trim()));
 	}
-	final NodeImpl root = NodeFactory.create(Node.ROOT); 
+	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT); 
 	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
 	return new Document(root);
     }

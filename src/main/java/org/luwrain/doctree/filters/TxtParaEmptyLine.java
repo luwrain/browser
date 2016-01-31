@@ -62,7 +62,7 @@ public class TxtParaEmptyLine
 	final ParagraphImpl para = createPara(paraLines);
 	if (para != null)
 	    nodes.add(para);
-	final NodeImpl root = NodeFactory.create(Node.ROOT); 
+	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT); 
 	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
 	return new Document(root);
     }
@@ -74,11 +74,11 @@ public class TxtParaEmptyLine
 	if (lines.length < 1)
 	    return null;
 	if (lines.length == 1)
-	    return NodeFactory.createPara(lines[0]);
+	    return NodeFactory.newPara(lines[0]);
 	final StringBuilder b = new StringBuilder();
 	b.append(lines[0]);
 	for(int i = 1;i < lines.length;++i)
 	    b.append(" " + lines[i]);
-	return NodeFactory.createPara(b.toString());
+	return NodeFactory.newPara(b.toString());
     }
 }

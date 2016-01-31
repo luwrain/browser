@@ -46,7 +46,7 @@ public class FictionBook2
     public org.luwrain.doctree.Document createDoc()
     {
 	try {
-	    final NodeImpl root = NodeFactory.create(Node.ROOT);
+	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	    final Elements descr=jdoc.select("FictionBook > description");
 	    if(!descr.isEmpty())
@@ -56,8 +56,8 @@ public class FictionBook2
 		Elements title=descr.first().getElementsByTag("book-title");
 		if(!title.isEmpty())
 		{
-		    final NodeImpl h1=NodeFactory.createSection(1);
-		    h1.subnodes=new NodeImpl[]{NodeFactory.createPara(title.first().text())};
+		    final NodeImpl h1=NodeFactory.newSection(1);
+		    h1.subnodes=new NodeImpl[]{NodeFactory.newPara(title.first().text())};
 		    subnodes.add(h1);
 		}
 
@@ -67,7 +67,7 @@ public class FictionBook2
 		{
 		    String str="";
 		    for(org.jsoup.nodes.Element e:genre) str+=" "+e.text();
-		    subnodes.add(NodeFactory.createPara(str));
+		    subnodes.add(NodeFactory.newPara(str));
 		}
 
 		// author, each per new line
@@ -80,7 +80,7 @@ public class FictionBook2
 			for(org.jsoup.nodes.Element i:e.children())
 			    if(i.hasText())
 				str+=" "+i.text();
-			subnodes.add(NodeFactory.createPara(str));
+			subnodes.add(NodeFactory.newPara(str));
 		    }
 		}
 
@@ -99,8 +99,8 @@ public class FictionBook2
 			     { // enumeraty body esctions
 				 if(e.hasAttr("name"))
 				 { // body name as h2
-				     NodeImpl h2=NodeFactory.createSection(2);
-				     h2.subnodes=new NodeImpl[]{NodeFactory.createPara(e.attr("name"))};
+				     NodeImpl h2=NodeFactory.newSection(2);
+				     h2.subnodes=new NodeImpl[]{NodeFactory.newPara(e.attr("name"))};
 				     subnodes.add(h2);
 				 }
 				 complexContent(subnodes,e);
@@ -125,17 +125,17 @@ public class FictionBook2
 	    case "section":
 	    case "epigraph":
 	    case "subtitle":
-		NodeImpl h2=NodeFactory.createSection(3);
+		NodeImpl h2=NodeFactory.newSection(3);
 	    final LinkedList<NodeImpl> sn = new LinkedList<NodeImpl>();
 	    complexContent(sn,e);
 	    h2.subnodes=sn.toArray(new NodeImpl[sn.size()]);
 	    subnodes.add(h2);
 	    break;
 	    case "empty-line":
-		subnodes.add(NodeFactory.createPara(" "));
+		subnodes.add(NodeFactory.newPara(" "));
 		break;
 	    case "p":
-		subnodes.add(NodeFactory.createPara(paraContent(e)));
+		subnodes.add(NodeFactory.newPara(paraContent(e)));
 		break;
 	    case "binary":
 	    case "image":

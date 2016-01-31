@@ -64,7 +64,7 @@ jsoupDoc = Jsoup.parse(text);
     public org.luwrain.doctree.Document constructDocument()
     {
 	//	final org.luwrain.doctree.NodeImpl rootNode = onNode(jsoupDoc.body(), NodeImpl.ROOT);
-	final org.luwrain.doctree.NodeImpl res = NodeFactory.create(NodeImpl.ROOT);
+	final org.luwrain.doctree.NodeImpl res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
 return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
     }
@@ -224,7 +224,7 @@ case "h1":
 case "h2":
 case "h3":
     commitPara(nodes, runs);
-n = NodeFactory.createSection(1);
+n = NodeFactory.newSection(1);
     n.subnodes = onNode(el);
 	nodes.add(n);
     break;
@@ -241,7 +241,7 @@ case "td":
 //System.out.println(el.attributes());
 //if (el.attr("id").equals("gbzc"))
 //    break;
-n = NodeFactory.create(getNodeType(name));
+n = NodeFactory.newNode(getNodeType(name));
     n.subnodes = onNode(el);
 	nodes.add(n);
     break;
@@ -280,31 +280,31 @@ default:
     {
 	if (runs.isEmpty())
 	    return;
-	final org.luwrain.doctree.ParagraphImpl para = NodeFactory.createPara();
+	final org.luwrain.doctree.ParagraphImpl para = NodeFactory.newPara();
 	para.runs = runs.toArray(new org.luwrain.doctree.Run[runs.size()]);
 	nodes.add(para);
 	runs.clear();
     }
 
-    private int getNodeType(String tagName)
+    private org.luwrain.doctree.Node.Type getNodeType(String tagName)
     {
 	switch(tagName)
 	{
 case "ul":
-    return NodeImpl.UNORDERED_LIST;
+    return org.luwrain.doctree.Node.Type.UNORDERED_LIST;
 case "ol":
-    return NodeImpl.ORDERED_LIST;
+    return org.luwrain.doctree.Node.Type.ORDERED_LIST;
 case "li":
-    return NodeImpl.LIST_ITEM;
+    return org.luwrain.doctree.Node.Type.LIST_ITEM;
 case "table":
-    return NodeImpl.TABLE;
+    return org.luwrain.doctree.Node.Type.TABLE;
 	case "th":
 case "tr":
-    return NodeImpl.TABLE_ROW;
+    return org.luwrain.doctree.Node.Type.TABLE_ROW;
 case "td":
-    return NodeImpl.TABLE_CELL;
+    return org.luwrain.doctree.Node.Type.TABLE_CELL;
     default:
-    return -1;//FIXME:
+	return null;
 	}
     }
 

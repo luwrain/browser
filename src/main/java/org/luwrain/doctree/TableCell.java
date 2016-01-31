@@ -21,7 +21,7 @@ public class TableCell extends NodeImpl
 {
     TableCell()
     {
-	super(Node.TABLE_CELL);
+	super(Node.Type.TABLE_CELL);
     }
 
     @Override void calcWidth(int recommended)

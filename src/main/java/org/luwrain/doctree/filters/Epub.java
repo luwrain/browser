@@ -51,15 +51,15 @@ public class Epub
     public Document constructDocument()
     {
 	try {
-		final NodeImpl root = NodeFactory.create(Node.ROOT);
+		final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 		EpubReader epubReader = new EpubReader();
 		Book book = epubReader.readEpub(new FileInputStream(fileName));
 		List<String> titles = book.getMetadata().getTitles();
 		for(String s: titles)
 		{
-			NodeImpl h1=NodeFactory.createSection(1);
-			h1.subnodes=new NodeImpl[]{NodeFactory.createPara(s)};
+			NodeImpl h1=NodeFactory.newSection(1);
+			h1.subnodes=new NodeImpl[]{NodeFactory.newPara(s)};
 			subnodes.add(h1);
 		}
 		for(SpineReference r: book.getSpine().getSpineReferences())

@@ -21,16 +21,16 @@ public class TableRow extends NodeImpl
 {
     TableRow()
     {
-	super(Node.TABLE_ROW);
+	super(Node.Type.TABLE_ROW);
     }
 
     @Override void commit()
     {
 	for(int i = 0;i < subnodes.length;++i)
 	{
-	    if (subnodes[i].type != Node.TABLE_CELL)
+	    if (subnodes[i].type != Node.Type.TABLE_CELL)
 	    {
-		final NodeImpl n = NodeFactory.create(TABLE_CELL);
+		final NodeImpl n = NodeFactory.newNode(Type.TABLE_CELL);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 		subnodes[i] = n;
 	    }

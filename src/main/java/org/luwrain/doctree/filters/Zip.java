@@ -59,7 +59,7 @@ public class Zip
     public Document createDoc() throws Exception
     {
 	try {
-	    final NodeImpl root = NodeFactory.create(Node.ROOT);
+	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	    final ZipInputStream zip = new ZipInputStream(is);
 	    ZipEntry entry = zip.getNextEntry();
