@@ -1,6 +1,6 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015 Roman Volovodov <gr.rPman@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -18,17 +18,20 @@
 package org.luwrain.doctree;
 
 import org.luwrain.doctree.dtbook.AudioInfo;
+import org.luwrain.core.NullCheck;
 
-public class SmilPar extends NodeImpl
+public class SmilPara extends NodeImpl
 {
-	private String[] textSrcs=new String[0];
-	private AudioInfo[] audioPar=new AudioInfo[0];
+	private String[] textSources = new String[0];
+	private AudioInfo[] audioPara = new AudioInfo[0];
 
-    public SmilPar(String[] text,AudioInfo[] audio)
+    public SmilPara(String[] text,AudioInfo[] audio)
     {
     	super(Node.Type.SMIL_PARA);
-    	textSrcs=text;
-    	audioPar=audio;
+	NullCheck.notNullItems(text, "text");
+	NullCheck.notNull(audio, "audio");
+    	textSources = text;
+    	audioPara = audio;
     }
 
     @Override void calcWidth(int recommended)
@@ -66,9 +69,8 @@ public class SmilPar extends NodeImpl
 	    n.calcPosition();
 	}
     }
-    
+
     @Override void setEmptyMark()
     {
-    	
     }
 }

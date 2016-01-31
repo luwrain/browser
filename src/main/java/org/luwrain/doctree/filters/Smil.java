@@ -1,6 +1,6 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015 Roman Volovodov <gr.rPman@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -135,7 +135,7 @@ public class Smil
 				// now store id, audio and text information
 				if(nodes==null)
 					throw new Exception("Bad SMIL format. Node PAR must be inside SEQ");
-			    final NodeImpl smilpar_node = new SmilPar(
+			    final NodeImpl smilpar_node = new SmilPara(
 			    		textSrcs.toArray(new String[textSrcs.size()]),
 			    		audioSrcs.toArray(new AudioInfo[audioSrcs.size()]));
 			    smilpar_node.setId(id);
