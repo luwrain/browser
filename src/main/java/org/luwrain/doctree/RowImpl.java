@@ -16,6 +16,7 @@
 */
 
 package org.luwrain.doctree;
+import org.luwrain.core.NullCheck;
 
 class RowImpl implements Row
 {
@@ -40,7 +41,9 @@ int x = 0;
 
     String text(RowPart[] parts)
     {
-	StringBuilder b = new StringBuilder();
+	if (isEmpty())
+	    return "";
+	final StringBuilder b = new StringBuilder();
 	for(int i = partsFrom;i < partsTo;++i)
 	    b.append(parts[i].text());
 	return b.toString();
@@ -48,6 +51,9 @@ int x = 0;
 
     String textWithHrefs(RowPart[] parts, String hrefPrefix)
     {
+	NullCheck.notNull(hrefPrefix, "hrefPrefix");
+	if (isEmpty())
+	    return "";
 	boolean wasHref = false;
 	final StringBuilder b = new StringBuilder();
 	for(int i = partsFrom;i < partsTo;++i)
@@ -65,6 +71,8 @@ int x = 0;
 
     String href(RowPart[] parts, int pos)
     {
+	if (isEmpty())
+	    return "";
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
@@ -79,19 +87,21 @@ int x = 0;
 	return null;
     }
 
-    boolean hasAssociatedText()
+    boolean isEmpty()
     {
-	return partsFrom >= 0 && partsTo >= 0;
+	return partsFrom < 0 || partsTo < 0;
     }
 
     RowPart getFirstPart(RowPart[] parts)
     {
+	if (isEmpty())
+	    return null;
 	return parts[partsFrom];
     }
 
     void mustIncludePart(int index)
     {
-	//We are registering only a first part;
+	//We are registering a first part only
 	if (partsFrom < 0)
 	    partsFrom = index;
 	if (partsTo < index + 1)

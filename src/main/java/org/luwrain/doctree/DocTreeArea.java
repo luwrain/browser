@@ -18,6 +18,7 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
+import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 import org.luwrain.util.*;
 
@@ -70,7 +71,7 @@ public class DocTreeArea implements Area
     {
 	if (document == null || iterator == null)
 	    return null;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	    return null;
 	return iterator.getHref(hotPointX);
     }
@@ -138,6 +139,7 @@ public class DocTreeArea implements Area
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
 	{
+	case EnvironmentEvent.READING_POINT:
 	case EnvironmentEvent.MOVE_HOT_POINT:
 	    if (event instanceof MoveHotPointEvent)
 		return onMoveHotPoint((MoveHotPointEvent)event);
@@ -154,21 +156,28 @@ public class DocTreeArea implements Area
 
     @Override public boolean onAreaQuery(AreaQuery query)
     {
+	NullCheck.notNull(query, "query");
+	switch(query.getQueryCode())
+	{
+	case AreaQuery.VOICED_FRAGMENT:
+	    return onVoicedFragmentQuery((VoicedFragmentQuery)query);
+	default:
 	return region.onAreaQuery(query, getHotPointX(), getHotPointY());
+	}
     }
 
     @Override public int getHotPointX()
     {
-	if (document == null || iterator == null)
+	if (isEmpty())
 	    return 0;
-	return iterator.getCurrentRow().getRowX() + hotPointX;
+	return iterator.getRow().getRowX() + hotPointX;
     }
 
     @Override public int getHotPointY()
     {
-	if (document == null || iterator == null)
+	if (isEmpty())
 	    return 0;
-	return iterator.getCurrentRow().getRowY();
+	return iterator.getRow().getRowY();
     }
 
     @Override public String getAreaName()
@@ -183,22 +192,43 @@ public class DocTreeArea implements Area
 	return "";
     }
 
+    private boolean onVoicedFragmentQuery(VoicedFragmentQuery query)
+    {
+	return false;
+	/*
+	NullCheck.notNull(query, "query");
+	if (noContentCheck())
+	    return false;
+	final Iterator it2 = (Iterator)iterator.clone();
+	String text = it2.getText();
+	int endPos = endOfSentence(text, hotPointX);
+	if (endPos > hotPointX)
+	{
+
+	}
+	while(it2.moveNext())
+	{
+	    text = it2.getText();
+	    endPost = getEndOfSentence(text, 0);
+	    if (endPoss >= 0)
+	}
+	return false;
+	*/
+    }
+
     private boolean onMoveHotPoint(MoveHotPointEvent event)
     {
-	System.out.println("begin");
 	if (document == null)
 	    return false;
 	final Iterator it2 = (Iterator)iterator.clone();
 	final int x = event.getNewHotPointX();
 	final int y = event.getNewHotPointY();
-	System.out.println("" + x + "," + y);
 	while (it2.canMoveNext() && !it2.coversPos(x, y))
 	    it2.moveNext();
 	if (!it2.canMoveNext())
 	    return false;
-	System.out.println("here");
 	iterator = it2;
-	hotPointX = x - iterator.getCurrentRow().getRowX();
+	hotPointX = x - iterator.getRow().getRowX();
 	return true;
     }
 
@@ -295,9 +325,9 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (!iterator.isCurrentRowEmpty())
+	if (!iterator.isEmptyRow())
 	{
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	if (hotPointX > text.length())
 	    hotPointX = text.length();
 	if (hotPointX > 0)
@@ -314,7 +344,7 @@ public class DocTreeArea implements Area
 	    return true;
 	}
 	iterator.movePrev();
-	final String prevRowText = iterator.getCurrentText();
+	final String prevRowText = iterator.getText();
 	hotPointX = prevRowText.length();
 	environment.hint(Hints.END_OF_LINE);
 	return true;
@@ -324,9 +354,9 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (!iterator.isCurrentRowEmpty())
+	if (!iterator.isEmptyRow())
 	{
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	if (hotPointX < text.length())
 	{
 	    ++hotPointX;
@@ -343,7 +373,7 @@ public class DocTreeArea implements Area
 	    return true;
 	}
 	iterator.moveNext();
-	final String nextRowText = iterator.getCurrentText();
+	final String nextRowText = iterator.getText();
 	hotPointX = 0;
 	if (nextRowText.isEmpty())
 	    environment.hint(Hints.END_OF_LINE); else
@@ -356,12 +386,12 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	{
 	    environment.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepBackward())
 	{
@@ -378,12 +408,12 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	{
 	    environment.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepForward())
 	{
@@ -402,12 +432,12 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	{
 	    environment.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	hotPointX = 0;
 	if (!text.isEmpty())
 	    environment.sayLetter(text.charAt(0)); else
@@ -420,12 +450,12 @@ public class DocTreeArea implements Area
     {
 	if (noContentCheck())
 	    return true;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	{
 	    environment.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
-	final String text = iterator.getCurrentText();
+	final String text = iterator.getText();
 	hotPointX = text.length();
 	environment.hint(Hints.END_OF_LINE);
 	environment.onAreaNewHotPoint(this);
@@ -435,7 +465,7 @@ public class DocTreeArea implements Area
     private void onNewHotPointY(boolean briefIntroduction)
     {
 	hotPointX = 0;
-	if (iterator.isCurrentRowEmpty())
+	if (iterator.isEmptyRow())
 	    environment.hint(Hints.EMPTY_LINE); else
 	    introduction.introduce(iterator, briefIntroduction);
 	environment.onAreaNewHotPoint(this);
@@ -447,13 +477,20 @@ public class DocTreeArea implements Area
 	Iterator it = itFrom;
 	while(!it.equals(itTo))
 	{
-	    if (!it.isCurrentRowEmpty())
-		b.append(it.getCurrentText());
+	    if (!it.isEmptyRow())
+		b.append(it.getText());
 	    if (!it.moveNext())
 		break;
 	}
 	environment.say(b.toString());
 
+    }
+
+    public boolean isEmpty()
+    {
+	if (document ==null || iterator == null)
+	    return true;
+	return iterator.noContent();
     }
 
     protected String noContentStr()
@@ -463,7 +500,7 @@ public class DocTreeArea implements Area
 
     private boolean noContentCheck()
     {
-	if (document == null)
+	if (isEmpty())
 	{
 	    environment.hint(noContentStr(), Hints.NO_CONTENT);
 	    return true;

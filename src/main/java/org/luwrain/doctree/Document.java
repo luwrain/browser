@@ -147,7 +147,7 @@ public class Document
 	    currentParaTop += p.height;
 	}
     }
-    
+
     // recreate hash map index for all node's ids
     public void makeIndex()
     {

@@ -66,7 +66,6 @@ jsoupDoc = Jsoup.parse(text);
 	//	final org.luwrain.doctree.NodeImpl rootNode = onNode(jsoupDoc.body(), NodeImpl.ROOT);
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.create(NodeImpl.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
-	//	System.out.println("" + res.subnodes.length + " root subnodes");
 return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
     }
 

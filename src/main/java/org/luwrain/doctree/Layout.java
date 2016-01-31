@@ -56,7 +56,7 @@ class Layout
 	    lines[i] = new Line();
 	for(int k = 0;k < rows.length;++k)
 	{
-	    if (!rows[k].hasAssociatedText())
+	    if (rows[k].isEmpty())
 		continue;
 	    final Line line = lines[rows[k].y];
 	    //	    System.out.println("y=" + rows[k].y);
@@ -76,7 +76,7 @@ class Layout
 	for(RowImpl r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts;
-	    if (!r.hasAssociatedText())
+	    if (r.isEmpty())
 	    {
 		r.x = lastX;
 		r.y = lastY + 1;

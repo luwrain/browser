@@ -48,7 +48,26 @@ public class Iterator
 	this.paragraphs = document.getParagraphs();
 	this.rowParts = document.getRowParts();
 	this.rows = document.getRows();
-	current = index;
+	current = index < rows.length?index:0;
+    }
+
+    public boolean noContent()
+    {
+	if (document == null)
+	    return true;
+	if (rows == null || rows.length < 1)
+	    return true;
+	if (rowParts == null || rowParts.length < 1)
+	    return true;
+	return false;
+    }
+
+    @Override public boolean equals(Object o)
+    {
+	if (o == null || !(o instanceof Iterator))
+	    return false;
+	final Iterator it2 = (Iterator)o;
+	return document == it2.document && current == it2.current;
     }
 
     @Override public Object clone()
@@ -56,107 +75,140 @@ public class Iterator
 	return new Iterator(document, current);
     }
 
-    public Row getCurrentRow()
+    public Row getRow()
     {
+	if (noContent())
+	    return null;
 	return rows[current];
     }
 
-    public int getCurrentRowAbsIndex()
+    //returns -1 if no content
+    public int getRowAbsIndex()
     {
+	if (noContent())
+	    return -1;
 	return current;
     }
 
-    public int getCurrentRowRelIndex()
+    //returns -1 if no content
+    public int getRowRelIndex()
     {
-	return current - getCurrentParagraphImpl().topRowIndex;
+	if (noContent())
+	    return -1;
+	return current - getParagraphImpl().topRowIndex;
     }
 
-    public boolean isCurrentRowFirst()
+    public boolean isFirstRow()
     {
-	return getCurrentRowRelIndex() == 0;
+	return getRowRelIndex() == 0;
     }
 
-    public boolean isCurrentRowEmpty()
+    public boolean isEmptyRow()
     {
-	return !rows[current].hasAssociatedText();
+	if (noContent())
+	    return true;
+	return rows[current].isEmpty();
     }
 
-    public ParagraphImpl getCurrentParagraph()//FIXME:Should be simply Paragraph, not "Impl"
+    public ParagraphImpl getParagraph()//FIXME:Should be simply Paragraph, not "Impl"
     {
-	return getCurrentParagraphImpl();
+	if (noContent())
+	    return null;
+	return getParagraphImpl();
     }
 
-    private ParagraphImpl getCurrentParagraphImpl()
+    private ParagraphImpl getParagraphImpl()
     {
-	return getFirstRunOfCurrentRow().parentParagraph;
+	if (noContent())
+	    return null;
+	return getFirstRunOfRow().parentParagraph;
     }
 
-    private Run getFirstRunOfCurrentRow()
+    private Run getFirstRunOfRow()
     {
+	if (noContent())
+	    return null;
 	return rows[current].getFirstPart(rowParts).run;
     }
 
+    //returns -1 if no content 
     public int getParaIndex()
     {
-	return getCurrentParagraphImpl().getIndexInParentSubnodes();
+	if (noContent())
+	    return -1;
+	return getParagraphImpl().getIndexInParentSubnodes();
     }
 
     public boolean coversPos(int x, int y)
     {
-	if (isCurrentRowEmpty())
+	if (noContent())
 	    return false;
-	final Row r = getCurrentRow();
+	if (isEmptyRow())
+	    return false;
+	final Row r = getRow();
 	if (r.getRowY() != y)
 	    return false;
 	if (x < r.getRowX())
 	    return false;
-	if (x > r.getRowX() + getCurrentText().length())
+	if (x > r.getRowX() + getText().length())
 	    return false;
 	return true;
     }
 
-    public boolean isCurrentParaFirst()
+    public boolean isFirstPara()
     {
+	if (noContent())
+	    return false;
 	return getParaIndex() == 0;
     }
 
-    public String getCurrentText()
+    public String getText()
     {
+	if (noContent())
+	    return "";
 	final RowImpl row = rows[current];
-	return row.hasAssociatedText()?row.text(rowParts):"";
+	return !row.isEmpty()?row.text(rowParts):"";
     }
 
-    public String getCurrentTextWithHref(String hrefPrefix)
+    public String getTextWithHref(String hrefPrefix)
     {
+	if (noContent())
+	    return "";
 	final RowImpl row = rows[current];
-	return row.hasAssociatedText()?row.textWithHrefs(rowParts, hrefPrefix):"";
+	return !row.isEmpty()?row.textWithHrefs(rowParts, hrefPrefix):"";
     }
 
     //May return null if there is no href at the specified position
     public String getHref(int pos)
     {
+	if (noContent())
+	    return "";
 	final RowImpl row = rows[current];
-	return row.hasAssociatedText()?row.href(rowParts, pos):null;
+	return !row.isEmpty()?row.href(rowParts, pos):null;
     }
 
-
-
-    public NodeImpl getCurrentParaContainer()
+    public NodeImpl getParaContainer()
     {
-	return getCurrentParagraphImpl().parentNode;
+	if (noContent())
+	    return null;
+	return getParagraphImpl().parentNode;
     }
 
     public boolean isContainerTableCell()
     {
-	if (isCurrentRowEmpty())
+	if (noContent())
 	    return false;
-	final NodeImpl container = getCurrentParaContainer();
+	if (isEmptyRow())
+	    return false;
+	final NodeImpl container = getParaContainer();
 	return container.type == Node.TABLE_CELL && (container instanceof TableCell);
     }
 
     public TableCell getTableCell()
     {
-	final NodeImpl container = getCurrentParaContainer();
+	if (noContent())
+	    return null;
+	final NodeImpl container = getParaContainer();
 	if (container == null || !(container instanceof TableCell))
 	    return null;
 	return (TableCell)container;
@@ -164,15 +216,19 @@ public class Iterator
 
     public boolean isContainerListItem()
     {
-	if (isCurrentRowEmpty())
+	if (noContent())
 	    return false;
-	final NodeImpl container = getCurrentParaContainer();
+	if (isEmptyRow())
+	    return false;
+	final NodeImpl container = getParaContainer();
 	return container.type == Node.LIST_ITEM && (container instanceof ListItem);
     }
 
     public ListItem getListItem()
     {
-	final NodeImpl container = getCurrentParaContainer();
+	if (noContent())
+	    return null;
+	final NodeImpl container = getParaContainer();
 	if (container == null || !(container instanceof ListItem))
 	    return null;
 	return (ListItem)container;
@@ -180,15 +236,19 @@ public class Iterator
 
     public boolean isContainerSection()
     {
-	if (isCurrentRowEmpty())
+	if (noContent())
 	    return false;
-	final NodeImpl container = getCurrentParaContainer();
+	if (isEmptyRow())
+	    return false;
+	final NodeImpl container = getParaContainer();
 	return container.type == Node.SECTION && (container instanceof Section);
     }
 
     public Section getSection()
     {
-	final NodeImpl container = getCurrentParaContainer();
+	if (noContent())
+	    return null;
+	final NodeImpl container = getParaContainer();
 	if (container == null || !(container instanceof Section))
 	    return null;
 	return (Section)container;
@@ -196,7 +256,9 @@ public class Iterator
 
     public boolean hasContainerInParents(Node container)
     {
-	NodeImpl n = getCurrentParagraphImpl();
+	if (noContent())
+	    return false;
+	NodeImpl n = getParagraphImpl();
 	while (n != null && n != container)
 	    n = n.parentNode;
 	return n == container;
@@ -204,7 +266,7 @@ public class Iterator
 
     public boolean moveNext()
     {
-	if (current + 1 >= rows.length)
+	if (!canMoveNext())
 	    return false;
 	++current;
 	return true;
@@ -218,13 +280,13 @@ public class Iterator
 		break;
 	if (!it.hasContainerInParents(container))
 	    return false;
-	current = it.getCurrentRowAbsIndex();
+	current = it.getRowAbsIndex();
 	return true;
     }
 
     public boolean movePrev()
     {
-	if (current == 0)
+	if (!canMovePrev())
 	    return false;
 	--current;
 	return true;
@@ -232,7 +294,7 @@ public class Iterator
 
     public void moveEnd()
     {
-	current = rowParts.length > 0?rowParts.length - 1:0;
+	current = rows.length > 0?rows.length - 1:0;
     }
 
     public void moveHome()
@@ -242,19 +304,15 @@ public class Iterator
 
     public boolean canMoveNext()
     {
+	if (noContent())
+	    return false;
 	return current + 1 < rows.length;
     }
 
     public boolean canMovePrev()
     {
-	return current > 0;
-    }
-
-    @Override public boolean equals(Object o)
-    {
-	if (o == null || !(o instanceof Iterator))
+	if (noContent())
 	    return false;
-	final Iterator it2 = (Iterator)o;
-	return document == it2.document && current == it2.current;
+	return current > 0;
     }
 }
