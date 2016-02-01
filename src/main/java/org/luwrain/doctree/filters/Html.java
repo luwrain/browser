@@ -172,103 +172,108 @@ finally
     private void onElement(Element el,
 			   LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
-final String name = el.nodeName();
-if (name == null || name.trim().isEmpty())
-    return;
-switch(name.toLowerCase().trim())
-{
-case "script":
-case "style":
-case "hr":
-case "input":
-case "button":
-case "nobr":
-case "wbr":
-    return;
-}
-//Log.debug("jsoup", "processing tag:" + name);
+	final String name = el.nodeName();
+	if (name == null || name.trim().isEmpty())
+	    return;
+	if (name.toLowerCase().trim().startsWith("g:") ||
+	    name.toLowerCase().trim().startsWith("fb:"))
+	    return;
+	switch(name.toLowerCase().trim())
+	{
+	case "script":
+	case "style":
+	case "hr":
+	case "input":
+	case "button":
+	case "nobr":
+	case "wbr":
+	case "map":
+	    return;
+	}
+	NodeImpl n = null;
+	NodeImpl[] nn = null;
+	switch(name.toLowerCase().trim())
+	{
+	case "br":
+	    commitPara(nodes, runs);
+	    break;
 
-NodeImpl n = null;
-NodeImpl[] nn = null;
+	case "p":
+	case "div":
+	case "noscript":
+	case "header":
+	case "footer":
+	case "center":
+	case "blockquote":
+	case "tbody":
+	case "figure":
+	case "figcaption":
+	case "address":
+	case "nav":
+	case "article":
+	case "noindex":
+	case "iframe":
+	case "form":
+	case "section":
+	case "dl":
+	case "dt":
+	case "dd":
+	case "aside":
+	    commitPara(nodes, runs);
+	nn = onNode(el);
+	for(NodeImpl i: nn)
+	    nodes.add(i);
+	break;
 
-switch(name.toLowerCase().trim())
-{
-case "br":
-    commitPara(nodes, runs);
-    break;
-
-case "p":
-case "div":
-case "noscript":
-case "header":
-case "footer":
-case "center":
-case "blockquote":
-case "tbody":
-case "figure":
-case "figcaption":
-case "address":
-case "nav":
-case "article":
-case "noindex":
-case "iframe":
-case "form":
-case "section":
-case "dl":
-case "dd":
-    commitPara(nodes, runs);
-    nn = onNode(el);
-    for(NodeImpl i: nn)
-	nodes.add(i);
-    break;
-
-case "h1":
-case "h2":
-case "h3":
-    commitPara(nodes, runs);
-n = NodeFactory.newSection(1);
-    n.subnodes = onNode(el);
+	case "h1":
+	case "h2":
+	case "h3":
+	case "h4":
+	case "h5":
+	case "h66":
+	case "h7":
+	case "h8":
+	case "h9":
+	    commitPara(nodes, runs);
+	n = NodeFactory.newSection(name.trim().charAt(1) - '0');
+	n.subnodes = onNode(el);
 	nodes.add(n);
-    break;
+	break;
 
-case "ul":
-case "ol":
-case "li":
-case "table":
-case "th":
-case "tr":
-case "td":
-    commitPara(nodes, runs);
-//System.out.println(el.nodeName());
-//System.out.println(el.attributes());
-//if (el.attr("id").equals("gbzc"))
-//    break;
-n = NodeFactory.newNode(getNodeType(name));
-    n.subnodes = onNode(el);
+	case "ul":
+	case "ol":
+	case "li":
+	case "table":
+	case "th":
+	case "tr":
+	case "td":
+	    commitPara(nodes, runs);
+	n = NodeFactory.newNode(getNodeType(name));
+	n.subnodes = onNode(el);
 	nodes.add(n);
-    break;
+	break;
 
-case "img":
-case "a":
-case "b":
-case "s":
-case "ins":
-case "em":
-case "i":
-case "big":
-case "small":
-case "strong":
-case "span":
-case "cite":
-case "font":
-case "sup":
-case "label":
-    onElementInPara(el, nodes, runs);
-    break;
+	case "img":
+	case "a":
+	case "b":
+	case "s":
+	case "ins":
+	case "em":
+	case "i":
+	case "big":
+	case "small":
+	case "strong":
+	case "span":
+	case "cite":
+	case "font":
+	case "sup":
+	case "label":
+	    onElementInPara(el, nodes, runs);
+	break;
 
-default:
-    Log.warning("doctree-html", "unprocessed tag:" + name);
-}
+	default:
+	    Log.warning("doctree-html", "unprocessed tag:" + name);
+	}
     }
 
     private void onTextNode(TextNode textNode, LinkedList<org.luwrain.doctree.Run> runs)

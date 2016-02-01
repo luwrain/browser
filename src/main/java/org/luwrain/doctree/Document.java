@@ -90,49 +90,9 @@ public class Document
 	return layout.getLine(index);
     }
 
-    public boolean checkConsistency(boolean stopImmediately)
-    {
-	boolean ok = true;
-	//All paragraphs must have valid parent node;
-	for(ParagraphImpl p: paragraphs)
-	    if (p.parentNode == null)
-	{
-	    System.out.println("warning::doctree:have a paragraph with an empty parent node");
-	    if (stopImmediately)
-		return false;
-	    ok = false;
-	}
-	return ok;
-    }
-
     public Iterator getIterator()
     {
 	return new Iterator(this);
-    }
-
-    public String getTitle()
-    {
-	return title != null?title:"";
-    }
-
-    public NodeImpl getRoot()
-    {
-	return root;
-    }
-
-    public ParagraphImpl[] getParagraphs()
-    {
-	return paragraphs;
-    }
-
-    public RowImpl[] getRows()
-    {
-	return rows;
-    }
-
-    public RowPart[] getRowParts()
-    {
-	return rowParts;
     }
 
     private void calcAbsRowNums()
@@ -143,7 +103,6 @@ public class Document
 	    p.topRowIndex = currentParaTop;
 	    for(RowPart r: p.rowParts)
 		r.absRowNum = r.relRowNum + currentParaTop;
-	    //currentParaTop += (p.height + (p.shouldHaveExtraLine()?1:0));
 	    currentParaTop += p.height;
 	}
     }
@@ -161,4 +120,10 @@ public class Document
     	for(NodeImpl n:node.subnodes)
     		makeIndex(n);
     }
+
+    public String getTitle() { return title != null?title:""; }
+    public NodeImpl getRoot() { return root; }
+    public ParagraphImpl[] getParagraphs() { return paragraphs; }
+    public RowImpl[] getRows() { return rows; }
+    public RowPart[] getRowParts() { return rowParts; }
 }

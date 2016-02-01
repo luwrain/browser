@@ -252,4 +252,13 @@ public class NodeImpl implements Node
 		return i;
 	return -1;
     }
+
+    boolean isLastInParentSubnodes()
+    {
+	final int count = getParentSubnodeCount();
+	final int index = getIndexInParentSubnodes();
+	if (index < 0 || count < 0)
+	    return false;
+	return index + 1 == count;
+    }
 }

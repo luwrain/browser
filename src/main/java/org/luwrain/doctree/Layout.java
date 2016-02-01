@@ -75,12 +75,12 @@ class Layout
 	int lastY = 0;
 	for(RowImpl r: rows)
 	{
-	    //Generally admissible situation as not all rows should have associated parts;
+	    //Generally admissible situation as not all rows should have associated parts
 	    if (r.isEmpty())
 	    {
 		r.x = lastX;
 		r.y = lastY + 1;
-		++lastX;
+		++lastY;
 		continue;
 	    }
 	    final Run run = r.getFirstPart(rowParts).run;
