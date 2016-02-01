@@ -59,13 +59,18 @@ public class Table extends NodeImpl
 	    n.calcHeight();
 	for(NodeImpl n: subnodes)
 	    height += n.height;
+	if (subnodes.length > 0)
+	    height += (subnodes.length - 1);
     }
 
     @Override void calcPosition()
     {
 	int offset = 0;
-	for(NodeImpl n: subnodes)
+	for(int i = 0;i < subnodes.length;++i)
 	{
+	    final NodeImpl n = subnodes[i];
+	    if (i > 0)
+		++offset;
 	    n.x = x;
 	    n.y = y + offset;
 	    offset += n.height;
