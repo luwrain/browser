@@ -73,10 +73,14 @@ public class Zip
 		    continue;
 		*/
 
-		final Document subdoc = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl, Factory.Format.UNRECOGNIZED);
-		//		Document subdoc=Factory.loadFromStream(format,zip,null);
+		final Result res = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl, Factory.Format.UNRECOGNIZED);
+		if (res.type() == Result.Type.OK)
+		{
+		    final Document subdoc = res.doc();
 		for(NodeImpl node: subdoc.getRoot().subnodes)
 		    subnodes.add(node);
+		} else
+		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
 		entry = zip.getNextEntry();
 	    }
 	    zip.close();

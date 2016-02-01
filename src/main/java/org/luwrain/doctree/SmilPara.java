@@ -27,7 +27,7 @@ public class SmilPara extends NodeImpl
 
     public SmilPara(String[] text,AudioInfo[] audio)
     {
-    	super(Node.Type.SMIL_PARA);
+    	super(Node.Type.SMIL_PARAGRAPH);
 	NullCheck.notNullItems(text, "text");
 	NullCheck.notNull(audio, "audio");
     	textSources = text;

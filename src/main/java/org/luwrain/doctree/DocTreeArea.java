@@ -68,14 +68,27 @@ public class DocTreeArea implements Area
 	return document;
     }
 
+    public boolean hasHref()
+    {
+	if (isEmpty() || iterator.isEmptyRow())
+	    return false;
+	return iterator.hasHrefUnderPos(hotPointX);
+    }
+
     public String getHref()
     {
-	if (document == null || iterator == null)
+	if (isEmpty() || iterator.isEmptyRow())
 	    return null;
-	if (iterator.isEmptyRow())
-	    return null;
-	return iterator.getHref(hotPointX);
+	return iterator.getHrefUnderPos(hotPointX);
     }
+
+    public String getHrefText()
+    {
+	if (isEmpty() || iterator.isEmptyRow())
+	    return null;
+	return iterator.getHrefTextUnderPos(hotPointX);
+    }
+
 
     @Override public int getLineCount()
     {
@@ -92,6 +105,16 @@ public class DocTreeArea implements Area
     @Override public boolean onKeyboardEvent(KeyboardEvent event) 
     {
 	NullCheck.notNull(event, "event");
+	if (!event.isCommand() && !event.isModified())
+	    switch(event.getCharacter())
+	    {
+	    case ' ':
+		return onSpace(event);
+	    case '[':
+		return onLeftSquareBracket(event);
+	    case ']':
+		return onRightSquareBracket(event);
+	    }
 	if (event.isCommand() && !event.isModified())
 	    switch(event.getCommand())
 	    {
@@ -129,8 +152,6 @@ public class DocTreeArea implements Area
 		return onPageUp(event, true);
 	    case KeyboardEvent.ALTERNATIVE_PAGE_DOWN:
 		return onPageDown(event, true);
-	    default:
-		return false;
 	    }
 	return false;
     }
@@ -322,6 +343,34 @@ public class DocTreeArea implements Area
 	return true;
     }
 
+    private boolean onRightSquareBracket(KeyboardEvent event)
+    {
+	if (noContentCheck())
+	    return true;
+	if (!iterator.moveNext())
+	{
+	    environment.hint(Hints.NO_LINES_BELOW);
+	    return true;
+	}
+	while(!iterator.isFirstRow() && iterator.moveNext());
+	onNewHotPointY(false);
+	return true;
+    }
+
+    private boolean onLeftSquareBracket(KeyboardEvent event)
+    {
+	if (noContentCheck())
+	    return true;
+	if (!iterator.movePrev())
+	{
+	    environment.hint(Hints.NO_LINES_ABOVE);
+	    return true;
+	}
+	while(!iterator.isFirstRow() && iterator.movePrev());
+	onNewHotPointY( false);
+	return true;
+    }
+
     private boolean onArrowLeft(KeyboardEvent event)
     {
 	if (noContentCheck())
@@ -461,6 +510,39 @@ public class DocTreeArea implements Area
 	environment.hint(Hints.END_OF_LINE);
 	environment.onAreaNewHotPoint(this);
 	return true;
+    }
+
+    protected boolean onSpace(KeyboardEvent event)
+    {
+	if (noContentCheck())
+	    return true;
+	int pos = iterator.findNextHref(hotPointX);
+	if (pos >= 0)
+	{
+	    hotPointX = pos;
+	    environment.say(getHrefText());
+	    environment.onAreaNewHotPoint(this);
+	    return true;
+	}
+	while (iterator.moveNext())
+	{
+	    if (iterator.hasHrefUnderPos(0))
+	    {
+		hotPointX = 0;
+		environment.say(getHrefText());
+		environment.onAreaNewHotPoint(this);
+		return true;
+	    }
+	    pos = iterator.findNextHref(0);
+	    if (pos >= 0)
+	    {
+		hotPointX = pos;
+		environment.say(getHrefText());
+		environment.onAreaNewHotPoint(this);
+		return true;
+	    }
+	}
+	return false;
     }
 
     private void onNewHotPointY(boolean briefIntroduction)

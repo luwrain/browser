@@ -87,6 +87,84 @@ int x = 0;
 	return null;
     }
 
+    String hrefText(RowPart[] parts, int pos)
+    {
+	if (isEmpty())
+	    return "";
+	int index = getPartIndexUnderPos(parts, pos);
+	if (index < 0 || !parts[index].hasHref())
+	    return "";
+	final StringBuilder b = new StringBuilder();
+	while(index < partsTo && parts[index].hasHref())
+	{
+	    b.append(parts[index].text());
+	    ++index;
+	}
+	return new String(b);
+    }
+
+    boolean hasHref(RowPart[] parts, int pos)
+    {
+	int index = getPartIndexUnderPos(parts, pos);
+	if (index < 0)
+	    return false;
+	return parts[index].hasHref();
+    }
+
+    //returns -1 if there is no any
+    int findNextHref(RowPart[] parts, int pos)
+    {
+	int index = getPartIndexUnderPos(parts, pos);
+	if (index < 0)
+	    return -1;
+	while (index < partsTo && parts[index].hasHref())
+	    ++index;
+	if (index >= partsTo)
+	    return -1;
+	while (index < partsTo && !parts[index].hasHref())
+	    ++index;
+	if (index >= partsTo)
+	    return -1;
+	return partBeginsAt(parts, index);
+    }
+
+    //returns -1 if there is no matching pos
+    int getPartIndexUnderPos(RowPart[] parts, int pos)
+    {
+	if (isEmpty())
+	    return -1;
+	int offset = 0;
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    //	    final RowPart p = parts[i];
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    if (pos >= offset && pos < offset + text.length())
+		return i;
+	    offset += text.length();
+	}
+	return -1;
+    }
+
+    //returns -1 if index is invalid
+    int partBeginsAt(RowPart[] parts, int index)
+    {
+	if (isEmpty() || index < partsFrom || index >= partsTo)
+	    return -1;
+	if (index == partsFrom)
+	    return 0;
+	int offset = 0;
+	for(int i = partsFrom;i < index;++i)
+	{
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    offset += text.length();
+	}
+	return offset;
+    }
+
     boolean isEmpty()
     {
 	return partsFrom < 0 || partsTo < 0;

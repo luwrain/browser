@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.NullCheck;
+
 class RowPart
 {
     Run run;
@@ -42,16 +44,20 @@ class RowPart
 
     TextAttr textAttr()
     {
-	if (run == null)
-	    throw new NullPointerException("node may not be null");
+	NullCheck.notNull(run, "run");
 	return run.textAttr;
     }
 
     String href()
     {
-	if (run == null)
-	    throw new NullPointerException("node may not be null");
+	NullCheck.notNull(run, "run");
 	return run.href;
+    }
+
+    boolean hasHref()
+    {
+	final String res = href();
+	return res != null && !res.isEmpty();
     }
 
 }

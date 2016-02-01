@@ -43,8 +43,6 @@ public class Factory
     };
 
     static private final String USER_AGENT = "Mozilla/5.0";
-    //static private final String USER_AGENT =      "Emacs-w3m/1.4.466 w3m/0.5.2";
-
     static private final String DEFAULT_CHARSET = "UTF-8";
 
     static public Document fromPath(Path path, String contentType, String charset)
@@ -102,7 +100,7 @@ public class Factory
 	}
     }
 
-    static public Document fromUrl(URL unpreparedUrl, 
+    static public Result fromUrl(URL unpreparedUrl, 
 String contentType, String charset)
     {
 	NullCheck.notNull(unpreparedUrl, "unpreparedUrl");
@@ -117,19 +115,29 @@ String contentType, String charset)
 	catch(MalformedURLException e)
 	{
 	    e.printStackTrace();
-	    return null;
+final Result res = new Result(Result.Type.INVALID_URL);
+res.origAddr = unpreparedUrl.toString();
+res.resultAddr = res.origAddr;
+return res;
 	}
 	try {
-	    return fromUrlImpl(url, contentType, charset);
+final Result res = fromUrlImpl(url, contentType, charset);
+res.origAddr = unpreparedUrl.toString();
+if (res.resultAddr == null || res.resultAddr.isEmpty())
+    res.resultAddr = res.origAddr;
+return res;
 	}
 	catch(Exception e)
 	{
 	    e.printStackTrace();
-	    return null;
+final Result res = new Result(Result.Type.UNEXPECTED_ERROR);
+res.origAddr = unpreparedUrl.toString();
+res.resultAddr = res.origAddr;
+return res;
 	}
     }
 
-    static public Document fromUrlImpl(URL url,
+    static public Result fromUrlImpl(URL url,
 String contentType, String charset) throws Exception
     {
 	NullCheck.notNull(url, "url");
@@ -147,10 +155,10 @@ String contentType, String charset) throws Exception
 		    break;
 		final HttpURLConnection httpCon = (HttpURLConnection)con;
 final int code = httpCon.getResponseCode();
-if (code >= 400 && code < 200)
+if (code >= 400 || code < 200)
 {
     Log.warning("doctree", "HTTP responce code is " + code);
-    return null;
+    return new Result(Result.Type.HTTP_ERROR, code);
 }
 if (code >= 200 && code <= 299)
     break;
@@ -158,7 +166,7 @@ final String location = httpCon.getHeaderField("location");
 if (location == null || location.isEmpty())
 {
     Log.warning("doctree", "HTTP responce code is " + code + " but \'location\' field is empty");
-    return null;
+    return new Result(Result.Type.INVALID_HTTP_REDIRECT);
 }
 Log.debug("doctree", "trying to follow redirect to " + location);
 final URL locationUrl = new URL(location);
@@ -191,7 +199,7 @@ effectiveIs = null;
 	       }
     }
 
-    static public Document fromInputStream(InputStream stream, String contentType,
+    static public Result fromInputStream(InputStream stream, String contentType,
 					   String charset, String baseUrl,
 Format defaultFilter) throws Exception
     {
@@ -205,7 +213,7 @@ Format defaultFilter) throws Exception
 	if (filter == Format.UNRECOGNIZED)
 	{
 	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
-	    return null;
+	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	}
 	Log.debug("doctree", "reading input stream using " + filter + " filter");
 	InputStream effectiveStream = stream;
@@ -233,17 +241,24 @@ break;
 	    effectiveCharset = charset;
 	if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
 	    effectiveCharset = DEFAULT_CHARSET;
-	//	System.out.println("effectiveCharset=" + effectiveCharset);
+	final Result res = new Result(Result.Type.OK);
+	res.format = filter.toString();
+	res.charset = effectiveCharset;
+	res.resultAddr = baseUrl;
 	switch(filter)
 	{
 	case HTML:
-	    return new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+return res;
 	case FB2:
-	    return new org.luwrain.doctree.filters.FictionBook2(effectiveStream, effectiveCharset).createDoc();
+res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
+return res;
 	case FB2_ZIP:
-	    return new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", charset, baseUrl).createDoc();
+	    res.charset = charset;
+res.doc = new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", charset, baseUrl).createDoc();
+return res;
 	default:
-	    return null;
+	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	}
 	}
 	finally

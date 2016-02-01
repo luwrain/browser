@@ -179,12 +179,36 @@ public class Iterator
     }
 
     //May return null if there is no href at the specified position
-    public String getHref(int pos)
+    public String getHrefUnderPos(int pos)
     {
 	if (noContent())
 	    return "";
 	final RowImpl row = rows[current];
 	return !row.isEmpty()?row.href(rowParts, pos):null;
+    }
+
+    public String getHrefTextUnderPos(int pos)
+    {
+	if (noContent())
+	    return "";
+	final RowImpl row = rows[current];
+	return !row.isEmpty()?row.hrefText(rowParts, pos):null;
+    }
+
+    public boolean hasHrefUnderPos(int pos)
+    {
+	if (noContent())
+	    return false;
+	final RowImpl row = rows[current];
+	return !row.isEmpty()?row.hasHref(rowParts, pos):false;
+    }
+
+    public int findNextHref(int pos)
+    {
+	if (noContent())
+	    return -1;
+	final RowImpl row = rows[current];
+	return !row.isEmpty()?row.findNextHref(rowParts, pos):-1;
     }
 
     public NodeImpl getParaContainer()

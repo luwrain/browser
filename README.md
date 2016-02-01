@@ -12,7 +12,7 @@ DOC,
 DOCX,
 FB2,
 EPUB,
-DAISY
+DAISY, etc
 
 * Easy navigation over document parts 
 
