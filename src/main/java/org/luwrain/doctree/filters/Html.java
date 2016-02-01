@@ -214,6 +214,8 @@ case "noindex":
 case "iframe":
 case "form":
 case "section":
+case "dl":
+case "dd":
     commitPara(nodes, runs);
     nn = onNode(el);
     for(NodeImpl i: nn)
@@ -290,21 +292,22 @@ default:
     {
 	switch(tagName)
 	{
-case "ul":
-    return org.luwrain.doctree.Node.Type.UNORDERED_LIST;
-case "ol":
-    return org.luwrain.doctree.Node.Type.ORDERED_LIST;
-case "li":
-    return org.luwrain.doctree.Node.Type.LIST_ITEM;
-case "table":
-    return org.luwrain.doctree.Node.Type.TABLE;
+	case "ul":
+	    return org.luwrain.doctree.Node.Type.UNORDERED_LIST;
+	case "ol":
+	    return org.luwrain.doctree.Node.Type.ORDERED_LIST;
+	case "li":
+	    return org.luwrain.doctree.Node.Type.LIST_ITEM;
+	case "table":
+	    return org.luwrain.doctree.Node.Type.TABLE;
 	case "th":
-case "tr":
-    return org.luwrain.doctree.Node.Type.TABLE_ROW;
-case "td":
-    return org.luwrain.doctree.Node.Type.TABLE_CELL;
-    default:
-	return null;
+	case "tr":
+	    return org.luwrain.doctree.Node.Type.TABLE_ROW;
+	case "td":
+	    return org.luwrain.doctree.Node.Type.TABLE_CELL;
+	default:
+	    Log.warning("doctree-html", "unable to create the node for tag \'" + tagName + "\'");
+	    return null;
 	}
     }
 

@@ -165,23 +165,19 @@ public class NodeImpl implements Node
 	    parentNode = null;
 	if (subnodes == null)
 	    subnodes = new NodeImpl[0];
-	if (type == Type.ORDERED_LIST || type == Type.UNORDERED_LIST)
+	for(NodeImpl n: subnodes)
 	{
+	    n.parentNode = this;
+	    n.commit();
+	}
+	if (type == Type.ORDERED_LIST || type == Type.UNORDERED_LIST)
 	    for(int i = 0;i < subnodes.length;++i)
-	    {
 		if (subnodes[i].type != Node.Type.LIST_ITEM)
 		{
 		    final NodeImpl n = NodeFactory.newNode(Type.LIST_ITEM);
 		    n.subnodes = new NodeImpl[]{subnodes[i]};
 		    subnodes[i] = n;
 		}
-	    }
-	}
-	for(NodeImpl n: subnodes)
-	{
-	    n.parentNode = this;
-	    n.commit();
-	}
     }
 
     void setEmptyMark()

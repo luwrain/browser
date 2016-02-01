@@ -26,16 +26,14 @@ public class Table extends NodeImpl
 
     @Override void commit()
     {
+	super.commit();
 	for(int i = 0;i < subnodes.length;++i)
-	{
 	    if (subnodes[i].type != Node.Type.TABLE_ROW)
 	    {
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 		subnodes[i] = n;
 	    }
-	}
-	super.commit();
 
     }
 

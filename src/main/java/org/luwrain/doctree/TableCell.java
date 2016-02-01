@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.Log;
+
 public class TableCell extends NodeImpl
 {
     TableCell()
@@ -66,8 +68,11 @@ public class TableCell extends NodeImpl
 	if (parentNode == null || parentNode.parentNode == null)
 	    return null;
 	final NodeImpl tableNode = parentNode.parentNode;
-	if (tableNode == null || !(tableNode instanceof Table))
+	if (!(tableNode instanceof Table))
+	{
+	    Log.warning("doctree", "table node has a wrong class " + tableNode.getClass().getName());
 	    return null;
+	}
 	return (Table)tableNode;
     }
 
