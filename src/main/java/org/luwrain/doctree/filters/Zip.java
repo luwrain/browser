@@ -27,30 +27,19 @@ import org.luwrain.core.Log;
 
 public class Zip
 {
-    //        private String fileName = "";
-    //    private String wholeText;
-    private InputStream is = null;
-    private boolean needToClose = false;
+    String fileName = "";
     private String itemsContentType = "";
     private String itemsCharset = "";
     private String itemsBaseUrl = "";
 
-    public Zip(String fileName) throws IOException
+    public Zip(String fileName, String itemsContentType,
+	       String itemsCharset, String itemsBaseUrl) throws IOException
     {
-	//	this.fileName = fileName;
 	NullCheck.notNull(fileName, "fileName");
-	is = new FileInputStream(fileName);
-	needToClose = true;
-    }
-
-    public Zip(InputStream is, String itemsContentType,
-	       String itemsCharset, String itemsBaseUrl)
-    {
-	NullCheck.notNull(is, "is");
 	NullCheck.notNull(itemsContentType, "itemsContentType");
 	NullCheck.notNull(itemsCharset, "itemsCharset");
 	NullCheck.notNull(itemsBaseUrl, "itemsBaseurl");
-	this.is = is;
+	this.fileName = fileName;
 	this.itemsContentType = itemsContentType;
 	this.itemsCharset = itemsCharset;
 	this.itemsBaseUrl = itemsBaseUrl;
@@ -58,22 +47,19 @@ public class Zip
 
     public Document createDoc() throws Exception
     {
+	ZipFile zip = null;
 	try {
 	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-	    final ZipInputStream zip = new ZipInputStream(is);
-	    ZipEntry entry = zip.getNextEntry();
-	    while (entry != null)
+zip = new ZipFile(fileName);
+	    //	    Enumeration<ZipEntry> entries = zip.entries();
+	    for(Enumeration e = zip.entries();e.hasMoreElements();)
 	    {
+		final ZipEntry entry = (ZipEntry)e.nextElement();
+		Log.debug("doctree-zip", "reading zip entry with name \'" + entry.getName() + "\'");
 		if(entry.isDirectory()) 
 		    continue;
-		/*
-		int format=Factory.suggestFormat(entry.getName());
-		if(format==Factory.UNRECOGNIZED)
-		    continue;
-		*/
-
-		final Result res = Factory.fromInputStream(zip, itemsContentType, itemsCharset, itemsBaseUrl, Factory.Format.UNRECOGNIZED);
+		final Result res = Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.suggestFilterByExtension(entry.getName()));
 		if (res.type() == Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
@@ -81,16 +67,13 @@ public class Zip
 		    subnodes.add(node);
 		} else
 		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
-		entry = zip.getNextEntry();
 	    }
-	    zip.close();
 		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 		return new Document(root);
 	}
-	finally 
-	{
-	    if (needToClose)
-		is.close();
+	finally {
+	    if (zip != null)
+	    zip.close();
 	}
     }
 }

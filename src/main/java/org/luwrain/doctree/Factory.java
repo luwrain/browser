@@ -38,8 +38,9 @@ public class Factory
 	DOC, DOCX,
 	FB2,
 	EPUB,
-	ZIPTEXT,
+	//	ZIPTEXT,
 	FB2_ZIP,
+	ZIP,
     };
 
     static private final String USER_AGENT = "Mozilla/5.0";
@@ -64,28 +65,28 @@ public class Factory
     }
 
     static public Document fromPath(Path path,
-				    Format format, String encoding)
+				    Format format, String charset)
     {
 	NullCheck.notNull(path, "path");
 	try {
 	    switch (format)
 	    {
 	    case TEXT_PARA_INDENT:
-		return new TxtParaIndent(path.toString()).constructDocument(encoding);
+		return new TxtParaIndent(path.toString()).constructDocument(charset);
 	    case TEXT_PARA_EMPTY_LINE:
-		return new TxtParaEmptyLine(path.toString()).constructDocument(encoding);
+		return new TxtParaEmptyLine(path.toString()).constructDocument(charset);
 	    case TEXT_PARA_EACH_LINE:
-		return new TxtParaEachLine(path.toString()).constructDocument(encoding);
+		return new TxtParaEachLine(path.toString()).constructDocument(charset);
 	    case DOC:
 		return new Doc(path.toString()).constructDocument();
 	    case DOCX:
 		return new DocX(path.toString()).constructDocument();
 	    case HTML:
-		return new Html(path, encoding).constructDocument();
+		return new Html(path, charset).constructDocument();
 	case EPUB:
 	    return new Epub(path.toString()).constructDocument();
-	case ZIPTEXT:
-	    return new Zip(path.toString()).createDoc();
+	case ZIP:
+	    return new Zip(path.toString(), "", charset, path.toString()).createDoc();
 	case FB2:
 	    //		return new FictionBook2(fileName).constructDocument();
 	    return null;
@@ -138,7 +139,7 @@ return res;
     }
 
     static public Result fromUrlImpl(URL url,
-String contentType, String charset) throws Exception
+				     String contentType, String charset) throws Exception
     {
 	NullCheck.notNull(url, "url");
 	NullCheck.notNull(charset, "charset");
@@ -176,8 +177,11 @@ final URL locationUrl = new URL(location);
 	    }
 	    is = con.getInputStream();
 	    final URL resultUrl = con.getURL();
+	    Log.debug("doctree", "content type in HTTP header is \'" + con.getContentType() + "\'");
 	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
+	    Log.debug("doctree", "effective content type is \'" + effectiveContentType + "\'");
 final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
+	    Log.debug("doctree", "effective charset is \'" + effectiveCharset + "\'");
 final String encoding = con.getContentEncoding();
 if (encoding != null && encoding.toLowerCase().trim().equals("gzip"))
     effectiveIs = new GZIPInputStream(is); else
@@ -251,11 +255,21 @@ break;
 res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
 return res;
 	case FB2:
+	    Log.debug("proba", "1");
 res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
+	    Log.debug("proba", "2");
+return res;
+	case ZIP:
+	    res.charset = charset;
+tmpFile = downloadToTmpFile(stream);
+Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
+res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
 return res;
 	case FB2_ZIP:
 	    res.charset = charset;
-res.doc = new org.luwrain.doctree.filters.Zip(effectiveStream, "application/fb2", charset, baseUrl).createDoc();
+tmpFile = downloadToTmpFile(stream);
+Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
+res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
 return res;
 	default:
 	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
@@ -273,6 +287,8 @@ return res;
 	}
     }
 
+
+    /*
     static public Document loadFromStream(Format format, InputStream stream, String charset)
     {
     	switch (format)
@@ -308,6 +324,7 @@ return res;
     	    throw new IllegalArgumentException("unknown format " + format);
     	}
     }
+*/
 
 
     static public Document loadFromText(Format format, String text)
@@ -332,11 +349,10 @@ return res;
 
     static public Format suggestFilterByExtension(String path)
     {
-	NullCheck.notNull(path, "path");
-	if (path.isEmpty())
-	    throw new IllegalArgumentException("path may not be empty");
+	if (path == null || path.trim().isEmpty())
+	    return Format.UNRECOGNIZED;
 	String ext = FileTypes.getExtension(path);
-	if (ext == null || path.isEmpty())
+	if (ext == null)
 	    return Format.UNRECOGNIZED;
 	ext = ext.toLowerCase();
 	switch(ext)
@@ -353,7 +369,7 @@ return res;
 	case "htm":
 	    return Format.HTML;
 	case "zip":
-	    return Format.ZIPTEXT;
+	    return Format.ZIP;
 	case "fb2":
 		return Format.FB2;
 	default:
@@ -390,6 +406,8 @@ return res;
 	    return Format.FB2;
 	case "application/fb2+zip":
 	    return Format.FB2_ZIP;
+	case "application/zip":
+	    return Format.ZIP;
 	default:
 	    return Format.UNRECOGNIZED;
 	}
