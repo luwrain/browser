@@ -34,13 +34,9 @@ public class Factory
     public enum Format {
 	UNRECOGNIZED,
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
-	HTML,
-	DOC, DOCX,
-	FB2,
-	EPUB,
-	//	ZIPTEXT,
-	FB2_ZIP,
-	ZIP,
+	HTML, DOC, DOCX,
+	FB2, EPUB,
+	ZIP, FB2_ZIP,
     };
 
     static private final String USER_AGENT = "Mozilla/5.0";
@@ -55,7 +51,7 @@ public class Factory
 	if (!contentType.trim().isEmpty())
 	    filter = chooseFilterByContentType(contentType);
 	if (filter == Format.UNRECOGNIZED)
-	    filter = suggestFilterByExtension(path.toString());
+	    filter = chooseFilterByExtension(path.toString());
 	if (filter == Format.UNRECOGNIZED)
 	{
 	    Log.warning("doctree", "unable to find a suitable filter for a file, content type is \'" + contentType + "\', path is \'" + path.toString() + "\'");
@@ -83,16 +79,16 @@ public class Factory
 		return new DocX(path.toString()).constructDocument();
 	    case HTML:
 		return new Html(path, charset).constructDocument();
-	case EPUB:
-	    return new Epub(path.toString()).constructDocument();
-	case ZIP:
-	    return new Zip(path.toString(), "", charset, path.toString()).createDoc();
-	case FB2:
-	    //		return new FictionBook2(fileName).constructDocument();
-	    return null;
-	default:
-	    throw new IllegalArgumentException("Unknown format " + format);
-	}
+	    case EPUB:
+		return new Epub(path.toString()).constructDocument();
+	    case ZIP:
+		return new Zip(path.toString(), "", charset, path.toString()).createDoc();
+	    case FB2:
+		//		return new FictionBook2(fileName).constructDocument();
+		return null;
+	    default:
+		throw new IllegalArgumentException("Unknown format " + format);
+	    }
 	}
 	catch(Exception e)
 	{
@@ -102,7 +98,7 @@ public class Factory
     }
 
     static public Result fromUrl(URL unpreparedUrl, 
-String contentType, String charset)
+				 String contentType, String charset)
     {
 	NullCheck.notNull(unpreparedUrl, "unpreparedUrl");
 	NullCheck.notNull(contentType, "contentType");
@@ -116,25 +112,25 @@ String contentType, String charset)
 	catch(MalformedURLException e)
 	{
 	    e.printStackTrace();
-final Result res = new Result(Result.Type.INVALID_URL);
-res.origAddr = unpreparedUrl.toString();
-res.resultAddr = res.origAddr;
-return res;
+	    final Result res = new Result(Result.Type.INVALID_URL);
+	    res.origAddr = unpreparedUrl.toString();
+	    res.resultAddr = res.origAddr;
+	    return res;
 	}
 	try {
-final Result res = fromUrlImpl(url, contentType, charset);
-res.origAddr = unpreparedUrl.toString();
-if (res.resultAddr == null || res.resultAddr.isEmpty())
-    res.resultAddr = res.origAddr;
-return res;
+	    final Result res = fromUrlImpl(url, contentType, charset);
+	    res.origAddr = unpreparedUrl.toString();
+	    if (res.resultAddr == null || res.resultAddr.isEmpty())
+		res.resultAddr = res.origAddr;
+	    return res;
 	}
 	catch(Exception e)
 	{
 	    e.printStackTrace();
-final Result res = new Result(Result.Type.UNEXPECTED_ERROR);
-res.origAddr = unpreparedUrl.toString();
-res.resultAddr = res.origAddr;
-return res;
+	    final Result res = new Result(Result.Type.UNEXPECTED_ERROR);
+	    res.origAddr = unpreparedUrl.toString();
+	    res.resultAddr = res.origAddr;
+	    return res;
 	}
     }
 
@@ -155,57 +151,57 @@ return res;
 		if (!(con instanceof HttpURLConnection))
 		    break;
 		final HttpURLConnection httpCon = (HttpURLConnection)con;
-final int code = httpCon.getResponseCode();
-if (code >= 400 || code < 200)
-{
-    Log.warning("doctree", "HTTP responce code is " + code);
-    return new Result(Result.Type.HTTP_ERROR, code);
-}
-if (code >= 200 && code <= 299)
-    break;
-final String location = httpCon.getHeaderField("location");
-if (location == null || location.isEmpty())
-{
-    Log.warning("doctree", "HTTP responce code is " + code + " but \'location\' field is empty");
-    return new Result(Result.Type.INVALID_HTTP_REDIRECT);
-}
-Log.debug("doctree", "trying to follow redirect to " + location);
-final URL locationUrl = new URL(location);
-	    con = locationUrl.openConnection();
-	    con.setRequestProperty("User-Agent", USER_AGENT);
-	    con.connect();
+		final int code = httpCon.getResponseCode();
+		if (code >= 400 || code < 200)
+		{
+		    Log.warning("doctree", "HTTP responce code is " + code);
+		    return new Result(Result.Type.HTTP_ERROR, code);
+		}
+		if (code >= 200 && code <= 299)
+		    break;
+		final String location = httpCon.getHeaderField("location");
+		if (location == null || location.isEmpty())
+		{
+		    Log.warning("doctree", "HTTP responce code is " + code + " but \'location\' field is empty");
+		    return new Result(Result.Type.INVALID_HTTP_REDIRECT);
+		}
+		Log.debug("doctree", "trying to follow redirect to " + location);
+		final URL locationUrl = new URL(location);
+		con = locationUrl.openConnection();
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.connect();
 	    }
 	    is = con.getInputStream();
 	    final URL resultUrl = con.getURL();
 	    Log.debug("doctree", "content type in HTTP header is \'" + con.getContentType() + "\'");
 	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
 	    Log.debug("doctree", "effective content type is \'" + effectiveContentType + "\'");
-final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
+	    final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
 	    Log.debug("doctree", "effective charset is \'" + effectiveCharset + "\'");
-final String encoding = con.getContentEncoding();
-if (encoding != null && encoding.toLowerCase().trim().equals("gzip"))
-    effectiveIs = new GZIPInputStream(is); else
-    effectiveIs = is;
-return fromInputStream(effectiveIs, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString(), Format.HTML);
+	    final String encoding = con.getContentEncoding();
+	    if (encoding != null && encoding.toLowerCase().trim().equals("gzip"))
+		effectiveIs = new GZIPInputStream(is); else
+		effectiveIs = is;
+	    return fromInputStream(effectiveIs, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString(), Format.HTML);
 	}
 	finally
-	       {
-		   if (effectiveIs != null)
-		   {
-		       effectiveIs.close();
-effectiveIs = null;
-		   }
-		   if (is != null)
-		   {
-		       is.close();
-		       is = null;
-		   }
-	       }
+	{
+	    if (effectiveIs != null)
+	    {
+		effectiveIs.close();
+		effectiveIs = null;
+	    }
+	    if (is != null)
+	    {
+		is.close();
+		is = null;
+	    }
+	}
     }
 
     static public Result fromInputStream(InputStream stream, String contentType,
-					   String charset, String baseUrl,
-Format defaultFilter) throws Exception
+					 String charset, String baseUrl,
+					 Format defaultFilter) throws Exception
     {
 	NullCheck.notNull(stream, "stream");
 	NullCheck.notNull(contentType, "contentType");
@@ -224,56 +220,56 @@ Format defaultFilter) throws Exception
 	String effectiveCharset = null;
 	Path tmpFile = null;
 	try {
-	if (charset.trim().isEmpty())
-	{
+	    if (charset.trim().isEmpty())
+	    {
+		switch(filter)
+		{
+		case FB2:
+		    tmpFile = downloadToTmpFile(stream);
+		    effectiveCharset = XmlEncoding.getEncoding(tmpFile);
+		    Log.debug("doctree", "XML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
+		    effectiveStream = Files.newInputStream(tmpFile);
+		    break;
+		case HTML:
+		    tmpFile = downloadToTmpFile(stream);
+		    effectiveCharset = extractCharsetInfo(tmpFile);
+		    Log.debug("doctree", "HTML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
+		    effectiveStream = Files.newInputStream(tmpFile);
+		    break;
+		}
+	    } else
+		effectiveCharset = charset;
+	    if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
+		effectiveCharset = DEFAULT_CHARSET;
+	    final Result res = new Result(Result.Type.OK);
+	    res.format = filter.toString();
+	    res.charset = effectiveCharset;
+	    res.resultAddr = baseUrl;
 	    switch(filter)
 	    {
-	    case FB2:
-tmpFile = downloadToTmpFile(stream);
-effectiveCharset = XmlEncoding.getEncoding(tmpFile);
-Log.debug("doctree", "XML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
-effectiveStream = Files.newInputStream(tmpFile);
-break;
 	    case HTML:
-tmpFile = downloadToTmpFile(stream);
-effectiveCharset = extractCharsetInfo(tmpFile);
-Log.debug("doctree", "HTML encoding of " + tmpFile.toString() + " is " + effectiveCharset);
-effectiveStream = Files.newInputStream(tmpFile);
-break;
+		res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+		return res;
+	    case FB2:
+		Log.debug("proba", "1");
+		res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
+		Log.debug("proba", "2");
+		return res;
+	    case ZIP:
+		res.charset = charset;
+		tmpFile = downloadToTmpFile(stream);
+		Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
+		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
+		return res;
+	    case FB2_ZIP:
+		res.charset = charset;
+		tmpFile = downloadToTmpFile(stream);
+		Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
+		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
+		return res;
+	    default:
+		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	    }
-	} else
-	    effectiveCharset = charset;
-	if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
-	    effectiveCharset = DEFAULT_CHARSET;
-	final Result res = new Result(Result.Type.OK);
-	res.format = filter.toString();
-	res.charset = effectiveCharset;
-	res.resultAddr = baseUrl;
-	switch(filter)
-	{
-	case HTML:
-res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
-return res;
-	case FB2:
-	    Log.debug("proba", "1");
-res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
-	    Log.debug("proba", "2");
-return res;
-	case ZIP:
-	    res.charset = charset;
-tmpFile = downloadToTmpFile(stream);
-Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
-res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
-return res;
-	case FB2_ZIP:
-	    res.charset = charset;
-tmpFile = downloadToTmpFile(stream);
-Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
-res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
-return res;
-	default:
-	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
-	}
 	}
 	finally
 	{
@@ -287,67 +283,7 @@ return res;
 	}
     }
 
-
-    /*
-    static public Document loadFromStream(Format format, InputStream stream, String charset)
-    {
-    	switch (format)
-    	{
-   		case TEXT_PARA_INDENT:
-   		case TEXT_PARA_EMPTY_LINE:
-   		case TEXT_PARA_EACH_LINE:
-   		case DOC:
-   		case DOCX:
-   		case HTML:
-   		case EPUB:
-   		case ZIPTEXT:
-			try
-			{
-				byte[] data;
-				data=IOUtils.toByteArray(stream);
-	    		return loadFromText(format,new String(data,"UTF-8"));
-			} catch(IOException e)
-			{
-				e.printStackTrace();
-				return null;
-			}
-    	case FB2:
-	    try {
-    		return new FictionBook2(stream,charset).createDoc();
-	    }
-	    catch(Exception e)
-	    {
-		e.printStackTrace();
-		return null;
-	    }
-    	default:
-    	    throw new IllegalArgumentException("unknown format " + format);
-    	}
-    }
-*/
-
-
-    static public Document loadFromText(Format format, String text)
-    {
-	NullCheck.notNull(text, "text");
-	switch (format)
-	{
-	case HTML:
-	    //	    return new Html(false, text).constructDocument("");
-	    try {
-		return new Html(text).constructDocument();
-	    }
-	    catch(Exception e)
-	    {
-		e.printStackTrace(); 
-		return null;
-	    }
-	default:
-	    throw new IllegalArgumentException("unknown format " + format);
-	}
-    }
-
-    static public Format suggestFilterByExtension(String path)
+    static public Format chooseFilterByExtension(String path)
     {
 	if (path == null || path.trim().isEmpty())
 	    return Format.UNRECOGNIZED;
@@ -371,31 +307,13 @@ return res;
 	case "zip":
 	    return Format.ZIP;
 	case "fb2":
-		return Format.FB2;
+	    return Format.FB2;
 	default:
 	    return Format.UNRECOGNIZED;
 	}
     }
 
-    static private Path downloadToTmpFile(InputStream s) throws IOException
-    {
-	final Path path = Files.createTempFile("lwrdoctree-download", "");
-	Log.debug("doctree", "creating temporary file " + path.toString());
-	    Files.copy(s, path, StandardCopyOption.REPLACE_EXISTING);
-	    return path;
-    }
-
-    static String extractCharsetInfo(Path path) throws IOException
-    {
-	final List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-	final StringBuilder b = new StringBuilder();
-	for(String s: lines)
-	    b.append(s + "\n");
-	final String res = HtmlEncoding.getEncoding(new String(b));
-	return res != null?res:"";
-    }
-
-    static private Format chooseFilterByContentType(String contentType)
+    static public Format chooseFilterByContentType(String contentType)
     {
 	NullCheck.notNull(contentType, "contentType");
 	switch(contentType.toLowerCase().trim())
@@ -413,35 +331,53 @@ return res;
 	}
     }
 
+    static private Path downloadToTmpFile(InputStream s) throws IOException
+    {
+	final Path path = Files.createTempFile("lwrdoctree-download", "");
+	Log.debug("doctree", "creating temporary file " + path.toString());
+	Files.copy(s, path, StandardCopyOption.REPLACE_EXISTING);
+	return path;
+    }
+
+    static String extractCharsetInfo(Path path) throws IOException
+    {
+	final List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+	final StringBuilder b = new StringBuilder();
+	for(String s: lines)
+	    b.append(s + "\n");
+	final String res = HtmlEncoding.getEncoding(new String(b));
+	return res != null?res:"";
+    }
+
     static private String getBaseContentType(String value)
     {
 	if (value == null)
 	    return "";
-	    try {
-		final MimeType mime = new MimeType(value);
-		final String res = mime.getBaseType();
-		return res != null?res:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
+	try {
+	    final MimeType mime = new MimeType(value);
+	    final String res = mime.getBaseType();
+	    return res != null?res:"";
+	}
+	catch(MimeTypeParseException e)
+	{
+	    e.printStackTrace();
+	    return "";
+	}
     }
 
     static private String getCharset(String value)
     {
 	if (value == null)
 	    return "";
-	    try {
-		final MimeType mime = new MimeType(value);
-		final String res = mime.getParameter("charset");
-		return res != null?res:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
+	try {
+	    final MimeType mime = new MimeType(value);
+	    final String res = mime.getParameter("charset");
+	    return res != null?res:"";
+	}
+	catch(MimeTypeParseException e)
+	{
+	    e.printStackTrace();
+	    return "";
+	}
     }
 }

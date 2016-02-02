@@ -59,7 +59,7 @@ zip = new ZipFile(fileName);
 		Log.debug("doctree-zip", "reading zip entry with name \'" + entry.getName() + "\'");
 		if(entry.isDirectory()) 
 		    continue;
-		final Result res = Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.suggestFilterByExtension(entry.getName()));
+		final Result res = Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.chooseFilterByExtension(entry.getName()));
 		if (res.type() == Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
