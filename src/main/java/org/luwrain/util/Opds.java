@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+o   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of the LUWRAIN.
@@ -186,6 +186,24 @@ public class Opds
 		    return false;
 	    return true;
 	}
+
+	public boolean hasCatalogLinks()
+	{
+	    for(Link link: links)
+		if (link.isCatalog())
+		    return true;
+	    return false;
+	}
+
+	public boolean hasBooks()
+	{
+	    for(Link link: links)
+		if (!link.isCatalog() && !link.isImage())
+		    return true;
+	    return false;
+	}
+
+
 
 	@Override public String toString()
 	{

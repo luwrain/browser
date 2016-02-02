@@ -18,11 +18,9 @@
 package org.luwrain.doctree.filters;
 
 import java.io.*;
-//import java.io.InputStream;
 import java.util.*;
 import java.util.function.Consumer;
 
-//import org.apache.poi.util.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
@@ -62,6 +60,7 @@ public class FictionBook2
 		}
 
 		// genre
+		/*
 		final Elements genre=descr.first().getElementsByTag("genre");
 		if(!genre.isEmpty())
 		{
@@ -69,6 +68,7 @@ public class FictionBook2
 		    for(org.jsoup.nodes.Element e:genre) str+=" "+e.text();
 		    subnodes.add(NodeFactory.newPara(str));
 		}
+		*/
 
 		// author, each per new line
 		final Elements author=descr.first().getElementsByTag("author");

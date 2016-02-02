@@ -32,6 +32,7 @@ public class Zip
     private String itemsCharset = "";
     private String itemsBaseUrl = "";
 
+    //itemsContentType and itemsCharset may be empty (but not null), it content type is empty filter will be suggested using file names
     public Zip(String fileName, String itemsContentType,
 	       String itemsCharset, String itemsBaseUrl) throws IOException
     {
@@ -51,7 +52,7 @@ public class Zip
 	try {
 	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-zip = new ZipFile(fileName);
+	    zip = new ZipFile(fileName);
 	    //	    Enumeration<ZipEntry> entries = zip.entries();
 	    for(Enumeration e = zip.entries();e.hasMoreElements();)
 	    {
@@ -63,17 +64,17 @@ zip = new ZipFile(fileName);
 		if (res.type() == Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
-		for(NodeImpl node: subdoc.getRoot().subnodes)
-		    subnodes.add(node);
+		    for(NodeImpl node: subdoc.getRoot().subnodes)
+			subnodes.add(node);
 		} else
 		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
 	    }
-		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
-		return new Document(root);
+	    root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	    return new Document(root);
 	}
 	finally {
 	    if (zip != null)
-	    zip.close();
+		zip.close();
 	}
     }
 }
