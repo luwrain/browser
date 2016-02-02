@@ -216,26 +216,39 @@ public class DocTreeArea implements Area
 
     private boolean onVoicedFragmentQuery(VoicedFragmentQuery query)
     {
-	return false;
-	/*
 	NullCheck.notNull(query, "query");
 	if (noContentCheck())
 	    return false;
 	final Iterator it2 = (Iterator)iterator.clone();
 	String text = it2.getText();
-	int endPos = endOfSentence(text, hotPointX);
-	if (endPos > hotPointX)
+	int pos = endOfSentence(text, hotPointX);
+	if (pos > hotPointX)
 	{
-
+	    text = text.substring(hotPointX, pos + 1);
+	    pos = findNextSentence(it2, pos);
+	    if (pos < 0)
+		return false;
+	    query.answer(text, it2.getRow().getRowX() + pos, it2.getRow().getRowY());
+	    return true;
 	}
+	final StringBuilder b = new StringBuilder();
+	b.append(text.substring(hotPointX) + " ");
 	while(it2.moveNext())
 	{
 	    text = it2.getText();
-	    endPost = getEndOfSentence(text, 0);
-	    if (endPoss >= 0)
+pos = endOfSentence(text, 0);
+if (pos < 0)
+{
+    b.append(text + " ");
+    continue;
+}
+b.append(text.substring(0, pos + 1));
+	    pos = findNextSentence(it2, pos);
+	    if (pos < 0)
+		return false;
+	    query.answer(new String(b), it2.getRow().getRowX() + pos, it2.getRow().getRowY());
 	}
 	return false;
-	*/
     }
 
     private boolean onMoveHotPoint(MoveHotPointEvent event)
@@ -251,6 +264,7 @@ public class DocTreeArea implements Area
 	    return false;
 	iterator = it2;
 	hotPointX = x - iterator.getRow().getRowX();
+	environment.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -589,5 +603,31 @@ public class DocTreeArea implements Area
 	    return true;
 	}
 	return false;
+    }
+
+    static private int endOfSentence(String text, int startFrom)
+    {
+	for(int i = startFrom;i < text.length();++i)
+	    if (text.charAt(i) == '.' ||
+		text.charAt(i) == '?' ||
+		text.charAt(i) == '!')
+		return i;
+	return -1;
+    }
+
+    static private int findNextSentence(Iterator it, int pos)
+    {
+	int start = pos;
+	do {
+	    final String text = it.getText();
+	    int i = start;
+	    start = 0;
+	    while (i < text.length() &&(
+					text.charAt(i) == '.' || text.charAt(i) == '?' || text.charAt(i) == '!'))
+		++i;
+	    if (i < text.length())
+		return i;
+	} while(it.moveNext());
+	return pos;
     }
 }
