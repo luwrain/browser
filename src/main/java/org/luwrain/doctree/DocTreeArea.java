@@ -161,8 +161,8 @@ public class DocTreeArea implements Area
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
 	{
-	case EnvironmentEvent.READING_POINT:
-	case EnvironmentEvent.MOVE_HOT_POINT:
+	case READING_POINT:
+	case MOVE_HOT_POINT:
 	    if (event instanceof MoveHotPointEvent)
 		return onMoveHotPoint((MoveHotPointEvent)event);
 	    return false;
