@@ -32,68 +32,80 @@ import org.luwrain.doctree.filters.*;
 public class Factory
 {
     public enum Format {
-	UNRECOGNIZED,
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
 	HTML, DOC, DOCX,
-	FB2, EPUB,
+	FB2, EPUB, SMIL,
 	ZIP, FB2_ZIP,
     };
 
-    static private final String USER_AGENT = "Mozilla/5.0";
+    static public final String USER_AGENT = "Mozilla/5.0";
     static private final String DEFAULT_CHARSET = "UTF-8";
 
-    static public Document fromPath(Path path, String contentType, String charset)
+    static public Result fromPath(Path path, String contentType, String charset)
     {
 	NullCheck.notNull(path, "path");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
-	Format filter = Format.UNRECOGNIZED;
+	Format filter = null;
 	if (!contentType.trim().isEmpty())
 	    filter = chooseFilterByContentType(contentType);
-	if (filter == Format.UNRECOGNIZED)
+	if (filter == null)
 	    filter = chooseFilterByExtension(path.toString());
-	if (filter == Format.UNRECOGNIZED)
-	{
-	    Log.warning("doctree", "unable to find a suitable filter for a file, content type is \'" + contentType + "\', path is \'" + path.toString() + "\'");
-	    return null;
-	}
+	if (filter == null)
+	    return new Result(Result.Type.UNRECOGNIZED_FORMAT, path.toString());
 	return fromPath(path, filter, charset);
     }
 
-    static public Document fromPath(Path path,
-				    Format format, String charset)
+    static public Result fromPath(Path path,
+				  Format format, String charset)
     {
 	NullCheck.notNull(path, "path");
+	NullCheck.notNull(format, "format");
+	NullCheck.notNull(charset, "charset");
+	final Result res = new Result(Result.Type.OK, path.toString());
+	res.format = format.toString();
 	try {
 	    switch (format)
 	    {
 	    case TEXT_PARA_INDENT:
-		return new TxtParaIndent(path.toString()).constructDocument(charset);
+		res.doc = new TxtParaIndent(path.toString()).constructDocument(charset);
+		return res;
 	    case TEXT_PARA_EMPTY_LINE:
-		return new TxtParaEmptyLine(path.toString()).constructDocument(charset);
+		res.doc = new TxtParaEmptyLine(path.toString()).constructDocument(charset);
+		return res;
 	    case TEXT_PARA_EACH_LINE:
-		return new TxtParaEachLine(path.toString()).constructDocument(charset);
+		res.doc = new TxtParaEachLine(path.toString()).constructDocument(charset);
+		return res;
 	    case DOC:
-		return new Doc(path.toString()).constructDocument();
+		res.doc = new Doc(path.toString()).constructDocument();
+		return res;
 	    case DOCX:
-		return new DocX(path.toString()).constructDocument();
+		res.doc = new DocX(path.toString()).constructDocument();
+		return res;
 	    case HTML:
-		return new Html(path, charset).constructDocument();
+		res.doc = new Html(path, charset).constructDocument();
+		return res;
 	    case EPUB:
-		return new Epub(path.toString()).constructDocument();
+		res.doc = new Epub(path.toString()).constructDocument();
+		return res;
 	    case ZIP:
-		return new Zip(path.toString(), "", charset, path.toString()).createDoc();
+		res.doc = new Zip(path.toString(), "", charset, path.toString()).createDoc();
+		return res;
 	    case FB2:
 		//		return new FictionBook2(fileName).constructDocument();
 		return null;
+
+	    case SMIL:
+		org.luwrain.util.Smil.fromPath(path);
+		return new Result(Result.Type.UNEXPECTED_ERROR);
 	    default:
-		throw new IllegalArgumentException("Unknown format " + format);
+		return new Result(Result.Type.UNRECOGNIZED_FORMAT, path.toString());
 	    }
 	}
 	catch(Exception e)
 	{
 	    e.printStackTrace();
-	    return null;
+	    return new Result(Result.Type.UNEXPECTED_ERROR, path.toString());
 	}
     }
 
@@ -208,9 +220,9 @@ public class Factory
 	NullCheck.notNull(charset, "charset");
 	NullCheck.notNull(baseUrl, "baseUrl");
 	Format filter = chooseFilterByContentType(contentType);
-	if (filter == Format.UNRECOGNIZED)
+	if (filter == null)
 	    filter = defaultFilter;
-	if (filter == Format.UNRECOGNIZED)
+	if (filter == null)
 	{
 	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
 	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
@@ -285,11 +297,12 @@ public class Factory
 
     static public Format chooseFilterByExtension(String path)
     {
-	if (path == null || path.trim().isEmpty())
-	    return Format.UNRECOGNIZED;
+	NullCheck.notNull(path, "path");
+	if (path.isEmpty())
+	    return null;
 	String ext = FileTypes.getExtension(path);
 	if (ext == null)
-	    return Format.UNRECOGNIZED;
+	    return null;
 	ext = ext.toLowerCase();
 	switch(ext)
 	{
@@ -308,8 +321,10 @@ public class Factory
 	    return Format.ZIP;
 	case "fb2":
 	    return Format.FB2;
+	case "smil":
+	    return Format.SMIL;
 	default:
-	    return Format.UNRECOGNIZED;
+	    return null;
 	}
     }
 
@@ -327,7 +342,7 @@ public class Factory
 	case "application/zip":
 	    return Format.ZIP;
 	default:
-	    return Format.UNRECOGNIZED;
+	    return null;
 	}
     }
 

@@ -15,104 +15,97 @@
    General Public License for more details.
 */
 
-package org.luwrain.doctree.filters;
+package org.luwrain.doctree.dtbook;
 
 import java.util.*;
 import java.util.regex.*;
-
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.luwrain.doctree.*;
-import org.luwrain.doctree.dtbook.AudioInfo;
-import org.luwrain.doctree.dtbook.DTBook;
-import org.luwrain.doctree.dtbook.DTBook.NoOpEntityResolver;
-import org.luwrain.core.Log;
-import org.luwrain.core.NullCheck;
+import org.luwrain.doctree.dtbook.*;
+import org.luwrain.core.*;
 
 public class Smil
 {
-	private String fileName;
-	private String src;
+    private String fileName;
+    private String src;
 
-	public Smil(boolean shouldRead, String arg)
+    public Smil(boolean shouldRead, String arg)
+    {
+	NullCheck.notNull(arg, "arg");
+	if (shouldRead)
 	{
-		NullCheck.notNull(arg, "arg");
-		if (shouldRead)
-		{
-			fileName = arg;
-			src = null;
-		} else
-		{
+	    fileName = arg;
+	    src = null;
+	} else
+	{
 			fileName = "";
 			src = arg;
-		}
 	}
+    }
 
-	public Document constructDocument() throws Exception
-	{
-		org.w3c.dom.Document xmlDoc=null;
-		File file = new File(fileName);
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		db.setEntityResolver(new DTBook.NoOpEntityResolver());
-		if (src == null)
-		{ // parse from file
-			xmlDoc = db.parse(file);
-		} else
-		{ // parse from string
-			xmlDoc = db.parse(src);
-		}
-		
-		xmlDoc.getDocumentElement().normalize();
-		
-		// validate smil root element
-		org.w3c.dom.Node rootNode=xmlDoc.getDocumentElement();
-		if(!rootNode.getNodeName().equalsIgnoreCase("smil"))
-			throw new Exception("Bad SMIL format. Root xml element must be SMIL");
-		// skip head and read body
-		org.w3c.dom.NodeList smilBody=xmlDoc.getElementsByTagName("body");
-		if(smilBody.getLength()==0)
-			throw new Exception("Bad SMIL format. Have no BODY element");
-		
-		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-		parseNode(subnodes,smilBody.item(0));
-		final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+    public Document constructDocument() throws Exception
+    {
+	org.w3c.dom.Document xmlDoc=null;
+	File file = new File(fileName);
+	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	DocumentBuilder db = dbf.newDocumentBuilder();
+	db.setEntityResolver(new DTBook.NoOpEntityResolver());
+	if (src == null)
+	{ // parse from file
+	    xmlDoc = db.parse(file);
+	} else
+	{ // parse from string
+	    xmlDoc = db.parse(src);
+	}
+	xmlDoc.getDocumentElement().normalize();
+	// validate smil root element
+	org.w3c.dom.Node rootNode=xmlDoc.getDocumentElement();
+	if(!rootNode.getNodeName().equalsIgnoreCase("smil"))
+	    throw new Exception("Bad SMIL format. Root xml element must be SMIL");
+	// skip head and read body
+	org.w3c.dom.NodeList smilBody=xmlDoc.getElementsByTagName("body");
+	if(smilBody.getLength()==0)
+	    throw new Exception("Bad SMIL format. Have no BODY element");
+	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	parseNode(subnodes,smilBody.item(0));
+	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
+	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 
-		Document luwrainDoc=new Document(root);
+	Document luwrainDoc=new Document(root);
 		
 		return luwrainDoc;
 	}
 
-	private Vector<String> textSrcs=new Vector<String>();
-	private Vector<AudioInfo> audioSrcs=new Vector<AudioInfo>();
+    private Vector<String> textSrcs=new Vector<String>();
+    private Vector<AudioInfo> audioSrcs=new Vector<AudioInfo>();
 	
-	public void parseNode(LinkedList<NodeImpl> nodes,org.w3c.dom.Node root) throws Exception
+    public void parseNode(LinkedList<NodeImpl> nodes,org.w3c.dom.Node root) throws Exception
+    {
+	org.w3c.dom.NodeList nList=root.getChildNodes();
+	for(int i=0;i<nList.getLength(); i++)
 	{
-		org.w3c.dom.NodeList nList=root.getChildNodes();
-		for(int i=0;i<nList.getLength(); i++)
+	    org.w3c.dom.Node n = nList.item(i);
+	    String nodeName=n.getNodeName().toLowerCase();
+	    // <!ELEMENT body (par|seq|text|audio|img|a)+ >
+	    if(nodeName.equals("seq"))
+	    { // smil section - need to continue walk inside
+		// get optional section id
+		org.w3c.dom.NamedNodeMap nm=n.getAttributes();
+		String id=null;
+		if(nm!=null)
 		{
-			org.w3c.dom.Node n = nList.item(i);
-			String nodeName=n.getNodeName().toLowerCase();
-			// <!ELEMENT body (par|seq|text|audio|img|a)+ >
-			if(nodeName.equals("seq"))
-			{ // smil section - need to continue walk inside
-				// get optional section id
-				org.w3c.dom.NamedNodeMap nm=n.getAttributes();
-				String id=null;
-				if(nm!=null)
-				{
-					org.w3c.dom.Node xmlId=nm.getNamedItem("id");
-					if(xmlId!=null)
-						id=xmlId.getNodeValue();
-				}
-				if(nodes==null)
-					throw new Exception("Bad SMIL format. Node SEQ can not be used here");
-				final NodeImpl section_node = NodeFactory.newSection(0);//FIXME:0
-			    section_node.setId(id);
-			    nodes.add(section_node);
+		    org.w3c.dom.Node xmlId=nm.getNamedItem("id");
+		    if(xmlId!=null)
+			id=xmlId.getNodeValue();
+		}
+		if(nodes==null)
+		    throw new Exception("Bad SMIL format. Node SEQ can not be used here");
+		final NodeImpl section_node = NodeFactory.newSection(0);//FIXME:0
+		section_node.setId(id);
+		nodes.add(section_node);
 			    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 			    // parse section children
 			    parseNode(subnodes,n);

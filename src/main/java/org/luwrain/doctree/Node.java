@@ -20,7 +20,7 @@ package org.luwrain.doctree;
 /**
  * The interface for structural items in a document. It is just some
  * common methods for access to {@link NodeImpl} class and constants for
- * designation of various node types. See {@NodeImpl} for further
+ * designation of various node types. See {@link NodeImpl} for further
  * information about nodes and their purposes.
  *
  * @see Document

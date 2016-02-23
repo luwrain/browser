@@ -80,26 +80,26 @@ return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
 	for(Node n: nodes)
 	{
 	    //	    System.out.println(n.getClass().getName());
-final String name = n.nodeName();
-if (n instanceof TextNode)
-{
-    final TextNode textNode = (TextNode)n;
-    final String text = textNode.text();
-    if (text != null && !text.isEmpty())
-	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
-    continue;
-}
-if (n instanceof Element)
-{
-    final Element el = (Element)n;
-    {
-	onElement((Element)n, resNodes, runs);
-	continue;
-    }
-}
+	    final String name = n.nodeName();
+	    if (n instanceof TextNode)
+	    {
+		final TextNode textNode = (TextNode)n;
+		final String text = textNode.text();
+		if (text != null && !text.isEmpty())
+		    runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
+		continue;
+	    }
+	    if (n instanceof Element)
+	    {
+		final Element el = (Element)n;
+		{
+		    onElement((Element)n, resNodes, runs);
+		    continue;
+		}
+	    }
 	}
 	commitPara(resNodes, runs);
-return resNodes.toArray(new NodeImpl[resNodes.size()]);
+	return resNodes.toArray(new NodeImpl[resNodes.size()]);
     }
 
     private void onElementInPara(Element el,

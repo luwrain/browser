@@ -18,6 +18,7 @@
 package org.luwrain.doctree;
 
 import java.net.*;
+import org.luwrain.core.NullCheck;
 
 public class Result
 {
@@ -30,7 +31,7 @@ public class Result
 	UNRECOGNIZED_FORMAT,
     };
 
-    Type type;
+    Type type = Type.OK;
     Document doc = null;
     String format = "";
     String charset = "";
@@ -48,6 +49,16 @@ public class Result
 	this.type = type;
 	this.code = code;
     }
+
+    Result(Type type, String path)
+    {
+	NullCheck.notNull(type, "type");
+	NullCheck.notNull(path, "path");
+	this.type = type;
+	this.origAddr = path;
+	this.resultAddr = path;
+    }
+
 
     public Type type() { return type; }
     public Document doc() { return doc; }

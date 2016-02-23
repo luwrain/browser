@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.luwrain.doctree.filters.DTBookXml;
-import org.luwrain.doctree.filters.Smil;
+import org.luwrain.doctree.dtbook.Smil;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
