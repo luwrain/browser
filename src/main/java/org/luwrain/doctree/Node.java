@@ -38,5 +38,6 @@ public interface Node
     int getNodeY();
     int getNodeWidth();
     int getNodeHeight();
+    Node[] getSubnodes();
     String getId();
 }

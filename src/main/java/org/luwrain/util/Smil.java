@@ -31,6 +31,17 @@ public class Smil
 	    this.type = type;
 	}
 
+	Entry (Type type,
+	       String id, String src)
+	{
+	    NullCheck.notNull(type, "type");
+	    NullCheck.notNull(id, "id");
+	    NullCheck.notNull(src, "src");
+	    this.type = type;
+	    this.id = id;
+	    this.src = src;
+	}
+
 	public Type type(){return type;}
     }
 
@@ -124,12 +135,18 @@ public class Smil
     static private Entry onAudio(Element el)
     {
 	NullCheck.notNull(el, "el");
-	return null;
+	final String id = el.attr("id");
+	final String src = el.attr("src");
+	System.out.println(src);
+	return new Entry(Entry.Type.AUDIO, id, src);
     }
 
     static private Entry onText(Element el)
     {
 	NullCheck.notNull(el, "el");
-	return null;
+	final String id = el.attr("id");
+	final String src = el.attr("src");
+	System.out.println(src);
+	return new Entry(Entry.Type.TEXT, id, src);
     }
 }

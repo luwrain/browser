@@ -83,7 +83,9 @@ public class Factory
 		res.doc = new DocX(path.toString()).constructDocument();
 		return res;
 	    case HTML:
-		res.doc = new Html(path, charset).constructDocument();
+if (charset.trim().isEmpty())
+    res.doc = new Html(path, extractCharsetInfo(path)).constructDocument(); else
+    res.doc = new Html(path, charset).constructDocument();
 		return res;
 	    case EPUB:
 		res.doc = new Epub(path.toString()).constructDocument();
@@ -354,13 +356,19 @@ public class Factory
 	return path;
     }
 
-    static String extractCharsetInfo(Path path) throws IOException
+    static private String extractCharsetInfo(Path path) throws IOException
     {
-	final List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+	Log.debug("doctree", "extracting charset info from the HTML file " + path.toString());
+	final BufferedReader r = new BufferedReader(new InputStreamReader(Files.newInputStream(path), StandardCharsets.US_ASCII));
 	final StringBuilder b = new StringBuilder();
-	for(String s: lines)
-	    b.append(s + "\n");
+	String line;
+	while ( (line = r.readLine()) != null)
+	    b.append(line + "\n");
 	final String res = HtmlEncoding.getEncoding(new String(b));
+	if (res != null)
+	    Log.debug("doctree", "recognized charset is " + res); else
+	    Log.debug("doctree", "charset isn\'t recognized");
+
 	return res != null?res:"";
     }
 

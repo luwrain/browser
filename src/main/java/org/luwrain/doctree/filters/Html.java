@@ -43,7 +43,9 @@ public class Html
 
     public Html(Path path, String charset) throws IOException
     {
-	//	NullCheck.notNull(url, "url");
+	NullCheck.notNull(path, "path");
+	NullCheck.notNull(charset, "charset");
+	Log.debug("doctree-html", "reading " + path.toString() + " with charset " + charset);
 jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
     }
 
@@ -51,14 +53,9 @@ jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
 		String baseUrl) throws IOException, MalformedURLException
     {
 	NullCheck.notNull(is, "is");
+	Log.debug("doctree-html", "reading input stream with charset " + charset);
 	jsoupDoc = Jsoup.parse(is, charset, baseUrl);
 	hrefBaseUrl = new URL(baseUrl);
-    }
-
-    public Html(String text) throws IOException
-    {
-	NullCheck.notNull(text, "text");
-jsoupDoc = Jsoup.parse(text);
     }
 
     public org.luwrain.doctree.Document constructDocument()

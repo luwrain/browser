@@ -214,6 +214,11 @@ public class NodeImpl implements Node
 	    n.removeEmpty();
     }
 
+    @Override public Node[] getSubnodes()
+    {
+	return subnodes != null?subnodes:new Node[0];
+    }
+
     @Override public String toString()
     {
 	if (subnodes == null)
