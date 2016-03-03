@@ -1,10 +1,12 @@
 
 package org.luwrain.doctree;
 
-import org.luwrain.util.Smil;
+import java.util.*;
+import java.net.*;
 
-public class Book
+public interface Book
 {
-    Document[] docs;
-    Smil.File[] smils;
+    Document[] getDocuments();
+    Map<URL, Document> getDocumentsWithUrls();
+    Document getFirstDocument();
 }

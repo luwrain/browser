@@ -42,7 +42,19 @@ public class Smil
 	    this.src = src;
 	}
 
+	public void saveTextSrc(List<String> res)
+	{
+	    if (type == Type.TEXT &&
+		src != null && !src.isEmpty())
+		res.add(src);
+	    if (entries != null)
+	    for(Entry e: entries)
+		e.saveTextSrc(res);
+	}
+
 	public Type type(){return type;}
+	public String src() {return src;}
+	public String id() {return id;}
     }
 
     static public class File extends Entry
@@ -71,7 +83,7 @@ public class Smil
 	return false;
     }
 
-    static public boolean fromPath(Path path)
+    static public Entry fromPath(Path path)
     {
 	NullCheck.notNull(path, "path");
 	org.jsoup.nodes.Document doc = null;
@@ -81,10 +93,11 @@ public class Smil
 	catch(Exception e)
 	{
 	    e.printStackTrace(); 
-	    return false;
+	    return null;
 	}
-	onNode(doc.body());
-	return false;
+	final Entry res = new Entry(Entry.Type.FILE);
+res.entries = onNode(doc.body());
+	return res;
     }
 
     static private Entry[] onNode(Node node)
@@ -137,7 +150,7 @@ public class Smil
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
 	final String src = el.attr("src");
-	System.out.println(src);
+	//	System.out.println(src);
 	return new Entry(Entry.Type.AUDIO, id, src);
     }
 
@@ -146,7 +159,7 @@ public class Smil
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
 	final String src = el.attr("src");
-	System.out.println(src);
+	//	System.out.println(src);
 	return new Entry(Entry.Type.TEXT, id, src);
     }
 }

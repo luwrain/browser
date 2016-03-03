@@ -28,12 +28,13 @@ import javax.activation.*;
 import org.apache.poi.util.IOUtils;
 import org.luwrain.core.*;
 import org.luwrain.doctree.filters.*;
+import org.luwrain.doctree.books.BookFactory;
 
 public class Factory
 {
     public enum Format {
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
-	HTML, DOC, DOCX,
+	HTML, XML, DOC, DOCX,
 	FB2, EPUB, SMIL,
 	ZIP, FB2_ZIP,
     };
@@ -62,6 +63,8 @@ public class Factory
 	NullCheck.notNull(path, "path");
 	NullCheck.notNull(format, "format");
 	NullCheck.notNull(charset, "charset");
+	Log.debug("doctree", "need to prepare a document by path " + path.toString());
+	Log.debug("doctree", "filter is \'" + format + "\', charset is \'" + charset + "\'");
 	final Result res = new Result(Result.Type.OK, path.toString());
 	res.format = format.toString();
 	try {
@@ -91,7 +94,7 @@ if (charset.trim().isEmpty())
 		res.doc = new Epub(path.toString()).constructDocument();
 		return res;
 	    case ZIP:
-		res.doc = new Zip(path.toString(), "", charset, path.toString()).createDoc();
+		res.doc = new Zip(path.toString(), "", charset, path.toUri().toURL()).createDoc();
 		return res;
 	    case FB2:
 		//		return new FictionBook2(fileName).constructDocument();
@@ -117,7 +120,8 @@ if (charset.trim().isEmpty())
 	NullCheck.notNull(unpreparedUrl, "unpreparedUrl");
 	NullCheck.notNull(contentType, "contentType");
 	NullCheck.notNull(charset, "charset");
-	Log.debug("doctree", "fetching url " + unpreparedUrl.toString() + " (content type=" + contentType + ")");
+	Log.debug("doctree", "need to prepare a document by URL " + unpreparedUrl.toString());
+	Log.debug("doctree", "charset is \'" + charset + "\', content type is \'" + contentType + "\'");
 	URL url = null;
 	try {
 	    url = new URL(unpreparedUrl.getProtocol(), IDN.toASCII(unpreparedUrl.getHost()),
@@ -157,6 +161,7 @@ if (charset.trim().isEmpty())
 	InputStream effectiveIs = null;
 	URLConnection con;
 	try {
+	    Log.debug("doctree", "opening connection for " + url.toString());
 	    con = url.openConnection();
 	    con.setRequestProperty("User-Agent", USER_AGENT);
 	    con.connect();
@@ -179,7 +184,7 @@ if (charset.trim().isEmpty())
 		    Log.warning("doctree", "HTTP responce code is " + code + " but \'location\' field is empty");
 		    return new Result(Result.Type.INVALID_HTTP_REDIRECT);
 		}
-		Log.debug("doctree", "trying to follow redirect to " + location);
+		Log.debug("doctree", "redirected to " + location);
 		final URL locationUrl = new URL(location);
 		con = locationUrl.openConnection();
 		con.setRequestProperty("User-Agent", USER_AGENT);
@@ -187,16 +192,19 @@ if (charset.trim().isEmpty())
 	    }
 	    is = con.getInputStream();
 	    final URL resultUrl = con.getURL();
-	    Log.debug("doctree", "content type in HTTP header is \'" + con.getContentType() + "\'");
+	    Log.debug("doctree", "content type in URL object is \'" + con.getContentType() + "\'");
 	    final String effectiveContentType = (contentType == null || contentType.trim().isEmpty())?getBaseContentType(con.getContentType()):contentType;
 	    Log.debug("doctree", "effective content type is \'" + effectiveContentType + "\'");
 	    final String effectiveCharset = (charset == null || charset.trim().isEmpty())?getCharset(con.getContentType()):charset;
 	    Log.debug("doctree", "effective charset is \'" + effectiveCharset + "\'");
 	    final String encoding = con.getContentEncoding();
 	    if (encoding != null && encoding.toLowerCase().trim().equals("gzip"))
-		effectiveIs = new GZIPInputStream(is); else
+	    {
+		Log.debug("doctree", "enabling gzip decompressing");
+		effectiveIs = new GZIPInputStream(is);
+	    } else
 		effectiveIs = is;
-	    return fromInputStream(effectiveIs, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl.toString():url.toString(), Format.HTML);
+	    return fromInputStream(effectiveIs, effectiveContentType, effectiveCharset, resultUrl != null?resultUrl:url, Format.HTML);
 	}
 	finally
 	{
@@ -214,7 +222,7 @@ if (charset.trim().isEmpty())
     }
 
     static public Result fromInputStream(InputStream stream, String contentType,
-					 String charset, String baseUrl,
+					 String charset, URL baseUrl,
 					 Format defaultFilter) throws Exception
     {
 	NullCheck.notNull(stream, "stream");
@@ -226,7 +234,7 @@ if (charset.trim().isEmpty())
 	    filter = defaultFilter;
 	if (filter == null)
 	{
-	    Log.warning("doctree", "unable to suggest a filter for content type \'" + contentType + "\'");
+	    Log.error("doctree", "unable to suggest a filter for content type \'" + contentType + "\' (default filter is null) while preparing a document from input stream");
 	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	}
 	Log.debug("doctree", "reading input stream using " + filter + " filter");
@@ -258,9 +266,19 @@ if (charset.trim().isEmpty())
 	    final Result res = new Result(Result.Type.OK);
 	    res.format = filter.toString();
 	    res.charset = effectiveCharset;
-	    res.resultAddr = baseUrl;
+	    res.resultAddr = baseUrl.toString();
 	    switch(filter)
 	    {
+	    case XML:
+		if (tmpFile == null)
+		    tmpFile = downloadToTmpFile(stream);
+		switch(		getDocTypeName(Files.newInputStream(tmpFile)).trim().toLowerCase())
+		{
+case "smil":
+    res.book = BookFactory.initDaisyBookBySmil(tmpFile, baseUrl);
+		default:
+		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
+		}
 	    case HTML:
 		res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
 		return res;
@@ -337,6 +355,8 @@ if (charset.trim().isEmpty())
 	{
 	case "text/html":
 	    return Format.HTML;
+	case "application/xml":
+	    return Format.XML;
 	case "application/fb2":
 	    return Format.FB2;
 	case "application/fb2+zip":
@@ -402,5 +422,20 @@ if (charset.trim().isEmpty())
 	    e.printStackTrace();
 	    return "";
 	}
+    }
+
+    static private String getDocTypeName(InputStream s) throws IOException
+    {
+	final org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(s, "us-ascii", "", org.jsoup.parser.Parser.xmlParser());
+	List<org.jsoup.nodes.Node>nods = doc.childNodes();
+	for (org.jsoup.nodes.Node node : nods)
+	    if (node instanceof org.jsoup.nodes.DocumentType)
+	    {
+		org.jsoup.nodes.DocumentType documentType = (org.jsoup.nodes.DocumentType)node;                  
+		final String res = documentType.attr("name");
+		if (res != null)
+		    return res;
+	    }                                                                    
+	return "";
     }
 }

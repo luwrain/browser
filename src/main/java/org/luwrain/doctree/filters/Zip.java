@@ -20,6 +20,7 @@ package org.luwrain.doctree.filters;
 import java.util.*;
 import java.util.zip.*;
 import java.io.*;
+import java.net.*;
 
 import org.luwrain.doctree.*;
 import org.luwrain.core.NullCheck;
@@ -30,11 +31,11 @@ public class Zip
     String fileName = "";
     private String itemsContentType = "";
     private String itemsCharset = "";
-    private String itemsBaseUrl = "";
+    private URL itemsBaseUrl;
 
     //itemsContentType and itemsCharset may be empty (but not null), it content type is empty filter will be suggested using file names
     public Zip(String fileName, String itemsContentType,
-	       String itemsCharset, String itemsBaseUrl) throws IOException
+	       String itemsCharset, URL itemsBaseUrl) throws IOException
     {
 	NullCheck.notNull(fileName, "fileName");
 	NullCheck.notNull(itemsContentType, "itemsContentType");

@@ -37,7 +37,7 @@ import org.luwrain.core.Log;
 public class Html
 {
     private Document jsoupDoc;
-    private URL hrefBaseUrl = null;
+    private URL hrefBaseUrl;
     private final LinkedList<String> hrefStack = new LinkedList<String>();
     private final LinkedList<ExtraInfo> extraInfoStack = new LinkedList<ExtraInfo>();
 
@@ -47,15 +47,16 @@ public class Html
 	NullCheck.notNull(charset, "charset");
 	Log.debug("doctree-html", "reading " + path.toString() + " with charset " + charset);
 jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
+hrefBaseUrl = path.toUri().toURL();
     }
 
     public Html(InputStream is, String charset,
-		String baseUrl) throws IOException, MalformedURLException
+		URL baseUrl) throws IOException
     {
 	NullCheck.notNull(is, "is");
 	Log.debug("doctree-html", "reading input stream with charset " + charset);
-	jsoupDoc = Jsoup.parse(is, charset, baseUrl);
-	hrefBaseUrl = new URL(baseUrl);
+	jsoupDoc = Jsoup.parse(is, charset, baseUrl.toString());
+	hrefBaseUrl = baseUrl;
     }
 
     public org.luwrain.doctree.Document constructDocument()

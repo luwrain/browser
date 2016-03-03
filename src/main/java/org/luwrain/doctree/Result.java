@@ -32,6 +32,7 @@ public class Result
     };
 
     Type type = Type.OK;
+    Book book = null;
     Document doc = null;
     String format = "";
     String charset = "";
@@ -59,9 +60,9 @@ public class Result
 	this.resultAddr = path;
     }
 
-
     public Type type() { return type; }
     public Document doc() { return doc; }
+    public Book book() {return book;}
     public int code() { return code; }
     public String format() { return format; }
     public String charset() { return charset; }
