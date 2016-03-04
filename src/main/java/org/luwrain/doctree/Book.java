@@ -9,4 +9,5 @@ public interface Book
     Document[] getDocuments();
     Map<URL, Document> getDocumentsWithUrls();
     Document getFirstDocument();
+    Document openHref(String href);
 }

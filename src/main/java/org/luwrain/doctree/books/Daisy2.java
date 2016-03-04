@@ -35,11 +35,18 @@ class Daisy2 implements Book
 	return res.length > 0?res[0]:null;
     }
 
+    @Override public Document openHref(String href)
+    {
+	return null;
+    }
+
+
     void loadSmil(Path smilFile, URL urlBase)
     {
 	NullCheck.notNull(smilFile, "smilFile");
 	Log.debug("doctree-daisy", "reading SMIL " + smilFile.toString());
 	final Smil.Entry smil = Smil.fromPath(smilFile);
+	smils.add(smil);
 	final LinkedList<String> textDocs = new LinkedList<String>();
 	smil.saveTextSrc(textDocs);
 	for(String s: textDocs)
@@ -72,9 +79,7 @@ class Daisy2 implements Book
 	    docs.put(url, doc);
 	    System.out.println(url.toString());
 	}
-	}
-
-
     }
+}
 
 

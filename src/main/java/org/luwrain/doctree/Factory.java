@@ -276,6 +276,7 @@ if (charset.trim().isEmpty())
 		{
 case "smil":
     res.book = BookFactory.initDaisyBookBySmil(tmpFile, baseUrl);
+    return res;
 		default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 		}

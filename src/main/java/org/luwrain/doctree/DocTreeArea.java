@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
@@ -580,9 +582,32 @@ b.append(text.substring(0, pos + 1));
 		break;
 	}
 	environment.say(b.toString());
+    }
+
+    public String[] getHtmlIds()
+    {
+	if (isEmpty() || iterator.isEmptyRow())
+	    return new String[0];
+	final LinkedList<String> res = new LinkedList<String>();
+	final Run run = iterator.getRunUnderPos(hotPointX);
+	if (run == null)
+	    return new String[0];
+	ExtraInfo info = run.extraInfo;
+	while (info != null)
+	{
+	    if (info.attrs.containsKey("id"))
+	    {
+		final String value = info.attrs.get("id");
+		if (!value.isEmpty())
+		    res.add(value);
+	    }
+	    info = info.parent;
+	}
+	return res.toArray(new String[res.size()]);
 
     }
 
+    //Iterator may return true on isEmptyRow() even if this method returns false
     public boolean isEmpty()
     {
 	if (document ==null || iterator == null)

@@ -27,7 +27,6 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
-
 import org.luwrain.doctree.NodeImpl;
 import org.luwrain.doctree.NodeFactory;
 import org.luwrain.doctree.ExtraInfo;
@@ -61,7 +60,6 @@ hrefBaseUrl = path.toUri().toURL();
 
     public org.luwrain.doctree.Document constructDocument()
     {
-	//	final org.luwrain.doctree.NodeImpl rootNode = onNode(jsoupDoc.body(), NodeImpl.ROOT);
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
 return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
@@ -69,15 +67,12 @@ return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
 
     private NodeImpl[] onNode(Node node)
     {
-	//http://jsoup.org/apidocs/org/jsoup/nodes/Element.html
 	NullCheck.notNull(node, "node");
 	final LinkedList<org.luwrain.doctree.NodeImpl> resNodes = new LinkedList<org.luwrain.doctree.NodeImpl>();
 	final LinkedList<org.luwrain.doctree.Run> runs = new LinkedList<org.luwrain.doctree.Run>();
 	final List<Node> nodes = node.childNodes();
-	//	System.out.println("" + nodes.size() + " nodes");
 	for(Node n: nodes)
 	{
-	    //	    System.out.println(n.getClass().getName());
 	    final String name = n.nodeName();
 	    if (n instanceof TextNode)
 	    {
@@ -106,14 +101,13 @@ return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
 	NullCheck.notNull(el, "el");
 	final String tagName = el.nodeName();
 	String href = null;
-
 	//img
 if (tagName.toLowerCase().trim().equals("img"))
 {
 	    final String value = el.attr("alt");
 	    if (value != null && !value.isEmpty())
-	runs.add(new org.luwrain.doctree.Run("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():""));
-		//Do nothing else here	    }
+		runs.add(new org.luwrain.doctree.Run("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
+		//Do nothing else here	    
 		return;
 }
 
@@ -121,7 +115,6 @@ if (tagName.toLowerCase().trim().equals("img"))
 if (tagName.toLowerCase().trim().equals("a"))
 	{
 	    final String value = el.attr("href");
-	    //	    System.out.println(value);
 	    if (value != null)
 	    {
 		try {
@@ -134,14 +127,9 @@ if (tagName.toLowerCase().trim().equals("a"))
 		}
 	    } else
 		href = value;
-	    //	    System.out.println("+" + href.toString());
 	}
-    //	System.out.println(tagName);
-
-
 if (href != null)
     hrefStack.add(href);
-
 try {
 	final List<Node> nn = el.childNodes();
 	for(Node n: nn)
@@ -153,7 +141,6 @@ if (n instanceof TextNode)
 }
 if (n instanceof Element)
 {
-    //    Log.debug("html-jsoup", "encountering  element \'" + n.nodeName() + "\' in place where expecting text nodes only");
 	onElement((Element)n, nodes, runs);
 	continue;
 }
@@ -218,7 +205,9 @@ finally
 	case "dd":
 	case "aside":
 	    commitPara(nodes, runs);
+	addExtraInfo(el);
 	nn = onNode(el);
+	releaseExtraInfo();
 	for(NodeImpl i: nn)
 	    nodes.add(i);
 	break;
@@ -233,8 +222,11 @@ finally
 	case "h8":
 	case "h9":
 	    commitPara(nodes, runs);
+	addExtraInfo(el);
 	n = NodeFactory.newSection(name.trim().charAt(1) - '0');
 	n.subnodes = onNode(el);
+	n.extraInfo = getCurrentExtraInfo();
+	releaseExtraInfo();
 	nodes.add(n);
 	break;
 
@@ -246,8 +238,11 @@ finally
 	case "tr":
 	case "td":
 	    commitPara(nodes, runs);
+	addExtraInfo(el);
 	n = NodeFactory.newNode(getNodeType(name));
 	n.subnodes = onNode(el);
+	n.extraInfo = getCurrentExtraInfo();
+	releaseExtraInfo();
 	nodes.add(n);
 	break;
 
@@ -258,6 +253,7 @@ finally
 	case "ins":
 	case "em":
 	case "i":
+	case "u":
 	case "big":
 	case "small":
 	case "strong":
@@ -266,9 +262,10 @@ finally
 	case "font":
 	case "sup":
 	case "label":
+	    addExtraInfo(el);
 	    onElementInPara(el, nodes, runs);
+	    releaseExtraInfo();
 	break;
-
 	default:
 	    Log.warning("doctree-html", "unprocessed tag:" + name);
 	}
@@ -278,7 +275,7 @@ finally
     {
     final String text = textNode.text();
     if (text != null && !text.isEmpty())
-	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
+	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
     }
 
     private void commitPara(LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
@@ -287,6 +284,7 @@ finally
 	    return;
 	final org.luwrain.doctree.ParagraphImpl para = NodeFactory.newPara();
 	para.runs = runs.toArray(new org.luwrain.doctree.Run[runs.size()]);
+	para.extraInfo = getCurrentExtraInfo();
 	nodes.add(para);
 	runs.clear();
     }
@@ -314,18 +312,19 @@ finally
 	}
     }
 
-    private void addExtraInfoItem(Element el)
+    private void addExtraInfo(Element el)
     {
 	NullCheck.notNull(el, "el");
 	final ExtraInfo info = new ExtraInfo();
 	info.name = el.nodeName();
+	System.out.println(info.name);
 	final Attributes attrs = el.attributes();
 	if (attrs != null)
 	    for(Attribute a: attrs.asList())
 	    {
 		final String key = a.getKey();
 		final String value = a.getValue();
-		if (key != null && value != null)
+		if (key != null && !key.isEmpty() && value != null)
 		    info.attrs.put(key, value);
 	    }
 	if (!extraInfoStack.isEmpty())
@@ -338,5 +337,10 @@ finally
     {
 	if (!extraInfoStack.isEmpty())
 	    extraInfoStack.pollLast();
+    }
+
+    private ExtraInfo getCurrentExtraInfo()
+    {
+	return extraInfoStack.isEmpty()?null:extraInfoStack.getLast();
     }
 }

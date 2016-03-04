@@ -25,6 +25,7 @@ public class Run
     String href = "";
     TextAttr textAttr = new TextAttr();
     ParagraphImpl parentParagraph;
+    ExtraInfo extraInfo = null;
 
     public Run(String text)
     {
@@ -38,6 +39,18 @@ public class Run
 	this.href = href;
 	NullCheck.notNull(text, "text");
     }
+
+    public Run(String text, String href,
+ExtraInfo extraInfo)
+    {
+	NullCheck.notNull(text, "text");
+	NullCheck.notNull(href, "href");
+	NullCheck.notNull(extraInfo, "extraInfo");
+	this.text = text;
+	this.href = href;
+	this.extraInfo = extraInfo;
+    }
+
 
     @Override public String toString()
     {

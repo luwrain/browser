@@ -195,6 +195,13 @@ public class Iterator
 	return !row.isEmpty()?row.hrefText(rowParts, pos):null;
     }
 
+    public Run getRunUnderPos(int pos)
+    {
+	if (noContent())
+	    return null;
+	return rows[current].getRunUnderPos(rowParts, pos);
+    }
+
     public boolean hasHrefUnderPos(int pos)
     {
 	if (noContent())

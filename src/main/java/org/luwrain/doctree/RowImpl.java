@@ -128,6 +128,17 @@ int x = 0;
 	return partBeginsAt(parts, index);
     }
 
+    //returns null if there is no suitable
+    Run getRunUnderPos(RowPart[] parts, int pos)
+    {
+	if (isEmpty())
+	    return null;
+	final int index = getPartIndexUnderPos(parts, pos);
+if (index < 0)
+    return null;
+return parts[index].run;
+    }
+
     //returns -1 if there is no matching pos
     int getPartIndexUnderPos(RowPart[] parts, int pos)
     {
@@ -136,7 +147,6 @@ int x = 0;
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
-	    //	    final RowPart p = parts[i];
 	    final String text = parts[i].text();
 	    if (text == null || text.isEmpty())
 		continue;
