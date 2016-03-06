@@ -36,33 +36,40 @@ import org.luwrain.core.Log;
 public class Html
 {
     private Document jsoupDoc;
-    private URL hrefBaseUrl;
+    private URL docUrl;
     private final LinkedList<String> hrefStack = new LinkedList<String>();
     private final LinkedList<ExtraInfo> extraInfoStack = new LinkedList<ExtraInfo>();
+    private final LinkedList<String> allHrefs = new LinkedList<String>();
 
-    public Html(Path path, String charset) throws IOException
+    public Html(Path path, String charset,
+		URL docUrl) throws IOException
     {
 	NullCheck.notNull(path, "path");
 	NullCheck.notNull(charset, "charset");
+	NullCheck.notNull(docUrl, "docUrl");
 	Log.debug("doctree-html", "reading " + path.toString() + " with charset " + charset);
 jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
-hrefBaseUrl = path.toUri().toURL();
+this.docUrl = docUrl;
     }
 
     public Html(InputStream is, String charset,
-		URL baseUrl) throws IOException
+		URL docUrl) throws IOException
     {
 	NullCheck.notNull(is, "is");
+	NullCheck.notNull(charset, "charset");
 	Log.debug("doctree-html", "reading input stream with charset " + charset);
-	jsoupDoc = Jsoup.parse(is, charset, baseUrl.toString());
-	hrefBaseUrl = baseUrl;
+	jsoupDoc = Jsoup.parse(is, charset, docUrl.toString());
+	this.docUrl = docUrl;
     }
 
     public org.luwrain.doctree.Document constructDocument()
     {
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
 	res.subnodes = onNode(jsoupDoc.body());
-return new org.luwrain.doctree.Document(jsoupDoc.title(), res);
+final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
+doc.setUrl(docUrl);
+doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
+return doc;
     }
 
     private NodeImpl[] onNode(Node node)
@@ -118,7 +125,7 @@ if (tagName.toLowerCase().trim().equals("a"))
 	    if (value != null)
 	    {
 		try {
-		href = new URL(hrefBaseUrl, value).toString();
+		href = new URL(docUrl, value).toString();
 		}
 		catch(MalformedURLException e)
 		{
@@ -129,7 +136,10 @@ if (tagName.toLowerCase().trim().equals("a"))
 		href = value;
 	}
 if (href != null)
+{
     hrefStack.add(href);
+    allHrefs.add(href);
+}
 try {
 	final List<Node> nn = el.childNodes();
 	for(Node n: nn)
@@ -317,7 +327,6 @@ finally
 	NullCheck.notNull(el, "el");
 	final ExtraInfo info = new ExtraInfo();
 	info.name = el.nodeName();
-	System.out.println(info.name);
 	final Attributes attrs = el.attributes();
 	if (attrs != null)
 	    for(Attribute a: attrs.asList())

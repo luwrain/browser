@@ -13,6 +13,7 @@ import org.jsoup.select.*;
 import org.jsoup.parser.*;
 
 import org.luwrain.core.*;
+import org.luwrain.doctree.AudioInfo;
 
 public class Smil
 {
@@ -52,7 +53,29 @@ public class Smil
 		e.saveTextSrc(res);
 	}
 
+	public Entry findById(String id)
+	{
+	    NullCheck.notNull(id, "id");
+	    if (this.id != null && this.id.equals(id))
+		return this;
+	    if (entries == null)
+		return null;
+	    for(Entry e: entries)
+	    {
+		final Entry res = e.findById(id);
+		if (res != null)
+		    return res;
+	    }
+	    return null;
+	}
+
+	public AudioInfo getAudioInfo()
+	{
+	    return null;
+	}
+
 	public Type type(){return type;}
+	public Entry[] entries(){return entries;}
 	public String src() {return src;}
 	public String id() {return id;}
     }
@@ -65,9 +88,19 @@ public class Smil
 	}
     }
 
-    static public boolean fromUrl(URL url)
+    static public Entry fromUrl(URL url, URL urlBase)
     {
 	NullCheck.notNull(url, "url");
+	NullCheck.notNull(urlBase, "urlBase");
+	try {
+	if (url.getProtocol().equals("file"))
+	    return fromPath(Paths.get(url.toURI()), urlBase);
+	}
+	catch(URISyntaxException e)
+	{
+	    e.printStackTrace();
+	    return null;
+	}
 	org.jsoup.nodes.Document doc = null;
 	try {
 	    final Connection con=Jsoup.connect(url.toString());
@@ -78,12 +111,14 @@ public class Smil
 	catch(Exception e)
 	{
 	    e.printStackTrace(); 
-	    return false;
+	    return null;
 	}
-	return false;
+	final Entry res = new Entry(Entry.Type.FILE);
+	    res.entries = onNode(doc.body(), urlBase);
+	return res;
     }
 
-    static public Entry fromPath(Path path)
+    static public Entry fromPath(Path path, URL urlBase)
     {
 	NullCheck.notNull(path, "path");
 	org.jsoup.nodes.Document doc = null;
@@ -96,11 +131,11 @@ public class Smil
 	    return null;
 	}
 	final Entry res = new Entry(Entry.Type.FILE);
-res.entries = onNode(doc.body());
+	    res.entries = onNode(doc.body(), urlBase);
 	return res;
     }
 
-    static private Entry[] onNode(Node node)
+    static private Entry[] onNode(Node node, URL urlBase)
     {
 	NullCheck.notNull(node, "node");
 	final LinkedList<Entry> res = new LinkedList<Entry>();
@@ -124,17 +159,17 @@ res.entries = onNode(doc.body());
 		{
 		case "seq":
 		    res.add(new Entry(Entry.Type.SEQ));
-		    res.getLast().entries = onNode(el);
+		    res.getLast().entries = onNode(el, urlBase);
 		    break;
 		case "par":
 		    res.add(new Entry(Entry.Type.PAR));
-		    res.getLast().entries = onNode(el);
+		    res.getLast().entries = onNode(el, urlBase);
 		    break;
 		case "audio":
-		    res.add(onAudio(el));
+		    res.add(onAudio(el, urlBase));
 		    break;
 		case "text":
-		    res.add(onText(el));
+		    res.add(onText(el, urlBase));
 		    break;
 		default:
 		    Log.warning("smil", "unknown tag:" + name);
@@ -145,7 +180,7 @@ res.entries = onNode(doc.body());
 	return res.toArray(new Entry[res.size()]);
     }
 
-    static private Entry onAudio(Element el)
+    static private Entry onAudio(Element el, URL urlBase)
     {
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
@@ -154,12 +189,18 @@ res.entries = onNode(doc.body());
 	return new Entry(Entry.Type.AUDIO, id, src);
     }
 
-    static private Entry onText(Element el)
+    static private Entry onText(Element el, URL urlBase)
     {
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
-	final String src = el.attr("src");
-	//	System.out.println(src);
+	String src = el.attr("src");
+	try {
+	    src = new URL(urlBase, src).toString();
+	}
+	catch(MalformedURLException e)
+	{
+	    e.printStackTrace();
+	}
 	return new Entry(Entry.Type.TEXT, id, src);
     }
 }

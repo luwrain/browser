@@ -86,10 +86,22 @@ public class Factory
 		res.doc = new DocX(path.toString()).constructDocument();
 		return res;
 	    case HTML:
-if (charset.trim().isEmpty())
-    res.doc = new Html(path, extractCharsetInfo(path)).constructDocument(); else
-    res.doc = new Html(path, charset).constructDocument();
-		return res;
+		try {
+		    if (charset.trim().isEmpty())
+			res.doc = new Html(path, extractCharsetInfo(path), path.toUri().toURL()).constructDocument(); else
+			res.doc = new Html(path, charset, path.toUri().toURL()).constructDocument();
+		    if (path.getFileName().toString().toLowerCase().equals("ncc.html"))
+		    {
+			res.book = BookFactory.initDaisy2(res.doc);
+			res.doc = null;
+		    }
+		    return res;
+		}
+		catch (MalformedURLException e)
+		{
+		    e.printStackTrace();
+		    return new Result(Result.Type.UNEXPECTED_ERROR);
+		}
 	    case EPUB:
 		res.doc = new Epub(path.toString()).constructDocument();
 		return res;
@@ -99,9 +111,8 @@ if (charset.trim().isEmpty())
 	    case FB2:
 		//		return new FictionBook2(fileName).constructDocument();
 		return null;
-
 	    case SMIL:
-		org.luwrain.util.Smil.fromPath(path);
+		org.luwrain.util.Smil.fromPath(path, path.toUri().toURL());
 		return new Result(Result.Type.UNEXPECTED_ERROR);
 	    default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT, path.toString());
@@ -269,17 +280,6 @@ if (charset.trim().isEmpty())
 	    res.resultAddr = baseUrl.toString();
 	    switch(filter)
 	    {
-	    case XML:
-		if (tmpFile == null)
-		    tmpFile = downloadToTmpFile(stream);
-		switch(		getDocTypeName(Files.newInputStream(tmpFile)).trim().toLowerCase())
-		{
-case "smil":
-    res.book = BookFactory.initDaisyBookBySmil(tmpFile, baseUrl);
-    return res;
-		default:
-		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
-		}
 	    case HTML:
 		res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
 		return res;

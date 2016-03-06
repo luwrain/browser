@@ -17,6 +17,7 @@
 
 package org.luwrain.doctree;
 
+import java.net.URL;
 import java.util.HashMap;
 
 import org.luwrain.core.NullCheck;
@@ -26,8 +27,10 @@ public class Document
 {
     private NodeImpl root;
     private String title;
-    private Layout layout = new Layout(this);
+    private URL url;
+    private String[] hrefs;
 
+    private Layout layout = new Layout(this);
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private RowImpl[] rows;
@@ -121,9 +124,26 @@ public class Document
     		makeIndex(n);
     }
 
+    public void setUrl(URL url)
+    {
+	NullCheck.notNull(url, "url");
+	this.url = url;
+    }
+
+    public void setHrefs(String[] hrefs)
+    {
+	NullCheck.notNullItems(hrefs, "hrefs");
+	this.hrefs = hrefs;
+    }
+
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
     public ParagraphImpl[] getParagraphs() { return paragraphs; }
     public RowImpl[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
+    public URL getUrl() {return url;}
+    public String[] getHrefs(){return hrefs;}
+
+
+
 }
