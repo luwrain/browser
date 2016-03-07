@@ -18,18 +18,19 @@
 package org.luwrain.doctree;
 
 import java.net.URL;
-import java.util.HashMap;
+import java.util.*;
 
 import org.luwrain.core.NullCheck;
 import org.luwrain.core.Log;
 
 public class Document 
 {
-    private NodeImpl root;
     private String title;
     private URL url;
     private String[] hrefs;
+    private Map<String, String> infoAttr = new HashMap<String, String>();
 
+    private NodeImpl root;
     private Layout layout = new Layout(this);
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
@@ -136,6 +137,13 @@ public class Document
 	this.hrefs = hrefs;
     }
 
+    public void setInfoAttr(Map<String, String> infoAttr)
+    {
+	NullCheck.notNull(infoAttr, "infoAttr");
+	this.infoAttr = infoAttr;
+    }
+
+
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
     public ParagraphImpl[] getParagraphs() { return paragraphs; }
@@ -143,6 +151,7 @@ public class Document
     public RowPart[] getRowParts() { return rowParts; }
     public URL getUrl() {return url;}
     public String[] getHrefs(){return hrefs;}
+    public Map<String, String> getInfoAttr() {return infoAttr;}
 
 
 

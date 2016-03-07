@@ -48,8 +48,8 @@ public class Html
 	NullCheck.notNull(charset, "charset");
 	NullCheck.notNull(docUrl, "docUrl");
 	Log.debug("doctree-html", "reading " + path.toString() + " with charset " + charset);
-jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
-this.docUrl = docUrl;
+	jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
+	this.docUrl = docUrl;
     }
 
     public Html(InputStream is, String charset,
@@ -65,11 +65,29 @@ this.docUrl = docUrl;
     public org.luwrain.doctree.Document constructDocument()
     {
 	final org.luwrain.doctree.NodeImpl res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
+	final HashMap<String, String> meta = new HashMap<String, String>();
+	collectMeta(jsoupDoc.head(), meta);
 	res.subnodes = onNode(jsoupDoc.body());
-final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
-doc.setUrl(docUrl);
-doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
-return doc;
+	final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
+	doc.setUrl(docUrl);
+	doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
+	doc.setInfoAttr(meta);
+	return doc;
+    }
+
+    private void collectMeta(Element el, HashMap<String, String> meta)
+    {
+	if (el.nodeName().equals("meta"))
+	{
+	    final String name = el.attr("name");
+	    final String content = el.attr("content");
+	    if (name != null && !name.isEmpty() && content != null)
+		meta.put(name, content);
+	}
+	if (el.childNodes() != null)
+	    for(Node n: el.childNodes())
+		if (n instanceof Element)
+		    collectMeta((Element)n, meta);
     }
 
     private NodeImpl[] onNode(Node node)
@@ -103,29 +121,29 @@ return doc;
     }
 
     private void onElementInPara(Element el,
-			      LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
+				 LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
 	NullCheck.notNull(el, "el");
 	final String tagName = el.nodeName();
 	String href = null;
 	//img
-if (tagName.toLowerCase().trim().equals("img"))
-{
+	if (tagName.toLowerCase().trim().equals("img"))
+	{
 	    final String value = el.attr("alt");
 	    if (value != null && !value.isEmpty())
 		runs.add(new org.luwrain.doctree.Run("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
-		//Do nothing else here	    
-		return;
-}
+	    //Do nothing else here	    
+	    return;
+	}
 
 	//a
-if (tagName.toLowerCase().trim().equals("a"))
+	if (tagName.toLowerCase().trim().equals("a"))
 	{
 	    final String value = el.attr("href");
 	    if (value != null)
 	    {
 		try {
-		href = new URL(docUrl, value).toString();
+		    href = new URL(docUrl, value).toString();
 		}
 		catch(MalformedURLException e)
 		{
@@ -135,33 +153,33 @@ if (tagName.toLowerCase().trim().equals("a"))
 	    } else
 		href = value;
 	}
-if (href != null)
-{
-    hrefStack.add(href);
-    allHrefs.add(href);
-}
-try {
-	final List<Node> nn = el.childNodes();
-	for(Node n: nn)
+	if (href != null)
 	{
-if (n instanceof TextNode)
-{
-    onTextNode((TextNode)n, runs);
-    continue;
-}
-if (n instanceof Element)
-{
-	onElement((Element)n, nodes, runs);
-	continue;
-}
-Log.warning("doctree-html", "encountering unexpected node of class " + n.getClass().getName());
+	    hrefStack.add(href);
+	    allHrefs.add(href);
 	}
-}
-finally
-{
-    if (href != null)
-	hrefStack.pollLast();
-}
+	try {
+	    final List<Node> nn = el.childNodes();
+	    for(Node n: nn)
+	    {
+		if (n instanceof TextNode)
+		{
+		    onTextNode((TextNode)n, runs);
+		    continue;
+		}
+		if (n instanceof Element)
+		{
+		    onElement((Element)n, nodes, runs);
+		    continue;
+		}
+		Log.warning("doctree-html", "encountering unexpected node of class " + n.getClass().getName());
+	    }
+	}
+	finally
+	{
+	    if (href != null)
+		hrefStack.pollLast();
+	}
     }
 
     private void onElement(Element el,
@@ -273,8 +291,8 @@ finally
 	case "sup":
 	case "label":
 	    addExtraInfo(el);
-	    onElementInPara(el, nodes, runs);
-	    releaseExtraInfo();
+	onElementInPara(el, nodes, runs);
+	releaseExtraInfo();
 	break;
 	default:
 	    Log.warning("doctree-html", "unprocessed tag:" + name);
@@ -283,9 +301,9 @@ finally
 
     private void onTextNode(TextNode textNode, LinkedList<org.luwrain.doctree.Run> runs)
     {
-    final String text = textNode.text();
-    if (text != null && !text.isEmpty())
-	runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
+	final String text = textNode.text();
+	if (text != null && !text.isEmpty())
+	    runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
     }
 
     private void commitPara(LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
