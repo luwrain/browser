@@ -3,6 +3,7 @@
 package org.luwrain.util;
 
 import java.util.*;
+import java.util.regex.*;
 import java.net.*;
 import java.io.*;
 import java.nio.file.*;
@@ -24,6 +25,7 @@ public class Smil
 	private Type type;
 	private String src = "";
 	private String id = "";
+	private AudioInfo audioInfo = null;
 	Entry[] entries;
 
 	Entry(Type type)
@@ -42,6 +44,19 @@ public class Smil
 	    this.id = id;
 	    this.src = src;
 	}
+
+	Entry (String id, String src,
+AudioInfo audioInfo)
+	{
+	    NullCheck.notNull(id, "id");
+	    NullCheck.notNull(src, "src");
+	    NullCheck.notNull(audioInfo, "audioInfo");
+	    this.type = Type.AUDIO;
+	    this.id = id;
+	    this.src = src;
+	    this.audioInfo = audioInfo;
+	}
+
 
 	public void saveTextSrc(List<String> res)
 	{
@@ -71,7 +86,7 @@ public class Smil
 
 	public AudioInfo getAudioInfo()
 	{
-	    return null;
+	    return audioInfo;
 	}
 
 	public Type type(){return type;}
@@ -184,9 +199,22 @@ public class Smil
     {
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
-	final String src = el.attr("src");
-	//	System.out.println(src);
-	return new Entry(Entry.Type.AUDIO, id, src);
+	String src = el.attr("src");
+	try {
+	    src = new URL(urlBase, src).toString();
+	}
+	catch (MalformedURLException e)
+	{
+	    e.printStackTrace();
+	}
+final String beginValue = el.attr("clip-begin");
+final String endValue = el.attr("clip-end");
+long beginPos = -1, endPos = -1;
+if (beginValue != null)
+beginPos = parseTime(beginValue);
+if (endValue != null)
+endPos = parseTime(endValue);
+return new Entry(id, src, new AudioInfo(src, beginPos, endPos));
     }
 
     static private Entry onText(Element el, URL urlBase)
@@ -202,5 +230,26 @@ public class Smil
 	    e.printStackTrace();
 	}
 	return new Entry(Entry.Type.TEXT, id, src);
+    }
+
+    //	static private final Pattern TIME_PATTERN = Pattern.compile("^(((?<hour>\\d{1,})\\:)?(?<min>\\d{1,2})\\:)?(?<sec>\\d{1,})(\\.(?<ms>\\d{1,}))?(?<n>h|min|s|ms)?$");
+	static private final Pattern TIME_PATTERN = Pattern.compile("^npt=(?<sec>\\d+.\\d+)s$");
+    static private long parseTime(String value)
+    {
+
+	final Matcher m = TIME_PATTERN.matcher(value);
+	if(m.matches()) 
+	{
+	    try {
+		float f = Float.parseFloat(m.group("sec"));
+					   f *= 1000;
+					   return new Float(f).longValue();
+	    }
+	    catch(NumberFormatException e)
+	    {
+		e.printStackTrace();
+	    }
+	}
+	    return -1;
     }
 }

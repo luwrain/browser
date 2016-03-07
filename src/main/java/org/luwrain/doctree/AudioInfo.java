@@ -42,6 +42,11 @@ long beginPos)
 	this.endPos = endPos;
     }
 
+    @Override public String toString()
+    {
+	return "Audio: " + src + " (from " + beginPos + ", to " + endPos + ")";
+    }
+
     // parse clock value, example: 3:22:55.91 or 43:15.044 or 102.02h
     static public long ParseTime(String value)
     {

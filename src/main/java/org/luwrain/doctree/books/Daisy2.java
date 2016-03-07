@@ -83,7 +83,13 @@ class Daisy2 implements Book
 	{
 	    final Smil.Entry entry = findSmilEntryWithText(e.getValue(), id);
 	    if (entry != null)
-		System.out.println("found");
+	    {
+		final LinkedList<AudioInfo> infos = new LinkedList<AudioInfo>();
+		collectAudioStartingAtEntry(entry, infos);
+		System.out.println("" + infos.size() + " collected");
+		if (infos.size() > 0)
+		    return infos.getFirst();
+	    }
 	}
 	return null;
     }
@@ -176,7 +182,7 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	    {
 		final Smil.Entry res = findSmilEntryWithText(entry.entries()[i], src);
 		if (res == null)
-		    return null;
+		    continue;
 		if (i == 0)
 		    return entry;
 		return entry.entries()[i];
@@ -202,25 +208,26 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
     {
 	NullCheck.notNull(entry, "entry");
 	NullCheck.notNull(audioInfos, "audioInfos");
-	if (entry.type() == Smil.Entry.Type.AUDIO)
+	switch(entry.type())
 	{
+	case AUDIO:
 	    audioInfos.add(entry.getAudioInfo());
 	    return;
-	}
-	if (entry.type() == Smil.Entry.Type.TEXT)
+	case TEXT:
 	    return;
-	if (entry.type() == Smil.Entry.Type.PAR && entry.entries() != null)
-	{
-	    for(Smil.Entry e: entry.entries())
-		collectAudioStartingAtEntry(e, audioInfos);
+	case PAR:
+	    if (entry.entries() != null)
+		for(Smil.Entry e: entry.entries())
+		    collectAudioStartingAtEntry(e, audioInfos);
 	    return;
-	}
-	if (entry.type() == Smil.Entry.Type.SEQ && entry.entries() != null &&
-	    entry.entries().length >= 1)
-	{
-	    collectAudioStartingAtEntry(entry.entries()[0], audioInfos);
+	case FILE:
+	case SEQ:
+	    if (entry.entries() != null &&
+		 entry.entries().length >= 1)
+		collectAudioStartingAtEntry(entry.entries()[0], audioInfos);
 	    return;
+	default:
+	    Log.warning("doctree-daisy", "unknown SMIL entry type:" + entry.type());
 	}
-	Log.warning("doctree-daisy", "unknown SMIL entry type:" + entry.type());
     }
 }
