@@ -19,10 +19,9 @@ package org.luwrain.doctree.filters;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.*;
 
 import org.luwrain.doctree.*;
 import org.apache.poi.xwpf.usermodel.*;
@@ -31,40 +30,33 @@ import org.luwrain.core.NullCheck;
 
 public class DocX
 {
-    private String fileName = "";
+    private Path path;
     private String wholeText;
-
-    // listInfo[id of list][level]=counter;
     private HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
     private int lastLvl = -1;
 
-    public DocX(String fileName)
+    public DocX(Path path)
     {
-	this.fileName = fileName;
-	NullCheck.notNull(fileName, "fileName");
+	NullCheck.notNull(path, "path");
+	this.path = path;
     }
 
     public org.luwrain.doctree.Document constructDocument()
     {
-    	FileInputStream  s = null;
     	try
     	{
-	    File docFile=new File(fileName);
-	    s = new FileInputStream(docFile.getAbsolutePath());
+	    final InputStream s = Files.newInputStream(path);
 	    XWPFDocument doc = new XWPFDocument(s);
 	    final org.luwrain .doctree.Document res = transform(doc);
-	    s.close(); //closing fileinputstream
+	    res.setFormat("DOCX");
+	    res.setUrl(path.toUri().toURL());
+	    s.close();
 	    return res;
     	} catch (IOException e)
     	{
 	    e.printStackTrace();
-	    try {
-		if (s != null)
-		    s.close();
-	    }
-	    catch (IOException ee) {}
 	    return null;
-    	}
+	}
     }
 
     private org.luwrain.doctree.Document transform(XWPFDocument doc)

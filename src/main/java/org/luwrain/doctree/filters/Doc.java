@@ -20,7 +20,9 @@ package org.luwrain.doctree.filters;
 import java.util.*;
 import java.util.Map.Entry;
 import java.io.*;
+import java.nio.file.*;
 
+import org.luwrain.core.NullCheck;
 import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeImpl;
@@ -33,34 +35,28 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 
 public class Doc
 {
-    private String fileName = "";
+    private Path path;
     private String wholeText;
 
-    public Doc(String fileName)
+    public Doc(Path path)
     {
-	this.fileName = fileName;
-	if (fileName == null)
-	    throw new NullPointerException("fileName may not be null");
+	NullCheck.notNull(path, "path");
+	this.path = path;
     }
 
     public Document constructDocument()
     {
-	FileInputStream  s = null;
 	try {
-	    File docFile=new File(fileName);
-	    s = new FileInputStream(docFile.getAbsolutePath());
-	    HWPFDocument doc = new HWPFDocument(s);
-	    Document res = transform(doc);
-	    s.close(); //closing fileinputstream
+	    final InputStream s = Files.newInputStream(path);
+	    final HWPFDocument doc = new HWPFDocument(s);
+	    final Document res = transform(doc);
+	    res.setFormat("DOC");
+	    res.setUrl(path.toUri().toURL());
+	    s.close();
 	    return res;
 	} catch (IOException e)
 	{
 	    e.printStackTrace();
-	    try {
-		if (s != null)
-		    s.close();
-	    }
-	    catch (IOException ee) {}
 	    return null;
 	}
     }

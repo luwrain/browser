@@ -64,7 +64,6 @@ public class Factory
 	NullCheck.notNull(format, "format");
 	NullCheck.notNull(charset, "charset");
 	Log.debug("doctree", "need to prepare a document by path " + path.toString());
-	Log.debug("doctree", "filter is \'" + format + "\', charset is \'" + charset + "\'");
 	final Result res = new Result(Result.Type.OK, path.toString());
 	res.format = format.toString();
 	try {
@@ -80,10 +79,10 @@ public class Factory
 		res.doc = new TxtParaEachLine(path.toString()).constructDocument(charset);
 		return res;
 	    case DOC:
-		res.doc = new Doc(path.toString()).constructDocument();
+		res.doc = new Doc(path).constructDocument();
 		return res;
 	    case DOCX:
-		res.doc = new DocX(path.toString()).constructDocument();
+		res.doc = new DocX(path).constructDocument();
 		return res;
 	    case HTML:
 		try {

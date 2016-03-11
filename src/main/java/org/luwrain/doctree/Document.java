@@ -27,8 +27,11 @@ public class Document
 {
     private String title;
     private URL url;
+    private String format;
+    private String charset;
     private String[] hrefs;
     private Map<String, String> infoAttr = new HashMap<String, String>();
+
 
     private NodeImpl root;
     private Layout layout = new Layout(this);
@@ -143,6 +146,17 @@ public class Document
 	this.infoAttr = infoAttr;
     }
 
+    public void setFormat(String format)
+    {
+	NullCheck.notNull(format, "format");
+	this.format = format;
+    }
+
+    public void setCharset(String charset)
+    {
+	NullCheck.notNull(charset, "charset");
+	this.charset = charset;
+    }
 
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
@@ -152,6 +166,8 @@ public class Document
     public URL getUrl() {return url;}
     public String[] getHrefs(){return hrefs;}
     public Map<String, String> getInfoAttr() {return infoAttr;}
+    public String getFormat() {return format;}
+    public String getCharset() {return charset;}
 
 
 
