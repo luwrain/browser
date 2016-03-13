@@ -8,10 +8,7 @@ import org.luwrain.core.NullCheck;
 public class AudioInfo
 {
     private String src;
-    /** Starting pos in milliseconds*/
 private long beginPos;
-
-    /** Ending pos in milliseconds*/
 private long endPos;
 
     public AudioInfo(String src,
@@ -39,6 +36,10 @@ long beginPos)
 	this.beginPos = beginPos;
 	this.endPos = endPos;
     }
+
+    public String src() {return src;}
+    public long beginPosMsec() {return beginPos;}
+    public long endPosMsec() {return endPos;}
 
     @Override public String toString()
     {

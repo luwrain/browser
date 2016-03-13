@@ -174,10 +174,12 @@ AudioInfo audioInfo)
 		{
 		case "seq":
 		    res.add(new Entry(Entry.Type.SEQ));
+		    res.getLast().id = el.attr("id");
 		    res.getLast().entries = onNode(el, urlBase);
 		    break;
 		case "par":
 		    res.add(new Entry(Entry.Type.PAR));
+		    res.getLast().id = el.attr("id");
 		    res.getLast().entries = onNode(el, urlBase);
 		    break;
 		case "audio":
@@ -236,7 +238,6 @@ return new Entry(id, src, new AudioInfo(src, beginPos, endPos));
 	static private final Pattern TIME_PATTERN = Pattern.compile("^npt=(?<sec>\\d+.\\d+)s$");
     static private long parseTime(String value)
     {
-
 	final Matcher m = TIME_PATTERN.matcher(value);
 	if(m.matches()) 
 	{
