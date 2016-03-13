@@ -57,7 +57,6 @@ AudioInfo audioInfo)
 	    this.audioInfo = audioInfo;
 	}
 
-
 	public void saveTextSrc(List<String> res)
 	{
 	    if (type == Type.TEXT &&

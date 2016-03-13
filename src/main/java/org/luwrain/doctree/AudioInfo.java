@@ -41,6 +41,15 @@ long beginPos)
     public long beginPosMsec() {return beginPos;}
     public long endPosMsec() {return endPos;}
 
+    public boolean covers(String audioFileUrl, long msec)
+    {
+	if (!src.equals(audioFileUrl))
+	    return false;
+	if (endPos < 0)
+	    return msec >= beginPos;
+	return msec >= beginPos && msec <= endPos;
+    }
+
     @Override public String toString()
     {
 	return "Audio: " + src + " (from " + beginPos + ", to " + endPos + ")";

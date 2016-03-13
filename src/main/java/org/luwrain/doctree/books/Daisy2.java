@@ -95,6 +95,26 @@ class Daisy2 implements Book
 	return null;
     }
 
+@Override public     String findTextForAudio(String audioFileUrl, long msec)
+    {
+	NullCheck.notNull(audioFileUrl, "audioFileUrl");
+	Log.debug("doctree-daisy", "text for " + audioFileUrl + " at " + msec);
+	for(Map.Entry<URL, Smil.Entry> e: smils.entrySet())
+	{
+	    final Smil.Entry entry = findSmilEntryWithAudio(e.getValue(), audioFileUrl, msec);
+	    if (entry != null)
+	    {
+		System.out.println(entry.id());
+		final LinkedList<String> links = new LinkedList<String>();
+		collectTextStartingAtEntry(entry, links);
+		System.out.println("" + links.size() + " linkscollected");
+		if (links.size() > 0)
+		    return links.getFirst();
+	    }
+	}
+	return null;
+    }
+
     void init(Document nccDoc)
     {
 	NullCheck.notNull(nccDoc, "nccDoc");
@@ -208,6 +228,49 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	}
     }
 
+    static private Smil.Entry findSmilEntryWithAudio(Smil.Entry entry, String audioFileUrl, long msec)
+    {
+	NullCheck.notNull(entry, "entry");
+	NullCheck.notNull(audioFileUrl, "audioFileUrl");
+	switch(entry.type() )
+	{
+	case AUDIO:
+	    return entry.getAudioInfo().covers(audioFileUrl, msec)?entry:null;
+	case TEXT:
+	    return null;
+	case FILE:
+	case SEQ:
+	    if (entry.entries() == null)
+		return null;
+	    for (int i = 0;i < entry.entries().length;++i)
+	    {
+		final Smil.Entry res = findSmilEntryWithAudio(entry.entries()[i], audioFileUrl, msec);
+		if (res == null)
+		    continue;
+		if (res != entry.entries()[i])
+		    return res;
+		//		System.out.println("res.id=" + res.id());
+		if (i == 0)
+		    return entry;
+		return entry.entries()[i];
+	    }
+	    return null;
+	case PAR:
+	    if (entry.entries() == null)
+		return null;
+	    for(Smil.Entry e: entry.entries())
+	    {
+		final Smil.Entry res = findSmilEntryWithAudio(e, audioFileUrl, msec);
+		if (res != null)
+		    return entry;
+	    }
+	    return null;
+	default:
+	    Log.warning("doctree-daisy", "unknown SMIL entry type:" + entry.type());
+	    return null;
+	}
+    }
+
     static private void collectAudioStartingAtEntry(Smil.Entry entry, LinkedList<AudioInfo> audioInfos)
     {
 	NullCheck.notNull(entry, "entry");
@@ -234,4 +297,32 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	    Log.warning("doctree-daisy", "unknown SMIL entry type:" + entry.type());
 	}
     }
+
+    static private void collectTextStartingAtEntry(Smil.Entry entry, LinkedList<String> links)
+    {
+	NullCheck.notNull(entry, "entry");
+	NullCheck.notNull(links, "links");
+	switch(entry.type())
+	{
+	case AUDIO:
+	    return;
+	case TEXT:
+	    links.add(entry.src());
+	    return;
+	case PAR:
+	    if (entry.entries() != null)
+		for(Smil.Entry e: entry.entries())
+		    collectTextStartingAtEntry(e, links);
+	    return;
+	case FILE:
+	case SEQ:
+	    if (entry.entries() != null &&
+		 entry.entries().length >= 1)
+		collectTextStartingAtEntry(entry.entries()[0], links);
+	    return;
+	default:
+	    Log.warning("doctree-daisy", "unknown SMIL entry type:" + entry.type());
+	}
+    }
+
 }
