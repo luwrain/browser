@@ -16,6 +16,8 @@
 */
 
 package org.luwrain.doctree;
+
+    import java.util.*;
 import org.luwrain.core.NullCheck;
 
 class RowImpl implements Row
@@ -28,6 +30,94 @@ int x = 0;
 
     private int partsFrom = -1;
     private int partsTo = -1;
+
+    //returns null if there is no suitable
+    Run getRunUnderPos(RowPart[] parts, int pos)
+    {
+	if (isEmpty())
+	    return null;
+	final int index = getPartIndexUnderPos(parts, pos);
+if (index < 0)
+    return null;
+return parts[index].run;
+    }
+
+    //returns null if there is no suitable
+    Run[] getRuns(RowPart[] parts)
+    {
+	if (isEmpty())
+	    return new Run[0];
+	final Vector<Run> res = new Vector<Run>();
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final Run run = parts[i].run;
+	    int k = 0;
+	    for(k = 0;k < res.size();++k)
+		if (res.get(k) == run)
+		    break;
+	    if (k >= res.size())
+		res.add(run);
+	}
+	return res.toArray(new Run[res.size()]);
+    }
+
+    //returns -1 if there is no matching pos
+    int getPartIndexUnderPos(RowPart[] parts, int pos)
+    {
+	if (isEmpty())
+	    return -1;
+	int offset = 0;
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    if (pos >= offset && pos < offset + text.length())
+		return i;
+	    offset += text.length();
+	}
+	return -1;
+    }
+
+    //returns -1 if index is invalid
+    int partBeginsAt(RowPart[] parts, int index)
+    {
+	if (isEmpty() || index < partsFrom || index >= partsTo)
+	    return -1;
+	if (index == partsFrom)
+	    return 0;
+	int offset = 0;
+	for(int i = partsFrom;i < index;++i)
+	{
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    offset += text.length();
+	}
+	return offset;
+    }
+
+    //returns -1 if index is invalid
+    int runBeginsAt(RowPart[] parts, Run run)
+    {
+	NullCheck.notNull(parts, "parts");
+	NullCheck.notNull(run, "run");
+	if (isEmpty())
+	    return -1;
+	int offset = 0;
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    if (parts[i].run == run)
+		return offset;
+	    offset += text.length();
+	}
+	return offset;
+    }
+
+
 
     @Override public int getRowX()
     {
@@ -128,52 +218,6 @@ int x = 0;
 	return partBeginsAt(parts, index);
     }
 
-    //returns null if there is no suitable
-    Run getRunUnderPos(RowPart[] parts, int pos)
-    {
-	if (isEmpty())
-	    return null;
-	final int index = getPartIndexUnderPos(parts, pos);
-if (index < 0)
-    return null;
-return parts[index].run;
-    }
-
-    //returns -1 if there is no matching pos
-    int getPartIndexUnderPos(RowPart[] parts, int pos)
-    {
-	if (isEmpty())
-	    return -1;
-	int offset = 0;
-	for(int i = partsFrom;i < partsTo;++i)
-	{
-	    final String text = parts[i].text();
-	    if (text == null || text.isEmpty())
-		continue;
-	    if (pos >= offset && pos < offset + text.length())
-		return i;
-	    offset += text.length();
-	}
-	return -1;
-    }
-
-    //returns -1 if index is invalid
-    int partBeginsAt(RowPart[] parts, int index)
-    {
-	if (isEmpty() || index < partsFrom || index >= partsTo)
-	    return -1;
-	if (index == partsFrom)
-	    return 0;
-	int offset = 0;
-	for(int i = partsFrom;i < index;++i)
-	{
-	    final String text = parts[i].text();
-	    if (text == null || text.isEmpty())
-		continue;
-	    offset += text.length();
-	}
-	return offset;
-    }
 
     boolean isEmpty()
     {

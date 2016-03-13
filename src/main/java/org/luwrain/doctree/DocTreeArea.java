@@ -91,6 +91,27 @@ public class DocTreeArea implements Area
 	return iterator.getHrefTextUnderPos(hotPointX);
     }
 
+    public boolean findRun(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	if (isEmpty())
+	    return false;
+	final Iterator newIt = document.getIterator();
+	while(newIt.canMoveNext() && !newIt.hasRunOnRow(run))
+	    newIt.moveNext();
+	if (!newIt.hasRunOnRow(run))
+	    return false;
+	final int pos = newIt.runBeginsAt(run);
+	if (pos < 0)
+	{
+	    Log.warning("doctree", "the row with required run found, but position is negative");
+	    return false;
+	}
+	iterator = newIt;
+	hotPointX = pos;
+	environment.onAreaNewHotPoint(this);
+	return true;
+    }
 
     @Override public int getLineCount()
     {

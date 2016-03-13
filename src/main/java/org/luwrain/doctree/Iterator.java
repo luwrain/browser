@@ -62,6 +62,26 @@ public class Iterator
 	return false;
     }
 
+    public boolean hasRunOnRow(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	if (isEmptyRow())
+	    return false;
+	final Run[] runs = getRowImpl().getRuns(rowParts);
+	for(Run r: runs)
+	    if (run == r)
+		return true;
+	return false;
+    }
+
+    public int runBeginsAt(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	if (isEmptyRow())
+	    return -1;
+	return getRowImpl().runBeginsAt(rowParts, run);
+    }
+
     @Override public boolean equals(Object o)
     {
 	if (o == null || !(o instanceof Iterator))
@@ -81,6 +101,14 @@ public class Iterator
 	    return null;
 	return rows[current];
     }
+
+RowImpl getRowImpl()
+    {
+	if (noContent())
+	    return null;
+	return rows[current];
+    }
+
 
     //returns -1 if no content
     public int getRowAbsIndex()

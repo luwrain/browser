@@ -76,4 +76,9 @@ ExtraInfo extraInfo)
 	text = new String(b);
 	//	System.out.println("text:" + text);
     }
+
+    public ExtraInfo extraInfo()
+    {
+	return extraInfo;
+    }
 }
