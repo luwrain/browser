@@ -51,6 +51,10 @@ ExtraInfo extraInfo)
 	this.extraInfo = extraInfo;
     }
 
+    public String href()
+    {
+	return href;
+    }
 
     @Override public String toString()
     {

@@ -16,6 +16,7 @@ class Daisy2 implements Book
     private final HashMap<URL, Document> docs = new HashMap<URL, Document>();
     private final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
     private Document nccDoc;
+    private Book.Section[] bookSections = new Book.Section[0];
 
     @Override public Document[] getDocuments()
     {
@@ -118,8 +119,8 @@ class Daisy2 implements Book
 	final LinkedList<String> textSrcs = new LinkedList<String>();
 	for(String h: allHrefs)
 	    try {
-URL url = new URL(h);
-url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+		URL url = new URL(h);
+		url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 		if (url.getFile().toLowerCase().endsWith(".smil"))
 		    loadSmil(url, textSrcs); else
 		    textSrcs.add(url.toString());
@@ -132,9 +133,9 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 
 	for(String s: textSrcs)
 	    try {
-URL url = new URL(s);
-url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
-		    loadDoc(url);
+		URL url = new URL(s);
+		url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+		loadDoc(url);
 	    }
 	    catch(MalformedURLException e)
 	    {
@@ -142,6 +143,33 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	    }
 	Log.debug("doctree-daisy", "" + docs.size() + " documents loaded");
 	this.nccDoc = nccDoc;
+
+	final SectionsVisitor visitor = new SectionsVisitor();
+	Visitor.walk(nccDoc.getRoot(), visitor);
+	final Book.Section[] sections = visitor.getBookSections();
+	for(int i = 0;i < sections.length;++i)
+	{
+	    try {
+		final URL url = new URL(sections[i].href());
+		final URL fileUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
+		if (fileUrl.getFile().toLowerCase().endsWith(".smil") && !url.getRef().isEmpty())
+		{
+		    final String text = smilEntryToText(fileUrl, url.getRef());
+		    if (text != null)
+			sections[i] = new Book.Section(sections[i].level(), sections[i].title(), text);
+		}
+	    }
+	    catch(MalformedURLException e)
+	    {
+		e.printStackTrace();
+	    }
+	}
+	this.bookSections = sections;
+    }
+
+    @Override public Book.Section[] getBookSections()
+    {
+	return bookSections;
     }
 
     private void loadSmil(URL url, LinkedList<String> textSrcs)
@@ -319,4 +347,15 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 	}
     }
 
+    private String smilEntryToText(URL url, String id)
+    {
+		    if (!smils.containsKey(url))
+			return null;
+			final Smil.Entry entry = smils.get(url).findById(id);
+			if (entry == null)
+			    return null;
+			final LinkedList<String> links = new LinkedList<String>();
+			collectTextStartingAtEntry(entry, links);
+			return !links.isEmpty()?links.getFirst():null;
+		    }
 }
