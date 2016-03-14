@@ -70,7 +70,6 @@ public class Epub
 		    String line;
 		    while ( (line = reader.readLine()) != null)
 		    {
-//			    System.out.println("["+line.substring(0,Math.min(64,line.length()))+"]");
 		    	if(line.startsWith("<?xml")) continue; // FIXME: make this fix inside Html parser
 		    	result+=line+"\n";
 		    }

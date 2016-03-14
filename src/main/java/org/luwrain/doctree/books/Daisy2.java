@@ -84,10 +84,8 @@ class Daisy2 implements Book
 	    final Smil.Entry entry = findSmilEntryWithText(e.getValue(), id);
 	    if (entry != null)
 	    {
-		System.out.println(entry.id());
 		final LinkedList<AudioInfo> infos = new LinkedList<AudioInfo>();
 		collectAudioStartingAtEntry(entry, infos);
-		System.out.println("" + infos.size() + " collected");
 		if (infos.size() > 0)
 		    return infos.getFirst();
 	    }
@@ -104,10 +102,8 @@ class Daisy2 implements Book
 	    final Smil.Entry entry = findSmilEntryWithAudio(e.getValue(), audioFileUrl, msec);
 	    if (entry != null)
 	    {
-		System.out.println(entry.id());
 		final LinkedList<String> links = new LinkedList<String>();
 		collectTextStartingAtEntry(entry, links);
-		System.out.println("" + links.size() + " linkscollected");
 		if (links.size() > 0)
 		    return links.getFirst();
 	    }
@@ -206,7 +202,6 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 		    continue;
 		if (res != entry.entries()[i])
 		    return res;
-		//		System.out.println("res.id=" + res.id());
 		if (i == 0)
 		    return entry;
 		return entry.entries()[i];
@@ -249,7 +244,6 @@ url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 		    continue;
 		if (res != entry.entries()[i])
 		    return res;
-		//		System.out.println("res.id=" + res.id());
 		if (i == 0)
 		    return entry;
 		return entry.entries()[i];

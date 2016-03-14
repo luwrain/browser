@@ -74,7 +74,6 @@ ExtraInfo extraInfo)
 	    wasSpace = Character.isSpace(c);
 	}
 	text = new String(b);
-	//	System.out.println("text:" + text);
     }
 
     public ExtraInfo extraInfo()

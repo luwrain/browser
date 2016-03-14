@@ -97,7 +97,6 @@ public class Doc
 		    final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 		    inTable=true;//We came to the table;
 		    final org.apache.poi.hwpf.usermodel.Table table = range.getTable(paragraph);
-		    //		    System.out.println(lvl+", is a table: "+table.numRows()+" rows");
 		    final int rnum=table.numRows();
 		    for(int r=0;r<rnum;r++)
 		    { // для каждой строки таблицы
@@ -113,7 +112,6 @@ public class Doc
 			    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
 			    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 			    cels_subnodes.add(celltable_node);
-			    //			    System.out.print("* cell["+r+","+c+"]: ");
 			    final TableCell cell=trow.getCell(c);
 			    //Trying to figure out that we have just a text in the table cell
 			    if(cell.numParagraphs()>1)
@@ -131,7 +129,6 @@ public class Doc
 	    } else //if(paragraph.getTableLevel() > lvl);
 	    {
 		inTable=false;//We are not in table any more
-		//		System.out.print(lvl+", not table: ");
 		parseParagraph(subnodes,paragraph);
 	    }
 	    i++;
@@ -180,14 +177,12 @@ public class Doc
 				String numstr="";
 				for(int lvl=0;lvl<=listLvl;lvl++) numstr+=listInfo.get(listId).get(lvl)+".";
 				paraText=paragraph.text().trim();
-				//				System.out.println("LIST ENTRY:"+listLvl+", "+listId+", "+numstr+"["+paraText+"]");
 				final LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
 				item_subnodes.add(NodeFactory.newPara(paraText));
 				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 			break;
 			case "Paragraph":
 				paraText=paragraph.text().trim();
-				//				System.out.println("PARAGRAPH:["+paraText+"]");
 				subnodes.add(NodeFactory.newPara(paraText));
 				/*
 				// получение стилей текста
@@ -195,13 +190,11 @@ public class Doc
 				if(nrun>1) for(int r=0;r<nrun;r++)
 				{
 					CharacterRun run=paragraph.getCharacterRun(r);
-//					System.out.println("RUN: ["+run.text()+"]");
 				}
 				*/
 			break;
 			default:
 				paraText=paragraph.text().trim();
-				//				System.out.println(className+"["+paraText+"]");
 				subnodes.add(NodeFactory.newPara(paraText));
 			break;
 		}

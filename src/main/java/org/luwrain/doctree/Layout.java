@@ -59,7 +59,6 @@ class Layout
 	    if (rows[k].isEmpty())
 		continue;
 	    final Line line = lines[rows[k].y];
-	    //	    System.out.println("y=" + rows[k].y);
 	    final int[] oldRows = line.rows;
 	    line.rows = new int[oldRows.length + 1];
 	    for(int i = 0;i < oldRows.length;++i)

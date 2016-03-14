@@ -88,7 +88,6 @@ public class DocX
 		final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
 		final XWPFTable table = (XWPFTable) paragraph;
 		wholeText+=table.getText();
-		//		System.out.println(lvl + ", is a table: " + table.getRows().size() + " rows");
 		int r = 0;
 		for (final XWPFTableRow trow : table.getRows())
 		{ // для каждой строки таблицы
@@ -106,7 +105,6 @@ public class DocX
 					    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
 					    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
 					    cels_subnodes.add(celltable_node);
-					    System.out.print("* cell[" + r + "," + c + "]: ");
 					    anyRangeAsParagraph(incell_subnodes, cell.getBodyElements(), lvl + 1);
 					    celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
 					    checkNodesNotNull(celltable_node.subnodes);
@@ -118,7 +116,6 @@ public class DocX
 		checkNodesNotNull(table_node.subnodes);
 	    } else
 	    {
-		//		System.out.print(lvl + ", not table: ");
 		parseParagraph(subnodes, paragraph);
 	    }
 	    i++;
@@ -170,19 +167,16 @@ public class DocX
 		String numstr = "";
 		for (int lvl = 0; lvl <= listLvl; lvl++) numstr += listInfo.get(listId).get(lvl) + ".";
 		paraText = paragraph.getText().trim();
-		//		System.out.println("LIST ENTRY:" + listLvl + ", " + listId + ", " + numstr + "[" + paraText + "]");
 		LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
 		item_subnodes.add(NodeFactory.newPara(paraText));
 		node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
 	    } else
 	    {
 		paraText = paragraph.getText().trim();
-		System.out.println("PARAGRAPH:[" + paraText + "]");
 		subnodes.add(NodeFactory.newPara(paraText));
 	    }
 	} else
 	{
-	    System.out.println(className);
 	    subnodes.add(NodeFactory.newPara(paraText));
 	}
     }

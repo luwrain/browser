@@ -141,7 +141,6 @@ public class FictionBook2
 	    case "image":
 		break;
 	    default:
-		System.out.println(e.tagName());//+": "+e.text());
 		break;
 	    }
     	}
@@ -179,7 +178,6 @@ public class FictionBook2
 	    case "image":
 		break;
 	    default:
-		System.out.println(n.nodeName());//+": "+n.text());
 		break;
 	    }
     	}

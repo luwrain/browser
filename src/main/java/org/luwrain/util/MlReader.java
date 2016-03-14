@@ -187,7 +187,6 @@ public class MlReader
 	       !it.isStringHere("/>") &&
 	       it.currentChar() != '>')
 	{
-	    //	System.out.println("value=" + value);
 	    if (it.currentChar() == '/')
 	    {
 value += "/";
@@ -227,13 +226,11 @@ continue;
     {
 	if (openedTagStack.isEmpty())
 	    return false;
-	//	System.out.println("checking " + constructClosingTag(openedTagStack.getLast()));
 	int newPos = expecting(pos, constructClosingTag(openedTagStack.getLast()));
 	if (newPos > pos)
 	{
 	    listener.onMlTagClose(openedTagStack.pollLast());
 	    pos = newPos;
-	    //	    System.out.println("found");
 	    return true;
 	}
 	if (openedTagStack.size() < 2)
