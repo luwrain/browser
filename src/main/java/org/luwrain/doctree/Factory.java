@@ -82,7 +82,7 @@ public class Factory
 		res.doc = new Doc(path).constructDocument();
 		return res;
 	    case DOCX:
-		res.doc = new DocX(path).constructDocument();
+		res.doc = new DocX(path).read();
 		return res;
 	    case HTML:
 		try {

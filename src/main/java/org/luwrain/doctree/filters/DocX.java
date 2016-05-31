@@ -32,7 +32,7 @@ public class DocX
 {
     private Path path;
     private String wholeText;
-    private HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
+    private final HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
     private int lastLvl = -1;
 
     public DocX(Path path)
@@ -41,7 +41,7 @@ public class DocX
 	this.path = path;
     }
 
-    public org.luwrain.doctree.Document constructDocument()
+    public org.luwrain.doctree.Document read()
     {
     	try
     	{
@@ -61,73 +61,54 @@ public class DocX
 
     private org.luwrain.doctree.Document transform(XWPFDocument doc)
     {
-	wholeText = ""; // упрощенное текстовое представление будет заполнено в процессе разбора
+	NullCheck.notNull(doc, "doc");
+	wholeText = "";
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
-	anyRangeAsParagraph(subnodes,doc.getBodyElements(),0);
+	transformNodes(subnodes, doc.getBodyElements());
 	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
 	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
 	return new org.luwrain.doctree.Document(root);
     }
 
-    /* рекурсивный метод, вызывается для любого места в документе, способного содержать несколько элементов, представляя их как список параграфов
-     * @param subnodes The list of nodes to get all new on current level
-     * @param range The range to look through
-     * @param lvl Current recurse level (must be zero for the root)
-     */
-    private void anyRangeAsParagraph(LinkedList<NodeImpl> subnodes,
-				     List<IBodyElement> range, int lvl)
+    private void transformNodes(LinkedList<NodeImpl> subnodes, List<IBodyElement> range)
     {
-	int i = 0;
-	for (IBodyElement paragraph : range)
-	{
-	    if (paragraph.getClass() == XWPFTable.class)
-	    {
-		// We do this processing for the first cell only, skipping all others
-		final NodeImpl table_node = NodeFactory.newNode(Node.Type.TABLE);
-		subnodes.add(table_node);
-		final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
-		final XWPFTable table = (XWPFTable) paragraph;
-		wholeText+=table.getText();
-		int r = 0;
-		for (final XWPFTableRow trow : table.getRows())
-		{ // для каждой строки таблицы
-					r++;
-					// создаем элементы структуры Node и добавляем текущую ноду
-					// в список потомка
-					final NodeImpl rowtable_node = NodeFactory.newNode(Node.Type.TABLE_ROW);
-					rows_subnodes.add(rowtable_node);
-					final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
-					int c = 0;
-					for (final XWPFTableCell cell : trow.getTableCells())
-					{ // для каждой ячейки таблицы
-					    c++;
-					    // Creating a node for table cell
-					    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
-					    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
-					    cels_subnodes.add(celltable_node);
-					    anyRangeAsParagraph(incell_subnodes, cell.getBodyElements(), lvl + 1);
-					    celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
-					    checkNodesNotNull(celltable_node.subnodes);
-					} // for(cells);
-					rowtable_node.subnodes = cels_subnodes.toArray(new NodeImpl[cels_subnodes.size()]);
-					checkNodesNotNull(rowtable_node.subnodes);
-		} // for(trows);
-		table_node.subnodes = rows_subnodes.toArray(new NodeImpl[rows_subnodes.size()]);
-		checkNodesNotNull(table_node.subnodes);
-	    } else
-	    {
-		parseParagraph(subnodes, paragraph);
-	    }
-	    i++;
-	} // for(body elements)
+	NullCheck.notNull(subnodes, "subnodes");
+	NullCheck.notNull(range, "range");
+	for (IBodyElement p: range)
+	    if (p instanceof XWPFTable)
+		subnodes.add(transformTable((XWPFTable) p)); else
+		parseParagraph(subnodes, p);
     }
 
-    /*
-     * Анализирует тип параграфа и выделяет в соответствии с ним данные
-     * @param subnodes список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
-     * @param paragraph элемент документа (параграф или элемент списка) или ячейка таблицы
-     */
-    void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement element)
+    private NodeImpl transformTable(XWPFTable table)
+    {
+	NullCheck.notNull(table, "table");
+	final NodeImpl res = NodeFactory.newNode(Node.Type.TABLE);
+	final LinkedList<NodeImpl> rows = new LinkedList<NodeImpl>();
+	wholeText+=table.getText();
+	for (final XWPFTableRow row: table.getRows())
+	{ // для каждой строки таблицы
+	    final NodeImpl rowNode = NodeFactory.newNode(Node.Type.TABLE_ROW);
+	    rows.add(rowNode);
+	    final LinkedList<NodeImpl> cells = new LinkedList<NodeImpl>();
+	    for (final XWPFTableCell cell: row.getTableCells())
+	    { // для каждой ячейки таблицы
+		final NodeImpl cellNode = NodeFactory.newNode(Node.Type.TABLE_CELL);
+		final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
+		cells.add(cellNode);
+		transformNodes(nodes, cell.getBodyElements());
+		cellNode.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
+		checkNodesNotNull(cellNode.subnodes);
+	    }
+	    rowNode.subnodes = cells.toArray(new NodeImpl[cells.size()]);
+	    checkNodesNotNull(rowNode.subnodes);
+	} // for(trows);
+	res.subnodes = rows.toArray(new NodeImpl[rows.size()]);
+	checkNodesNotNull(res.subnodes);
+	return res;
+    }
+
+    private void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement element)
     {
 	String className = element.getClass().getSimpleName();
 	String paraText = "";
