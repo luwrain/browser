@@ -26,22 +26,22 @@ import java.nio.file.*;
 import org.luwrain.doctree.*;
 import org.apache.poi.xwpf.usermodel.*;
 
+import org.luwrain.core.Log;
 import org.luwrain.core.NullCheck;
 
 public class DocX
 {
     private Path path;
-    private String wholeText;
     private final HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
-    private int lastLvl = -1;
+    private int lastLevel = -1;
 
-    public DocX(Path path)
+    DocX(Path path)
     {
 	NullCheck.notNull(path, "path");
 	this.path = path;
     }
 
-    public org.luwrain.doctree.Document read()
+private  org.luwrain.doctree.Document process()
     {
     	try
     	{
@@ -62,7 +62,6 @@ public class DocX
     private org.luwrain.doctree.Document transform(XWPFDocument doc)
     {
 	NullCheck.notNull(doc, "doc");
-	wholeText = "";
 	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
 	transformNodes(subnodes, doc.getBodyElements());
 	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
@@ -85,7 +84,6 @@ public class DocX
 	NullCheck.notNull(table, "table");
 	final NodeImpl res = NodeFactory.newNode(Node.Type.TABLE);
 	final LinkedList<NodeImpl> rows = new LinkedList<NodeImpl>();
-	wholeText+=table.getText();
 	for (final XWPFTableRow row: table.getRows())
 	{ // для каждой строки таблицы
 	    final NodeImpl rowNode = NodeFactory.newNode(Node.Type.TABLE_ROW);
@@ -108,58 +106,56 @@ public class DocX
 	return res;
     }
 
-    private void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement element)
+    private void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement el)
     {
-	String className = element.getClass().getSimpleName();
-	String paraText = "";
-	if (element.getClass() == XWPFParagraph.class)
-	{ // все есть параграф
-	    final XWPFParagraph paragraph = (XWPFParagraph) element;
-	    wholeText+=paragraph.getText();
-	    if (paragraph.getNumIlvl() != null)
-	    { // параграф с установленным уровнем - элемент списка
-		// создаем элементы структуры Node и добавляем текущую ноду в
-		// список потомка
-		final NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
-		subnodes.add(node);
-		//
-		BigInteger listId = paragraph.getNumID();
-		int listLvl = paragraph.getNumIlvl().intValue();
-		// если это новый список, то добавим пустой подсписок его
-		// счетчиков
-		if (!listInfo.containsKey(listId))
-		    listInfo.put(listId, new HashMap<Integer, Integer>());
-		// если уровень списка уменьшился, то очищаем счетчики выше
-		// уровнем
-		if (lastLvl > listLvl)
-		{
-		    for (Entry<Integer, Integer> lvls : listInfo.get(listId).entrySet())
-			if (lvls.getKey() > listLvl)
-			    listInfo.get(listId).put(lvls.getKey(), 1);
-		}
-		lastLvl = listLvl;
-		// если в списке счетчиков значения нет, то иннициализируем его
-		// 0 (позже он будет обязательно увеличен на 1)
-		if (!listInfo.get(listId).containsKey(listLvl))listInfo.get(listId).put(listLvl, 0);
-		// так как это очередной элемент списка, то увеличиваем его
-		// счетчик на 1
-		listInfo.get(listId).put(listLvl,listInfo.get(listId).get(listLvl) + 1);
-		// формируем строку-номер
-		String numstr = "";
-		for (int lvl = 0; lvl <= listLvl; lvl++) numstr += listInfo.get(listId).get(lvl) + ".";
-		paraText = paragraph.getText().trim();
-		LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-		item_subnodes.add(NodeFactory.newPara(paraText));
-		node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
-	    } else
-	    {
-		paraText = paragraph.getText().trim();
-		subnodes.add(NodeFactory.newPara(paraText));
-	    }
-	} else
+	NullCheck.notNull(subnodes, "subnodes");
+	NullCheck.notNull(el, "el");
+	if (el instanceof XWPFParagraph)
 	{
-	    subnodes.add(NodeFactory.newPara(paraText));
+	    final XWPFParagraph para = (XWPFParagraph) el;
+	    if (para.getNumIlvl() != null)
+		transformListItem(subnodes, para); else 
+		subnodes.add(NodeFactory.newPara(para.getText().trim()));
+	} else
+	    Log.warning("doctree-docx", "unhandled element of class " + el.getClass().getName());
+    }
+
+    private void transformListItem(LinkedList<NodeImpl> subnodes, XWPFParagraph para)
+    {
+	// создаем элементы структуры Node и добавляем текущую ноду в
+	// список потомка
+	final NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
+	subnodes.add(node);
+	final BigInteger listId = para.getNumID();
+	final int listLevel = para.getNumIlvl().intValue();
+	// если это новый список, то добавим пустой подсписок его
+	// счетчиков
+	if (!listInfo.containsKey(listId))
+	    listInfo.put(listId, new HashMap<Integer, Integer>());
+	// если уровень списка уменьшился, то очищаем счетчики выше
+	// уровнем
+	if (lastLevel > listLevel)
+	{
+	    for (Entry<Integer, Integer> lvls : listInfo.get(listId).entrySet())
+		if (lvls.getKey() > listLevel)
+		    listInfo.get(listId).put(lvls.getKey(), 1);
 	}
+	lastLevel = listLevel;
+	// если в списке счетчиков значения нет, то иннициализируем его
+	// 0 (позже он будет обязательно увеличен на 1)
+	if (!listInfo.get(listId).containsKey(listLevel))
+	    listInfo.get(listId).put(listLevel, 0);
+	// так как это очередной элемент списка, то увеличиваем его
+	// счетчик на 1
+	listInfo.get(listId).put(listLevel, listInfo.get(listId).get(listLevel) + 1);
+	// формируем строку-номер
+	String numstr = "";
+	for (int lvl = 0; lvl <= listLevel; lvl++) 
+	    numstr += listInfo.get(listId).get(lvl) + ".";
+	String paraText = para.getText().trim();
+	LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
+	item_subnodes.add(NodeFactory.newPara(paraText));
+	node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
     }
 
     private void checkNodesNotNull(NodeImpl[] nodes)
@@ -169,5 +165,11 @@ public class DocX
 	for (int i = 0; i < nodes.length; ++i)
 	    if (nodes[i] == null)
 		throw new NullPointerException("nodes[" + i + "] is null");
+    }
+
+    static public org.luwrain.doctree.Document read(Path path)
+    {
+	NullCheck.notNull(path, "path");
+	return new DocX(path).process();
     }
 }
