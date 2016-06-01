@@ -32,8 +32,6 @@ import org.luwrain.core.NullCheck;
 public class DocX
 {
     private Path path;
-    private final HashMap<BigInteger, HashMap<Integer, Integer>> listInfo = new HashMap<BigInteger, HashMap<Integer, Integer>>();
-    private int lastLevel = -1;
 
     DocX(Path path)
     {
@@ -113,49 +111,12 @@ private  org.luwrain.doctree.Document process()
 	if (el instanceof XWPFParagraph)
 	{
 	    final XWPFParagraph para = (XWPFParagraph) el;
-	    if (para.getNumIlvl() != null)
-		transformListItem(subnodes, para); else 
+	    //FIXME:Proper lists processing
+	    //	    if (para.getNumIlvl() != null)
+	    //		transformListItem(subnodes, para); else 
 		subnodes.add(NodeFactory.newPara(para.getText().trim()));
 	} else
 	    Log.warning("doctree-docx", "unhandled element of class " + el.getClass().getName());
-    }
-
-    private void transformListItem(LinkedList<NodeImpl> subnodes, XWPFParagraph para)
-    {
-	// создаем элементы структуры Node и добавляем текущую ноду в
-	// список потомка
-	final NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
-	subnodes.add(node);
-	final BigInteger listId = para.getNumID();
-	final int listLevel = para.getNumIlvl().intValue();
-	// если это новый список, то добавим пустой подсписок его
-	// счетчиков
-	if (!listInfo.containsKey(listId))
-	    listInfo.put(listId, new HashMap<Integer, Integer>());
-	// если уровень списка уменьшился, то очищаем счетчики выше
-	// уровнем
-	if (lastLevel > listLevel)
-	{
-	    for (Entry<Integer, Integer> lvls : listInfo.get(listId).entrySet())
-		if (lvls.getKey() > listLevel)
-		    listInfo.get(listId).put(lvls.getKey(), 1);
-	}
-	lastLevel = listLevel;
-	// если в списке счетчиков значения нет, то иннициализируем его
-	// 0 (позже он будет обязательно увеличен на 1)
-	if (!listInfo.get(listId).containsKey(listLevel))
-	    listInfo.get(listId).put(listLevel, 0);
-	// так как это очередной элемент списка, то увеличиваем его
-	// счетчик на 1
-	listInfo.get(listId).put(listLevel, listInfo.get(listId).get(listLevel) + 1);
-	// формируем строку-номер
-	String numstr = "";
-	for (int lvl = 0; lvl <= listLevel; lvl++) 
-	    numstr += listInfo.get(listId).get(lvl) + ".";
-	String paraText = para.getText().trim();
-	LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
-	item_subnodes.add(NodeFactory.newPara(paraText));
-	node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
     }
 
     private void checkNodesNotNull(NodeImpl[] nodes)
