@@ -67,6 +67,17 @@ AudioInfo audioInfo)
 		e.saveTextSrc(res);
 	}
 
+	public void allSrcToUrls(URL base) throws MalformedURLException
+	{
+	    NullCheck.notNull(base, "base");
+	    if (src != null && !src.isEmpty())
+src = new URL(base, src).toString();
+	    if (entries != null)
+	    for(Entry e: entries)
+		e.allSrcToUrls(base);
+	}
+
+
 	public Entry findById(String id)
 	{
 	    NullCheck.notNull(id, "id");
@@ -102,13 +113,12 @@ AudioInfo audioInfo)
 	}
     }
 
-    static public Entry fromUrl(URL url, URL urlBase)
+    static public Entry fromUrl(URL url)
     {
 	NullCheck.notNull(url, "url");
-	NullCheck.notNull(urlBase, "urlBase");
 	try {
 	if (url.getProtocol().equals("file"))
-	    return fromPath(Paths.get(url.toURI()), urlBase);
+	    return fromPath(Paths.get(url.toURI()));
 	}
 	catch(URISyntaxException e)
 	{
@@ -128,11 +138,11 @@ AudioInfo audioInfo)
 	    return null;
 	}
 	final Entry res = new Entry(Entry.Type.FILE);
-	    res.entries = onNode(doc.body(), urlBase);
+	    res.entries = onNode(doc.body());
 	return res;
     }
 
-    static public Entry fromPath(Path path, URL urlBase)
+    static public Entry fromPath(Path path)
     {
 	NullCheck.notNull(path, "path");
 	org.jsoup.nodes.Document doc = null;
@@ -145,11 +155,11 @@ AudioInfo audioInfo)
 	    return null;
 	}
 	final Entry res = new Entry(Entry.Type.FILE);
-	    res.entries = onNode(doc.body(), urlBase);
+	    res.entries = onNode(doc.body());
 	return res;
     }
 
-    static private Entry[] onNode(Node node, URL urlBase)
+    static private Entry[] onNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	final LinkedList<Entry> res = new LinkedList<Entry>();
@@ -174,18 +184,18 @@ AudioInfo audioInfo)
 		case "seq":
 		    res.add(new Entry(Entry.Type.SEQ));
 		    res.getLast().id = el.attr("id");
-		    res.getLast().entries = onNode(el, urlBase);
+		    res.getLast().entries = onNode(el);
 		    break;
 		case "par":
 		    res.add(new Entry(Entry.Type.PAR));
 		    res.getLast().id = el.attr("id");
-		    res.getLast().entries = onNode(el, urlBase);
+		    res.getLast().entries = onNode(el);
 		    break;
 		case "audio":
-		    res.add(onAudio(el, urlBase));
+		    res.add(onAudio(el));
 		    break;
 		case "text":
-		    res.add(onText(el, urlBase));
+		    res.add(onText(el));
 		    break;
 		default:
 		    Log.warning("smil", "unknown tag:" + name);
@@ -196,18 +206,11 @@ AudioInfo audioInfo)
 	return res.toArray(new Entry[res.size()]);
     }
 
-    static private Entry onAudio(Element el, URL urlBase)
+    static private Entry onAudio(Element el)
     {
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
-	String src = el.attr("src");
-	try {
-	    src = new URL(urlBase, src).toString();
-	}
-	catch (MalformedURLException e)
-	{
-	    e.printStackTrace();
-	}
+	final String src = el.attr("src");
 final String beginValue = el.attr("clip-begin");
 final String endValue = el.attr("clip-end");
 long beginPos = -1, endPos = -1;
@@ -218,22 +221,14 @@ endPos = parseTime(endValue);
 return new Entry(id, src, new AudioInfo(src, beginPos, endPos));
     }
 
-    static private Entry onText(Element el, URL urlBase)
+    static private Entry onText(Element el)
     {
 	NullCheck.notNull(el, "el");
 	final String id = el.attr("id");
-	String src = el.attr("src");
-	try {
-	    src = new URL(urlBase, src).toString();
-	}
-	catch(MalformedURLException e)
-	{
-	    e.printStackTrace();
-	}
+	final String src = el.attr("src");
 	return new Entry(Entry.Type.TEXT, id, src);
     }
 
-    //	static private final Pattern TIME_PATTERN = Pattern.compile("^(((?<hour>\\d{1,})\\:)?(?<min>\\d{1,2})\\:)?(?<sec>\\d{1,})(\\.(?<ms>\\d{1,}))?(?<n>h|min|s|ms)?$");
 	static private final Pattern TIME_PATTERN = Pattern.compile("^npt=(?<sec>\\d+.\\d+)s$");
     static private long parseTime(String value)
     {

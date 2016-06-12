@@ -142,6 +142,8 @@ public class Html
 	    final String value = el.attr("href");
 	    if (value != null)
 	    {
+	    allHrefs.add(value);
+	    
 		try {
 		    href = new URL(docUrl, value).toString();
 		}
@@ -156,7 +158,6 @@ public class Html
 	if (href != null)
 	{
 	    hrefStack.add(href);
-	    allHrefs.add(href);
 	}
 	try {
 	    final List<Node> nn = el.childNodes();

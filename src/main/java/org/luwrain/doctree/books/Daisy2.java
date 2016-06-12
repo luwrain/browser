@@ -11,12 +11,12 @@ import org.luwrain.core.Log;
 import org.luwrain.doctree.*;
 import org.luwrain.util.*;
 
-class Daisy2 implements Book
+class Daisy2 extends Base
 {
-    private final HashMap<URL, Document> docs = new HashMap<URL, Document>();
-    private final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
-    private Document nccDoc;
-    private Book.Section[] bookSections = new Book.Section[0];
+    protected final HashMap<URL, Document> docs = new HashMap<URL, Document>();
+    protected final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
+    protected Document nccDoc;
+    protected Book.Section[] bookSections = new Book.Section[0];
 
     @Override public Document[] getDocuments()
     {
@@ -34,6 +34,33 @@ class Daisy2 implements Book
     @Override public Document getStartingDocument()
     {
 	return nccDoc;
+    }
+
+    @Override public Note createNote(Document doc, int rowIndex)
+    {
+	NullCheck.notNull(doc, "doc");
+	final String localPath = doc.getProperties().getProperty("daisy.localpath");
+	if (localPath != null && !localPath.isEmpty())
+	return new Note(localPath, rowIndex);
+	return null;
+    }
+
+@Override public     String getHrefOfNoteDoc(Note note)
+    {
+	System.out.println("start");
+	NullCheck.notNull(note, "note");
+	final String id = note.docId();
+	final String nccLocalPath = nccDoc.getProperties().getProperty("daisy.localpath");
+	if (nccLocalPath != null && id.equals(nccLocalPath))
+	    return nccDoc.getUrl().toString();
+	for(Map.Entry<URL, Document> e: docs.entrySet())
+	{
+	    final String url = e.getKey().toString();
+	    final String localPath = e.getValue().getProperties().getProperty("daisy.localpath");
+	    if (localPath != null && id.equals(localPath))
+		return url;
+	}
+	return "";
     }
 
     @Override public Document getDocument(String href)
@@ -56,18 +83,18 @@ class Daisy2 implements Book
 	    if (requested != null)
 	    {
 		if (requested.type() == Smil.Entry.Type.TEXT)
-		return getDocument(requested.src()); else
+		    return getDocument(requested.src()); else
 		{
 		    Log.warning("doctree-daisy", "URL " + href + " points to a SMIL entry, but its type is " + requested.type());
 		    return null;
 		}
 	    }
 	} //smils;
-    if (docs.containsKey(noRefUrl))
-    {
-	final Document res = docs.get(noRefUrl);
-	return res;
-    }
+	if (docs.containsKey(noRefUrl))
+	{
+	    final Document res = docs.get(noRefUrl);
+	    return res;
+	}
 	return null;
     }
 
@@ -94,7 +121,7 @@ class Daisy2 implements Book
 	return null;
     }
 
-@Override public     String findTextForAudio(String audioFileUrl, long msec)
+    @Override public     String findTextForAudio(String audioFileUrl, long msec)
     {
 	NullCheck.notNull(audioFileUrl, "audioFileUrl");
 	Log.debug("doctree-daisy", "text for " + audioFileUrl + " at " + msec);
@@ -115,27 +142,27 @@ class Daisy2 implements Book
     void init(Document nccDoc)
     {
 	NullCheck.notNull(nccDoc, "nccDoc");
+	nccDoc.getProperties().setProperty("daisy.localpath", nccDoc.getUrl().getFile());//FIXME:Leave only base file name
 	final String[] allHrefs = nccDoc.getHrefs();
 	final LinkedList<String> textSrcs = new LinkedList<String>();
 	for(String h: allHrefs)
 	    try {
-		URL url = new URL(h);
+		URL url = new URL(nccDoc.getUrl(), h);
 		url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 		if (url.getFile().toLowerCase().endsWith(".smil"))
 		    loadSmil(url, textSrcs); else
-		    textSrcs.add(url.toString());
+		    textSrcs.add(h);
 	    }
 	    catch(MalformedURLException e)
 	    {
 		e.printStackTrace();
 	    }
 	Log.debug("doctree-daisy", "" + smils.size() + " SMIL(s) loaded");
-
 	for(String s: textSrcs)
 	    try {
-		URL url = new URL(s);
+		URL url = new URL(nccDoc.getUrl(), s);
 		url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
-		loadDoc(url);
+		loadDoc(s, url);
 	    }
 	    catch(MalformedURLException e)
 	    {
@@ -143,7 +170,6 @@ class Daisy2 implements Book
 	    }
 	Log.debug("doctree-daisy", "" + docs.size() + " documents loaded");
 	this.nccDoc = nccDoc;
-
 	final SectionsVisitor visitor = new SectionsVisitor();
 	Visitor.walk(nccDoc.getRoot(), visitor);
 	final Book.Section[] sections = visitor.getBookSections();
@@ -165,6 +191,17 @@ class Daisy2 implements Book
 	    }
 	}
 	this.bookSections = sections;
+	try {
+	    this.bookPath = Paths.get(nccDoc.getUrl().toURI()).getParent().resolve("luwrain.book");
+	}
+	catch(URISyntaxException e)
+	{
+	    e.printStackTrace();
+	    bookPath = null;
+	}
+	if (bookPath != null)
+	    Log.debug("doctree-daisy", "book path set to " + bookPath.toString()); else
+	    Log.debug("doctree-daisy", "book path isn\'t set");
     }
 
     @Override public Book.Section[] getBookSections()
@@ -176,13 +213,19 @@ class Daisy2 implements Book
     {
 	if (smils.containsKey(url))
 	    return;
-	Log.debug("doctree-daisy", "reading SMIL " + url.toString());
-	final Smil.Entry smil = Smil.fromUrl(url, url);
+	final Smil.Entry smil = Smil.fromUrl(url);
 	smils.put(url, smil);
 	smil.saveTextSrc(textSrcs);
+	try {
+	    smil.allSrcToUrls(url); 
+	}
+	catch(MalformedURLException e)
+	{
+	    e.printStackTrace();
+	}
     }
 
-    private void loadDoc(URL url)
+    private void loadDoc(String localPath, URL url)
     {
 	if (docs.containsKey(url))
 	    return;
@@ -206,6 +249,7 @@ class Daisy2 implements Book
 	    Log.debug("doctree-daisy", "the URL " + url + "references a book, not including to current one");
 	    return;
 	}
+	res.doc().getProperties().setProperty("daisy.localpath", localPath);
 	docs.put(url, res.doc());
     }
 

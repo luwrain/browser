@@ -25,6 +25,7 @@ import org.luwrain.core.Log;
 
 public class Document 
 {
+    private Properties props = new Properties();
     private String title;
     private URL url;
     private String format;
@@ -168,7 +169,7 @@ public class Document
     public Map<String, String> getInfoAttr() {return infoAttr;}
     public String getFormat() {return format;}
     public String getCharset() {return charset;}
-
+    public Properties getProperties() {return props;}
 
 
 }

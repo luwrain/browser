@@ -65,7 +65,7 @@ public class Factory
 	NullCheck.notNull(charset, "charset");
 	Log.debug("doctree", "need to prepare a document by path " + path.toString());
 	final Result res = new Result(Result.Type.OK, path.toString());
-	res.format = format.toString();
+	res.setProperty("format", format.toString());
 	try {
 	    switch (format)
 	    {
@@ -110,9 +110,11 @@ public class Factory
 	    case FB2:
 		//		return new FictionBook2(fileName).constructDocument();
 		return null;
+		/*
 	    case SMIL:
 		org.luwrain.util.Smil.fromPath(path, path.toUri().toURL());
 		return new Result(Result.Type.UNEXPECTED_ERROR);
+		*/
 	    default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT, path.toString());
 	    }
@@ -141,23 +143,19 @@ public class Factory
 	{
 	    e.printStackTrace();
 	    final Result res = new Result(Result.Type.INVALID_URL);
-	    res.origAddr = unpreparedUrl.toString();
-	    res.resultAddr = res.origAddr;
+	    res.setProperty("url", unpreparedUrl.toString());
 	    return res;
 	}
 	try {
 	    final Result res = fromUrlImpl(url, contentType, charset);
-	    res.origAddr = unpreparedUrl.toString();
-	    if (res.resultAddr == null || res.resultAddr.isEmpty())
-		res.resultAddr = res.origAddr;
+	    res.setProperty("origurl", unpreparedUrl.toString());
 	    return res;
 	}
 	catch(Exception e)
 	{
 	    e.printStackTrace();
 	    final Result res = new Result(Result.Type.UNEXPECTED_ERROR);
-	    res.origAddr = unpreparedUrl.toString();
-	    res.resultAddr = res.origAddr;
+	    res.setProperty("url", unpreparedUrl.toString());
 	    return res;
 	}
     }
@@ -274,9 +272,9 @@ public class Factory
 	    if (effectiveCharset == null || effectiveCharset.trim().isEmpty())
 		effectiveCharset = DEFAULT_CHARSET;
 	    final Result res = new Result(Result.Type.OK);
-	    res.format = filter.toString();
-	    res.charset = effectiveCharset;
-	    res.resultAddr = baseUrl.toString();
+	    res.setProperty("format", filter.toString());
+	    res.setProperty("charset", effectiveCharset);
+	    res.setProperty("url", baseUrl.toString());
 	    switch(filter)
 	    {
 	    case HTML:
@@ -288,13 +286,13 @@ public class Factory
 		Log.debug("proba", "2");
 		return res;
 	    case ZIP:
-		res.charset = charset;
+		res.setProperty("charset", charset);
 		tmpFile = downloadToTmpFile(stream);
 		Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
 		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
 		return res;
 	    case FB2_ZIP:
-		res.charset = charset;
+		res.setProperty("charset", charset);
 		tmpFile = downloadToTmpFile(stream);
 		Log.debug("doctree", "dealing with ZIP, so, downloading to tmp file " + tmpFile.toString());
 		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();

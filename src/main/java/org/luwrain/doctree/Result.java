@@ -17,13 +17,15 @@
 
 package org.luwrain.doctree;
 
+import java.util.*;
 import java.net.*;
+
 import org.luwrain.core.NullCheck;
 
 public class Result
 {
     public enum Type {
-	OK,
+	OK, EXCEPTION,
 	HTTP_ERROR, //code variable gets corresponding value 
 	INVALID_HTTP_REDIRECT,
 	UNEXPECTED_ERROR,
@@ -34,21 +36,20 @@ public class Result
     Type type = Type.OK;
     Book book = null;
     Document doc = null;
-    String format = "";
-    String charset = "";
-    String origAddr = "";
-    String resultAddr = "";
-    int code = 0;
+    int startingRowIndex;
+    final Properties props = new Properties();
 
     Result(Type type)
     {
+	NullCheck.notNull(type, "type");
 	this.type = type;
     }
 
-    Result(Type type, int code)
+    Result(Type type, int httpCode)
     {
+	NullCheck.notNull(type, "type");
 	this.type = type;
-	this.code = code;
+	props.setProperty("httpcode", "" + httpCode);
     }
 
     Result(Type type, String path)
@@ -56,16 +57,45 @@ public class Result
 	NullCheck.notNull(type, "type");
 	NullCheck.notNull(path, "path");
 	this.type = type;
-	this.origAddr = path;
-	this.resultAddr = path;
+	props.setProperty("path", path);
+    }
+
+    public Result(Book book, Document doc)
+    {
+	NullCheck.notNull(book, "book");
+	NullCheck.notNull(doc, "doc");
+	this.type = Type.OK;
+	this.book = book;
+	this.doc = doc;
+    }
+
+    public void clearDoc()
+    {
+	book = null;
+	doc = null;
+    }
+
+    public void setStartingRowIndex(int value)
+    {
+	startingRowIndex = value;
+    }
+
+    public String getProperty(String propName)
+    {
+	NullCheck.notNull(propName, "propName");
+	final String res = props.getProperty(propName);
+	return res != null?res:"";
+    }
+
+    public void setProperty(String propName, String value)
+    {
+	NullCheck.notNull(propName, "propName");
+	NullCheck.notNull(value, "value");
+	props.setProperty(propName, value);
     }
 
     public Type type() { return type; }
     public Document doc() { return doc; }
     public Book book() {return book;}
-    public int code() { return code; }
-    public String format() { return format; }
-    public String charset() { return charset; }
-    public String origAddr() { return origAddr;}
-    public String resultAddr() { return resultAddr; }
+
 }
