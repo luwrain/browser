@@ -28,7 +28,7 @@ import org.luwrain.util.*;
 public class DocTreeArea implements Area
 {
     private ControlEnvironment environment;
-    private final Region region = new Region(new LinesRegionProvider(this));
+    private final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
     private RowIntroduction introduction;
     private String areaName = null;//FIXME:No corresponding constructor;
     private Document document;
