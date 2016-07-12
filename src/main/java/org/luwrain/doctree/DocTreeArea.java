@@ -638,7 +638,7 @@ b.append(text.substring(0, pos + 1));
 
     protected String noContentStr()
     {
-	return environment.staticStr(LangStatic.DOCUMENT_NO_CONTENT);
+	return environment.getStaticStr("DocumentNoContent");
     }
 
     private boolean noContentCheck()
