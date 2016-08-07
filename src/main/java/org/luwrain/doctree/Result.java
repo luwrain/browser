@@ -25,8 +25,12 @@ import org.luwrain.core.NullCheck;
 public class Result
 {
     public enum Type {
+	UNKNOWN_HOST,  //See "host" property
+	HTTP_ERROR, //See "httpcode" property
+	FETCHING_ERROR, //See "descr" property
+	UNDETERMINED_CONTENT_TYPE,
 	OK, EXCEPTION,
-	HTTP_ERROR, //code variable gets corresponding value 
+	//	HTTP_ERROR, //code variable gets corresponding value 
 	INVALID_HTTP_REDIRECT,
 	UNEXPECTED_ERROR,
 	INVALID_URL,

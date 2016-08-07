@@ -14,7 +14,7 @@ import org.luwrain.core.*;
 import org.luwrain.doctree.filters.*;
 import org.luwrain.doctree.books.BookFactory;
 
-public class Loader
+public class UrlLoader
 {
     public enum Format {
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
@@ -36,57 +36,105 @@ public class Loader
     private String selectedContentType;
     private String selectedCharset;
 
-    public Loader(URL url) throws MalformedURLException
+    public UrlLoader(URL url) throws MalformedURLException
     {
 	NullCheck.notNull(url, "url");
-requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
-url.getPort(), url.getFile());
-requestedContentType = "";
+	requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
+			       url.getPort(), url.getFile());
+	requestedContentType = "";
     }
 
-    public Loader(URL url, String contentType) throws MalformedURLException
+    public UrlLoader(URL url, String contentType) throws MalformedURLException
     {
 	NullCheck.notNull(url, "url");
 	NullCheck.notNull(contentType, "contentType");
-requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
-url.getPort(), url.getFile());
-requestedContentType = contentType;
+	requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
+			       url.getPort(), url.getFile());
+	requestedContentType = contentType;
     }
 
     public Result load() throws IOException
     {
-	fetch();
-	selectedContentType = requestedContentType.isEmpty()?responseContentType:requestedContentType;
-	if (selectedContentType.isEmpty())
-	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
-	final Format format = chooseFilterByContentType(selectedContentType);
-	if (format == null)
-	    return new Result(Result.Type.UNRECOGNIZED_FORMAT);
-	selectCharset(format);
-final Result res = parse(format);
-//	    res.setProperty("format", filter.toString());
-//	    res.setProperty("charset", effectiveCharset);
-//	    res.setProperty("url", baseUrl.toString());
+	try {
+	    try {
+		if (!fetch())
+		{
+		final Result res = new Result(Result.Type.HTTP_ERROR);
+		res.setProperty("url", requestedUrl.toString());
+		res.setProperty("httpcode", "" + httpCode);
+		return res;
+		}
+	    }
+	    catch (UnknownHostException  e)
+	    {
+		final Result res = new Result(Result.Type.UNKNOWN_HOST);
+		res.setProperty("url", requestedUrl.toString());
+		res.setProperty("host", e.getMessage());
+		return res;
+	    }
+	    catch (IOException e)
+	    {
+		e.printStackTrace();
+		final Result res = new Result(Result.Type.FETCHING_ERROR);
+		res.setProperty("url", requestedUrl.toString());
+		res.setProperty("descr", e.getClass().getName() + ":" + e.getMessage());
+		return res;
+	    }
+	    selectedContentType = requestedContentType.isEmpty()?responseContentType:requestedContentType;
+	    if (selectedContentType.isEmpty())
+		return new Result(Result.Type.UNDETERMINED_CONTENT_TYPE);
+	    if (!requestedContentType.isEmpty())
+	    {
+		Log.debug("doctree", "requested content type is " + requestedContentType);
+		Log.debug("doctree", "response content type is " + responseContentType);
+		Log.debug("doctree", "selected content type is " + selectedContentType);
+	    } else
+		Log.debug("doctree", "response content type is " + responseContentType);
+	    final Format format = chooseFilterByContentType(extractBaseContentType(selectedContentType));
+	    if (format == null)
+	    {
+		Log.error("doctree", "unable to choose suitable filter depending on selected content type:" + requestedUrl.toString());
+final Result res = new Result(Result.Type.UNRECOGNIZED_FORMAT);
+res.setProperty("contenttype", selectedContentType);
+res.setProperty("url", responseUrl.toString());
 return res;
+	    }
+	    selectCharset(format);
+	    Log.debug("doctree", "selected charset is " + selectedCharset);
+	    final Result res = parse(format);
+res.setProperty("url", responseUrl.toString());
+res.setProperty("format", format.toString());
+res.setProperty("contenttype", selectedContentType);
+res.setProperty("charset", selectedCharset);
+	    return res;
+	}
+	finally {
+	    if (tmpFile != null)
+	    {
+		Log.debug("doctree", "deleting temporary file " + tmpFile.toString());
+		Files.delete(tmpFile);
+		tmpFile = null;
+	    }
+	}
     }
 
+    // Returns false only on HTTP errors, see httpCode for details.
+    // ALl other errors are reported through IOException
     private boolean fetch() throws IOException
     {
-	//	InputStream is = null;
-	//	InputStream effectiveIs = null;
 	InputStream responseStream = null;
 	try {
-	URLConnection con;
+	    URLConnection con;
 	    Log.debug("doctree", "opening connection for " + requestedUrl.toString());
 	    con = requestedUrl.openConnection();
 	    while(true)
 	    {
-	    con.setRequestProperty("User-Agent", USER_AGENT);
-	    con.connect();
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.connect();
 		if (!(con instanceof HttpURLConnection))
 		    break;//Considering everything is OK, but lines below are pointless
 		final HttpURLConnection httpCon = (HttpURLConnection)con;
-httpCode = httpCon.getResponseCode();
+		httpCode = httpCon.getResponseCode();
 		Log.debug("doctree", "response code is " + httpCode);
 		if (httpCode >= 400 || httpCode < 200)
 		    return false;
@@ -102,15 +150,17 @@ httpCode = httpCon.getResponseCode();
 		final URL locationUrl = new URL(location);
 		con = locationUrl.openConnection();
 	    }
-responseStream = con.getInputStream();
-responseUrl = con.getURL();
+	    responseStream = con.getInputStream();
+	    responseUrl = con.getURL();
+	    if (responseUrl == null)
+		responseUrl = requestedUrl;
 	    responseContentType = con.getContentType();
 	    if (responseContentType == null)
 		responseContentType = "";
 	    responseContentEncoding = con.getContentEncoding();
-						 if (responseContentEncoding == null)
-						     responseContentEncoding = "";
-						 //						 InputStream is = null;
+	    if (responseContentEncoding == null)
+		responseContentEncoding = "";
+	    //						 InputStream is = null;
 	    if (responseContentEncoding.toLowerCase().trim().equals("gzip"))
 	    {
 		Log.debug("doctree", "enabling gzip decompressing");
@@ -118,49 +168,53 @@ responseUrl = con.getURL();
 	    } else
 		downloadToTmpFile(responseStream);
 	    return true;
-    }
-    finally {
-	if (responseStream != null)
-						 responseStream.close();
-    }
+	}
+	finally {
+	    if (responseStream != null)
+		responseStream.close();
+	}
     }
 
-private void downloadToTmpFile(InputStream s) throws IOException
+    private void downloadToTmpFile(InputStream s) throws IOException
     {
 	NullCheck.notNull(s, "s");
-tmpFile = Files.createTempFile("lwrdoctree-download", "");
+	tmpFile = Files.createTempFile("lwrdoctree-download", "");
 	Log.debug("doctree", "creating temporary file " + tmpFile.toString());
 	Files.copy(s, tmpFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-private void selectCharset(Format format) throws IOException
-{
-    NullCheck.notNull(format, "format");
-    NullCheck.notEmpty(selectedContentType, "selectedContentType");
-    selectedCharset = extractCharset(selectedContentType);
-    if (selectedCharset.isEmpty())
-	return;
-		switch(format)
-		{
-		case FB2:
-selectedCharset = XmlEncoding.getEncoding(tmpFile);
-		    break;
-		case HTML:
-		    selectedCharset = extractCharset(tmpFile);
-		    break;
-		}
-		if (selectedCharset == null || selectedCharset.isEmpty())
-		    selectedCharset = DEFAULT_CHARSET;
-}
+    private void selectCharset(Format format) throws IOException
+    {
+	NullCheck.notNull(format, "format");
+	NullCheck.notEmpty(selectedContentType, "selectedContentType");
+	selectedCharset = extractCharset(selectedContentType);
+	if (selectedCharset.isEmpty())
+	    return;
+	switch(format)
+	{
+	case FB2:
+	    selectedCharset = XmlEncoding.getEncoding(tmpFile);
+	    break;
+	case HTML:
+	    selectedCharset = extractCharset(tmpFile);
+	    break;
+	}
+	if (selectedCharset == null || selectedCharset.isEmpty())
+	    selectedCharset = DEFAULT_CHARSET;
+    }
 
-private Result parse(Format format)
-{
-    NullCheck.notNull(format, "format");
+    private Result parse(Format format) throws IOException
+    {
+	NullCheck.notNull(format, "format");
+	Log.debug("doctree", "parsing the document as " + format.toString());
+	InputStream stream = null;
+	try {
+	    stream = Files.newInputStream(tmpFile);
 	    final Result res = new Result(Result.Type.OK);
 	    switch(format)
 	    {
 	    case HTML:
-		//		res.doc = new Html(effectiveStream, effectiveCharset, baseUrl).constructDocument();
+		res.doc = new Html(stream, selectedCharset, responseUrl).constructDocument();
 		return res;
 	    case FB2:
 		//		res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
@@ -174,6 +228,11 @@ private Result parse(Format format)
 	    default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	    }
+	}
+	finally {
+	    if (stream != null)
+		stream.close();
+	}
     }
 
     static private Format chooseFilterByContentType(String contentType)
@@ -252,5 +311,4 @@ private Result parse(Format format)
 	    }                                                                    
 	return "";
     }
-    }
-    
+}
