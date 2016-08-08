@@ -94,7 +94,7 @@ public class UrlLoader
 	    if (format == null)
 	    {
 		Log.error("doctree", "unable to choose suitable filter depending on selected content type:" + requestedUrl.toString());
-final Result res = new Result(Result.Type.UNRECOGNIZED_FORMAT);
+		final Result res = new Result(Result.Type.UNRECOGNIZED_FORMAT);
 res.setProperty("contenttype", selectedContentType);
 res.setProperty("url", responseUrl.toString());
 return res;
@@ -106,6 +106,10 @@ res.setProperty("url", responseUrl.toString());
 res.setProperty("format", format.toString());
 res.setProperty("contenttype", selectedContentType);
 res.setProperty("charset", selectedCharset);
+res.doc.setProperty("url", responseUrl.toString());
+res.doc.setProperty("format", format.toString());
+res.doc.setProperty("contenttype", selectedContentType);
+res.doc.setProperty("charset", selectedCharset);
 	    return res;
 	}
 	finally {
@@ -310,5 +314,52 @@ res.setProperty("charset", selectedCharset);
 		    return res;
 	    }                                                                    
 	return "";
+    }
+
+    static public class Result
+    {
+	public enum Type {
+	    OK,
+	    UNKNOWN_HOST,  //See "host" property
+	    HTTP_ERROR, //See "httpcode" property
+	    FETCHING_ERROR, //See "descr" property
+	    UNDETERMINED_CONTENT_TYPE,
+	    UNRECOGNIZED_FORMAT, //See "contenttype" property
+	};
+
+	private Type type = Type.OK;
+	public Book book = null;
+	public Document doc = null;
+	//	int startingRowIndex;
+	private final Properties props = new Properties();
+
+	public Result()
+	{
+	    type = Type.OK;
+	}
+
+	Result(Type type)
+	{
+	    NullCheck.notNull(type, "type");
+	    this.type = type;
+	}
+
+	public String getProperty(String propName)
+	{
+	    NullCheck.notNull(propName, "propName");
+	    final String res = props.getProperty(propName);
+	    return res != null?res:"";
+	}
+
+	void setProperty(String propName, String value)
+	{
+	    NullCheck.notEmpty(propName, "propName");
+	    NullCheck.notNull(value, "value");
+	    props.setProperty(propName, value);
+	}
+
+	public Type type() { return type; }
+	public Document doc() { return doc; }
+	public Book book() {return book;}
     }
 }

@@ -39,7 +39,7 @@ class Daisy2 extends Base
     @Override public Note createNote(Document doc, int rowIndex)
     {
 	NullCheck.notNull(doc, "doc");
-	final String localPath = doc.getProperties().getProperty("daisy.localpath");
+	final String localPath = doc.getProperty("daisy.localpath");
 	if (localPath != null && !localPath.isEmpty())
 	return new Note(localPath, rowIndex);
 	return null;
@@ -50,13 +50,13 @@ class Daisy2 extends Base
 	System.out.println("start");
 	NullCheck.notNull(note, "note");
 	final String id = note.docId();
-	final String nccLocalPath = nccDoc.getProperties().getProperty("daisy.localpath");
+	final String nccLocalPath = nccDoc.getProperty("daisy.localpath");
 	if (nccLocalPath != null && id.equals(nccLocalPath))
-	    return nccDoc.getUrl().toString();
+	    return nccDoc.getProperty("url").toString();
 	for(Map.Entry<URL, Document> e: docs.entrySet())
 	{
 	    final String url = e.getKey().toString();
-	    final String localPath = e.getValue().getProperties().getProperty("daisy.localpath");
+	    final String localPath = e.getValue().getProperty("daisy.localpath");
 	    if (localPath != null && id.equals(localPath))
 		return url;
 	}
@@ -142,7 +142,7 @@ class Daisy2 extends Base
     void init(Document nccDoc)
     {
 	NullCheck.notNull(nccDoc, "nccDoc");
-	nccDoc.getProperties().setProperty("daisy.localpath", nccDoc.getUrl().getFile());//FIXME:Leave only base file name
+	nccDoc.setProperty("daisy.localpath", nccDoc.getUrl().getFile());//FIXME:Leave only base file name
 	final String[] allHrefs = nccDoc.getHrefs();
 	final LinkedList<String> textSrcs = new LinkedList<String>();
 	for(String h: allHrefs)
@@ -249,7 +249,7 @@ class Daisy2 extends Base
 	    Log.debug("doctree-daisy", "the URL " + url + "references a book, not including to current one");
 	    return;
 	}
-	res.doc().getProperties().setProperty("daisy.localpath", localPath);
+	res.doc().setProperty("daisy.localpath", localPath);
 	docs.put(url, res.doc());
     }
 

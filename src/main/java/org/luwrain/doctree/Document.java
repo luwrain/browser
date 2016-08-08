@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 import org.luwrain.core.NullCheck;
@@ -25,13 +25,13 @@ import org.luwrain.core.Log;
 
 public class Document 
 {
-    private Properties props = new Properties();
+    private final Properties props = new Properties();
     private String title;
-    private URL url;
-    private String format;
-    private String charset;
+    //    private URL url;
+    //    private String format;
+    //    private String charset;
     private String[] hrefs;
-    private Map<String, String> infoAttr = new HashMap<String, String>();
+    //    private Map<String, String> infoAttr = new HashMap<String, String>();
 
 
     private NodeImpl root;
@@ -129,11 +129,27 @@ public class Document
     		makeIndex(n);
     }
 
+    public void setProperty(String propName, String value)
+    {
+	NullCheck.notEmpty(propName, "propName");
+	NullCheck.notNull(value, "value");
+	props.setProperty(propName, value);
+    }
+
+    public String getProperty(String propName)
+    {
+	NullCheck.notEmpty(propName, "propName");
+	final String res = props.getProperty(propName);
+	return res != null?res:"";
+    }
+
+    /*
     public void setUrl(URL url)
     {
 	NullCheck.notNull(url, "url");
 	this.url = url;
     }
+    */
 
     public void setHrefs(String[] hrefs)
     {
@@ -141,6 +157,7 @@ public class Document
 	this.hrefs = hrefs;
     }
 
+    /*
     public void setInfoAttr(Map<String, String> infoAttr)
     {
 	NullCheck.notNull(infoAttr, "infoAttr");
@@ -158,18 +175,35 @@ public class Document
 	NullCheck.notNull(charset, "charset");
 	this.charset = charset;
     }
+    */
+
+    public URL getUrl()
+    {
+	final String value = getProperty("url");
+	if (value.isEmpty())
+	    return null;
+	try {
+	    return new URL(value);
+	}
+	catch(MalformedURLException e)
+	{
+	    return null;
+	}
+    }
 
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
     public ParagraphImpl[] getParagraphs() { return paragraphs; }
     public RowImpl[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
-    public URL getUrl() {return url;}
+    //    public URL getUrl() {return url;}
     public String[] getHrefs(){return hrefs;}
+    /*
     public Map<String, String> getInfoAttr() {return infoAttr;}
     public String getFormat() {return format;}
     public String getCharset() {return charset;}
     public Properties getProperties() {return props;}
+    */
 
 
 }

@@ -69,9 +69,9 @@ public class Html
 	collectMeta(jsoupDoc.head(), meta);
 	res.subnodes = onNode(jsoupDoc.body());
 	final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
-	doc.setUrl(docUrl);
+	doc.setProperty("url", docUrl.toString());
 	doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
-	doc.setInfoAttr(meta);
+	//	doc.setInfoAttr(meta);
 	return doc;
     }
 

@@ -50,8 +50,8 @@ public class Doc
 	    final InputStream s = Files.newInputStream(path);
 	    final HWPFDocument doc = new HWPFDocument(s);
 	    final Document res = transform(doc);
-	    res.setFormat("DOC");
-	    res.setUrl(path.toUri().toURL());
+	    res.setProperty("format", "DOC");
+	    res.setProperty("url", path.toUri().toURL().toString());
 	    s.close();
 	    return res;
 	} catch (IOException e)

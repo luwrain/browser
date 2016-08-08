@@ -46,8 +46,8 @@ private  org.luwrain.doctree.Document process()
 	    final InputStream s = Files.newInputStream(path);
 	    XWPFDocument doc = new XWPFDocument(s);
 	    final org.luwrain .doctree.Document res = transform(doc);
-	    res.setFormat("DOCX");
-	    res.setUrl(path.toUri().toURL());
+	    res.setProperty("format", "DOCX");
+	    res.setProperty("url", path.toUri().toURL().toString());
 	    s.close();
 	    return res;
     	} catch (IOException e)
