@@ -90,7 +90,9 @@ public class UrlLoader
 		Log.debug("doctree", "selected content type is " + selectedContentType);
 	    } else
 		Log.debug("doctree", "response content type is " + responseContentType);
-	    final Format format = chooseFilterByContentType(extractBaseContentType(selectedContentType));
+	    Format format = chooseFilterByContentType(extractBaseContentType(selectedContentType));
+	    if (format == null)
+		format = chooseFilterByFileName(responseUrl);
 	    if (format == null)
 	    {
 		Log.error("doctree", "unable to choose suitable filter depending on selected content type:" + requestedUrl.toString());
@@ -102,6 +104,13 @@ return res;
 	    selectCharset(format);
 	    Log.debug("doctree", "selected charset is " + selectedCharset);
 	    final Result res = parse(format);
+	    if (res.doc == null)
+	    {
+		final Result r = new Result(Result.Type.UNRECOGNIZED_FORMAT);
+r.setProperty("contenttype", selectedContentType);
+r.setProperty("url", responseUrl.toString());
+return r;
+	    }
 res.setProperty("url", responseUrl.toString());
 res.setProperty("format", format.toString());
 res.setProperty("contenttype", selectedContentType);
@@ -192,11 +201,11 @@ res.doc.setProperty("charset", selectedCharset);
 	NullCheck.notNull(format, "format");
 	NullCheck.notEmpty(selectedContentType, "selectedContentType");
 	selectedCharset = extractCharset(selectedContentType);
-	if (selectedCharset.isEmpty())
+	if (!selectedCharset.isEmpty())
 	    return;
 	switch(format)
 	{
-	case FB2:
+	case XML:
 	    selectedCharset = XmlEncoding.getEncoding(tmpFile);
 	    break;
 	case HTML:
@@ -220,8 +229,11 @@ res.doc.setProperty("charset", selectedCharset);
 	    case HTML:
 		res.doc = new Html(stream, selectedCharset, responseUrl).constructDocument();
 		return res;
-	    case FB2:
-		//		res.doc = new FictionBook2(effectiveStream, effectiveCharset).createDoc();
+	    case XML:
+		res.doc = readXml();
+		return res;
+	    case DOCX:
+		res.doc = DocX.read(tmpFile);
 		return res;
 	    case ZIP:
 		//		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
@@ -239,6 +251,23 @@ res.doc.setProperty("charset", selectedCharset);
 	}
     }
 
+    private Document readXml() throws IOException
+    {
+	final String doctype = getDoctypeName(Files.newInputStream(tmpFile));
+	if (doctype == null || doctype.trim().isEmpty())
+	{
+	    Log.debug("doctree", "unable to determine doctype");
+	    return null;
+	}
+	Log.debug("doctree", "determined doctype is \'" + doctype + "\'");
+	switch(doctype.trim().toLowerCase())
+	{
+	case "fictionbook":
+	    return new FictionBook2(Files.newInputStream(tmpFile), selectedCharset).createDoc();
+	}
+	return null;
+    }
+
     static private Format chooseFilterByContentType(String contentType)
     {
 	NullCheck.notEmpty(contentType, "contentType");
@@ -254,6 +283,30 @@ res.doc.setProperty("charset", selectedCharset);
 	    return Format.FB2_ZIP;
 	case "application/zip":
 	    return Format.ZIP;
+	default:
+	    return null;
+	}
+    }
+
+    static private Format chooseFilterByFileName(URL url)
+    {
+	NullCheck.notNull(url, "url");
+	final String fileName = url.getFile();
+	if (fileName.isEmpty())
+	    return null;
+	Log.debug("doctree", "trying to choose the filter using file name \'" + fileName + "\'");
+	final String ext = org.luwrain.core.FileTypes.getExtension(fileName).trim().toLowerCase();
+	if (ext.isEmpty())
+	    return null;
+	Log.debug("doctree", "extracted extension is \'" + ext + "\'");
+	switch(ext)
+	{
+	case "docx":
+	    return Format.DOCX;
+	case "doc":
+	    return Format.DOC;
+	case "fb2":
+	    return Format.FB2;
 	default:
 	    return null;
 	}
@@ -301,7 +354,7 @@ res.doc.setProperty("charset", selectedCharset);
 	}
     }
 
-    static private String getDocTypeName(InputStream s) throws IOException
+    static private String getDoctypeName(InputStream s) throws IOException
     {
 	final org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(s, "us-ascii", "", org.jsoup.parser.Parser.xmlParser());
 	List<org.jsoup.nodes.Node>nods = doc.childNodes();
@@ -312,7 +365,15 @@ res.doc.setProperty("charset", selectedCharset);
 		final String res = documentType.attr("name");
 		if (res != null)
 		    return res;
-	    }                                                                    
+	    }
+	for (org.jsoup.nodes.Node node : nods)
+	    if (node instanceof org.jsoup.nodes.Element)
+	    {
+		org.jsoup.nodes.Element el = (org.jsoup.nodes.Element)node;                  
+		final String res = el.tagName();
+		if (res != null)
+		    return res;
+	    }
 	return "";
     }
 

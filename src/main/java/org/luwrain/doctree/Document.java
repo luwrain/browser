@@ -27,11 +27,7 @@ public class Document
 {
     private final Properties props = new Properties();
     private String title;
-    //    private URL url;
-    //    private String format;
-    //    private String charset;
     private String[] hrefs;
-    //    private Map<String, String> infoAttr = new HashMap<String, String>();
 
 
     private NodeImpl root;
@@ -143,39 +139,11 @@ public class Document
 	return res != null?res:"";
     }
 
-    /*
-    public void setUrl(URL url)
-    {
-	NullCheck.notNull(url, "url");
-	this.url = url;
-    }
-    */
-
     public void setHrefs(String[] hrefs)
     {
 	NullCheck.notNullItems(hrefs, "hrefs");
 	this.hrefs = hrefs;
     }
-
-    /*
-    public void setInfoAttr(Map<String, String> infoAttr)
-    {
-	NullCheck.notNull(infoAttr, "infoAttr");
-	this.infoAttr = infoAttr;
-    }
-
-    public void setFormat(String format)
-    {
-	NullCheck.notNull(format, "format");
-	this.format = format;
-    }
-
-    public void setCharset(String charset)
-    {
-	NullCheck.notNull(charset, "charset");
-	this.charset = charset;
-    }
-    */
 
     public URL getUrl()
     {
@@ -196,14 +164,5 @@ public class Document
     public ParagraphImpl[] getParagraphs() { return paragraphs; }
     public RowImpl[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
-    //    public URL getUrl() {return url;}
     public String[] getHrefs(){return hrefs;}
-    /*
-    public Map<String, String> getInfoAttr() {return infoAttr;}
-    public String getFormat() {return format;}
-    public String getCharset() {return charset;}
-    public Properties getProperties() {return props;}
-    */
-
-
 }
