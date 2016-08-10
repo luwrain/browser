@@ -16,15 +16,25 @@ import org.luwrain.doctree.books.BookFactory;
 
 public class UrlLoader
 {
-    public enum Format {
+    static public final String CONTENT_TYPE_DATA = "application/octet-stream";
+    static public final String CONTENT_TYPE_PDF = "application/pdf";
+    static public final String CONTENT_TYPE_POSTSCRIPT = "application/postscript";
+    static public final String CONTENT_TYPE_XHTML = "application/xhtml";
+    static public final String CONTENT_TYPE_ZIP = "application/zip";
+    static public final String CONTENT_TYPE_DOC = "application/msword";
+    static public final String CONTENT_TYPE_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    static public final String CONTENT_TYPE_HTML = "text/html";
+    static public final String CONTENT_TYPE_TXT = "text/plain";
+
+    static public final String USER_AGENT = "Mozilla/5.0";
+    static private final String DEFAULT_CHARSET = "UTF-8";
+
+    private enum Format {
 	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
 	HTML, XML, DOC, DOCX,
 	FB2, EPUB, SMIL,
 	ZIP, FB2_ZIP,
     };
-
-    static public final String USER_AGENT = "Mozilla/5.0";
-    static private final String DEFAULT_CHARSET = "UTF-8";
 
     private URL requestedUrl;
     private String requestedContentType;

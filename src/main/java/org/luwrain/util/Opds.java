@@ -298,7 +298,7 @@ public class Opds
 	org.jsoup.nodes.Document doc = null;
 	try {
 	    final Connection con=Jsoup.connect(url.toString());
-	    con.userAgent(org.luwrain.doctree.Factory.USER_AGENT);
+	    con.userAgent(org.luwrain.doctree.UrlLoader.USER_AGENT);
 	    con.timeout(30000);
 	    doc = con.get();
 	}

@@ -61,8 +61,8 @@ public class Zip
 		Log.debug("doctree-zip", "reading zip entry with name \'" + entry.getName() + "\'");
 		if(entry.isDirectory()) 
 		    continue;
-		final Result res = Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.chooseFilterByExtension(entry.getName()));
-		if (res.type() == Result.Type.OK)
+		final UrlLoader.Result res = null;//Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.chooseFilterByExtension(entry.getName()));
+		if (res.type() == UrlLoader.Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
 		    for(NodeImpl node: subdoc.getRoot().subnodes)

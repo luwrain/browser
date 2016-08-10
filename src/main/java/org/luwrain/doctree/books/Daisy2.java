@@ -229,9 +229,10 @@ class Daisy2 extends Base
     {
 	if (docs.containsKey(url))
 	    return;
-	Result res;
+	UrlLoader.Result res;
 	try {
-	    res = Factory.fromUrl(url, "", "");
+	    //FIXME:	    res = Factory.fromUrl(url, "", "");
+	    res = null;
 	}
 	catch(Exception e)
 	{
@@ -239,7 +240,7 @@ class Daisy2 extends Base
 	    e.printStackTrace();
 	    return;
 	}
-	if (res.type() != Result.Type.OK)
+	if (res.type() != UrlLoader.Result.Type.OK)
 	{
 	    Log.warning("doctree-daisy", "unable to load a document by URL " + url + ":" + res.toString());
 	    return;
