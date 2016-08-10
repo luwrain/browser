@@ -25,6 +25,8 @@ public class UrlLoader
     static public final String CONTENT_TYPE_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     static public final String CONTENT_TYPE_HTML = "text/html";
     static public final String CONTENT_TYPE_TXT = "text/plain";
+    static public final String CONTENT_TYPE_XML = "application/xml";
+    static public final String CONTENT_TYPE_FB2 = "application/fb2";
 
     static public final String USER_AGENT = "Mozilla/5.0";
     static private final String DEFAULT_CHARSET = "UTF-8";
@@ -283,11 +285,11 @@ res.doc.setProperty("charset", selectedCharset);
 	NullCheck.notEmpty(contentType, "contentType");
 	switch(contentType.toLowerCase().trim())
 	{
-	case "text/html":
+	case CONTENT_TYPE_HTML:
 	    return Format.HTML;
-	case "application/xml":
+	case CONTENT_TYPE_XML:
 	    return Format.XML;
-	case "application/fb2":
+	case CONTENT_TYPE_FB2:
 	    return Format.FB2;
 	case "application/fb2+zip":
 	    return Format.FB2_ZIP;
