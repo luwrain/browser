@@ -82,10 +82,10 @@ class Layout
 		++lastY;
 		continue;
 	    }
-	    final Run run = r.getFirstPart(rowParts).run;
+	    final Run run = r.getFirstPart().run;
 	    final ParagraphImpl paragraph = run.parentParagraph;
 	    r.x = paragraph.x;
-	    r.y = paragraph.y + r.getFirstPart(rowParts).relRowNum;
+	    r.y = paragraph.y + r.getFirstPart().relRowNum;
 	    lastX = r.x;
 	    lastY = r.y;
 	    if (r.y > maxLineNum)
@@ -108,7 +108,7 @@ class Layout
 	    final RowImpl row = rows[r];
 	    while(b.length() < row.x)
 		b.append(" ");
-	    b.append(row.text(rowParts));
+	    b.append(row.text());
 	}
 	return b.toString();
     }

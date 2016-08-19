@@ -163,7 +163,7 @@ public class RowPartsBuilder
 	final RowImpl[] rows = RowImpl.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
 	for(RowImpl r: rows)
-	    lines.add(r.text(parts));
+	    lines.add(r.text());
 	return lines.toArray(new String[lines.size()]);
     }
 }

@@ -28,22 +28,28 @@ int x = 0;
     /** Absolute vertical position in the area*/
     int y = 0;
 
+    private RowPart[] parts;
     private int partsFrom = -1;
     private int partsTo = -1;
 
+    private RowImpl(RowPart[] parts)
+    {
+	this.parts = parts;
+    }
+
     //returns null if there is no suitable
-    Run getRunUnderPos(RowPart[] parts, int pos)
+    Run getRunUnderPos(int pos)
     {
 	if (isEmpty())
 	    return null;
-	final int index = getPartIndexUnderPos(parts, pos);
+	final int index = getPartIndexUnderPos(pos);
 if (index < 0)
     return null;
 return parts[index].run;
     }
 
     //returns null if there is no suitable
-    Run[] getRuns(RowPart[] parts)
+    Run[] getRuns()
     {
 	if (isEmpty())
 	    return new Run[0];
@@ -62,7 +68,7 @@ return parts[index].run;
     }
 
     //returns -1 if there is no matching pos
-    int getPartIndexUnderPos(RowPart[] parts, int pos)
+    private int getPartIndexUnderPos(int pos)
     {
 	if (isEmpty())
 	    return -1;
@@ -80,7 +86,7 @@ return parts[index].run;
     }
 
     //returns -1 if index is invalid
-    int partBeginsAt(RowPart[] parts, int index)
+    private int partBeginsAt(int index)
     {
 	if (isEmpty() || index < partsFrom || index >= partsTo)
 	    return -1;
@@ -98,7 +104,7 @@ return parts[index].run;
     }
 
     //returns -1 if index is invalid
-    int runBeginsAt(RowPart[] parts, Run run)
+    int runBeginsAt(Run run)
     {
 	NullCheck.notNull(parts, "parts");
 	NullCheck.notNull(run, "run");
@@ -117,8 +123,6 @@ return parts[index].run;
 	return offset;
     }
 
-
-
     @Override public int getRowX()
     {
 	return x;
@@ -129,7 +133,7 @@ return parts[index].run;
 	return y;
     }
 
-    String text(RowPart[] parts)
+    String text()
     {
 	if (isEmpty())
 	    return "";
@@ -139,7 +143,7 @@ return parts[index].run;
 	return b.toString();
     }
 
-    String textWithHrefs(RowPart[] parts, String hrefPrefix)
+    String textWithHrefs(String hrefPrefix)
     {
 	NullCheck.notNull(hrefPrefix, "hrefPrefix");
 	if (isEmpty())
@@ -159,7 +163,7 @@ return parts[index].run;
 	return b.toString();
     }
 
-    String href(RowPart[] parts, int pos)
+    private String href(int pos)
     {
 	if (isEmpty())
 	    return "";
@@ -177,11 +181,11 @@ return parts[index].run;
 	return null;
     }
 
-    String hrefText(RowPart[] parts, int pos)
+    private String hrefText(int pos)
     {
 	if (isEmpty())
 	    return "";
-	int index = getPartIndexUnderPos(parts, pos);
+	int index = getPartIndexUnderPos(pos);
 	if (index < 0 || !parts[index].hasHref())
 	    return "";
 	final StringBuilder b = new StringBuilder();
@@ -193,18 +197,18 @@ return parts[index].run;
 	return new String(b);
     }
 
-    boolean hasHref(RowPart[] parts, int pos)
+    private boolean hasHref(int pos)
     {
-	int index = getPartIndexUnderPos(parts, pos);
+	int index = getPartIndexUnderPos(pos);
 	if (index < 0)
 	    return false;
 	return parts[index].hasHref();
     }
 
     //returns -1 if there is no any
-    int findNextHref(RowPart[] parts, int pos)
+    int findNextHref(int pos)
     {
-	int index = getPartIndexUnderPos(parts, pos);
+	int index = getPartIndexUnderPos(pos);
 	if (index < 0)
 	    return -1;
 	while (index < partsTo && parts[index].hasHref())
@@ -215,23 +219,22 @@ return parts[index].run;
 	    ++index;
 	if (index >= partsTo)
 	    return -1;
-	return partBeginsAt(parts, index);
+	return partBeginsAt(index);
     }
-
 
     boolean isEmpty()
     {
 	return partsFrom < 0 || partsTo < 0;
     }
 
-    RowPart getFirstPart(RowPart[] parts)
+    RowPart getFirstPart()
     {
 	if (isEmpty())
 	    return null;
 	return parts[partsFrom];
     }
 
-    void mustIncludePart(int index)
+    private void mustIncludePart(int index)
     {
 	//We are registering a first part only
 	if (partsFrom < 0)
@@ -242,9 +245,10 @@ return parts[index].run;
 
     static RowImpl[] buildRows(RowPart[] parts)
     {
+	NullCheck.notNullItems(parts, "parts");
 	final RowImpl[] rows = new RowImpl[parts[parts.length - 1].absRowNum + 1];
 	for(int i = 0;i < rows.length;++i)
-	    rows[i] = new RowImpl();
+	    rows[i] = new RowImpl(parts);
 	int current = -1;
 	for(int i = 0;i < parts.length;++i)
 	    rows[parts[i].absRowNum].mustIncludePart(i);

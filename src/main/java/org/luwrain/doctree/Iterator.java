@@ -67,7 +67,7 @@ public class Iterator
 	NullCheck.notNull(run, "run");
 	if (isEmptyRow())
 	    return false;
-	final Run[] runs = getRowImpl().getRuns(rowParts);
+	final Run[] runs = getRowImpl().getRuns();
 	for(Run r: runs)
 	    if (run == r)
 		return true;
@@ -79,7 +79,7 @@ public class Iterator
 	NullCheck.notNull(run, "run");
 	if (isEmptyRow())
 	    return -1;
-	return getRowImpl().runBeginsAt(rowParts, run);
+	return getRowImpl().runBeginsAt(run);
     }
 
     @Override public boolean equals(Object o)
@@ -155,7 +155,7 @@ RowImpl getRowImpl()
     {
 	if (noContent())
 	    return null;
-	return rows[current].getFirstPart(rowParts).run;
+	return rows[current].getFirstPart().run;
     }
 
     //returns -1 if no content 
@@ -194,9 +194,10 @@ RowImpl getRowImpl()
 	if (noContent())
 	    return "";
 	final RowImpl row = rows[current];
-	return !row.isEmpty()?row.text(rowParts):"";
+	return !row.isEmpty()?row.text():"";
     }
 
+    /*
     public String getTextWithHref(String hrefPrefix)
     {
 	if (noContent())
@@ -204,14 +205,16 @@ RowImpl getRowImpl()
 	final RowImpl row = rows[current];
 	return !row.isEmpty()?row.textWithHrefs(rowParts, hrefPrefix):"";
     }
+    */
 
     public Run getRunUnderPos(int pos)
     {
 	if (noContent())
 	    return null;
-	return rows[current].getRunUnderPos(rowParts, pos);
+	return rows[current].getRunUnderPos(pos);
     }
 
+    /*
     public boolean hasHrefUnderPos(int pos)
     {
 	if (noContent())
@@ -219,13 +222,14 @@ RowImpl getRowImpl()
 	final RowImpl row = rows[current];
 	return !row.isEmpty()?row.hasHref(rowParts, pos):false;
     }
+    */
 
     public int findNextHref(int pos)
     {
 	if (noContent())
 	    return -1;
 	final RowImpl row = rows[current];
-	return !row.isEmpty()?row.findNextHref(rowParts, pos):-1;
+	return !row.isEmpty()?row.findNextHref(pos):-1;
     }
 
     public NodeImpl getParaContainer()
