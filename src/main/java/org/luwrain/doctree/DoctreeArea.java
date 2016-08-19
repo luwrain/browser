@@ -25,26 +25,25 @@ import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 import org.luwrain.util.*;
 
-public class DocTreeArea implements Area
+public class DoctreeArea implements Area
 {
-    private ControlEnvironment environment;
-    private final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
-    private RowIntroduction introduction;
+    protected ControlEnvironment environment;
+    protected final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
+    protected RowIntroduction introduction;
     private String areaName = null;//FIXME:No corresponding constructor;
-    private Document document;
-    private org.luwrain.doctree.Iterator iterator;
-    private int hotPointX = 0;
+    protected Document document;
+    protected org.luwrain.doctree.Iterator iterator;
+    protected int hotPointX = 0;
 
-    public DocTreeArea(ControlEnvironment environment, 
+    public DoctreeArea(ControlEnvironment environment, 
 		       RowIntroduction introduction, 
 		       Document document)
     {
-	this.environment = environment;
-	this.introduction = introduction;
-
-	this.document = document;
 	NullCheck.notNull(environment, "environment");
 	NullCheck.notNull(introduction, "introduction");
+	this.environment = environment;
+	this.introduction = introduction;
+	this.document = document;
 	if (document != null)
 	    iterator = document.getIterator(); else
 	    iterator = null;
@@ -70,26 +69,38 @@ public class DocTreeArea implements Area
 	return document;
     }
 
+    public Run getCurrentRun()
+    {
+	NullCheck.notNull(iterator, "iterator");
+	return iterator.getRunUnderPos(hotPointX);
+    }
+
+    /*
     public boolean hasHref()
     {
 	if (isEmpty() || iterator.isEmptyRow())
 	    return false;
 	return iterator.hasHrefUnderPos(hotPointX);
     }
+    */
 
+    /*
     public String getHref()
     {
 	if (isEmpty() || iterator.isEmptyRow())
 	    return null;
 	return iterator.getHrefUnderPos(hotPointX);
     }
+    */
 
+    /*
     public String getHrefText()
     {
 	if (isEmpty() || iterator.isEmptyRow())
 	    return null;
 	return iterator.getHrefTextUnderPos(hotPointX);
     }
+    */
 
     public boolean findRun(Run run)
     {
@@ -103,10 +114,7 @@ public class DocTreeArea implements Area
 	    return false;
 	final int pos = newIt.runBeginsAt(run);
 	if (pos < 0)
-	{
-	    Log.warning("doctree", "the row with required run found, but position is negative");
 	    return false;
-	}
 	iterator = newIt;
 	hotPointX = pos;
 	environment.onAreaNewHotPoint(this);
@@ -196,7 +204,7 @@ public class DocTreeArea implements Area
 
     @Override public Action[] getAreaActions()
     {
-	return null;
+	return new Action[0];
     }
 
     @Override public boolean onAreaQuery(AreaQuery query)
@@ -276,11 +284,15 @@ b.append(text.substring(0, pos + 1));
 
     private boolean onMoveHotPoint(MoveHotPointEvent event)
     {
+	NullCheck.notNull(event, "event");
 	if (document == null)
 	    return false;
-	final Iterator it2 = (Iterator)iterator.clone();
+	final Iterator it2 = document.getIterator();
 	final int x = event.getNewHotPointX();
 	final int y = event.getNewHotPointY();
+	if (x < 0 || y < 0)
+	    return false;
+	Log.debug("doctree", "area requested to move hot point at " + x + "," + y);
 	while (it2.canMoveNext() && !it2.coversPos(x, y))
 	    it2.moveNext();
 	if (!it2.canMoveNext())
@@ -551,6 +563,7 @@ b.append(text.substring(0, pos + 1));
 
     protected boolean onSpace(KeyboardEvent event)
     {
+	/*
 	if (noContentCheck())
 	    return true;
 	int pos = iterator.findNextHref(hotPointX);
@@ -579,6 +592,7 @@ b.append(text.substring(0, pos + 1));
 		return true;
 	    }
 	}
+	*/
 	return false;
     }
 

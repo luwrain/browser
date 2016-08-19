@@ -109,7 +109,6 @@ RowImpl getRowImpl()
 	return rows[current];
     }
 
-
     //returns -1 if no content
     public int getRowAbsIndex()
     {
@@ -207,6 +206,7 @@ RowImpl getRowImpl()
     }
 
     //May return null if there is no href at the specified position
+    /*
     public String getHrefUnderPos(int pos)
     {
 	if (noContent())
@@ -214,7 +214,9 @@ RowImpl getRowImpl()
 	final RowImpl row = rows[current];
 	return !row.isEmpty()?row.href(rowParts, pos):null;
     }
+    */
 
+    /*
     public String getHrefTextUnderPos(int pos)
     {
 	if (noContent())
@@ -222,6 +224,7 @@ RowImpl getRowImpl()
 	final RowImpl row = rows[current];
 	return !row.isEmpty()?row.hrefText(rowParts, pos):null;
     }
+    */
 
     public Run getRunUnderPos(int pos)
     {

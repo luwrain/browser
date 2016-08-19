@@ -53,7 +53,7 @@ ExtraInfo extraInfo)
 
     public String href()
     {
-	return href;
+	return href != null?href:"";
     }
 
     @Override public String toString()

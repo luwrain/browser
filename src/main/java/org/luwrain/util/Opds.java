@@ -57,11 +57,11 @@ public class Opds
 	Link(String url, String rel,
 	     String type, String profile)
 	{
+	    NullCheck.notNull(url, "url");
 	    this.url = url;
 	    this.rel = rel;
 	    this.type = type;
 	    this.profile = profile;
-	    NullCheck.notNull(url, "url");
 	}
 
 	public boolean isCatalog()
@@ -158,17 +158,21 @@ public class Opds
     static public class Entry 
     {
 	private String id;
+	private URL parentUrl;
 	private String title;
 	private Link[] links;
 
-	Entry(String id, String title, Link[] links)
+	Entry(String id, URL parentUrl,
+	      String title, Link[] links)
 	{
-	    this.id = id;
-	    this.title = title;
-	    this.links = links != null?links:new Link[0];
 	    NullCheck.notNull(id, "id");
+	    NullCheck.notNull(parentUrl, "parentUrl");
 	    NullCheck.notNull(title, "title");
 	    NullCheck.notNullItems(links, "links");
+	    this.id = id;
+	    this.parentUrl = parentUrl;;
+	    this.title = title;
+	    this.links = links != null?links:new Link[0];
 	}
 
 	public Link getCatalogLink()
@@ -203,14 +207,13 @@ public class Opds
 	    return false;
 	}
 
-
-
 	@Override public String toString()
 	{
 	    return title;
 	}
 
 	public String id(){return id;}
+	public URL parentUrl() {return parentUrl;}
 	public String title(){return title;}
 	public Link[] links(){return links;}
     }
@@ -314,7 +317,7 @@ public class Opds
 	}
 	for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
 	    try {
-		final Entry entry = parseEntry(node);
+		final Entry entry = parseEntry(url, node);
 		if (entry != null)
 		    res.add(entry);
 	    }
@@ -325,7 +328,7 @@ public class Opds
 	return new Result(new Directory(res.toArray(new Entry[res.size()])));
     }
 
-    static private Entry parseEntry(Element el) throws Exception
+    static private Entry parseEntry(URL parentUrl, Element el) throws Exception
     {
 	NullCheck.notNull(el, "el");
 	String id = "";
@@ -341,7 +344,7 @@ public class Opds
 			       node.attributes().get("type"),
 			       node.attributes().get("profile")));
 	if (id != null && title != null && !links.isEmpty())
-	    return new Entry(id, title, links.toArray(new Link[links.size()]));
+	    return new Entry(id, parentUrl, title, links.toArray(new Link[links.size()]));
 	return null;
     }
 }
