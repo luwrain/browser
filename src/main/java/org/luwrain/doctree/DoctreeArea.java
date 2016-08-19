@@ -29,20 +29,15 @@ public class DoctreeArea implements Area
 {
     protected ControlEnvironment environment;
     protected final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
-    protected RowIntroduction introduction;
     private String areaName = null;//FIXME:No corresponding constructor;
     protected Document document;
     protected org.luwrain.doctree.Iterator iterator;
     protected int hotPointX = 0;
 
-    public DoctreeArea(ControlEnvironment environment, 
-		       RowIntroduction introduction, 
-		       Document document)
+    public DoctreeArea(ControlEnvironment environment, Document document)
     {
 	NullCheck.notNull(environment, "environment");
-	NullCheck.notNull(introduction, "introduction");
 	this.environment = environment;
-	this.introduction = introduction;
 	this.document = document;
 	if (document != null)
 	    iterator = document.getIterator(); else
@@ -303,7 +298,7 @@ b.append(text.substring(0, pos + 1));
 	return true;
     }
 
-    private boolean onTab(KeyboardEvent event, boolean briefIntroduction)
+    private boolean onTab(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -320,7 +315,7 @@ b.append(text.substring(0, pos + 1));
 	return true;
     }
 
-    private boolean onArrowDown(KeyboardEvent event, boolean briefIntroduction)
+    private boolean onArrowDown(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -329,11 +324,11 @@ b.append(text.substring(0, pos + 1));
 	    environment.hint(Hints.NO_LINES_BELOW);
 	    return true;
 	}
-	onNewHotPointY( briefIntroduction );
+	onNewHotPointY( briefAnnouncement );
 	return true;
     }
 
-    private boolean onArrowUp(KeyboardEvent event, boolean briefIntroduction)
+    private boolean onArrowUp(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -342,7 +337,7 @@ b.append(text.substring(0, pos + 1));
 	    environment.hint(Hints.NO_LINES_ABOVE);
 	    return true;
 	}
-	onNewHotPointY( briefIntroduction);
+	onNewHotPointY( briefAnnouncement);
 	return true;
     }
 
@@ -364,7 +359,7 @@ b.append(text.substring(0, pos + 1));
 	return true;
     }
 
-    private boolean onPageDown(KeyboardEvent event, boolean briefIntroduction)
+    private boolean onPageDown(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -374,11 +369,11 @@ b.append(text.substring(0, pos + 1));
 	    return true;
 	}
 	while(!iterator.isContainerSection() && iterator.moveNext());
-	onNewHotPointY( briefIntroduction );
+	onNewHotPointY( briefAnnouncement );
 	return true;
     }
 
-    private boolean onPageUp(KeyboardEvent event, boolean briefIntroduction)
+    private boolean onPageUp(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -388,7 +383,7 @@ b.append(text.substring(0, pos + 1));
 	    return true;
 	}
 	while(!iterator.isContainerSection() && iterator.movePrev());
-	onNewHotPointY( briefIntroduction );
+	onNewHotPointY( briefAnnouncement );
 	return true;
     }
 
@@ -596,13 +591,21 @@ b.append(text.substring(0, pos + 1));
 	return false;
     }
 
-    private void onNewHotPointY(boolean briefIntroduction)
+    private void onNewHotPointY(boolean briefAnnouncement)
     {
 	hotPointX = 0;
 	if (iterator.isEmptyRow())
 	    environment.hint(Hints.EMPTY_LINE); else
-	    introduction.introduce(iterator, briefIntroduction);
+	    announceRow(iterator, briefAnnouncement);
 	environment.onAreaNewHotPoint(this);
+    }
+
+    protected void announceRow(Iterator it, boolean briefAnnouncement)
+    {
+	NullCheck.notNull(it, "it");
+	if (!it.isEmptyRow())
+	    environment.say(it.getText()); else
+	    environment.hint(Hints.EMPTY_LINE);
     }
 
     protected 	void announceFragment(Iterator itFrom, Iterator itTo)
