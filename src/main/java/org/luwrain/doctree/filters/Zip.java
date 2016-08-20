@@ -23,8 +23,8 @@ import java.io.*;
 import java.net.*;
 
 import org.luwrain.doctree.*;
-import org.luwrain.core.NullCheck;
-import org.luwrain.core.Log;
+import org.luwrain.doctree.loading.*;
+import org.luwrain.core.*;
 
 public class Zip
 {

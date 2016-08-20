@@ -1,5 +1,5 @@
 
-package org.luwrain.doctree;
+package org.luwrain.doctree.loading;
 
 import java.net.*;
 import java.io.*;
@@ -10,7 +10,9 @@ import java.util.zip.*;
 import javax.activation.*;
 
 import org.apache.poi.util.IOUtils;
+
 import org.luwrain.core.*;
+import org.luwrain.doctree.*;
 import org.luwrain.doctree.filters.*;
 import org.luwrain.doctree.books.BookFactory;
 

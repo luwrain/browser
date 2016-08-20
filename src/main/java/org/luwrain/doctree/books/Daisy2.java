@@ -9,6 +9,7 @@ import java.nio.file.*;
 import org.luwrain.core.NullCheck;
 import org.luwrain.core.Log;
 import org.luwrain.doctree.*;
+import org.luwrain.doctree.loading.*;
 import org.luwrain.util.*;
 
 class Daisy2 extends Base

@@ -128,7 +128,7 @@ src = new URL(base, src).toString();
 	org.jsoup.nodes.Document doc = null;
 	try {
 	    final Connection con=Jsoup.connect(url.toString());
-	    con.userAgent(org.luwrain.doctree.UrlLoader.USER_AGENT);
+	    con.userAgent(org.luwrain.doctree.loading.UrlLoader.USER_AGENT);
 	    con.timeout(30000);
 	    doc = con.get();
 	}

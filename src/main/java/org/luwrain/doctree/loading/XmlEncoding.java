@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.doctree;
+package org.luwrain.doctree.loading;
 
 import java.io.*;
 import java.nio.file.*;
