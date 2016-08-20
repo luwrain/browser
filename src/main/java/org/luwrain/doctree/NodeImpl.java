@@ -41,19 +41,14 @@ public class NodeImpl implements Node
 
     boolean empty = false;
 
-	public String id=null;
-    @Override public String getId()
-	{
-		return id;
-	}
-    public void setId(String id)
-    {
-    	this.id=id;
-    }
-
 	NodeImpl(Type type)
     {
 	this.type = type;
+    }
+
+    NodeImpl[] getSubnodes()
+    {
+	return subnodes != null?subnodes:new NodeImpl[0];
     }
 
     @Override public int getNodeX()
@@ -134,11 +129,6 @@ public class NodeImpl implements Node
 	}
 	for(NodeImpl n: subnodes)
 	    n.removeEmpty();
-    }
-
-    @Override public Node[] getSubnodes()
-    {
-	return subnodes != null?subnodes:new Node[0];
     }
 
     @Override public String toString()

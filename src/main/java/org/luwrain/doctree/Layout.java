@@ -21,11 +21,6 @@ import org.luwrain.core.NullCheck;
 
 class Layout
 {
-    static private class Line
-    {
-	int[] rows = new int[0];
-    }
-
     private Document document;
     private NodeImpl root;
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
@@ -35,8 +30,8 @@ class Layout
 
     Layout(Document document)
     {
-	this.document = document;
 	NullCheck.notNull(document, "document");
+	this.document = document;
     }
 
     private void init()
@@ -67,6 +62,25 @@ class Layout
 	}
     }
 
+    int getLineCount()
+    {
+	return lines != null?lines.length:0;
+    }
+
+    String getLine(int index)
+    {
+	final Line line = lines[index];
+	StringBuilder b = new StringBuilder();
+	for(int r: line.rows)
+	{
+	    final Row row = rows[r];
+	    while(b.length() < row.x)
+		b.append(" ");
+	    b.append(row.text());
+	}
+	return b.toString();
+    }
+
     private int calcRowsPosition()
     {
 	int maxLineNum = 0;
@@ -94,30 +108,11 @@ class Layout
 	return maxLineNum + 1;
     }
 
-    int getLineCount()
-    {
-	return lines != null?lines.length:0;
-    }
-
-    String getLine(int index)
-    {
-	final Line line = lines[index];
-	StringBuilder b = new StringBuilder();
-	for(int r: line.rows)
-	{
-	    final Row row = rows[r];
-	    while(b.length() < row.x)
-		b.append(" ");
-	    b.append(row.text());
-	}
-	return b.toString();
-    }
-
     //Launched before any other processing, RowPartsBuilder goes next
     static void calcWidth(NodeImpl node, int recommended)
     {
 	NullCheck.notNull(node, "node");
-	final NodeImpl[] subnodes = node.subnodes;
+	final NodeImpl[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
@@ -150,32 +145,32 @@ class Layout
 	{
 	    final ParagraphImpl para = (ParagraphImpl)node;
 	    if (para.getRowParts().length == 0)
-	{
-	    para.height = 0;
+	    {
+		para.height = 0;
+		return;
+	    }
+	    int maxRelRowNum = 0;
+	    for(RowPart p: para.getRowParts())
+		if (p.relRowNum > maxRelRowNum)
+		    maxRelRowNum = p.relRowNum;
+	    para.height = maxRelRowNum + 1;
 	    return;
 	}
-	int maxRelRowNum = 0;
-	for(RowPart p: para.getRowParts())
-	    if (p.relRowNum > maxRelRowNum)
-		maxRelRowNum = p.relRowNum;
-	para.height = maxRelRowNum + 1;
-	return;
-    }
-	final NodeImpl[] subnodes = node.subnodes;
+	final NodeImpl[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
 	    final TableRow tableRow = (TableRow)node;
-	for(NodeImpl n: subnodes)
-	    calcHeight(n);
-	tableRow.height = 0;
-	for(NodeImpl n: subnodes)
-	    if (tableRow.height < n.height)
-		tableRow.height = n.height;
-	return;
+	    for(NodeImpl n: subnodes)
+		calcHeight(n);
+	    tableRow.height = 0;
+	    for(NodeImpl n: subnodes)
+		if (tableRow.height < n.height)
+		    tableRow.height = n.height;
+	    return;
 	}
 	for(NodeImpl n: subnodes)
-calcHeight(n);
+	    calcHeight(n);
 	node.height = 0;
 	for(NodeImpl n: subnodes)
 	    node.height += n.height;
@@ -185,7 +180,7 @@ calcHeight(n);
     static void calcPosition(NodeImpl node)
     {
 	NullCheck.notNull(node, "node");
-	final NodeImpl[] subnodes = node.subnodes;
+	final NodeImpl[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
@@ -215,5 +210,10 @@ calcHeight(n);
 		++offset;
 	    calcPosition(n);
 	}
+    }
+
+    static private class Line
+    {
+	int[] rows = new int[0];
     }
 }

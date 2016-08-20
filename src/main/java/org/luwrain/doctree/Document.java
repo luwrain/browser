@@ -84,6 +84,11 @@ public class Document
 	}
     }
 
+    public Iterator getIterator()
+    {
+	return new Iterator(this);
+    }
+
     public int getLineCount()
     {
 	return layout.getLineCount();
@@ -92,11 +97,6 @@ public class Document
     public String getLine(int index)
     {
 	return layout.getLine(index);
-    }
-
-    public Iterator getIterator()
-    {
-	return new Iterator(this);
     }
 
     private void calcAbsRowNums()
@@ -109,20 +109,6 @@ public class Document
 		r.absRowNum = r.relRowNum + currentParaTop;
 	    currentParaTop += p.height;
 	}
-    }
-
-    // recreate hash map index for all node's ids
-    public void makeIndex()
-    {
-    	idx=new HashMap<String,NodeImpl>();
-    	makeIndex(root);
-    }
-    public void makeIndex(NodeImpl node)
-    {
-    	// TODO: duplicate id in document, it would but can not be supported, make decision, what to do with this
-    	if(node.id!=null) idx.put(node.id,node);
-    	for(NodeImpl n:node.subnodes)
-    		makeIndex(n);
     }
 
     public void setProperty(String propName, String value)
