@@ -21,13 +21,13 @@ import org.luwrain.core.*;
 
 public class Iterator
 {
-    private Document document;
-    private NodeImpl root;
-    private ParagraphImpl[] paragraphs;
-    private RowPart[] rowParts;
-    private Row[] rows;
+protected Document document;
+    protected NodeImpl root;
+    protected ParagraphImpl[] paragraphs;
+    //    private RowPart[] rowParts;
+    protected Row[] rows;
 
-    private int current = 0;
+    protected int current = 0;
 
     Iterator(Document document)
     {
@@ -35,7 +35,7 @@ public class Iterator
 	this.document = document;
 	this.root = document.getRoot();
 	this.paragraphs = document.getParagraphs();
-	this.rowParts = document.getRowParts();
+	//	this.rowParts = document.getRowParts();
 	this.rows = document.getRows();
 	current = 0;
     }
@@ -46,7 +46,7 @@ public class Iterator
 	this.document = document;
 	this.root = document.getRoot();
 	this.paragraphs = document.getParagraphs();
-	this.rowParts = document.getRowParts();
+	//	this.rowParts = document.getRowParts();
 	this.rows = document.getRows();
 	current = index < rows.length?index:0;
     }
@@ -57,8 +57,10 @@ public class Iterator
 	    return true;
 	if (rows == null || rows.length < 1)
 	    return true;
+	/*
 	if (rowParts == null || rowParts.length < 1)
 	    return true;
+	*/
 	return false;
     }
 
@@ -191,16 +193,6 @@ public class Iterator
 	final Row row = rows[current];
 	return !row.isEmpty()?row.text():"";
     }
-
-    /*
-    public String getTextWithHref(String hrefPrefix)
-    {
-	if (noContent())
-	    return "";
-	final RowImpl row = rows[current];
-	return !row.isEmpty()?row.textWithHrefs(rowParts, hrefPrefix):"";
-    }
-    */
 
     public Run getRunUnderPos(int pos)
     {

@@ -51,16 +51,6 @@ public class NodeImpl implements Node
     	this.id=id;
     }
 
-    public String smil=null;
-    public String getSmil()
-	{
-		return smil;
-	}
-	public void setSmil(String smil)
-	{
-		this.smil=smil;
-	}
-
 	NodeImpl(Type type)
     {
 	this.type = type;
