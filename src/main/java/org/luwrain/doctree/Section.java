@@ -33,6 +33,7 @@ public class Section extends NodeImpl
 	this.level = level;
     }
 
+    /*
     @Override void calcWidth(int recommended)
     {
 	width = recommended;
@@ -45,7 +46,9 @@ public class Section extends NodeImpl
 		width = n.width;
 	}
     }
+    */
 
+    /*
     @Override void calcHeight()
     {
 	height = 0;
@@ -56,7 +59,9 @@ public class Section extends NodeImpl
 	for(NodeImpl n: subnodes)
 	    height += n.height;
     }
+    */
 
+    /*
     @Override void calcPosition()
     {
 	int offset = 0;
@@ -68,6 +73,7 @@ public class Section extends NodeImpl
 	    n.calcPosition();
 	}
     }
+    */
 
     public int getSectionLevel()
     {

@@ -37,6 +37,7 @@ public class Table extends NodeImpl
 
     }
 
+    /*
     @Override void calcWidth(int recommended)
     {
 	width = recommended;
@@ -49,7 +50,9 @@ public class Table extends NodeImpl
 		width = n.width;
 	}
     }
+    */
 
+    /*
     @Override void calcHeight()
     {
 	height = 0;
@@ -62,7 +65,9 @@ public class Table extends NodeImpl
 	if (subnodes.length > 0)
 	    height += (subnodes.length - 1);
     }
+    */
 
+    /*
     @Override void calcPosition()
     {
 	int offset = 0;
@@ -77,6 +82,7 @@ public class Table extends NodeImpl
 	    n.calcPosition();
 	}
     }
+    */
 
     public TableCell getCell(int col, int row)
     {

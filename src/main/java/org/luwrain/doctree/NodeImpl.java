@@ -77,6 +77,7 @@ public class NodeImpl implements Node
     }
 
     //Launched before everything, RowPartsBuilder goes next
+    /*
     void calcWidth(int recommended)
     {
 	switch (type)
@@ -99,8 +100,10 @@ public class NodeImpl implements Node
 		width = n.width;
 	}
     }
+    */
 
     //Launched after RowPartsBuilder;
+    /*
     void calcHeight()
     {
 	switch (type)
@@ -121,8 +124,10 @@ public class NodeImpl implements Node
 	for(NodeImpl n: subnodes)
 	    height += n.height;
     }
+    */
 
     //Launched after calcHeight;
+    /*
     void calcPosition()
     {
 	switch (type)
@@ -147,6 +152,12 @@ public class NodeImpl implements Node
 		++offset;
 	    n.calcPosition();
 	}
+    }
+    */
+
+    public boolean noSubnodes()
+    {
+	return subnodes == null || subnodes.length < 1;
     }
 
     void commit()

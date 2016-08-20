@@ -112,4 +112,108 @@ class Layout
 	}
 	return b.toString();
     }
+
+    //Launched before any other processing, RowPartsBuilder goes next
+    static void calcWidth(NodeImpl node, int recommended)
+    {
+	NullCheck.notNull(node, "node");
+	final NodeImpl[] subnodes = node.subnodes;
+	NullCheck.notNullItems(subnodes, "subnodes");
+	if (node instanceof TableRow)
+	{
+	    final TableRow tableRow = (TableRow)node;
+	    final int cellWidth = (recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1;
+	    for(NodeImpl n: subnodes)
+		calcWidth(n, cellWidth);
+	    tableRow.width = 0;
+	    for(NodeImpl n: subnodes)
+		tableRow.width += n.width;
+	    tableRow.width += (subnodes.length - 1);//One additional empty column after each cell
+	    if (tableRow.width < recommended)
+		tableRow.width = recommended;
+	    return;
+	}
+	node.width = recommended;
+	for(NodeImpl n: subnodes)
+	{
+	    calcWidth(n, recommended);
+	    if (node.width < n.width)
+	        node.width = n.width;
+	}
+    }
+
+    //Launched after RowPartsBuilder
+    static void calcHeight(NodeImpl node)
+    {
+	NullCheck.notNull(node, "node");
+	if (node instanceof ParagraphImpl)
+	{
+	    final ParagraphImpl para = (ParagraphImpl)node;
+	    if (para.getRowParts().length == 0)
+	{
+	    para.height = 0;
+	    return;
+	}
+	int maxRelRowNum = 0;
+	for(RowPart p: para.getRowParts())
+	    if (p.relRowNum > maxRelRowNum)
+		maxRelRowNum = p.relRowNum;
+	para.height = maxRelRowNum + 1;
+	return;
+    }
+	final NodeImpl[] subnodes = node.subnodes;
+	NullCheck.notNullItems(subnodes, "subnodes");
+	if (node instanceof TableRow)
+	{
+	    final TableRow tableRow = (TableRow)node;
+	for(NodeImpl n: subnodes)
+	    calcHeight(n);
+	tableRow.height = 0;
+	for(NodeImpl n: subnodes)
+	    if (tableRow.height < n.height)
+		tableRow.height = n.height;
+	return;
+	}
+	for(NodeImpl n: subnodes)
+calcHeight(n);
+	node.height = 0;
+	for(NodeImpl n: subnodes)
+	    node.height += n.height;
+    }
+
+    //Launched after calcHeight;
+    static void calcPosition(NodeImpl node)
+    {
+	NullCheck.notNull(node, "node");
+	final NodeImpl[] subnodes = node.subnodes;
+	NullCheck.notNullItems(subnodes, "subnodes");
+	if (node instanceof TableRow)
+	{
+	    final TableRow tableRow = (TableRow)node;
+	    int offset = 0;
+	    for(NodeImpl n: subnodes)
+	    {
+		n.x = tableRow.x + offset;
+		offset += (tableRow.width + 1);
+		n.y = node.y;
+		calcPosition(n);
+	    }
+	    return;
+	}
+	if  (node.type == Node.Type.ROOT)
+	{
+	    node.x = 0;
+	    node.y = 0;
+	}
+	int offset = 0;
+	for(NodeImpl n: subnodes)
+	{
+	    n.x = node.x;
+	    n.y = node.y + offset;
+	    offset += n.height;
+	    if (n.type == Node.Type.ROOT)
+		++offset;
+	    calcPosition(n);
+	}
+    }
 }

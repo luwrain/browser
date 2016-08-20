@@ -60,7 +60,7 @@ public class Document
 	    root.commit();
 	    root.setEmptyMark();
 	    root.removeEmpty();
-	    root.calcWidth(width);
+	    Layout.calcWidth(root, width);
 	    final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
 	    rowPartsBuilder.onNode(root);
 	    rowParts = rowPartsBuilder.parts();
@@ -71,9 +71,9 @@ public class Document
 		return;
 	    paragraphs = rowPartsBuilder.paragraphs();
 	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
-	    root.calcHeight();
+	    Layout.calcHeight(root);
 	    calcAbsRowNums();
-	    root.calcPosition();
+	    Layout.calcPosition(root);
 	    rows = Row.buildRows(rowParts);
 	    Log.debug("doctree", "" + rows.length + " rows prepared");
 	    layout.calc();

@@ -36,6 +36,7 @@ public class TableRow extends NodeImpl
 	    }
     }
 
+    /*
     @Override void calcWidth(int recommended)
     {
 	final int cellWidth = (recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1;
@@ -48,7 +49,9 @@ public class TableRow extends NodeImpl
 	if (width < recommended)
 	    width = recommended;
     }
+    */
 
+    /*
     @Override void calcHeight()
     {
 	height = 0;
@@ -60,7 +63,9 @@ public class TableRow extends NodeImpl
 	    if (height < n.height)
 		height = n.height;
     }
+    */
 
+    /*
     @Override void calcPosition()
     {
 	int offset = 0;
@@ -72,4 +77,5 @@ public class TableRow extends NodeImpl
 	    n.calcPosition();
 	}
     }
+*/
 }

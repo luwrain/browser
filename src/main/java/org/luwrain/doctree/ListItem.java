@@ -24,6 +24,7 @@ public class ListItem extends NodeImpl
 	super(Node.Type.LIST_ITEM);
     }
 
+    /*
     @Override void calcWidth(int recommended)
     {
 	width = recommended;
@@ -36,7 +37,9 @@ public class ListItem extends NodeImpl
 		width = n.width;
 	}
     }
+    */
 
+    /*
     @Override void calcHeight()
     {
 	height = 0;
@@ -47,7 +50,9 @@ public class ListItem extends NodeImpl
 	for(NodeImpl n: subnodes)
 	    height += n.height;
     }
+    */
 
+    /*
     @Override void calcPosition()
     {
 	int offset = 0;
@@ -59,6 +64,7 @@ public class ListItem extends NodeImpl
 	    n.calcPosition();
 	}
     }
+    */
 
     public int getListItemIndex()
     {
