@@ -34,7 +34,7 @@ public class Document
     private Layout layout = new Layout(this);
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
-    private RowImpl[] rows;
+    private Row[] rows;
 
     public HashMap<String,NodeImpl> idx=new HashMap<String,NodeImpl>();
 
@@ -74,7 +74,7 @@ public class Document
 	    root.calcHeight();
 	    calcAbsRowNums();
 	    root.calcPosition();
-	    rows = RowImpl.buildRows(rowParts);
+	    rows = Row.buildRows(rowParts);
 	    Log.debug("doctree", "" + rows.length + " rows prepared");
 	    layout.calc();
 	}
@@ -162,7 +162,7 @@ public class Document
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
     public ParagraphImpl[] getParagraphs() { return paragraphs; }
-    public RowImpl[] getRows() { return rows; }
+    public Row[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
     public String[] getHrefs(){return hrefs;}
 }

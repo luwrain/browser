@@ -160,9 +160,9 @@ public class RowPartsBuilder
 	final RowPart[] parts = builder.parts();
 	    for(RowPart r: parts)
 		r.absRowNum = r.relRowNum;
-	final RowImpl[] rows = RowImpl.buildRows(parts);
+	final Row[] rows = Row.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
-	for(RowImpl r: rows)
+	for(Row r: rows)
 	    lines.add(r.text());
 	return lines.toArray(new String[lines.size()]);
     }

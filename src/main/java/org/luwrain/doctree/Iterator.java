@@ -25,7 +25,7 @@ public class Iterator
     private NodeImpl root;
     private ParagraphImpl[] paragraphs;
     private RowPart[] rowParts;
-    private RowImpl[] rows;
+    private Row[] rows;
 
     private int current = 0;
 
@@ -67,7 +67,7 @@ public class Iterator
 	NullCheck.notNull(run, "run");
 	if (isEmptyRow())
 	    return false;
-	final Run[] runs = getRowImpl().getRuns();
+	final Run[] runs = getRow().getRuns();
 	for(Run r: runs)
 	    if (run == r)
 		return true;
@@ -79,7 +79,7 @@ public class Iterator
 	NullCheck.notNull(run, "run");
 	if (isEmptyRow())
 	    return -1;
-	return getRowImpl().runBeginsAt(run);
+	return getRow().runBeginsAt(run);
     }
 
     @Override public boolean equals(Object o)
@@ -99,12 +99,7 @@ public class Iterator
     {
 	if (noContent())
 	    return null;
-	return rows[current];
-    }
-
-RowImpl getRowImpl()
-    {
-	if (noContent())
+	if (current < 0 || current >= rows.length)
 	    return null;
 	return rows[current];
     }
@@ -193,7 +188,7 @@ RowImpl getRowImpl()
     {
 	if (noContent())
 	    return "";
-	final RowImpl row = rows[current];
+	final Row row = rows[current];
 	return !row.isEmpty()?row.text():"";
     }
 

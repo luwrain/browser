@@ -30,7 +30,7 @@ class Layout
     private NodeImpl root;
     private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
-    private RowImpl[] rows;
+    private Row[] rows;
     private Line[] lines = new Line[0];
 
     Layout(Document document)
@@ -72,7 +72,7 @@ class Layout
 	int maxLineNum = 0;
 	int lastX = 0;
 	int lastY = 0;
-	for(RowImpl r: rows)
+	for(Row r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts
 	    if (r.isEmpty())
@@ -105,7 +105,7 @@ class Layout
 	StringBuilder b = new StringBuilder();
 	for(int r: line.rows)
 	{
-	    final RowImpl row = rows[r];
+	    final Row row = rows[r];
 	    while(b.length() < row.x)
 		b.append(" ");
 	    b.append(row.text());
