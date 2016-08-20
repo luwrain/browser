@@ -76,35 +76,6 @@ public class ParagraphImpl extends NodeImpl
 	}
     }
 
-/*
-    @Override void calcWidth(int recommended)
-    {
-	width = recommended;
-    }
-*/
-
-    /*
-    @Override public void calcHeight()
-    {
-	if (rowParts == null || rowParts.length < 1)
-	{
-	    height = 0;
-	    return;
-	}
-	int maxRelRowNum = 0;
-	for(RowPart p: rowParts)
-	    if (p.relRowNum > maxRelRowNum)
-		maxRelRowNum = p.relRowNum;
-	height = maxRelRowNum + 1;
-    }
-    */
-
-  /*
-    @Override void calcPosition()
-    {
-    }
-  */
-
     public RowPart[] getRowParts()
     {
 	return rowParts != null?rowParts:new RowPart[0];

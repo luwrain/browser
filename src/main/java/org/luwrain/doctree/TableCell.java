@@ -26,49 +26,6 @@ public class TableCell extends NodeImpl
 	super(Node.Type.TABLE_CELL);
     }
 
-    /*
-    @Override void calcWidth(int recommended)
-    {
-	final int minWidth = recommended >= MIN_TABLE_CELL_WIDTH?recommended:MIN_TABLE_CELL_WIDTH;
-	width = minWidth;
-	if (subnodes == null || subnodes.length < 1)
-	    return;
-	for(NodeImpl n: subnodes)
-	{
-	    n.calcWidth(minWidth);
-	    if (width < n.width)
-		width = n.width;
-	}
-    }
-    */
-
-    /*
-    @Override void calcHeight()
-    {
-	height = 0;
-	if (subnodes == null)
-	    return;
-	for(NodeImpl n: subnodes)
-	    n.calcHeight();
-	for(NodeImpl n: subnodes)
-	    height += n.height;
-    }
-    */
-
-/*
-    @Override void calcPosition()
-    {
-	int offset = 0;
-	for(NodeImpl n: subnodes)
-	{
-	    n.x = x;
-	    n.y = y + offset;
-	    offset += n.height;
-	    n.calcPosition();
-	}
-    }
-*/
-
     public Table getTable()
     {
 	if (parentNode == null || parentNode.parentNode == null)
