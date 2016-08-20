@@ -214,24 +214,6 @@ RowImpl getRowImpl()
 	return rows[current].getRunUnderPos(pos);
     }
 
-    /*
-    public boolean hasHrefUnderPos(int pos)
-    {
-	if (noContent())
-	    return false;
-	final RowImpl row = rows[current];
-	return !row.isEmpty()?row.hasHref(rowParts, pos):false;
-    }
-    */
-
-    public int findNextHref(int pos)
-    {
-	if (noContent())
-	    return -1;
-	final RowImpl row = rows[current];
-	return !row.isEmpty()?row.findNextHref(pos):-1;
-    }
-
     public NodeImpl getParaContainer()
     {
 	if (noContent())

@@ -43,7 +43,7 @@ int x = 0;
 	if (isEmpty())
 	    return null;
 	final int index = getPartIndexUnderPos(pos);
-if (index < 0)
+	if (index < 0)
     return null;
 return parts[index].run;
     }
@@ -67,44 +67,8 @@ return parts[index].run;
 	return res.toArray(new Run[res.size()]);
     }
 
-    //returns -1 if there is no matching pos
-    private int getPartIndexUnderPos(int pos)
-    {
-	if (isEmpty())
-	    return -1;
-	int offset = 0;
-	for(int i = partsFrom;i < partsTo;++i)
-	{
-	    final String text = parts[i].text();
-	    if (text == null || text.isEmpty())
-		continue;
-	    if (pos >= offset && pos < offset + text.length())
-		return i;
-	    offset += text.length();
-	}
-	return -1;
-    }
-
     //returns -1 if index is invalid
-    private int partBeginsAt(int index)
-    {
-	if (isEmpty() || index < partsFrom || index >= partsTo)
-	    return -1;
-	if (index == partsFrom)
-	    return 0;
-	int offset = 0;
-	for(int i = partsFrom;i < index;++i)
-	{
-	    final String text = parts[i].text();
-	    if (text == null || text.isEmpty())
-		continue;
-	    offset += text.length();
-	}
-	return offset;
-    }
-
-    //returns -1 if index is invalid
-    int runBeginsAt(Run run)
+    public int runBeginsAt(Run run)
     {
 	NullCheck.notNull(parts, "parts");
 	NullCheck.notNull(run, "run");
@@ -123,6 +87,21 @@ return parts[index].run;
 	return offset;
     }
 
+    public String text()
+    {
+	if (isEmpty())
+	    return "";
+	final StringBuilder b = new StringBuilder();
+	for(int i = partsFrom;i < partsTo;++i)
+	    b.append(parts[i].text());
+	return b.toString();
+    }
+
+    public boolean isEmpty()
+    {
+	return partsFrom < 0 || partsTo < 0;
+    }
+
     @Override public int getRowX()
     {
 	return x;
@@ -133,105 +112,29 @@ return parts[index].run;
 	return y;
     }
 
-    String text()
-    {
-	if (isEmpty())
-	    return "";
-	final StringBuilder b = new StringBuilder();
-	for(int i = partsFrom;i < partsTo;++i)
-	    b.append(parts[i].text());
-	return b.toString();
-    }
-
-    String textWithHrefs(String hrefPrefix)
-    {
-	NullCheck.notNull(hrefPrefix, "hrefPrefix");
-	if (isEmpty())
-	    return "";
-	boolean wasHref = false;
-	final StringBuilder b = new StringBuilder();
-	for(int i = partsFrom;i < partsTo;++i)
-	{
-	    final RowPart p = parts[i];
-	    final String href = p.href();
-	    if (!wasHref &&
-		href != null && !href.trim().isEmpty())
-		b.append(hrefPrefix);
-	    b.append(parts[i].text());
-	    wasHref = (href != null && !href.trim().isEmpty());
-	}
-	return b.toString();
-    }
-
-    private String href(int pos)
-    {
-	if (isEmpty())
-	    return "";
-	int offset = 0;
-	for(int i = partsFrom;i < partsTo;++i)
-	{
-	    final RowPart p = parts[i];
-	    final String text = p.text();
-	    if (text == null || text.isEmpty())
-		continue;
-	    if (pos >= offset && pos < offset + text.length())
-		return p.href();
-	    offset += text.length();
-	}
-	return null;
-    }
-
-    private String hrefText(int pos)
-    {
-	if (isEmpty())
-	    return "";
-	int index = getPartIndexUnderPos(pos);
-	if (index < 0 || !parts[index].hasHref())
-	    return "";
-	final StringBuilder b = new StringBuilder();
-	while(index < partsTo && parts[index].hasHref())
-	{
-	    b.append(parts[index].text());
-	    ++index;
-	}
-	return new String(b);
-    }
-
-    private boolean hasHref(int pos)
-    {
-	int index = getPartIndexUnderPos(pos);
-	if (index < 0)
-	    return false;
-	return parts[index].hasHref();
-    }
-
-    //returns -1 if there is no any
-    int findNextHref(int pos)
-    {
-	int index = getPartIndexUnderPos(pos);
-	if (index < 0)
-	    return -1;
-	while (index < partsTo && parts[index].hasHref())
-	    ++index;
-	if (index >= partsTo)
-	    return -1;
-	while (index < partsTo && !parts[index].hasHref())
-	    ++index;
-	if (index >= partsTo)
-	    return -1;
-	return partBeginsAt(index);
-    }
-
-    boolean isEmpty()
-    {
-	return partsFrom < 0 || partsTo < 0;
-    }
-
     RowPart getFirstPart()
     {
 	if (isEmpty())
 	    return null;
 	return parts[partsFrom];
+    }
+
+    //returns -1 if there is no matching pos
+    private int getPartIndexUnderPos(int pos)
+    {
+	if (isEmpty())
+	    return -1;
+	int offset = 0;
+	for(int i = partsFrom;i < partsTo;++i)
+	{
+	    final String text = parts[i].text();
+	    if (text == null || text.isEmpty())
+		continue;
+	    if (pos >= offset && pos < offset + text.length())
+		return i;
+	    offset += text.length();
+	}
+	return -1;
     }
 
     private void mustIncludePart(int index)
