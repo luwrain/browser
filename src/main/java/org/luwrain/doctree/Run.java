@@ -17,97 +17,16 @@
 
 package org.luwrain.doctree;
 
-import org.luwrain.core.NullCheck;
+//import org.luwrain.core.NullCheck;
 
-public class Run
+public interface Run
 {
-    private String text = "";
-    private String href = "";
-private TextAttr textAttr = new TextAttr();
-    private ParagraphImpl parent;
-    ExtraInfo extraInfo = null;
-
-    public Run(String text)
-    {
-	NullCheck.notNull(text, "text");
-	this.text = text;
-    }
-
-    public Run(String text, String href)
-    {
-	NullCheck.notNull(text, "text");
-	this.text = text;
-	this.href = href;
-    }
-
-    public Run(String text, String href,
-ExtraInfo extraInfo)
-    {
-	NullCheck.notNull(text, "text");
-	NullCheck.notNull(href, "href");
-	NullCheck.notNull(extraInfo, "extraInfo");
-	this.text = text;
-	this.href = href;
-	this.extraInfo = extraInfo;
-    }
-
-    public String text()
-    {
-	return text != null?text:"";
-    }
-
-    public boolean isEmpty()
-    {
-	return text == null || text.isEmpty();
-    }
-
-    public String href()
-    {
-	return href != null?href:"";
-    }
-
-    public TextAttr textAttr()
-    {
-	return textAttr;
-    }
-
-    @Override public String toString()
-    {
-	return text != null?text:"";
-    }
-
-    void prepareText()
-    {
-	final StringBuilder b = new StringBuilder();
-	boolean wasSpace = false;
-	for(int i = 0;i < text.length();++i)
-	{
-	    char c = text.charAt(i);
-	    if (c == '\n' || c == '\t' || c == ' ')
-		c = ' ';
-	    if (Character.isISOControl(c))
-		continue;
-	    if (wasSpace && Character.isSpace(c))
-		continue;
-	    b.append(c);
-	    wasSpace = Character.isSpace(c);
-	}
-	text = new String(b);
-    }
-
-    public ExtraInfo extraInfo()
-    {
-	return extraInfo;
-    }
-
-void setParentParagraph(ParagraphImpl para)
-    {
-	NullCheck.notNull(para, "para");
-	this.parent = para;
-    }
-
-    public ParagraphImpl getParentParagraph()
-    {
-	return parent;
-    }
+    String text();
+boolean isEmpty();
+    String href();
+    TextAttr textAttr();
+    ExtraInfo extraInfo();
+    void setParentParagraph(ParagraphImpl para);
+    ParagraphImpl getParentParagraph();
+    void prepareText();
 }

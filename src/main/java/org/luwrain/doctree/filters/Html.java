@@ -104,7 +104,7 @@ public class Html
 		final TextNode textNode = (TextNode)n;
 		final String text = textNode.text();
 		if (text != null && !text.isEmpty())
-		    runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
+		    runs.add(new org.luwrain.doctree.TextRun(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
 		continue;
 	    }
 	    if (n instanceof Element)
@@ -131,7 +131,7 @@ public class Html
 	{
 	    final String value = el.attr("alt");
 	    if (value != null && !value.isEmpty())
-		runs.add(new org.luwrain.doctree.Run("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
+		runs.add(new org.luwrain.doctree.TextRun("[" + value + "]", !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
 	    //Do nothing else here	    
 	    return;
 	}
@@ -304,7 +304,7 @@ public class Html
     {
 	final String text = textNode.text();
 	if (text != null && !text.isEmpty())
-	    runs.add(new org.luwrain.doctree.Run(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
+	    runs.add(new org.luwrain.doctree.TextRun(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
     }
 
     private void commitPara(LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)

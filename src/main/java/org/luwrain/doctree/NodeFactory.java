@@ -53,7 +53,7 @@ public class NodeFactory
     static public ParagraphImpl newPara(String text)
     {
 	final ParagraphImpl para = newPara();
-	para.runs = new Run[]{new Run(text)};
+	para.runs = new Run[]{new TextRun(text)};
 	return para;
     }
 }

@@ -630,7 +630,7 @@ b.append(text.substring(0, pos + 1));
 	final Run run = iterator.getRunUnderPos(hotPointX);
 	if (run == null)
 	    return new String[0];
-	ExtraInfo info = run.extraInfo;
+	ExtraInfo info = run.extraInfo();
 	while (info != null)
 	{
 	    if (info.attrs.containsKey("id"))
