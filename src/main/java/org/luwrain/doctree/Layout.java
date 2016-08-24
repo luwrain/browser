@@ -97,7 +97,7 @@ class Layout
 		continue;
 	    }
 	    final Run run = r.getFirstPart().run;
-	    final ParagraphImpl paragraph = run.parentParagraph;
+	    final ParagraphImpl paragraph = run.getParentParagraph();
 	    r.x = paragraph.x;
 	    r.y = paragraph.y + r.getFirstPart().relRowNum;
 	    lastX = r.x;

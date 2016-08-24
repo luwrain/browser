@@ -67,7 +67,7 @@ public class RowPartsBuilder
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars;
     private void onRun(Run run, int maxRowLen)
     {
-	final String text = run.text;
+	final String text = run.text();
 	NullCheck.notNull(text, "text");
 	if (text.isEmpty())
 	    return;

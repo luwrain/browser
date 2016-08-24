@@ -39,19 +39,19 @@ class RowPart
     {
 	if (run == null)
 	    throw new NullPointerException("run may not be null");
-	return run.text.substring(posFrom, posTo);
+	return run.text().substring(posFrom, posTo);
     }
 
     TextAttr textAttr()
     {
 	NullCheck.notNull(run, "run");
-	return run.textAttr;
+	return run.textAttr();
     }
 
     String href()
     {
 	NullCheck.notNull(run, "run");
-	return run.href;
+	return run.href();
     }
 
     boolean hasHref()

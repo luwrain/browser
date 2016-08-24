@@ -145,7 +145,7 @@ protected Document document;
     {
 	if (noContent())
 	    return null;
-	return getFirstRunOfRow().parentParagraph;
+	return getFirstRunOfRow().getParentParagraph();
     }
 
     private Run getFirstRunOfRow()

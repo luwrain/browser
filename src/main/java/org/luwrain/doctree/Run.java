@@ -21,23 +21,23 @@ import org.luwrain.core.NullCheck;
 
 public class Run
 {
-    String text = "";
-    String href = "";
-    TextAttr textAttr = new TextAttr();
-    ParagraphImpl parentParagraph;
+    private String text = "";
+    private String href = "";
+private TextAttr textAttr = new TextAttr();
+    private ParagraphImpl parent;
     ExtraInfo extraInfo = null;
 
     public Run(String text)
     {
-	this.text = text;
 	NullCheck.notNull(text, "text");
+	this.text = text;
     }
 
     public Run(String text, String href)
     {
+	NullCheck.notNull(text, "text");
 	this.text = text;
 	this.href = href;
-	NullCheck.notNull(text, "text");
     }
 
     public Run(String text, String href,
@@ -51,9 +51,24 @@ ExtraInfo extraInfo)
 	this.extraInfo = extraInfo;
     }
 
+    public String text()
+    {
+	return text != null?text:"";
+    }
+
+    public boolean isEmpty()
+    {
+	return text == null || text.isEmpty();
+    }
+
     public String href()
     {
 	return href != null?href:"";
+    }
+
+    public TextAttr textAttr()
+    {
+	return textAttr;
     }
 
     @Override public String toString()
@@ -83,5 +98,16 @@ ExtraInfo extraInfo)
     public ExtraInfo extraInfo()
     {
 	return extraInfo;
+    }
+
+void setParentParagraph(ParagraphImpl para)
+    {
+	NullCheck.notNull(para, "para");
+	this.parent = para;
+    }
+
+    public ParagraphImpl getParentParagraph()
+    {
+	return parent;
     }
 }

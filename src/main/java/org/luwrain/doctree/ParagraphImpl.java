@@ -42,7 +42,7 @@ public class ParagraphImpl extends NodeImpl
 	    runs = new Run[0];
 	for(Run r: runs)
 	{
-	    r.parentParagraph = this;
+	    r.setParentParagraph(this);
 	    r.prepareText();
 	}
     }
@@ -63,7 +63,7 @@ public class ParagraphImpl extends NodeImpl
 	    return;
 	int k = 0;
 	for(int i = 0;i < runs.length;++i)
-	    if (runs[i].text.isEmpty() )
+	    if (runs[i].isEmpty() )
 		++k; else
 		runs[i - k] = runs[i];
 	if (k > 0)
