@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.*;
+
 public class TableRow extends NodeImpl
 {
     TableRow()
@@ -34,5 +36,22 @@ public class TableRow extends NodeImpl
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 		subnodes[i] = n;
 	    }
+    }
+
+    void addEmptyCells(int num)
+    {
+	NullCheck.notNullItems(subnodes, "subnodes");
+	if (subnodes.length >= num)
+	    return;
+	final NodeImpl[] newNodes = new NodeImpl[num];
+	for(int i = 0;i < subnodes.length;++i)
+	    newNodes[i] = subnodes[i];
+	for(int i = subnodes.length;i < newNodes.length;++i)
+	{
+	    final TableCell cell = new TableCell();
+	    cell.subnodes = new NodeImpl[]{NodeFactory.newPara("-")};
+	    newNodes[i] = cell;
+	}
+
     }
 }

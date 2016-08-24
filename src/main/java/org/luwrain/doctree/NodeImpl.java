@@ -51,6 +51,11 @@ public class NodeImpl implements Node
 	return subnodes != null?subnodes:new NodeImpl[0];
     }
 
+    public int getSubnodeCount()
+    {
+	return subnodes != null?subnodes.length:0;
+    }
+
     @Override public int getNodeX()
     {
 	return x;

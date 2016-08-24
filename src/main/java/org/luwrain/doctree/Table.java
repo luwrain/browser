@@ -33,7 +33,14 @@ public class Table extends NodeImpl
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 		subnodes[i] = n;
-	    }
+	    	    }
+
+		int maxCellCount = 0;
+		for(NodeImpl n: getSubnodes())
+		    if (maxCellCount < n.getSubnodeCount())
+			maxCellCount = n.getSubnodeCount();
+		for(NodeImpl n: getSubnodes())
+		    ((TableRow)n).addEmptyCells(maxCellCount);
 
     }
 
