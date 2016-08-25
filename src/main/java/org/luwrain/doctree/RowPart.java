@@ -21,19 +21,30 @@ import org.luwrain.core.NullCheck;
 
 class RowPart
 {
-    Run run;
+    private Run run;
 
     /** Starting position in the text of the corresponding run*/
-    int posFrom = 0;
+    private int posFrom = 0;
 
     /** Ending position in the text of the corresponding run*/
-    int posTo = 0;
+    private int posTo = 0;
 
     /** Absolute row index in a document*/
     int absRowNum = 0;
 
     /** Index in the corresponding paragraph*/
-    int relRowNum = 0;
+    private int relRowNum = 0;
+
+    RowPart(Run run, 
+	    int posFrom, int posTo,
+int relRowNum)
+    {
+	NullCheck.notNull(run, "run");
+	this.run = run;
+	this.posFrom = posFrom;
+	this.posTo = posTo;
+	this.relRowNum = relRowNum;
+    }
 
     String text()
     {
@@ -41,4 +52,9 @@ class RowPart
 	    throw new NullPointerException("run may not be null");
 	return run.text().substring(posFrom, posTo);
     }
+
+    Run run() {return run;}
+    int posFrom() {return posFrom;}
+    int posTo() {return posTo;}
+    int relRowNum() {return relRowNum;}
 }

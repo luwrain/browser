@@ -146,7 +146,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return null;
-	return rows[current].getFirstPart().run;
+	return rows[current].getFirstPart().run();
     }
 
     //returns -1 if no content 

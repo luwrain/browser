@@ -134,25 +134,28 @@ public class RowPartsBuilder
     private RowPart makeTextPart(Run run,
 				int posFrom, int posTo)
     {
-	final RowPart part = new RowPart();
+	final RowPart part = new RowPart(run, posFrom, posTo, index);
+	/*
 	part.run = run;
 	part.relRowNum = index;
 	part.posFrom = posFrom;
 	part.posTo = posTo;
+	*/
 	return part;
     }
 
-    private RowPart makeTitlePart(Run run)
+    static private RowPart makeTitlePart(Run run)
     {
 	NullCheck.notNull(run, "run");
-	final RowPart part = new RowPart();
+	final RowPart part = new RowPart(run, 0, 1, 0);
+	/*
 	part.run = run;
 	part.relRowNum = index;
 	part.posFrom = 0;
 	part.posTo = 1;
+	*/
 	return part;
     }
-
 
     RowPart[] parts()
     {
@@ -171,7 +174,7 @@ public class RowPartsBuilder
 	builder.onNode(para, width);
 	final RowPart[] parts = builder.parts();
 	    for(RowPart r: parts)
-		r.absRowNum = r.relRowNum;
+		r.absRowNum = r.relRowNum();
 	final Row[] rows = Layout.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
 	for(Row r: rows)
