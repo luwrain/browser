@@ -180,6 +180,7 @@ public class NodeImpl implements Node
 	return -1;
     }
 
+    /*
     boolean isLastInParentSubnodes()
     {
 	final int count = getParentSubnodeCount();
@@ -188,6 +189,7 @@ public class NodeImpl implements Node
 	    return false;
 	return index + 1 == count;
     }
+    */
 
     public TitleRun getTitleRun()
     {

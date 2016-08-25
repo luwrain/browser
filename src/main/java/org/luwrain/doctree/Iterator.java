@@ -24,7 +24,6 @@ public class Iterator
 protected Document document;
     protected NodeImpl root;
     protected Paragraph[] paragraphs;
-    //    private RowPart[] rowParts;
     protected Row[] rows;
 
     protected int current = 0;
@@ -35,7 +34,6 @@ protected Document document;
 	this.document = document;
 	this.root = document.getRoot();
 	this.paragraphs = document.getParagraphs();
-	//	this.rowParts = document.getRowParts();
 	this.rows = document.getRows();
 	current = 0;
     }
@@ -46,7 +44,6 @@ protected Document document;
 	this.document = document;
 	this.root = document.getRoot();
 	this.paragraphs = document.getParagraphs();
-	//	this.rowParts = document.getRowParts();
 	this.rows = document.getRows();
 	current = index < rows.length?index:0;
     }
@@ -57,10 +54,6 @@ protected Document document;
 	    return true;
 	if (rows == null || rows.length < 1)
 	    return true;
-	/*
-	if (rowParts == null || rowParts.length < 1)
-	    return true;
-	*/
 	return false;
     }
 
@@ -106,6 +99,32 @@ protected Document document;
 	return rows[current];
     }
 
+    public Paragraph getParagraph()
+    {
+	if (noContent() || isEmptyRow())
+	    return null;
+final NodeImpl parent = getFirstRunOfRow().getParentNode();
+return (parent instanceof Paragraph)?(Paragraph)parent:null;
+    }
+
+    public boolean isTitleRow()
+    {
+	final Row row = getRow();
+	if (row == null)
+	    return false;
+	return row.getFirstPart().run() instanceof TitleRun;
+    }
+
+    public NodeImpl getTitleParentNode()
+    {
+	if (!isTitleRow())
+	    return null;
+	return getRow().getFirstPart().run().getParentNode();
+    }
+
+
+
+
     //returns -1 if no content
     public int getRowAbsIndex()
     {
@@ -135,13 +154,6 @@ protected Document document;
 	return rows[current].isEmpty();
     }
 
-    public Paragraph getParagraph()
-    {
-	if (noContent() || isEmptyRow())
-	    return null;
-final NodeImpl parent = getFirstRunOfRow().getParentNode();
-return (parent instanceof Paragraph)?(Paragraph)parent:null;
-    }
 
     private Run getFirstRunOfRow()
     {

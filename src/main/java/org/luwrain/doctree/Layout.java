@@ -98,44 +98,31 @@ class Layout
 	    }
 	    final Run run = r.getFirstPart().run();
 	    NullCheck.notNull(run, "run");
-	    System.out.println(run.toString());
 	    final NodeImpl parent = run.getParentNode();
 	    NullCheck.notNull(parent, "parent");
 	    if (parent instanceof Paragraph)
 	    {
 		final Paragraph paragraph = (Paragraph)parent;
-	    r.x = paragraph.x;
-	    r.y = paragraph.y + r.getFirstPart().relRowNum();
+		r.x = paragraph.x;
+		r.y = paragraph.y + r.getFirstPart().relRowNum();
+	    } else 
+	    {
+		r.x = parent.x;
+		r.y = parent.y;
+	    }
 	    lastX = r.x;
 	    lastY = r.y;
-	    }
 	    if (r.y > maxLineNum)
 		maxLineNum = r.y;
 	}
 	return maxLineNum + 1;
     }
 
-    /*
-static void calcAbsRowNums(Paragraph[] paragraphs)
-    {
-	NullCheck.notNullItems(paragraphs, "paragraphs");
-	int currentParaTop = 0;
-	for(Paragraph p: paragraphs)
-	{
-	    //	    p.topRowIndex = currentParaTop;
-	    for(RowPart r: p.rowParts)
-		r.absRowNum = r.relRowNum() + currentParaTop;
-	    currentParaTop += p.height;
-	}
-    }
-    */
-
 static void calcAbsRowNums(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	if (parts.length < 1)
 	    return;
-	//	int current = 0;
 	RowPart first = parts[0];
 	parts[0].absRowNum = 0;
 	for(int i = 1;i < parts.length;++i)
@@ -145,7 +132,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    {
 	    part.absRowNum = first.absRowNum + 1;
 	    first = part;
-	    System.out.println("new");
+	    //	    System.out.println("new");
 	    } else
 		part.absRowNum = first.absRowNum;
 	}
@@ -223,6 +210,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    for(NodeImpl n: subnodes)
 		if (tableRow.height < n.height)
 		    tableRow.height = n.height;
+	    ++node.height;//For title run
 	    return;
 	}
 	for(NodeImpl n: subnodes)
@@ -230,6 +218,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	node.height = 0;
 	for(NodeImpl n: subnodes)
 	    node.height += n.height;
+	++node.height;//For title run
     }
 
     //Launched after calcHeight;
@@ -246,7 +235,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    {
 		n.x = tableRow.x + offset;
 		offset += (tableRow.width + 1);
-		n.y = node.y;
+		n.y = node.y + 1;
 		calcPosition(n);
 	    }
 	    return;
@@ -256,14 +245,17 @@ static void calcAbsRowNums(RowPart[] parts)
 	    node.x = 0;
 	    node.y = 0;
 	}
-	int offset = 0;
+	//Assuming node.x and node.y already set appropriately
+	int offset = 1;//1 for title run
 	for(NodeImpl n: subnodes)
 	{
 	    n.x = node.x;
 	    n.y = node.y + offset;
 	    offset += n.height;
+	    /*
 	    if (n.type == Node.Type.ROOT)
 		++offset;
+	    */
 	    calcPosition(n);
 	}
     }

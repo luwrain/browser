@@ -53,10 +53,11 @@ int relRowNum)
 	return run.text().substring(posFrom, posTo);
     }
 
+    //Checks relRowNum and parents of runs
     boolean onTheSameRow(RowPart rowPart)
     {
 	NullCheck.notNull(rowPart, "rowPart");
-	return run == rowPart.run && relRowNum == rowPart.relRowNum;
+	return run.getParentNode() == rowPart.run.getParentNode() && relRowNum == rowPart.relRowNum;
     }
 
     Run run() {return run;}

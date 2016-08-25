@@ -28,21 +28,24 @@ public class TableRow extends NodeImpl
 
     @Override void commit()
     {
-	super.commit();
+	NullCheck.notNullItems(subnodes, "subnodes");
 	for(int i = 0;i < subnodes.length;++i)
-	    if (subnodes[i].type != Node.Type.TABLE_CELL)
+	    if (!(subnodes[i] instanceof TableCell))
 	    {
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_CELL);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
+		subnodes[i].parentNode = n;
 		n.parentNode = this;
-		n.commit();
+		//		n.commit();
 		subnodes[i] = n;
 	    }
+	super.commit();
     }
 
     void addEmptyCells(int num)
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
+	//	Log.debug("table", "has " + subnodes.length + ", required " + num);
 	if (subnodes.length >= num)
 	    return;
 	final NodeImpl[] newNodes = new NodeImpl[num];
@@ -50,10 +53,12 @@ public class TableRow extends NodeImpl
 	    newNodes[i] = subnodes[i];
 	for(int i = subnodes.length;i < newNodes.length;++i)
 	{
+	    //	    Log.debug("table", "adding new");
 	    final TableCell cell = new TableCell();
 	    cell.subnodes = new NodeImpl[]{NodeFactory.newPara("-")};
+	    cell.subnodes[0].parentNode = cell;
 	    newNodes[i] = cell;
 	}
-
+	subnodes = newNodes;
     }
 }

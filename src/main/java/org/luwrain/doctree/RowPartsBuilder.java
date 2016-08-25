@@ -60,6 +60,7 @@ public class RowPartsBuilder
 	    return;
 	}
 	parts.add(makeTitlePart(node.getTitleRun()));
+	//	System.out.println(node.getClass().getName());
 	for(NodeImpl n: node.getSubnodes())
 		onNode(n);
     }

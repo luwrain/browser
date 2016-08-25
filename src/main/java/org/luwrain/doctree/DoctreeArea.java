@@ -607,9 +607,32 @@ b.append(text.substring(0, pos + 1));
     protected void announceRow(Iterator it, boolean briefAnnouncement)
     {
 	NullCheck.notNull(it, "it");
-	if (!it.isEmptyRow())
-	    environment.say(it.getText()); else
+	if (it.isEmptyRow())
+	{
 	    environment.hint(Hints.EMPTY_LINE);
+	    return;
+	}
+	if (it.isTitleRow())
+	{
+	    final NodeImpl node = it.getTitleParentNode();
+	    if (node instanceof Table)
+	    {
+		final Table table = (Table)node;
+		environment.say("Table, " + table.getRowCount() + " rows, " + table.getColCount() + " columns, level " + table.getTableLevel());
+	    } else
+
+	    if (node instanceof TableCell)
+	    {
+		final TableCell cell = (TableCell)node;
+		environment.say("Cell, row " + cell.getRowIndex() + ", column " + cell.getColIndex());
+	    } else
+
+
+
+	    environment.say(node.getClass().getName());
+	    return;
+	}
+	    environment.say(it.getText());
     }
 
     protected 	void announceFragment(Iterator itFrom, Iterator itTo)
