@@ -119,7 +119,8 @@ protected Document document;
     {
 	if (noContent())
 	    return -1;
-	return current - getParagraph().topRowIndex;
+	//	return current - getParagraph().topRowIndex;
+	return getRow().getFirstPart().relRowNum();
     }
 
     public boolean isFirstRow()
@@ -154,7 +155,8 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return -1;
-	return getParagraph().getIndexInParentSubnodes();
+	final Paragraph para = getParagraph();
+	return para != null?para.getIndexInParentSubnodes():-1;
     }
 
     public boolean coversPos(int x, int y)
@@ -199,9 +201,11 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return null;
-	return getParagraph().parentNode;
+	final Paragraph para = getParagraph();
+	return para != null?para.parentNode:null;
     }
 
+    /*
     public boolean isContainerTableCell()
     {
 	if (noContent())
@@ -211,7 +215,9 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	final NodeImpl container = getParaContainer();
 	return container.type == Node.Type.TABLE_CELL && (container instanceof TableCell);
     }
+    */
 
+    /*
     public TableCell getTableCell()
     {
 	if (noContent())
@@ -221,7 +227,9 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return null;
 	return (TableCell)container;
     }
+    */
 
+    /*
     public boolean isContainerListItem()
     {
 	if (noContent())
@@ -231,7 +239,9 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	final NodeImpl container = getParaContainer();
 	return container.type == Node.Type.LIST_ITEM && (container instanceof ListItem);
     }
+    */
 
+    /*
     public ListItem getListItem()
     {
 	if (noContent())
@@ -241,7 +251,9 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return null;
 	return (ListItem)container;
     }
+    */
 
+    /*
     public boolean isContainerSection()
     {
 	if (noContent())
@@ -251,7 +263,9 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	final NodeImpl container = getParaContainer();
 	return container.type == Node.Type.SECTION && (container instanceof Section);
     }
+    */
 
+    /*
     public Section getSection()
     {
 	if (noContent())
@@ -261,6 +275,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return null;
 	return (Section)container;
     }
+    */
 
     public boolean hasContainerInParents(Node container)
     {

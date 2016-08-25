@@ -23,6 +23,13 @@ public class TitleRun implements Run
 {
     protected NodeImpl parentNode;
     protected final ExtraInfo extraInfo = new ExtraInfo();
+    protected String parentClassName;
+
+    TitleRun(String parentClassName)
+    {
+	NullCheck.notNull(parentClassName, "parentClassName");
+	this.parentClassName = parentClassName;
+    }
 
     @Override public String text()
     {
@@ -46,7 +53,8 @@ public class TitleRun implements Run
 
     @Override public String toString()
     {
-	return text();
+	//	return text();
+	return parentClassName;
     }
 
     @Override public void prepareText()

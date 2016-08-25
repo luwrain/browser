@@ -361,6 +361,7 @@ b.append(text.substring(0, pos + 1));
 
     private boolean onPageDown(KeyboardEvent event, boolean briefAnnouncement)
     {
+	/*
 	if (noContentCheck())
 	    return true;
 	if (!iterator.moveNext())
@@ -370,11 +371,13 @@ b.append(text.substring(0, pos + 1));
 	}
 	while(!iterator.isContainerSection() && iterator.moveNext());
 	onNewHotPointY( briefAnnouncement );
+	*/
 	return true;
     }
 
     private boolean onPageUp(KeyboardEvent event, boolean briefAnnouncement)
     {
+	/*
 	if (noContentCheck())
 	    return true;
 	if (!iterator.movePrev())
@@ -384,6 +387,7 @@ b.append(text.substring(0, pos + 1));
 	}
 	while(!iterator.isContainerSection() && iterator.movePrev());
 	onNewHotPointY( briefAnnouncement );
+	*/
 	return true;
     }
 

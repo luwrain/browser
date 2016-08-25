@@ -55,35 +55,25 @@ public class Document
 
     public void buildView(int width)
     {
-	//	try {
-	    //	    Log.debug("doctree", "building view for width=" + width);
-	    root.commit();
-	    root.setEmptyMark();
-	    root.removeEmpty();
-	    Layout.calcWidth(root, width);
-	    final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
-	    rowPartsBuilder.onNode(root);
-	    rowParts = rowPartsBuilder.parts();
-	    if (rowParts == null)
-		rowParts = new RowPart[0];
-	    //	    Log.debug("doctree", "" + rowParts.length + " row parts prepared");
-	    if (rowParts.length <= 0)
-		return;
-	    paragraphs = rowPartsBuilder.paragraphs();
-	    //	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
-	    Layout.calcHeight(root);
-	    Layout.calcAbsRowNums(paragraphs);
-	    Layout.calcPosition(root);
-	    rows = Layout.buildRows(rowParts);
-	    //	    Log.debug("doctree", "" + rows.length + " rows prepared");
-	    layout.calc();
-	    /*
-	}
-	catch(Exception e)
-	{
-	    e.printStackTrace();
-	}
-	    */
+	root.commit();
+	root.setEmptyMark();
+	root.removeEmpty();
+	Layout.calcWidth(root, width);
+	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
+	rowPartsBuilder.onNode(root);
+	rowParts = rowPartsBuilder.parts();
+	NullCheck.notNullItems(rowParts, "rowParts");
+	Log.debug("doctree", "" + rowParts.length + " row parts prepared");
+	if (rowParts.length <= 0)
+	    return;
+	paragraphs = rowPartsBuilder.paragraphs();
+	//	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
+	Layout.calcHeight(root);
+	Layout.calcAbsRowNums(rowParts);
+	Layout.calcPosition(root);
+	rows = Layout.buildRows(rowParts);
+	Log.debug("doctree", "" + rows.length + " rows prepared");
+	layout.calc();
     }
 
     public Iterator getIterator()

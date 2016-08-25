@@ -23,7 +23,7 @@ public class Paragraph extends NodeImpl
     RowPart[] rowParts = new RowPart[0];
 
     /** Position of the first row in a document*/
-    int topRowIndex = -1;
+    //    int topRowIndex = -1;
 
     Paragraph()
     {
@@ -40,6 +40,8 @@ public class Paragraph extends NodeImpl
 	subnodes = null;
 	if (runs == null)
 	    runs = new Run[0];
+	if (titleRun != null)
+	    titleRun.setParentNode(this);
 	for(Run r: runs)
 	{
 	    r.setParentNode(this);

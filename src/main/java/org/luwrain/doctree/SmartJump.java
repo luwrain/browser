@@ -34,6 +34,7 @@ class SmartJump
 
     boolean jumpForward()
     {
+	/*
 	if (it.isContainerTableCell())
 	{
 	    final TableCell cell = it.getTableCell();
@@ -45,11 +46,13 @@ class SmartJump
 	}
 	if (findNextParaBegin())
 	    return finish();
+	*/
 	return false;
     }
 
     private boolean findTableRow(int level, int rowIndex)
     {
+	/*
 	while (true)
 	{
 	    if (!it.isContainerTableCell())
@@ -61,6 +64,8 @@ class SmartJump
 	    if (!it.moveNext())
 		return false;
 	}
+	*/
+	return false;
     }
 
     private boolean findNextParaBegin()

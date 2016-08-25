@@ -27,7 +27,7 @@ public class NodeImpl implements Node
     public int importance = IMPORTANCE_REGULAR;
     public NodeImpl[] subnodes = new NodeImpl[0];
     NodeImpl parentNode;
-    private final TitleRun titleRun = new TitleRun();
+    protected final TitleRun titleRun = new TitleRun(this.getClass().getName());
 
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
@@ -86,6 +86,8 @@ public class NodeImpl implements Node
     {
 	if (type == Type.ROOT)
 	    parentNode = null;
+	if (titleRun != null)
+	    titleRun.setParentNode(this);
 	if (subnodes == null)
 	    subnodes = new NodeImpl[0];
 	for(NodeImpl n: subnodes)
@@ -99,6 +101,8 @@ public class NodeImpl implements Node
 		{
 		    final NodeImpl n = NodeFactory.newNode(Type.LIST_ITEM);
 		    n.subnodes = new NodeImpl[]{subnodes[i]};
+		    n.parentNode = this;
+		    n.commit();
 		    subnodes[i] = n;
 		}
     }

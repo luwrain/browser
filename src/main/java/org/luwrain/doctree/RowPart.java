@@ -53,6 +53,12 @@ int relRowNum)
 	return run.text().substring(posFrom, posTo);
     }
 
+    boolean onTheSameRow(RowPart rowPart)
+    {
+	NullCheck.notNull(rowPart, "rowPart");
+	return run == rowPart.run && relRowNum == rowPart.relRowNum;
+    }
+
     Run run() {return run;}
     int posFrom() {return posFrom;}
     int posTo() {return posTo;}

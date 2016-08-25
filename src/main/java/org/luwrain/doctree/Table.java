@@ -32,6 +32,8 @@ public class Table extends NodeImpl
 	    {
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
+		n.parentNode = this;
+		n.commit();
 		subnodes[i] = n;
 	    	    }
 

@@ -98,6 +98,7 @@ class Layout
 	    }
 	    final Run run = r.getFirstPart().run();
 	    NullCheck.notNull(run, "run");
+	    System.out.println(run.toString());
 	    final NodeImpl parent = run.getParentNode();
 	    NullCheck.notNull(parent, "parent");
 	    if (parent instanceof Paragraph)
@@ -114,18 +115,42 @@ class Layout
 	return maxLineNum + 1;
     }
 
+    /*
 static void calcAbsRowNums(Paragraph[] paragraphs)
     {
 	NullCheck.notNullItems(paragraphs, "paragraphs");
 	int currentParaTop = 0;
 	for(Paragraph p: paragraphs)
 	{
-	    p.topRowIndex = currentParaTop;
+	    //	    p.topRowIndex = currentParaTop;
 	    for(RowPart r: p.rowParts)
 		r.absRowNum = r.relRowNum() + currentParaTop;
 	    currentParaTop += p.height;
 	}
     }
+    */
+
+static void calcAbsRowNums(RowPart[] parts)
+    {
+	NullCheck.notNullItems(parts, "parts");
+	if (parts.length < 1)
+	    return;
+	//	int current = 0;
+	RowPart first = parts[0];
+	parts[0].absRowNum = 0;
+	for(int i = 1;i < parts.length;++i)
+	{
+	    final RowPart part = parts[i];
+	    if (!first.onTheSameRow(part))
+	    {
+	    part.absRowNum = first.absRowNum + 1;
+	    first = part;
+	    System.out.println("new");
+	    } else
+		part.absRowNum = first.absRowNum;
+	}
+    }
+
 
     static Row[] buildRows(RowPart[] parts)
     {
