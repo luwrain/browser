@@ -30,25 +30,25 @@ public class RowPartsBuilder
     /** The index of the next row to be added to the current paragraph*/
     private int index = 0;
 
-    /** Number of characters in current incomplete row*/
+    /** Number of characters in the current (incomplete) row*/
     private int offset = 0;
 
     void onNode(NodeImpl node)
     {
+	NullCheck.notNull(node, "node"); 
 	onNode(node, 0);
     }
 
     private void onNode(NodeImpl node, int width)
     {
 	NullCheck.notNull(node, "node");
-	if (node.type == Node.Type.PARAGRAPH && (node instanceof Paragraph))
+	if (node instanceof Paragraph)
 	{
 	    offset = 0;
 	    index = 0;
 	    final Paragraph para = (Paragraph)node;
 	    currentParaParts.clear();
-	    if (para.runs != null)
-		for(Run r: para.runs)
+	    for(Run r: para.runs())
 		    onRun(r, width > 0?width:para.width);
 	    if (!currentParaParts.isEmpty())
 	    {
@@ -59,8 +59,8 @@ public class RowPartsBuilder
 	    }
 	    return;
 	}
-	if (node.subnodes != null)
-	    for(NodeImpl n: node.subnodes)
+	parts.add(makeTitlePart(node.getTitleRun()));
+	for(NodeImpl n: node.getSubnodes())
 		onNode(n);
     }
 
@@ -87,7 +87,7 @@ public class RowPartsBuilder
 	    if (remains <= available)
 	    {
 		//We have a chunk for the last row for this run
-		currentParaParts.add(makeRunPart(run, posFrom, text.length()));
+		currentParaParts.add(makeTextPart(run, posFrom, text.length()));
 		offset += remains;
 		posFrom = text.length();
 		continue;
@@ -118,7 +118,7 @@ public class RowPartsBuilder
 		Log.warning("doctree", "having posFrom equal to posTo (" + posFrom + ")");
 	    if (posTo - posFrom > available)
 		Log.warning("doctree", "getting the line with length greater than line length limit");
-	    currentParaParts.add(makeRunPart(run, posFrom, posTo));
+	    currentParaParts.add(makeTextPart(run, posFrom, posTo));
 	    ++index;
 	    offset = 0;
 	    posFrom = posTo;
@@ -131,7 +131,7 @@ public class RowPartsBuilder
 	}
     }
 
-    private RowPart makeRunPart(Run run,
+    private RowPart makeTextPart(Run run,
 				int posFrom, int posTo)
     {
 	final RowPart part = new RowPart();
@@ -141,6 +141,18 @@ public class RowPartsBuilder
 	part.posTo = posTo;
 	return part;
     }
+
+    private RowPart makeTitlePart(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	final RowPart part = new RowPart();
+	part.run = run;
+	part.relRowNum = index;
+	part.posFrom = 0;
+	part.posTo = 1;
+	return part;
+    }
+
 
     RowPart[] parts()
     {
@@ -160,7 +172,7 @@ public class RowPartsBuilder
 	final RowPart[] parts = builder.parts();
 	    for(RowPart r: parts)
 		r.absRowNum = r.relRowNum;
-	final Row[] rows = Row.buildRows(parts);
+	final Row[] rows = Layout.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
 	for(Row r: rows)
 	    lines.add(r.text());

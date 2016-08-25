@@ -32,7 +32,7 @@ int x = 0;
     private int partsFrom = -1;
     private int partsTo = -1;
 
-    private Row(RowPart[] parts)
+    Row(RowPart[] parts)
     {
 	this.parts = parts;
     }
@@ -137,24 +137,12 @@ return parts[index].run;
 	return -1;
     }
 
-    private void mustIncludePart(int index)
+    void mustIncludePart(int index)
     {
 	//We are registering a first part only
 	if (partsFrom < 0)
 	    partsFrom = index;
 	if (partsTo < index + 1)
 	    partsTo = index + 1;
-    }
-
-    static Row[] buildRows(RowPart[] parts)
-    {
-	NullCheck.notNullItems(parts, "parts");
-	final Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
-	for(int i = 0;i < rows.length;++i)
-	    rows[i] = new Row(parts);
-	int current = -1;
-	for(int i = 0;i < parts.length;++i)
-	    rows[parts[i].absRowNum].mustIncludePart(i);
-	return rows;
     }
 }

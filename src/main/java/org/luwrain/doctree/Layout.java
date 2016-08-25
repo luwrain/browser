@@ -114,6 +114,31 @@ class Layout
 	return maxLineNum + 1;
     }
 
+static void calcAbsRowNums(Paragraph[] paragraphs)
+    {
+	NullCheck.notNullItems(paragraphs, "paragraphs");
+	int currentParaTop = 0;
+	for(Paragraph p: paragraphs)
+	{
+	    p.topRowIndex = currentParaTop;
+	    for(RowPart r: p.rowParts)
+		r.absRowNum = r.relRowNum + currentParaTop;
+	    currentParaTop += p.height;
+	}
+    }
+
+    static Row[] buildRows(RowPart[] parts)
+    {
+	NullCheck.notNullItems(parts, "parts");
+	final Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
+	for(int i = 0;i < rows.length;++i)
+	    rows[i] = new Row(parts);
+	int current = -1;
+	for(int i = 0;i < parts.length;++i)
+	    rows[parts[i].absRowNum].mustIncludePart(i);
+	return rows;
+    }
+
     //Launched before any other processing, RowPartsBuilder goes next
     static void calcWidth(NodeImpl node, int recommended)
     {

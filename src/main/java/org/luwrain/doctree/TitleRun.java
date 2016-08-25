@@ -19,26 +19,53 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.NullCheck;
 
-class RowPart
+public class TitleRun implements Run
 {
-    Run run;
+    protected NodeImpl parentNode;
+    protected final ExtraInfo extraInfo = new ExtraInfo();
 
-    /** Starting position in the text of the corresponding run*/
-    int posFrom = 0;
-
-    /** Ending position in the text of the corresponding run*/
-    int posTo = 0;
-
-    /** Absolute row index in a document*/
-    int absRowNum = 0;
-
-    /** Index in the corresponding paragraph*/
-    int relRowNum = 0;
-
-    String text()
+    @Override public String text()
     {
-	if (run == null)
-	    throw new NullPointerException("run may not be null");
-	return run.text().substring(posFrom, posTo);
+	return "-";
+    }
+
+    @Override public boolean isEmpty()
+    {
+	return false;
+    }
+
+    @Override public String href()
+    {
+	return "";
+    }
+
+    @Override public TextAttr textAttr()
+    {
+	return new TextAttr();
+    }
+
+    @Override public String toString()
+    {
+	return text();
+    }
+
+    @Override public void prepareText()
+    {
+    }
+
+    public ExtraInfo extraInfo()
+    {
+	return extraInfo;
+    }
+
+@Override public void setParentNode(NodeImpl node)
+    {
+	NullCheck.notNull(node, "node");
+	parentNode = node;
+    }
+
+    public NodeImpl getParentNode()
+    {
+	return parentNode;
     }
 }

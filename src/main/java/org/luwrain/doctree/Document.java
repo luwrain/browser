@@ -72,9 +72,9 @@ public class Document
 	    paragraphs = rowPartsBuilder.paragraphs();
 	    //	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
 	    Layout.calcHeight(root);
-	    calcAbsRowNums();
+	    Layout.calcAbsRowNums(paragraphs);
 	    Layout.calcPosition(root);
-	    rows = Row.buildRows(rowParts);
+	    rows = Layout.buildRows(rowParts);
 	    //	    Log.debug("doctree", "" + rows.length + " rows prepared");
 	    layout.calc();
 	    /*
@@ -99,18 +99,6 @@ public class Document
     public String getLine(int index)
     {
 	return layout.getLine(index);
-    }
-
-    private void calcAbsRowNums()
-    {
-	int currentParaTop = 0;
-	for(Paragraph p: paragraphs)
-	{
-	    p.topRowIndex = currentParaTop;
-	    for(RowPart r: p.rowParts)
-		r.absRowNum = r.relRowNum + currentParaTop;
-	    currentParaTop += p.height;
-	}
     }
 
     public void setProperty(String propName, String value)

@@ -95,4 +95,9 @@ public class Paragraph extends NodeImpl
 	    sb.append(r.toString());
 	return sb.toString();
     }
+
+    public Run[] runs()
+    {
+	return runs != null?runs:new Run[0];
+    }
 }

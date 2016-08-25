@@ -22,11 +22,12 @@ public class NodeImpl implements Node
     static public final int IMPORTANCE_REGULAR = 50;
     protected static final int MIN_TABLE_CELL_WIDTH = 8;
 
-    public Type type;
+    protected Type type;
     public ExtraInfo extraInfo = null;
     public int importance = IMPORTANCE_REGULAR;
     public NodeImpl[] subnodes = new NodeImpl[0];
     NodeImpl parentNode;
+    private final TitleRun titleRun = new TitleRun();
 
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
@@ -182,5 +183,10 @@ public class NodeImpl implements Node
 	if (index < 0 || count < 0)
 	    return false;
 	return index + 1 == count;
+    }
+
+    public TitleRun getTitleRun()
+    {
+	return titleRun;
     }
 }
