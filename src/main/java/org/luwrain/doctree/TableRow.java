@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 
 public class TableRow extends NodeImpl
@@ -34,9 +36,8 @@ public class TableRow extends NodeImpl
 	    {
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_CELL);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
-		subnodes[i].parentNode = n;
+		n.subnodes[0].parentNode = n;
 		n.parentNode = this;
-		//		n.commit();
 		subnodes[i] = n;
 	    }
 	super.commit();
@@ -48,15 +49,14 @@ public class TableRow extends NodeImpl
 	//	Log.debug("table", "has " + subnodes.length + ", required " + num);
 	if (subnodes.length >= num)
 	    return;
-	final NodeImpl[] newNodes = new NodeImpl[num];
-	for(int i = 0;i < subnodes.length;++i)
-	    newNodes[i] = subnodes[i];
+	final NodeImpl[] newNodes = Arrays.copyOf(subnodes, num);
 	for(int i = subnodes.length;i < newNodes.length;++i)
 	{
 	    //	    Log.debug("table", "adding new");
 	    final TableCell cell = new TableCell();
 	    cell.subnodes = new NodeImpl[]{NodeFactory.newPara("-")};
 	    cell.subnodes[0].parentNode = cell;
+	    cell.parentNode = this;
 	    newNodes[i] = cell;
 	}
 	subnodes = newNodes;

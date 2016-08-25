@@ -55,9 +55,10 @@ public class Document
 
     public void buildView(int width)
     {
-	root.commit();
+
 	root.setEmptyMark();
-	root.removeEmpty();
+	root.prune();
+	root.commit();
 	Layout.calcWidth(root, width);
 	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
 	rowPartsBuilder.onNode(root);

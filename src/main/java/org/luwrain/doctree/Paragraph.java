@@ -17,22 +17,16 @@
 
 package org.luwrain.doctree;
 
+import java.util.*;
+
 public class Paragraph extends NodeImpl
 {
     public Run[] runs = new Run[0];
     RowPart[] rowParts = new RowPart[0];
 
-    /** Position of the first row in a document*/
-    //    int topRowIndex = -1;
-
     Paragraph()
     {
 	super(Node.Type.PARAGRAPH);
-    }
-
-    public boolean hasSingleLineOnly()
-    {
-	return height == 1;
     }
 
     @Override void commit()
@@ -59,7 +53,7 @@ public class Paragraph extends NodeImpl
 		empty = false;
     }
 
-    @Override void removeEmpty()
+    @Override void prune()
     {
 	if (runs == null)
 	    return;
@@ -69,13 +63,7 @@ public class Paragraph extends NodeImpl
 		++k; else
 		runs[i - k] = runs[i];
 	if (k > 0)
-	{
-	    final int count = runs.length - k;
-	    Run[] newRuns = new Run[count];
-	    for(int i = 0;i < count;++i)
-		newRuns[i] = runs[i];
-	    runs = newRuns;
-	}
+	    runs = Arrays.copyOf(runs, runs.length - k);
     }
 
     public RowPart[] getRowParts()

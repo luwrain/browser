@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import java.util.*;
+
 public class NodeImpl implements Node
 {
     static public final int IMPORTANCE_REGULAR = 50;
@@ -107,7 +109,7 @@ public class NodeImpl implements Node
 		}
     }
 
-    void setEmptyMark()
+void setEmptyMark()
     {
 	empty = true;
 	if (subnodes == null || subnodes.length < 1)
@@ -120,7 +122,7 @@ public class NodeImpl implements Node
 	}
     }
 
-    void removeEmpty()
+    void prune()
     {
 	if (subnodes == null)
 	    return;
@@ -130,15 +132,9 @@ public class NodeImpl implements Node
 		++k; else
 		subnodes[i - k] = subnodes[i];
 	if (k > 0)
-	{
-	    final int count = subnodes.length - k;
-	    NodeImpl[] newNodes = new NodeImpl[count];
-	    for(int i = 0;i < count;++i)
-		newNodes[i] = subnodes[i];
-	    subnodes = newNodes;
-	}
+	    subnodes = Arrays.copyOf(subnodes, subnodes.length - k);
 	for(NodeImpl n: subnodes)
-	    n.removeEmpty();
+	    n.prune();
     }
 
     @Override public String toString()

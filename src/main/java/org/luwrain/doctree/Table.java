@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree;
 
+import org.luwrain.core.*;
+
 import org.luwrain.core.NullCheck;
 
 public class Table extends NodeImpl
@@ -30,13 +32,12 @@ public class Table extends NodeImpl
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
 	for(int i = 0;i < subnodes.length;++i)
-	    if (subnodes[i].type != Node.Type.TABLE_ROW)
+	    if (!(subnodes[i] instanceof TableRow))
 	    {
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
-		subnodes[i].parentNode = n;
+n.subnodes[0].parentNode = n;
 		n.parentNode = this;
-		//		n.commit();
 		subnodes[i] = n;
 	    	    }
 		int maxCellCount = 0;
