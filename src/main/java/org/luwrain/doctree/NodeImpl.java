@@ -122,10 +122,11 @@ void setEmptyMark()
 	}
     }
 
-    void prune()
+    //Must return the number of deleted subnodes
+    int prune()
     {
 	if (subnodes == null)
-	    return;
+	    return 0;
 	int k = 0;
 	for(int i = 0;i < subnodes.length;++i)
 	    if (subnodes[i].empty)
@@ -134,7 +135,8 @@ void setEmptyMark()
 	if (k > 0)
 	    subnodes = Arrays.copyOf(subnodes, subnodes.length - k);
 	for(NodeImpl n: subnodes)
-	    n.prune();
+	    k += n.prune();
+	return k;
     }
 
     @Override public String toString()

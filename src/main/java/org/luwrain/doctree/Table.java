@@ -34,6 +34,7 @@ public class Table extends NodeImpl
 	for(int i = 0;i < subnodes.length;++i)
 	    if (!(subnodes[i] instanceof TableRow))
 	    {
+		Log.warning("doctree", "table has a subnode of class " + subnodes[i].getClass().getName() + ", it will be put into newly created table row");
 		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new NodeImpl[]{subnodes[i]};
 n.subnodes[0].parentNode = n;

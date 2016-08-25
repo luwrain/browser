@@ -56,8 +56,12 @@ public class Document
     public void buildView(int width)
     {
 
+	int deleted = 0;
+	do {
 	root.setEmptyMark();
-	root.prune();
+deleted = root.prune();
+Log.debug("doctree", "prune pass: " + deleted + " deleted");
+	} while (deleted > 0);
 	root.commit();
 	Layout.calcWidth(root, width);
 	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();

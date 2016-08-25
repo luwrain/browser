@@ -60,7 +60,12 @@ public class RowPartsBuilder
 	    return;
 	}
 	parts.add(makeTitlePart(node.getTitleRun()));
-	//	Log.debug("table", node.toString());
+	/*
+	if (node.parentNode != null)
+	Log.debug("table", node.toString() + ", " + node.parentNode.toString()); else
+	Log.debug("table", node.toString() + ", null");
+	*/
+
 	for(NodeImpl n: node.getSubnodes())
 		onNode(n);
     }

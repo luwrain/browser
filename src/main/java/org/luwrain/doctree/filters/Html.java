@@ -320,6 +320,7 @@ public class Html
 
     private org.luwrain.doctree.Node.Type getNodeType(String tagName)
     {
+	NullCheck.notEmpty(tagName, "tagName");
 	switch(tagName)
 	{
 	case "ul":
@@ -330,9 +331,9 @@ public class Html
 	    return org.luwrain.doctree.Node.Type.LIST_ITEM;
 	case "table":
 	    return org.luwrain.doctree.Node.Type.TABLE;
-	case "th":
 	case "tr":
 	    return org.luwrain.doctree.Node.Type.TABLE_ROW;
+	case "th":
 	case "td":
 	    return org.luwrain.doctree.Node.Type.TABLE_CELL;
 	default:

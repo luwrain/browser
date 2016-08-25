@@ -17,13 +17,28 @@
 
 package org.luwrain.doctree;
 
-import org.luwrain.core.Log;
+import org.luwrain.core.*;
 
 public class TableCell extends NodeImpl
 {
     TableCell()
     {
 	super(Node.Type.TABLE_CELL);
+    }
+
+    @Override public void commit()
+    {
+	NullCheck.notNullItems(subnodes, "subnodes");
+	for(NodeImpl n: subnodes)
+	{
+	    if (n instanceof TableRow)
+		Log.warning("doctree", "table cell contains table row what is very odd and looks like a bug");
+	    if (n instanceof TableCell)
+		Log.warning("doctree", "table cell contains table cell what is very odd and looks like a bug");
+	    if (n instanceof ListItem)
+		Log.warning("doctree", "table cell contains list item what is very odd and looks like a bug");
+	}
+	super.commit();
     }
 
     public Table getTable()

@@ -53,10 +53,10 @@ public class Paragraph extends NodeImpl
 		empty = false;
     }
 
-    @Override void prune()
+    @Override int prune()
     {
 	if (runs == null)
-	    return;
+	    return 0;
 	int k = 0;
 	for(int i = 0;i < runs.length;++i)
 	    if (runs[i].isEmpty() )
@@ -64,6 +64,7 @@ public class Paragraph extends NodeImpl
 		runs[i - k] = runs[i];
 	if (k > 0)
 	    runs = Arrays.copyOf(runs, runs.length - k);
+	return k;
     }
 
     public RowPart[] getRowParts()
