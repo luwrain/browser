@@ -311,7 +311,7 @@ public class Html
     {
 	if (runs.isEmpty())
 	    return;
-	final org.luwrain.doctree.ParagraphImpl para = NodeFactory.newPara();
+	final org.luwrain.doctree.Paragraph para = NodeFactory.newPara();
 	para.runs = runs.toArray(new org.luwrain.doctree.Run[runs.size()]);
 	para.extraInfo = getCurrentExtraInfo();
 	nodes.add(para);

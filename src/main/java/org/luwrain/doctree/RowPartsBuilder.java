@@ -25,7 +25,7 @@ public class RowPartsBuilder
 {
     private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
     private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
-    private final LinkedList<ParagraphImpl> paragraphs = new LinkedList<ParagraphImpl>();
+    private final LinkedList<Paragraph> paragraphs = new LinkedList<Paragraph>();
 
     /** The index of the next row to be added to the current paragraph*/
     private int index = 0;
@@ -41,11 +41,11 @@ public class RowPartsBuilder
     private void onNode(NodeImpl node, int width)
     {
 	NullCheck.notNull(node, "node");
-	if (node.type == Node.Type.PARAGRAPH && (node instanceof ParagraphImpl))
+	if (node.type == Node.Type.PARAGRAPH && (node instanceof Paragraph))
 	{
 	    offset = 0;
 	    index = 0;
-	    final ParagraphImpl para = (ParagraphImpl)node;
+	    final Paragraph para = (Paragraph)node;
 	    currentParaParts.clear();
 	    if (para.runs != null)
 		for(Run r: para.runs)
@@ -147,12 +147,12 @@ public class RowPartsBuilder
 	return parts.toArray(new RowPart[parts.size()]);
     }
 
-    ParagraphImpl[] paragraphs()
+    Paragraph[] paragraphs()
     {
-	return paragraphs.toArray(new ParagraphImpl[paragraphs.size()]);
+	return paragraphs.toArray(new Paragraph[paragraphs.size()]);
     }
 
-    static public String[] paraToLines(ParagraphImpl para, int width)
+    static public String[] paraToLines(Paragraph para, int width)
     {
 	NullCheck.notNull(para, "para");
 	final RowPartsBuilder builder = new RowPartsBuilder();

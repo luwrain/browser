@@ -93,7 +93,7 @@ public class TxtParaIndent
 	return new Document(root);
     }
 
-    private ParagraphImpl createPara(LinkedList<String> linesList)
+    private Paragraph createPara(LinkedList<String> linesList)
     {
 	final String[] lines = linesList.toArray(new String[linesList.size()]);
 	linesList.clear();

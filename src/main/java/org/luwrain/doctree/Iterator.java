@@ -23,7 +23,7 @@ public class Iterator
 {
 protected Document document;
     protected NodeImpl root;
-    protected ParagraphImpl[] paragraphs;
+    protected Paragraph[] paragraphs;
     //    private RowPart[] rowParts;
     protected Row[] rows;
 
@@ -134,14 +134,14 @@ protected Document document;
 	return rows[current].isEmpty();
     }
 
-    public ParagraphImpl getParagraph()//FIXME:Should be simply Paragraph, not "Impl"
+    public Paragraph getParagraph()
     {
 	if (noContent())
 	    return null;
 	return getParagraphImpl();
     }
 
-    private ParagraphImpl getParagraphImpl()
+    private Paragraph getParagraphImpl()
     {
 	if (noContent())
 	    return null;

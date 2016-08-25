@@ -24,7 +24,7 @@ public class NodeFactory
 	switch(type)
 	{
 	case PARAGRAPH:
-	    throw new IllegalArgumentException("doctree.ParagraphImpl may not be created through NodeFactory.newNode(), use NodeFactory.newPara() instead");
+	    throw new IllegalArgumentException("doctree.Paragraph may not be created through NodeFactory.newNode(), use NodeFactory.newPara() instead");
 	case SECTION:
 	    throw new IllegalArgumentException("doctree.Section may not be created through NodeFactory.newNode(), use NodeFactory.newSection() instead");
 	case TABLE:
@@ -45,14 +45,14 @@ public class NodeFactory
 	return new Section(level);
     }
 
-    static public ParagraphImpl newPara()
+    static public Paragraph newPara()
     {
-	return new ParagraphImpl();
+	return new Paragraph();
     }
 
-    static public ParagraphImpl newPara(String text)
+    static public Paragraph newPara(String text)
     {
-	final ParagraphImpl para = newPara();
+	final Paragraph para = newPara();
 	para.runs = new Run[]{new TextRun(text)};
 	return para;
     }

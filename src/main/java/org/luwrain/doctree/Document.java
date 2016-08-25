@@ -32,7 +32,7 @@ public class Document
 
     private NodeImpl root;
     private Layout layout = new Layout(this);
-    private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private Row[] rows;
 
@@ -55,8 +55,8 @@ public class Document
 
     public void buildView(int width)
     {
-	try {
-	    Log.debug("doctree", "building view for width=" + width);
+	//	try {
+	    //	    Log.debug("doctree", "building view for width=" + width);
 	    root.commit();
 	    root.setEmptyMark();
 	    root.removeEmpty();
@@ -66,22 +66,24 @@ public class Document
 	    rowParts = rowPartsBuilder.parts();
 	    if (rowParts == null)
 		rowParts = new RowPart[0];
-	    Log.debug("doctree", "" + rowParts.length + " row parts prepared");
+	    //	    Log.debug("doctree", "" + rowParts.length + " row parts prepared");
 	    if (rowParts.length <= 0)
 		return;
 	    paragraphs = rowPartsBuilder.paragraphs();
-	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
+	    //	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
 	    Layout.calcHeight(root);
 	    calcAbsRowNums();
 	    Layout.calcPosition(root);
 	    rows = Row.buildRows(rowParts);
-	    Log.debug("doctree", "" + rows.length + " rows prepared");
+	    //	    Log.debug("doctree", "" + rows.length + " rows prepared");
 	    layout.calc();
+	    /*
 	}
 	catch(Exception e)
 	{
 	    e.printStackTrace();
 	}
+	    */
     }
 
     public Iterator getIterator()
@@ -102,7 +104,7 @@ public class Document
     private void calcAbsRowNums()
     {
 	int currentParaTop = 0;
-	for(ParagraphImpl p: paragraphs)
+	for(Paragraph p: paragraphs)
 	{
 	    p.topRowIndex = currentParaTop;
 	    for(RowPart r: p.rowParts)
@@ -147,7 +149,7 @@ public class Document
 
     public String getTitle() { return title != null?title:""; }
     public NodeImpl getRoot() { return root; }
-    public ParagraphImpl[] getParagraphs() { return paragraphs; }
+    public Paragraph[] getParagraphs() { return paragraphs; }
     public Row[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
     public String[] getHrefs(){return hrefs;}

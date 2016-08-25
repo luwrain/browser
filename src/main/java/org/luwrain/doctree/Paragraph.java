@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-public class ParagraphImpl extends NodeImpl
+public class Paragraph extends NodeImpl
 {
     public Run[] runs = new Run[0];
     RowPart[] rowParts = new RowPart[0];
@@ -25,7 +25,7 @@ public class ParagraphImpl extends NodeImpl
     /** Position of the first row in a document*/
     int topRowIndex = -1;
 
-    ParagraphImpl()
+    Paragraph()
     {
 	super(Node.Type.PARAGRAPH);
     }

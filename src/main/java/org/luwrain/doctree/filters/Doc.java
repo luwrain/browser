@@ -27,7 +27,7 @@ import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeImpl;
 import org.luwrain.doctree.NodeFactory;
-import org.luwrain.doctree.ParagraphImpl;
+import org.luwrain.doctree.Paragraph;
 
 import org.apache.poi.hwpf.*;
 import org.apache.poi.hwpf.usermodel.*;
@@ -86,7 +86,7 @@ public class Doc
 	Boolean inTable=false;//Allows to silently skip all table cells except of first;
 	while(i<num)
 	{
-	    final Paragraph paragraph = range.getParagraph(i);
+	    final org.apache.poi.hwpf.usermodel.Paragraph paragraph = range.getParagraph(i);
 	    if (paragraph.getTableLevel() > lvl)
 	    {
 		if(!inTable)
@@ -143,7 +143,7 @@ public class Doc
 	 * @param	subnodes	список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
 	 * @param	paragraph	элемент документа (параграф или элемент списка) или ячейка таблицы
 	 */
-	public void parseParagraph(LinkedList<NodeImpl> subnodes,Paragraph paragraph)
+private void parseParagraph(LinkedList<NodeImpl> subnodes, org.apache.poi.hwpf.usermodel.Paragraph paragraph)
 	{
 		String className=paragraph.getClass().getSimpleName();
 		String paraText="";

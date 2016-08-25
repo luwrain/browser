@@ -42,7 +42,7 @@ class SectionsVisitor implements Visitor
 
     @Override public void visitNode(NodeImpl node) {}
     @Override public void visit(ListItem node) {}
-    @Override public void visit(ParagraphImpl node) {}
+    @Override public void visit(Paragraph node) {}
 
     @Override public void visit(TableCell node) {}
     @Override public void visit(Table node) {}
@@ -52,9 +52,9 @@ class SectionsVisitor implements Visitor
     {
 	NullCheck.notNull(node, "node");
 	NullCheck.notNull(hrefs, "hrefs");
-	if (node instanceof ParagraphImpl)
+	if (node instanceof Paragraph)
 	{
-	    final ParagraphImpl para = (ParagraphImpl)node;
+	    final Paragraph para = (Paragraph)node;
 	    if (para.runs != null)
 		for(Run r: para.runs)
 		    if (r.href() != null && !r.href().isEmpty())

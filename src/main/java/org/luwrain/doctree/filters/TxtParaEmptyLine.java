@@ -52,14 +52,14 @@ public class TxtParaEmptyLine
 	{
 	    if (line.trim().isEmpty())
 	    {
-		final ParagraphImpl para = createPara(paraLines);
+		final Paragraph para = createPara(paraLines);
 		if (para != null)
 		    nodes.add(para);
 		continue;
 	    }
 	    paraLines.add(line.trim());
 	}
-	final ParagraphImpl para = createPara(paraLines);
+	final Paragraph para = createPara(paraLines);
 	if (para != null)
 	    nodes.add(para);
 	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT); 
@@ -67,7 +67,7 @@ public class TxtParaEmptyLine
 	return new Document(root);
     }
 
-    private ParagraphImpl createPara(LinkedList<String> linesList)
+    private Paragraph createPara(LinkedList<String> linesList)
     {
 	final String[] lines = linesList.toArray(new String[linesList.size()]);
 	linesList.clear();

@@ -25,7 +25,7 @@ import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeImpl;
 import org.luwrain.doctree.NodeFactory;
-import org.luwrain.doctree.ParagraphImpl;
+import org.luwrain.doctree.Paragraph;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;

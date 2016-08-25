@@ -23,7 +23,7 @@ class Layout
 {
     private Document document;
     private NodeImpl root;
-    private ParagraphImpl[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private Row[] rows;
     private Line[] lines = new Line[0];
@@ -97,7 +97,7 @@ class Layout
 		continue;
 	    }
 	    final Run run = r.getFirstPart().run;
-	    final ParagraphImpl paragraph = run.getParentParagraph();
+	    final Paragraph paragraph = run.getParentParagraph();
 	    r.x = paragraph.x;
 	    r.y = paragraph.y + r.getFirstPart().relRowNum;
 	    lastX = r.x;
@@ -141,9 +141,9 @@ class Layout
     static void calcHeight(NodeImpl node)
     {
 	NullCheck.notNull(node, "node");
-	if (node instanceof ParagraphImpl)
+	if (node instanceof Paragraph)
 	{
-	    final ParagraphImpl para = (ParagraphImpl)node;
+	    final Paragraph para = (Paragraph)node;
 	    if (para.getRowParts().length == 0)
 	    {
 		para.height = 0;

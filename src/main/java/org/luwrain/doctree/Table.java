@@ -87,9 +87,9 @@ public class Table extends NodeImpl
 	{
 	    if (n.subnodes.length > 1)
 		return false;
-	    if (n.subnodes[0].type != Node.Type.PARAGRAPH || !(n.subnodes[0] instanceof ParagraphImpl))
+	    if (n.subnodes[0].type != Node.Type.PARAGRAPH || !(n.subnodes[0] instanceof Paragraph))
 		return false;
-	    final ParagraphImpl p = (ParagraphImpl)n.subnodes[0];
+	    final Paragraph p = (Paragraph)n.subnodes[0];
 	    if (p.height > 1)
 		return false;
 	}

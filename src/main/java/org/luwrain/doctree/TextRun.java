@@ -24,7 +24,7 @@ public class TextRun implements Run
     private String text = "";
     private String href = "";
 private TextAttr textAttr = new TextAttr();
-    private ParagraphImpl parent;
+    private Paragraph parent;
     ExtraInfo extraInfo = null;
 
     public TextRun(String text)
@@ -100,13 +100,13 @@ ExtraInfo extraInfo)
 	return extraInfo;
     }
 
-@Override public void setParentParagraph(ParagraphImpl para)
+@Override public void setParentParagraph(Paragraph para)
     {
 	NullCheck.notNull(para, "para");
 	this.parent = para;
     }
 
-    public ParagraphImpl getParentParagraph()
+    public Paragraph getParentParagraph()
     {
 	return parent;
     }

@@ -23,7 +23,7 @@ public interface Visitor
 {
     void visitNode(NodeImpl node);
     void visit(ListItem node);
-    void visit(ParagraphImpl node);
+    void visit(Paragraph node);
     void visit(Section node);
     void visit(TableCell node);
     void visit(Table node);
@@ -43,8 +43,8 @@ public interface Visitor
 	    visitor.visit((TableRow)node); else
 	if (node instanceof TableCell)
 	    visitor.visit((TableCell)node); else
-	if (node instanceof ParagraphImpl)
-	    visitor.visit((ParagraphImpl)node); else
+	if (node instanceof Paragraph)
+	    visitor.visit((Paragraph)node); else
 	    visitor.visitNode(node);
 	if (node.subnodes != null)
 	for(NodeImpl n: node.subnodes)
