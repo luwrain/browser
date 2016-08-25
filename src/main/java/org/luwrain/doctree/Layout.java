@@ -97,11 +97,17 @@ class Layout
 		continue;
 	    }
 	    final Run run = r.getFirstPart().run;
-	    final Paragraph paragraph = run.getParentParagraph();
+	    NullCheck.notNull(run, "run");
+	    final NodeImpl parent = run.getParentNode();
+	    NullCheck.notNull(parent, "parent");
+	    if (parent instanceof Paragraph)
+	    {
+		final Paragraph paragraph = (Paragraph)parent;
 	    r.x = paragraph.x;
 	    r.y = paragraph.y + r.getFirstPart().relRowNum;
 	    lastX = r.x;
 	    lastY = r.y;
+	    }
 	    if (r.y > maxLineNum)
 		maxLineNum = r.y;
 	}

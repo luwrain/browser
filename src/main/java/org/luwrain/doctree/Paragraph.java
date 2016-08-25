@@ -42,7 +42,7 @@ public class Paragraph extends NodeImpl
 	    runs = new Run[0];
 	for(Run r: runs)
 	{
-	    r.setParentParagraph(this);
+	    r.setParentNode(this);
 	    r.prepareText();
 	}
     }

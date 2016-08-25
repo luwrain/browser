@@ -24,7 +24,7 @@ public class TextRun implements Run
     private String text = "";
     private String href = "";
 private TextAttr textAttr = new TextAttr();
-    private Paragraph parent;
+    private Paragraph parentPara;
     ExtraInfo extraInfo = null;
 
     public TextRun(String text)
@@ -100,14 +100,16 @@ ExtraInfo extraInfo)
 	return extraInfo;
     }
 
-@Override public void setParentParagraph(Paragraph para)
+@Override public void setParentNode(NodeImpl node)
     {
-	NullCheck.notNull(para, "para");
-	this.parent = para;
+	NullCheck.notNull(node, "node");
+	if (!(node instanceof Paragraph))
+	    throw new IllegalArgumentException("node must be an instance of Paragraph");
+	parentPara = (Paragraph)node;
     }
 
-    public Paragraph getParentParagraph()
+    public NodeImpl getParentNode()
     {
-	return parent;
+	return parentPara;
     }
 }

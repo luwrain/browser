@@ -119,7 +119,7 @@ protected Document document;
     {
 	if (noContent())
 	    return -1;
-	return current - getParagraphImpl().topRowIndex;
+	return current - getParagraph().topRowIndex;
     }
 
     public boolean isFirstRow()
@@ -136,16 +136,10 @@ protected Document document;
 
     public Paragraph getParagraph()
     {
-	if (noContent())
+	if (noContent() || isEmptyRow())
 	    return null;
-	return getParagraphImpl();
-    }
-
-    private Paragraph getParagraphImpl()
-    {
-	if (noContent())
-	    return null;
-	return getFirstRunOfRow().getParentParagraph();
+final NodeImpl parent = getFirstRunOfRow().getParentNode();
+return (parent instanceof Paragraph)?(Paragraph)parent:null;
     }
 
     private Run getFirstRunOfRow()
@@ -160,7 +154,7 @@ protected Document document;
     {
 	if (noContent())
 	    return -1;
-	return getParagraphImpl().getIndexInParentSubnodes();
+	return getParagraph().getIndexInParentSubnodes();
     }
 
     public boolean coversPos(int x, int y)
@@ -205,7 +199,7 @@ protected Document document;
     {
 	if (noContent())
 	    return null;
-	return getParagraphImpl().parentNode;
+	return getParagraph().parentNode;
     }
 
     public boolean isContainerTableCell()
@@ -272,7 +266,7 @@ protected Document document;
     {
 	if (noContent())
 	    return false;
-	NodeImpl n = getParagraphImpl();
+	NodeImpl n = getParagraph();
 	while (n != null && n != container)
 	    n = n.parentNode;
 	return n == container;
