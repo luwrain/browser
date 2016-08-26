@@ -210,6 +210,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    for(NodeImpl n: subnodes)
 		if (tableRow.height < n.height)
 		    tableRow.height = n.height;
+	    if (hasTitleRun(node))
 	    ++node.height;//For title run
 	    return;
 	}
@@ -218,6 +219,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	node.height = 0;
 	for(NodeImpl n: subnodes)
 	    node.height += n.height;
+	if (hasTitleRun(node))
 	++node.height;//For title run
     }
 
@@ -235,7 +237,9 @@ static void calcAbsRowNums(RowPart[] parts)
 	    {
 		n.x = tableRow.x + offset;
 		offset += (tableRow.width + 1);
-		n.y = node.y + 1;
+		n.y = node.y;
+		if (hasTitleRun(node))
+		    ++n.y;
 		calcPosition(n);
 	    }
 	    return;
@@ -246,7 +250,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    node.y = 0;
 	}
 	//Assuming node.x and node.y already set appropriately
-	int offset = 1;//1 for title run
+	int offset = hasTitleRun(node)?1:0;//1 for title run
 	for(NodeImpl n: subnodes)
 	{
 	    n.x = node.x;
@@ -257,6 +261,20 @@ static void calcAbsRowNums(RowPart[] parts)
 		++offset;
 	    */
 	    calcPosition(n);
+	}
+    }
+
+    static boolean hasTitleRun(NodeImpl node)
+    {
+	NullCheck.notNull(node, "node");
+	switch(node.type)
+	{
+	case ROOT:
+	case TABLE:
+	case TABLE_ROW:
+	    return false;
+	default:
+	    return true;
 	}
     }
 
