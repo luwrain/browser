@@ -21,7 +21,7 @@ import org.luwrain.core.*;
 
 import org.luwrain.core.NullCheck;
 
-public class Table extends NodeImpl
+public class Table extends Node
 {
     Table()
     {
@@ -35,17 +35,17 @@ public class Table extends NodeImpl
 	    if (!(subnodes[i] instanceof TableRow))
 	    {
 		Log.warning("doctree", "table has a subnode of class " + subnodes[i].getClass().getName() + ", it will be put into newly created table row");
-		final NodeImpl n = NodeFactory.newNode(Type.TABLE_ROW);
-		n.subnodes = new NodeImpl[]{subnodes[i]};
+		final Node n = NodeFactory.newNode(Type.TABLE_ROW);
+		n.subnodes = new Node[]{subnodes[i]};
 n.subnodes[0].parentNode = n;
 		n.parentNode = this;
 		subnodes[i] = n;
 	    	    }
 		int maxCellCount = 0;
-		for(NodeImpl n: subnodes)
+		for(Node n: subnodes)
 		    if (maxCellCount < n.getSubnodeCount())
 			maxCellCount = n.getSubnodeCount();
-		for(NodeImpl n: subnodes)
+		for(Node n: subnodes)
 		    ((TableRow)n).addEmptyCells(maxCellCount);
 	super.commit();
     }
@@ -54,7 +54,7 @@ n.subnodes[0].parentNode = n;
     {
 	if (row >= subnodes.length || col >= subnodes[row].subnodes.length)
 	    return null;
-	final NodeImpl cellNode = subnodes[row].subnodes[col];
+	final Node cellNode = subnodes[row].subnodes[col];
 	if (cellNode == null || !(cellNode instanceof TableCell))
 	    return null;
 	return (TableCell)cellNode;
@@ -68,7 +68,7 @@ n.subnodes[0].parentNode = n;
     public int getColCount()
     {
 	int maxValue = 0;
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	    if (maxValue < n.subnodes.length)
 		maxValue = n.subnodes.length;
 	return maxValue;
@@ -77,7 +77,7 @@ n.subnodes[0].parentNode = n;
     public int getTableLevel()
     {
 	int count = 1;
-	NodeImpl n = parentNode;
+	Node n = parentNode;
 	while(n != null)
 	{
 	    if (n.type == Node.Type.TABLE)
@@ -89,7 +89,7 @@ n.subnodes[0].parentNode = n;
 
     public boolean isSingleLineRow(int index)
     {
-	for(NodeImpl n: subnodes[index].subnodes)
+	for(Node n: subnodes[index].subnodes)
 	{
 	    if (n.subnodes.length > 1)
 		return false;

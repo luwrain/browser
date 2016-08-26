@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 public class NodeFactory
 {
-    static public NodeImpl newNode(Node.Type type)
+    static public Node newNode(Node.Type type)
     {
 	switch(type)
 	{
@@ -36,11 +36,11 @@ public class NodeFactory
 	case LIST_ITEM:
 	    return new ListItem();
 	default:
-	return new NodeImpl(type);
+	return new Node(type);
 	}
     }
 
-    static public NodeImpl newSection(int level)
+    static public Node newSection(int level)
     {
 	return new Section(level);
     }

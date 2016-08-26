@@ -21,7 +21,7 @@ import org.luwrain.core.NullCheck;
 
 public interface Visitor
 {
-    void visitNode(NodeImpl node);
+    void visitNode(Node node);
     void visit(ListItem node);
     void visit(Paragraph node);
     void visit(Section node);
@@ -29,7 +29,7 @@ public interface Visitor
     void visit(Table node);
     void visit(TableRow node);
 
-    static public void walk(NodeImpl node, Visitor visitor)
+    static public void walk(Node node, Visitor visitor)
     {
 	NullCheck.notNull(node, "node");
 	NullCheck.notNull(visitor, "visitor");
@@ -47,7 +47,7 @@ public interface Visitor
 	    visitor.visit((Paragraph)node); else
 	    visitor.visitNode(node);
 	if (node.subnodes != null)
-	for(NodeImpl n: node.subnodes)
+	for(Node n: node.subnodes)
 	    walk(n, visitor);
     }
 }

@@ -30,22 +30,22 @@ public class Document
     private String[] hrefs;
 
 
-    private NodeImpl root;
+    private Node root;
     private Layout layout = new Layout(this);
     private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private Row[] rows;
 
-    public HashMap<String,NodeImpl> idx=new HashMap<String,NodeImpl>();
+    public HashMap<String,Node> idx=new HashMap<String,Node>();
 
-    public Document(NodeImpl root)
+    public Document(Node root)
     {
 	this.root = root;
 	NullCheck.notNull(root, "root");
 	title = "";
     }
 
-    public Document(String title, NodeImpl root)
+    public Document(String title, Node root)
     {
 	this.root = root;
 	this.title = title;
@@ -131,7 +131,7 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
     }
 
     public String getTitle() { return title != null?title:""; }
-    public NodeImpl getRoot() { return root; }
+    public Node getRoot() { return root; }
     public Paragraph[] getParagraphs() { return paragraphs; }
     public Row[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }

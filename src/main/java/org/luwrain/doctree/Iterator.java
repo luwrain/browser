@@ -22,7 +22,7 @@ import org.luwrain.core.*;
 public class Iterator
 {
 protected Document document;
-    protected NodeImpl root;
+    protected Node root;
     protected Paragraph[] paragraphs;
     protected Row[] rows;
 
@@ -103,7 +103,7 @@ protected Document document;
     {
 	if (noContent() || isEmptyRow())
 	    return null;
-final NodeImpl parent = getFirstRunOfRow().getParentNode();
+final Node parent = getFirstRunOfRow().getParentNode();
 return (parent instanceof Paragraph)?(Paragraph)parent:null;
     }
 
@@ -115,7 +115,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	return row.getFirstPart().run() instanceof TitleRun;
     }
 
-    public NodeImpl getTitleParentNode()
+    public Node getTitleParentNode()
     {
 	if (!isTitleRow())
 	    return null;
@@ -209,7 +209,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	return rows[current].getRunUnderPos(pos);
     }
 
-    public NodeImpl getParaContainer()
+    public Node getParaContainer()
     {
 	if (noContent())
 	    return null;
@@ -224,7 +224,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return false;
 	if (isEmptyRow())
 	    return false;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	return container.type == Node.Type.TABLE_CELL && (container instanceof TableCell);
     }
     */
@@ -234,7 +234,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return null;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	if (container == null || !(container instanceof TableCell))
 	    return null;
 	return (TableCell)container;
@@ -248,7 +248,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return false;
 	if (isEmptyRow())
 	    return false;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	return container.type == Node.Type.LIST_ITEM && (container instanceof ListItem);
     }
     */
@@ -258,7 +258,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return null;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	if (container == null || !(container instanceof ListItem))
 	    return null;
 	return (ListItem)container;
@@ -272,7 +272,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return false;
 	if (isEmptyRow())
 	    return false;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	return container.type == Node.Type.SECTION && (container instanceof Section);
     }
     */
@@ -282,7 +282,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return null;
-	final NodeImpl container = getParaContainer();
+	final Node container = getParaContainer();
 	if (container == null || !(container instanceof Section))
 	    return null;
 	return (Section)container;
@@ -293,7 +293,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     {
 	if (noContent())
 	    return false;
-	NodeImpl n = getParagraph();
+	Node n = getParagraph();
 	while (n != null && n != container)
 	    n = n.parentNode;
 	return n == container;

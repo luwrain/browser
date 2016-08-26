@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-public class Section extends NodeImpl
+public class Section extends Node
 {
     private int level = 1;
 

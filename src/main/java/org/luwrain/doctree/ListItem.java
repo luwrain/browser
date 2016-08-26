@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-public class ListItem extends NodeImpl
+public class ListItem extends Node
 {
     ListItem()
     {

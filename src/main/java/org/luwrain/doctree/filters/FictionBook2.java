@@ -44,8 +44,8 @@ public class FictionBook2
     public org.luwrain.doctree.Document createDoc()
     {
 	try {
-	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	    final Node root = NodeFactory.newNode(Node.Type.ROOT);
+	    final LinkedList<Node> subnodes = new LinkedList<Node>();
 	    final Elements descr=jdoc.select("FictionBook > description");
 	    if(!descr.isEmpty())
 	    {
@@ -54,8 +54,8 @@ public class FictionBook2
 		Elements title=descr.first().getElementsByTag("book-title");
 		if(!title.isEmpty())
 		{
-		    final NodeImpl h1=NodeFactory.newSection(1);
-		    h1.subnodes=new NodeImpl[]{NodeFactory.newPara(title.first().text())};
+		    final Node h1=NodeFactory.newSection(1);
+		    h1.subnodes=new Node[]{NodeFactory.newPara(title.first().text())};
 		    subnodes.add(h1);
 		}
 
@@ -99,14 +99,14 @@ public class FictionBook2
 			     { // enumeraty body esctions
 				 if(e.hasAttr("name"))
 				 { // body name as h2
-				     NodeImpl h2=NodeFactory.newSection(2);
-				     h2.subnodes=new NodeImpl[]{NodeFactory.newPara(e.attr("name"))};
+				     Node h2=NodeFactory.newSection(2);
+				     h2.subnodes=new Node[]{NodeFactory.newPara(e.attr("name"))};
 				     subnodes.add(h2);
 				 }
 				 complexContent(subnodes,e);
 			     });
 	    }
-	    root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	    root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
 	    return new org.luwrain.doctree.Document(root);
 	} catch (Exception e)
 	{
@@ -115,7 +115,7 @@ public class FictionBook2
 	}
     }
     
-    private void complexContent(LinkedList<NodeImpl> subnodes,org.jsoup.nodes.Element element)
+    private void complexContent(LinkedList<Node> subnodes,org.jsoup.nodes.Element element)
     {
     	for(org.jsoup.nodes.Element e:element.children())
     	{
@@ -125,10 +125,10 @@ public class FictionBook2
 	    case "section":
 	    case "epigraph":
 	    case "subtitle":
-		NodeImpl h2=NodeFactory.newSection(3);
-	    final LinkedList<NodeImpl> sn = new LinkedList<NodeImpl>();
+		Node h2=NodeFactory.newSection(3);
+	    final LinkedList<Node> sn = new LinkedList<Node>();
 	    complexContent(sn,e);
-	    h2.subnodes=sn.toArray(new NodeImpl[sn.size()]);
+	    h2.subnodes=sn.toArray(new Node[sn.size()]);
 	    subnodes.add(h2);
 	    break;
 	    case "empty-line":

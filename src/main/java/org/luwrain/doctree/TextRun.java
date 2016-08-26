@@ -100,7 +100,7 @@ ExtraInfo extraInfo)
 	return extraInfo;
     }
 
-@Override public void setParentNode(NodeImpl node)
+@Override public void setParentNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (!(node instanceof Paragraph))
@@ -108,7 +108,7 @@ ExtraInfo extraInfo)
 	parentPara = (Paragraph)node;
     }
 
-    public NodeImpl getParentNode()
+    public Node getParentNode()
     {
 	return parentPara;
     }

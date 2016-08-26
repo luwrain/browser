@@ -614,7 +614,7 @@ b.append(text.substring(0, pos + 1));
 	}
 	if (it.isTitleRow())
 	{
-	    final NodeImpl node = it.getTitleParentNode();
+	    final Node node = it.getTitleParentNode();
 	    if (node instanceof Table)
 	    {
 		final Table table = (Table)node;

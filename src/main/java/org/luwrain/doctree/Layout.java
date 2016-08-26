@@ -22,7 +22,7 @@ import org.luwrain.core.*;
 class Layout
 {
     private Document document;
-    private NodeImpl root;
+    private Node root;
     private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     public RowPart[] rowParts;
     private Row[] rows;
@@ -98,7 +98,7 @@ class Layout
 	    }
 	    final Run run = r.getFirstPart().run();
 	    NullCheck.notNull(run, "run");
-	    final NodeImpl parent = run.getParentNode();
+	    final Node parent = run.getParentNode();
 	    NullCheck.notNull(parent, "parent");
 	    if (parent instanceof Paragraph)
 	    {
@@ -151,19 +151,19 @@ static void calcAbsRowNums(RowPart[] parts)
 	return rows;
     }
 
-    static void calcWidth(NodeImpl node, int recommended)
+    static void calcWidth(Node node, int recommended)
     {
 	NullCheck.notNull(node, "node");
-	final NodeImpl[] subnodes = node.getSubnodes();
+	final Node[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
 	    final TableRow tableRow = (TableRow)node;
 	    final int cellWidth = (recommended - subnodes.length + 1) >= subnodes.length?(recommended - subnodes.length + 1) / subnodes.length:1;
-	    for(NodeImpl n: subnodes)
+	    for(Node n: subnodes)
 		calcWidth(n, cellWidth);
 	    tableRow.width = 0;
-	    for(NodeImpl n: subnodes)
+	    for(Node n: subnodes)
 		tableRow.width += n.width;
 	    tableRow.width += (subnodes.length - 1);//One additional empty column after each cell
 	    if (tableRow.width < recommended)
@@ -171,7 +171,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    return;
 	}
 	node.width = recommended;
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	{
 	    calcWidth(n, recommended);
 	    if (node.width < n.width)
@@ -179,7 +179,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	}
     }
 
-    static void calcHeight(NodeImpl node)
+    static void calcHeight(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof Paragraph)
@@ -197,40 +197,40 @@ static void calcAbsRowNums(RowPart[] parts)
 	    para.height = maxRelRowNum + 1;
 	    return;
 	}
-	final NodeImpl[] subnodes = node.getSubnodes();
+	final Node[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
 	    final TableRow tableRow = (TableRow)node;
-	    for(NodeImpl n: subnodes)
+	    for(Node n: subnodes)
 		calcHeight(n);
 	    tableRow.height = 0;
-	    for(NodeImpl n: subnodes)
+	    for(Node n: subnodes)
 		if (tableRow.height < n.height)
 		    tableRow.height = n.height;
 	    if (hasTitleRun(node))
 	    ++node.height;//For title run
 	    return;
 	}
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	    calcHeight(n);
 	node.height = 0;
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	    node.height += n.height;
 	if (hasTitleRun(node))
 	++node.height;//For title run
     }
 
-    static void calcPosition(NodeImpl node)
+    static void calcPosition(Node node)
     {
 	NullCheck.notNull(node, "node");
-	final NodeImpl[] subnodes = node.getSubnodes();
+	final Node[] subnodes = node.getSubnodes();
 	NullCheck.notNullItems(subnodes, "subnodes");
 	if (node instanceof TableRow)
 	{
 	    final TableRow tableRow = (TableRow)node;
 	    int offset = 0;
-	    for(NodeImpl n: subnodes)
+	    for(Node n: subnodes)
 	    {
 		n.x = tableRow.x + offset;
 		offset += (n.width + 1);
@@ -248,7 +248,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	}
 	//Assuming node.x and node.y already set appropriately
 	int offset = hasTitleRun(node)?1:0;//1 for title run
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	{
 	    n.x = node.x;
 	    n.y = node.y + offset;
@@ -257,7 +257,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	}
     }
 
-    static boolean hasTitleRun(NodeImpl node)
+    static boolean hasTitleRun(Node node)
     {
 	NullCheck.notNull(node, "node");
 	switch(node.type)

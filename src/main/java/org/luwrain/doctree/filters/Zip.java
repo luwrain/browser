@@ -51,8 +51,8 @@ public class Zip
     {
 	ZipFile zip = null;
 	try {
-	    final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-	    final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	    final Node root = NodeFactory.newNode(Node.Type.ROOT);
+	    final LinkedList<Node> subnodes = new LinkedList<Node>();
 	    zip = new ZipFile(fileName);
 	    //	    Enumeration<ZipEntry> entries = zip.entries();
 	    for(Enumeration e = zip.entries();e.hasMoreElements();)
@@ -65,12 +65,12 @@ public class Zip
 		if (res.type() == UrlLoader.Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
-		    for(NodeImpl node: subdoc.getRoot().subnodes)
+		    for(Node node: subdoc.getRoot().subnodes)
 			subnodes.add(node);
 		} else
 		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
 	    }
-	    root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	    root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
 	    return new Document(root);
 	}
 	finally {

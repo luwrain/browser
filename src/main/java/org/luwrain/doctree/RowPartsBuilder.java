@@ -33,13 +33,13 @@ public class RowPartsBuilder
     /** Number of characters in the current (incomplete) row*/
     private int offset = 0;
 
-    void onNode(NodeImpl node)
+    void onNode(Node node)
     {
 	NullCheck.notNull(node, "node"); 
 	onNode(node, 0);
     }
 
-    private void onNode(NodeImpl node, int width)
+    private void onNode(Node node, int width)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof Paragraph)
@@ -61,7 +61,7 @@ public class RowPartsBuilder
 	}
 	if (Layout.hasTitleRun(node))
 	parts.add(makeTitlePart(node.getTitleRun()));
-	for(NodeImpl n: node.getSubnodes())
+	for(Node n: node.getSubnodes())
 		onNode(n);
     }
 

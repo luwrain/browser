@@ -23,7 +23,7 @@ import java.io.*;
 
 import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
-import org.luwrain.doctree.NodeImpl;
+import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeFactory;
 import org.luwrain.doctree.Paragraph;
 
@@ -51,15 +51,15 @@ public class Epub
     public Document constructDocument()
     {
 	try {
-		final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-		final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+		final Node root = NodeFactory.newNode(Node.Type.ROOT);
+		final LinkedList<Node> subnodes = new LinkedList<Node>();
 		EpubReader epubReader = new EpubReader();
 		Book book = epubReader.readEpub(new FileInputStream(fileName));
 		List<String> titles = book.getMetadata().getTitles();
 		for(String s: titles)
 		{
-			NodeImpl h1=NodeFactory.newSection(1);
-			h1.subnodes=new NodeImpl[]{NodeFactory.newPara(s)};
+			Node h1=NodeFactory.newSection(1);
+			h1.subnodes=new Node[]{NodeFactory.newPara(s)};
 			subnodes.add(h1);
 		}
 		for(SpineReference r: book.getSpine().getSpineReferences())
@@ -76,11 +76,11 @@ public class Epub
 		    //FIXME:
 		    //		    				Html html=new Html(false,result);
 		    Document subdoc = null;//html.constructDocument("UTF-8");
-			for(NodeImpl node:subdoc.getRoot().subnodes)
+			for(Node node:subdoc.getRoot().subnodes)
 				subnodes.add(node);
 		}
 		//Range range = doc.getRange();
-		root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+		root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
 		return new Document(root);
 	} catch (IOException e)
 	{

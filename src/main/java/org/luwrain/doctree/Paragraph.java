@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 import java.util.*;
 
-public class Paragraph extends NodeImpl
+public class Paragraph extends Node
 {
     public Run[] runs = new Run[0];
     RowPart[] rowParts = new RowPart[0];

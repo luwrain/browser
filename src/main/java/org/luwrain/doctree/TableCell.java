@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.*;
 
-public class TableCell extends NodeImpl
+public class TableCell extends Node
 {
     TableCell()
     {
@@ -29,7 +29,7 @@ public class TableCell extends NodeImpl
     @Override public void commit()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
-	for(NodeImpl n: subnodes)
+	for(Node n: subnodes)
 	{
 	    if (n instanceof TableRow)
 		Log.warning("doctree", "table cell contains table row what is very odd and looks like a bug");
@@ -45,7 +45,7 @@ public class TableCell extends NodeImpl
     {
 	if (parentNode == null || parentNode.parentNode == null)
 	    return null;
-	final NodeImpl tableNode = parentNode.parentNode;
+	final Node tableNode = parentNode.parentNode;
 	if (!(tableNode instanceof Table))
 	{
 	    Log.warning("doctree", "table node has a wrong class " + tableNode.getClass().getName());

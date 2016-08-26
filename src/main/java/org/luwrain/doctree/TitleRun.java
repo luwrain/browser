@@ -21,7 +21,7 @@ import org.luwrain.core.NullCheck;
 
 public class TitleRun implements Run
 {
-    protected NodeImpl parentNode;
+    protected Node parentNode;
     protected final ExtraInfo extraInfo = new ExtraInfo();
     protected String parentClassName;
 
@@ -66,13 +66,13 @@ public class TitleRun implements Run
 	return extraInfo;
     }
 
-@Override public void setParentNode(NodeImpl node)
+@Override public void setParentNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	parentNode = node;
     }
 
-    public NodeImpl getParentNode()
+    public Node getParentNode()
     {
 	return parentNode;
     }

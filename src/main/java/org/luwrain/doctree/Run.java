@@ -26,7 +26,7 @@ boolean isEmpty();
     String href();
     TextAttr textAttr();
     ExtraInfo extraInfo();
-    void setParentNode(NodeImpl node);
-    NodeImpl getParentNode();
+    void setParentNode(Node node);
+    Node getParentNode();
     void prepareText();
 }

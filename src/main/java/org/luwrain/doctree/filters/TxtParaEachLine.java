@@ -46,15 +46,15 @@ public class TxtParaEachLine
 
     private Document format(String[] lines)
     {
-	final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
+	final LinkedList<Node> nodes = new LinkedList<Node>();
 	for(String line: lines)
 	{
 	    if (line.trim().isEmpty())
 		continue;
 	    nodes.add(NodeFactory.newPara(line.trim()));
 	}
-	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT); 
-	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
+	final Node root = NodeFactory.newNode(Node.Type.ROOT); 
+	root.subnodes = nodes.toArray(new Node[nodes.size()]);
 	return new Document(root);
     }
 }

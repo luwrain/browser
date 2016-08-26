@@ -27,7 +27,7 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
-import org.luwrain.doctree.NodeImpl;
+//import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeFactory;
 import org.luwrain.doctree.ExtraInfo;
 import org.luwrain.core.NullCheck;
@@ -64,7 +64,7 @@ public class Html
 
     public org.luwrain.doctree.Document constructDocument()
     {
-	final org.luwrain.doctree.NodeImpl res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
+	final org.luwrain.doctree.Node res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
 	final HashMap<String, String> meta = new HashMap<String, String>();
 	collectMeta(jsoupDoc.head(), meta);
 	res.subnodes = onNode(jsoupDoc.body());
@@ -90,10 +90,10 @@ public class Html
 		    collectMeta((Element)n, meta);
     }
 
-    private NodeImpl[] onNode(Node node)
+    private org.luwrain.doctree.Node[] onNode(org.jsoup.nodes.Node node)
     {
 	NullCheck.notNull(node, "node");
-	final LinkedList<org.luwrain.doctree.NodeImpl> resNodes = new LinkedList<org.luwrain.doctree.NodeImpl>();
+	final LinkedList<org.luwrain.doctree.Node> resNodes = new LinkedList<org.luwrain.doctree.Node>();
 	final LinkedList<org.luwrain.doctree.Run> runs = new LinkedList<org.luwrain.doctree.Run>();
 	final List<Node> nodes = node.childNodes();
 	for(Node n: nodes)
@@ -117,11 +117,11 @@ public class Html
 	    }
 	}
 	commitPara(resNodes, runs);
-	return resNodes.toArray(new NodeImpl[resNodes.size()]);
+	return resNodes.toArray(new org.luwrain.doctree.Node[resNodes.size()]);
     }
 
     private void onElementInPara(Element el,
-				 LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
+				 LinkedList<org.luwrain.doctree.Node> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
 	NullCheck.notNull(el, "el");
 	final String tagName = el.nodeName();
@@ -184,7 +184,7 @@ public class Html
     }
 
     private void onElement(Element el,
-			   LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
+			   LinkedList<org.luwrain.doctree.Node> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
 	final String name = el.nodeName();
 	if (name == null || name.trim().isEmpty())
@@ -204,8 +204,8 @@ public class Html
 	case "map":
 	    return;
 	}
-	NodeImpl n = null;
-	NodeImpl[] nn = null;
+	org.luwrain.doctree.Node n = null;
+	org.luwrain.doctree.Node[] nn = null;
 	switch(name.toLowerCase().trim())
 	{
 	case "br":
@@ -237,7 +237,7 @@ public class Html
 	addExtraInfo(el);
 	nn = onNode(el);
 	releaseExtraInfo();
-	for(NodeImpl i: nn)
+	for(org.luwrain.doctree.Node i: nn)
 	    nodes.add(i);
 	break;
 
@@ -307,7 +307,7 @@ public class Html
 	    runs.add(new org.luwrain.doctree.TextRun(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
     }
 
-    private void commitPara(LinkedList<NodeImpl> nodes, LinkedList<org.luwrain.doctree.Run> runs)
+    private void commitPara(LinkedList<org.luwrain.doctree.Node> nodes, LinkedList<org.luwrain.doctree.Run> runs)
     {
 	if (runs.isEmpty())
 	    return;

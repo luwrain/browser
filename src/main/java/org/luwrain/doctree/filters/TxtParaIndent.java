@@ -62,12 +62,12 @@ public class TxtParaIndent
     private Document format(String[] lines)
     {
 	final LinkedList<String> paraLines = new LinkedList<String>();
-	final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
+	final LinkedList<Node> nodes = new LinkedList<Node>();
 	for(String line: lines)
 	{
 	    if (line.trim().isEmpty())
 	    {
-		final NodeImpl para = createPara(paraLines);
+		final Node para = createPara(paraLines);
 		if (para != null)
 		    nodes.add(para);
 		continue;
@@ -77,7 +77,7 @@ public class TxtParaIndent
 		indent++;
 	    if (indent > 0)
 	    {
-		final NodeImpl para = createPara(paraLines);
+		final Node para = createPara(paraLines);
 		if (para != null)
 		    nodes.add(para);
 		paraLines.add(line.trim());
@@ -85,11 +85,11 @@ public class TxtParaIndent
 	    }
 	    paraLines.add(line.trim());
 	}
-	final NodeImpl para = createPara(paraLines);
+	final Node para = createPara(paraLines);
 	if (para != null)
 	    nodes.add(para);
-	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT); 
-	root.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
+	final Node root = NodeFactory.newNode(Node.Type.ROOT); 
+	root.subnodes = nodes.toArray(new Node[nodes.size()]);
 	return new Document(root);
     }
 

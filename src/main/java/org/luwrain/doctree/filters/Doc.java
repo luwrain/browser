@@ -25,7 +25,7 @@ import java.nio.file.*;
 import org.luwrain.core.NullCheck;
 import org.luwrain.doctree.Document;
 import org.luwrain.doctree.Node;
-import org.luwrain.doctree.NodeImpl;
+import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeFactory;
 import org.luwrain.doctree.Paragraph;
 
@@ -64,11 +64,11 @@ public class Doc
     private Document transform(HWPFDocument doc)
     {
 	wholeText = doc.getDocumentText();
-	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	final LinkedList<Node> subnodes = new LinkedList<Node>();
 	Range range = doc.getRange();
 	anyRangeAsParagraph(subnodes,range,0);
-	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	final Node root = NodeFactory.newNode(Node.Type.ROOT);
+	root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
 	return new Document(root);
     }
 
@@ -77,7 +77,7 @@ public class Doc
      * @param	range	The range to look through
      * @param	lvl	Current recurse level (must be zero for the root)
      */
-    private void anyRangeAsParagraph(LinkedList<NodeImpl> subnodes,
+    private void anyRangeAsParagraph(LinkedList<Node> subnodes,
 				    Range range,
 				    int lvl)
     {
@@ -92,38 +92,38 @@ public class Doc
 		if(!inTable)
 		{
 		    //We do this processing for the first cell only, skipping all others
-		    final NodeImpl table_node = NodeFactory.newNode(Node.Type.TABLE);
+		    final Node table_node = NodeFactory.newNode(Node.Type.TABLE);
 		    subnodes.add(table_node);
-		    final LinkedList<NodeImpl> rows_subnodes = new LinkedList<NodeImpl>();
+		    final LinkedList<Node> rows_subnodes = new LinkedList<Node>();
 		    inTable=true;//We came to the table;
 		    final org.apache.poi.hwpf.usermodel.Table table = range.getTable(paragraph);
 		    final int rnum=table.numRows();
 		    for(int r=0;r<rnum;r++)
 		    { // для каждой строки таблицы
 			// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-			final NodeImpl rowtable_node = NodeFactory.newNode(Node.Type.TABLE_ROW);
+			final Node rowtable_node = NodeFactory.newNode(Node.Type.TABLE_ROW);
 			rows_subnodes.add(rowtable_node);
-			final LinkedList<NodeImpl> cels_subnodes = new LinkedList<NodeImpl>();
+			final LinkedList<Node> cels_subnodes = new LinkedList<Node>();
 			final TableRow trow=table.getRow(r);
 			final int cnum=trow.numCells();
 			for(int c=0;c<cnum;c++)
 			{ // для каждой ячейки таблицы
 			    //Creating a node for table cell
-			    final NodeImpl celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
-			    final LinkedList<NodeImpl> incell_subnodes = new LinkedList<NodeImpl>();
+			    final Node celltable_node = NodeFactory.newNode(Node.Type.TABLE_CELL);
+			    final LinkedList<Node> incell_subnodes = new LinkedList<Node>();
 			    cels_subnodes.add(celltable_node);
 			    final TableCell cell=trow.getCell(c);
 			    //Trying to figure out that we have just a text in the table cell
 			    if(cell.numParagraphs()>1)
 				anyRangeAsParagraph(incell_subnodes,cell,lvl+1); else
 				parseParagraph(incell_subnodes,cell.getParagraph(0));
-			    celltable_node.subnodes = incell_subnodes.toArray(new NodeImpl[incell_subnodes.size()]);
+			    celltable_node.subnodes = incell_subnodes.toArray(new Node[incell_subnodes.size()]);
 			    checkNodesNotNull(celltable_node.subnodes);
 			} //for(cells);
-			rowtable_node.subnodes = cels_subnodes.toArray(new NodeImpl[cels_subnodes.size()]);
+			rowtable_node.subnodes = cels_subnodes.toArray(new Node[cels_subnodes.size()]);
 			checkNodesNotNull(rowtable_node.subnodes);
 		    } //for(rows);
-		    table_node.subnodes = rows_subnodes.toArray(new NodeImpl[rows_subnodes.size()]);
+		    table_node.subnodes = rows_subnodes.toArray(new Node[rows_subnodes.size()]);
 		    checkNodesNotNull(table_node.subnodes);
 		} // if(!inTable);
 	    } else //if(paragraph.getTableLevel() > lvl);
@@ -143,7 +143,7 @@ public class Doc
 	 * @param	subnodes	список нод на текущем уровне собираемой структуры, в этот список будут добавлены новые элементы
 	 * @param	paragraph	элемент документа (параграф или элемент списка) или ячейка таблицы
 	 */
-private void parseParagraph(LinkedList<NodeImpl> subnodes, org.apache.poi.hwpf.usermodel.Paragraph paragraph)
+private void parseParagraph(LinkedList<Node> subnodes, org.apache.poi.hwpf.usermodel.Paragraph paragraph)
 	{
 		String className=paragraph.getClass().getSimpleName();
 		String paraText="";
@@ -151,7 +151,7 @@ private void parseParagraph(LinkedList<NodeImpl> subnodes, org.apache.poi.hwpf.u
 		{
 			case "ListEntry":
 				// создаем элементы структуры Node и добавляем текущую ноду в список потомка
-				NodeImpl node = NodeFactory.newNode(Node.Type.LIST_ITEM);
+				Node node = NodeFactory.newNode(Node.Type.LIST_ITEM);
 				subnodes.add(node);
 				//
 				ListEntry elem=(ListEntry)paragraph;
@@ -177,9 +177,9 @@ private void parseParagraph(LinkedList<NodeImpl> subnodes, org.apache.poi.hwpf.u
 				String numstr="";
 				for(int lvl=0;lvl<=listLvl;lvl++) numstr+=listInfo.get(listId).get(lvl)+".";
 				paraText=paragraph.text().trim();
-				final LinkedList<NodeImpl> item_subnodes = new LinkedList<NodeImpl>();
+				final LinkedList<Node> item_subnodes = new LinkedList<Node>();
 				item_subnodes.add(NodeFactory.newPara(paraText));
-				node.subnodes = item_subnodes.toArray(new NodeImpl[item_subnodes.size()]);
+				node.subnodes = item_subnodes.toArray(new Node[item_subnodes.size()]);
 			break;
 			case "Paragraph":
 				paraText=paragraph.text().trim();
@@ -200,7 +200,7 @@ private void parseParagraph(LinkedList<NodeImpl> subnodes, org.apache.poi.hwpf.u
 		}
 	}
 
-    private void checkNodesNotNull(NodeImpl[] nodes)
+    private void checkNodesNotNull(Node[] nodes)
     {
 	if (nodes == null)
 	    throw new NullPointerException("nodes is null");

@@ -60,14 +60,14 @@ private  org.luwrain.doctree.Document process()
     private org.luwrain.doctree.Document transform(XWPFDocument doc)
     {
 	NullCheck.notNull(doc, "doc");
-	final LinkedList<NodeImpl> subnodes = new LinkedList<NodeImpl>();
+	final LinkedList<Node> subnodes = new LinkedList<Node>();
 	transformNodes(subnodes, doc.getBodyElements());
-	final NodeImpl root = NodeFactory.newNode(Node.Type.ROOT);
-	root.subnodes = subnodes.toArray(new NodeImpl[subnodes.size()]);
+	final Node root = NodeFactory.newNode(Node.Type.ROOT);
+	root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
 	return new org.luwrain.doctree.Document(root);
     }
 
-    private void transformNodes(LinkedList<NodeImpl> subnodes, List<IBodyElement> range)
+    private void transformNodes(LinkedList<Node> subnodes, List<IBodyElement> range)
     {
 	NullCheck.notNull(subnodes, "subnodes");
 	NullCheck.notNull(range, "range");
@@ -77,34 +77,34 @@ private  org.luwrain.doctree.Document process()
 		parseParagraph(subnodes, p);
     }
 
-    private NodeImpl transformTable(XWPFTable table)
+    private Node transformTable(XWPFTable table)
     {
 	NullCheck.notNull(table, "table");
-	final NodeImpl res = NodeFactory.newNode(Node.Type.TABLE);
-	final LinkedList<NodeImpl> rows = new LinkedList<NodeImpl>();
+	final Node res = NodeFactory.newNode(Node.Type.TABLE);
+	final LinkedList<Node> rows = new LinkedList<Node>();
 	for (final XWPFTableRow row: table.getRows())
 	{ // для каждой строки таблицы
-	    final NodeImpl rowNode = NodeFactory.newNode(Node.Type.TABLE_ROW);
+	    final Node rowNode = NodeFactory.newNode(Node.Type.TABLE_ROW);
 	    rows.add(rowNode);
-	    final LinkedList<NodeImpl> cells = new LinkedList<NodeImpl>();
+	    final LinkedList<Node> cells = new LinkedList<Node>();
 	    for (final XWPFTableCell cell: row.getTableCells())
 	    { // для каждой ячейки таблицы
-		final NodeImpl cellNode = NodeFactory.newNode(Node.Type.TABLE_CELL);
-		final LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
+		final Node cellNode = NodeFactory.newNode(Node.Type.TABLE_CELL);
+		final LinkedList<Node> nodes = new LinkedList<Node>();
 		cells.add(cellNode);
 		transformNodes(nodes, cell.getBodyElements());
-		cellNode.subnodes = nodes.toArray(new NodeImpl[nodes.size()]);
+		cellNode.subnodes = nodes.toArray(new Node[nodes.size()]);
 		checkNodesNotNull(cellNode.subnodes);
 	    }
-	    rowNode.subnodes = cells.toArray(new NodeImpl[cells.size()]);
+	    rowNode.subnodes = cells.toArray(new Node[cells.size()]);
 	    checkNodesNotNull(rowNode.subnodes);
 	} // for(trows);
-	res.subnodes = rows.toArray(new NodeImpl[rows.size()]);
+	res.subnodes = rows.toArray(new Node[rows.size()]);
 	checkNodesNotNull(res.subnodes);
 	return res;
     }
 
-    private void parseParagraph(LinkedList<NodeImpl> subnodes, IBodyElement el)
+    private void parseParagraph(LinkedList<Node> subnodes, IBodyElement el)
     {
 	NullCheck.notNull(subnodes, "subnodes");
 	NullCheck.notNull(el, "el");
@@ -119,7 +119,7 @@ private  org.luwrain.doctree.Document process()
 	    Log.warning("doctree-docx", "unhandled element of class " + el.getClass().getName());
     }
 
-    private void checkNodesNotNull(NodeImpl[] nodes)
+    private void checkNodesNotNull(Node[] nodes)
     {
 	if (nodes == null)
 	    throw new NullPointerException("nodes is null");

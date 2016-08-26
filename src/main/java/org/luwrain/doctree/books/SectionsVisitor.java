@@ -40,7 +40,7 @@ class SectionsVisitor implements Visitor
 	return sections.toArray(new Book.Section[sections.size()]);
     }
 
-    @Override public void visitNode(NodeImpl node) {}
+    @Override public void visitNode(Node node) {}
     @Override public void visit(ListItem node) {}
     @Override public void visit(Paragraph node) {}
 
@@ -48,7 +48,7 @@ class SectionsVisitor implements Visitor
     @Override public void visit(Table node) {}
     @Override public void visit(TableRow node) {}
 
-    static private void collectHrefs(NodeImpl node, LinkedList<String> hrefs)
+    static private void collectHrefs(Node node, LinkedList<String> hrefs)
     {
 	NullCheck.notNull(node, "node");
 	NullCheck.notNull(hrefs, "hrefs");
@@ -61,7 +61,7 @@ class SectionsVisitor implements Visitor
 			hrefs.add(r.href());
 	} else
 	    if (node.subnodes != null)
-		for(NodeImpl n: node.subnodes)
+		for(Node n: node.subnodes)
 		    collectHrefs(n, hrefs);
     }
 }
