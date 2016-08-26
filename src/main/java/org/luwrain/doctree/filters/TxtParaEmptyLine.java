@@ -63,7 +63,7 @@ public class TxtParaEmptyLine
 	if (para != null)
 	    nodes.add(para);
 	final Node root = NodeFactory.newNode(Node.Type.ROOT); 
-	root.subnodes = nodes.toArray(new Node[nodes.size()]);
+	root.setSubnodes(nodes.toArray(new Node[nodes.size()]));
 	return new Document(root);
     }
 

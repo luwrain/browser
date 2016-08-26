@@ -67,7 +67,7 @@ public class Html
 	final org.luwrain.doctree.Node res = NodeFactory.newNode(org.luwrain.doctree.Node.Type.ROOT);
 	final HashMap<String, String> meta = new HashMap<String, String>();
 	collectMeta(jsoupDoc.head(), meta);
-	res.subnodes = onNode(jsoupDoc.body());
+	res.setSubnodes(onNode(jsoupDoc.body()));
 	final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
 	doc.setProperty("url", docUrl.toString());
 	doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
@@ -253,7 +253,7 @@ public class Html
 	    commitPara(nodes, runs);
 	addExtraInfo(el);
 	n = NodeFactory.newSection(name.trim().charAt(1) - '0');
-	n.subnodes = onNode(el);
+	n.setSubnodes(onNode(el));
 	n.extraInfo = getCurrentExtraInfo();
 	releaseExtraInfo();
 	nodes.add(n);
@@ -269,7 +269,7 @@ public class Html
 	    commitPara(nodes, runs);
 	addExtraInfo(el);
 	n = NodeFactory.newNode(getNodeType(name));
-	n.subnodes = onNode(el);
+	n.setSubnodes(onNode(el));
 	n.extraInfo = getCurrentExtraInfo();
 	releaseExtraInfo();
 	nodes.add(n);

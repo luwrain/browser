@@ -59,7 +59,7 @@ public class Epub
 		for(String s: titles)
 		{
 			Node h1=NodeFactory.newSection(1);
-			h1.subnodes=new Node[]{NodeFactory.newPara(s)};
+			h1.setSubnodes(new Node[]{NodeFactory.newPara(s)});
 			subnodes.add(h1);
 		}
 		for(SpineReference r: book.getSpine().getSpineReferences())
@@ -76,11 +76,11 @@ public class Epub
 		    //FIXME:
 		    //		    				Html html=new Html(false,result);
 		    Document subdoc = null;//html.constructDocument("UTF-8");
-			for(Node node:subdoc.getRoot().subnodes)
+		    for(Node node:subdoc.getRoot().getSubnodes())
 				subnodes.add(node);
 		}
 		//Range range = doc.getRange();
-		root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+		root.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
 		return new Document(root);
 	} catch (IOException e)
 	{

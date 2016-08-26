@@ -19,6 +19,8 @@ package org.luwrain.doctree;
 
 import java.util.*;
 
+import org.luwrain.core.*;
+
 public class Node
 {
     public enum Type {
@@ -34,7 +36,7 @@ public class Node
     protected Type type;
     public ExtraInfo extraInfo = null;
     public int importance = IMPORTANCE_REGULAR;
-    public Node[] subnodes = new Node[0];
+Node[] subnodes = new Node[0];
     Node parentNode;
     protected final TitleRun titleRun = new TitleRun(this.getClass().getName());
 
@@ -56,7 +58,7 @@ public class Node
 	this.type = type;
     }
 
-    Node[] getSubnodes()
+    public Node[] getSubnodes()
     {
 	return subnodes != null?subnodes:new Node[0];
     }
@@ -204,5 +206,11 @@ void setEmptyMark()
     public Type getType()
     {
 	return type;
+    }
+
+    public void setSubnodes(Node[] subnodes)
+    {
+	NullCheck.notNullItems(subnodes, "subnodes");
+	this.subnodes = subnodes;
     }
 }

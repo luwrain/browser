@@ -63,7 +63,7 @@ private  org.luwrain.doctree.Document process()
 	final LinkedList<Node> subnodes = new LinkedList<Node>();
 	transformNodes(subnodes, doc.getBodyElements());
 	final Node root = NodeFactory.newNode(Node.Type.ROOT);
-	root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+	root.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
 	return new org.luwrain.doctree.Document(root);
     }
 
@@ -93,14 +93,14 @@ private  org.luwrain.doctree.Document process()
 		final LinkedList<Node> nodes = new LinkedList<Node>();
 		cells.add(cellNode);
 		transformNodes(nodes, cell.getBodyElements());
-		cellNode.subnodes = nodes.toArray(new Node[nodes.size()]);
-		checkNodesNotNull(cellNode.subnodes);
+		cellNode.setSubnodes(nodes.toArray(new Node[nodes.size()]));
+		//		checkNodesNotNull(cellNode.subnodes);
 	    }
-	    rowNode.subnodes = cells.toArray(new Node[cells.size()]);
-	    checkNodesNotNull(rowNode.subnodes);
+	    rowNode.setSubnodes(cells.toArray(new Node[cells.size()]));
+	    //	    checkNodesNotNull(rowNode.subnodes);
 	} // for(trows);
-	res.subnodes = rows.toArray(new Node[rows.size()]);
-	checkNodesNotNull(res.subnodes);
+	res.setSubnodes(rows.toArray(new Node[rows.size()]));
+	//	checkNodesNotNull(res.subnodes);
 	return res;
     }
 

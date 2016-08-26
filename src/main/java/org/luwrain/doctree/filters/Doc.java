@@ -68,7 +68,7 @@ public class Doc
 	Range range = doc.getRange();
 	anyRangeAsParagraph(subnodes,range,0);
 	final Node root = NodeFactory.newNode(Node.Type.ROOT);
-	root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+	root.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
 	return new Document(root);
     }
 
@@ -117,14 +117,14 @@ public class Doc
 			    if(cell.numParagraphs()>1)
 				anyRangeAsParagraph(incell_subnodes,cell,lvl+1); else
 				parseParagraph(incell_subnodes,cell.getParagraph(0));
-			    celltable_node.subnodes = incell_subnodes.toArray(new Node[incell_subnodes.size()]);
-			    checkNodesNotNull(celltable_node.subnodes);
+			    celltable_node.setSubnodes(incell_subnodes.toArray(new Node[incell_subnodes.size()]));
+			    //			    checkNodesNotNull(celltable_node.subnodes);
 			} //for(cells);
-			rowtable_node.subnodes = cels_subnodes.toArray(new Node[cels_subnodes.size()]);
-			checkNodesNotNull(rowtable_node.subnodes);
+			rowtable_node.setSubnodes(cels_subnodes.toArray(new Node[cels_subnodes.size()]));
+			//			checkNodesNotNull(rowtable_node.subnodes);
 		    } //for(rows);
-		    table_node.subnodes = rows_subnodes.toArray(new Node[rows_subnodes.size()]);
-		    checkNodesNotNull(table_node.subnodes);
+		    table_node.setSubnodes(rows_subnodes.toArray(new Node[rows_subnodes.size()]));
+		    //		    checkNodesNotNull(table_node.subnodes);
 		} // if(!inTable);
 	    } else //if(paragraph.getTableLevel() > lvl);
 	    {
@@ -179,7 +179,7 @@ private void parseParagraph(LinkedList<Node> subnodes, org.apache.poi.hwpf.userm
 				paraText=paragraph.text().trim();
 				final LinkedList<Node> item_subnodes = new LinkedList<Node>();
 				item_subnodes.add(NodeFactory.newPara(paraText));
-				node.subnodes = item_subnodes.toArray(new Node[item_subnodes.size()]);
+				node.setSubnodes(item_subnodes.toArray(new Node[item_subnodes.size()]));
 			break;
 			case "Paragraph":
 				paraText=paragraph.text().trim();
@@ -200,6 +200,7 @@ private void parseParagraph(LinkedList<Node> subnodes, org.apache.poi.hwpf.userm
 		}
 	}
 
+    /*
     private void checkNodesNotNull(Node[] nodes)
     {
 	if (nodes == null)
@@ -208,4 +209,5 @@ private void parseParagraph(LinkedList<Node> subnodes, org.apache.poi.hwpf.userm
 	    if (nodes[i] == null)
 		throw new NullPointerException("nodes[" + i + "] is null");
     }
+    */
 }

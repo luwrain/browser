@@ -55,7 +55,7 @@ public class FictionBook2
 		if(!title.isEmpty())
 		{
 		    final Node h1=NodeFactory.newSection(1);
-		    h1.subnodes=new Node[]{NodeFactory.newPara(title.first().text())};
+		    h1.setSubnodes(new Node[]{NodeFactory.newPara(title.first().text())});
 		    subnodes.add(h1);
 		}
 
@@ -100,13 +100,13 @@ public class FictionBook2
 				 if(e.hasAttr("name"))
 				 { // body name as h2
 				     Node h2=NodeFactory.newSection(2);
-				     h2.subnodes=new Node[]{NodeFactory.newPara(e.attr("name"))};
+				     h2.setSubnodes(new Node[]{NodeFactory.newPara(e.attr("name"))});
 				     subnodes.add(h2);
 				 }
 				 complexContent(subnodes,e);
 			     });
 	    }
-	    root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+	    root.setSubnodes ( subnodes.toArray(new Node[subnodes.size()]));
 	    return new org.luwrain.doctree.Document(root);
 	} catch (Exception e)
 	{
@@ -128,7 +128,7 @@ public class FictionBook2
 		Node h2=NodeFactory.newSection(3);
 	    final LinkedList<Node> sn = new LinkedList<Node>();
 	    complexContent(sn,e);
-	    h2.subnodes=sn.toArray(new Node[sn.size()]);
+	    h2.setSubnodes(sn.toArray(new Node[sn.size()]));
 	    subnodes.add(h2);
 	    break;
 	    case "empty-line":

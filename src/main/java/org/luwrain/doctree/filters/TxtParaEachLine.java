@@ -54,7 +54,7 @@ public class TxtParaEachLine
 	    nodes.add(NodeFactory.newPara(line.trim()));
 	}
 	final Node root = NodeFactory.newNode(Node.Type.ROOT); 
-	root.subnodes = nodes.toArray(new Node[nodes.size()]);
+	root.setSubnodes(nodes.toArray(new Node[nodes.size()]));
 	return new Document(root);
     }
 }

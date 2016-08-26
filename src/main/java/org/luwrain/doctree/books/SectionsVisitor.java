@@ -60,8 +60,7 @@ class SectionsVisitor implements Visitor
 		    if (r.href() != null && !r.href().isEmpty())
 			hrefs.add(r.href());
 	} else
-	    if (node.subnodes != null)
-		for(Node n: node.subnodes)
+	    for(Node n: node.getSubnodes())
 		    collectHrefs(n, hrefs);
     }
 }

@@ -65,12 +65,12 @@ public class Zip
 		if (res.type() == UrlLoader.Result.Type.OK)
 		{
 		    final Document subdoc = res.doc();
-		    for(Node node: subdoc.getRoot().subnodes)
+		    for(Node node: subdoc.getRoot().getSubnodes())
 			subnodes.add(node);
 		} else
 		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
 	    }
-	    root.subnodes = subnodes.toArray(new Node[subnodes.size()]);
+	    root.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
 	    return new Document(root);
 	}
 	finally {
