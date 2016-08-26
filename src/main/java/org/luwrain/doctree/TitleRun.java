@@ -33,7 +33,7 @@ public class TitleRun implements Run
 
     @Override public String text()
     {
-	return "-";
+	return " ";
     }
 
     @Override public boolean isEmpty()

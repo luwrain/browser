@@ -17,7 +17,7 @@
 
 package org.luwrain.doctree;
 
-import org.luwrain.core.NullCheck;
+import org.luwrain.core.*;
 
 class Layout
 {
@@ -151,7 +151,6 @@ static void calcAbsRowNums(RowPart[] parts)
 	return rows;
     }
 
-    //Launched before any other processing, RowPartsBuilder goes next
     static void calcWidth(NodeImpl node, int recommended)
     {
 	NullCheck.notNull(node, "node");
@@ -180,7 +179,6 @@ static void calcAbsRowNums(RowPart[] parts)
 	}
     }
 
-    //Launched after RowPartsBuilder
     static void calcHeight(NodeImpl node)
     {
 	NullCheck.notNull(node, "node");
@@ -223,7 +221,6 @@ static void calcAbsRowNums(RowPart[] parts)
 	++node.height;//For title run
     }
 
-    //Launched after calcHeight;
     static void calcPosition(NodeImpl node)
     {
 	NullCheck.notNull(node, "node");
@@ -236,7 +233,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	    for(NodeImpl n: subnodes)
 	    {
 		n.x = tableRow.x + offset;
-		offset += (tableRow.width + 1);
+		offset += (n.width + 1);
 		n.y = node.y;
 		if (hasTitleRun(node))
 		    ++n.y;
@@ -256,10 +253,6 @@ static void calcAbsRowNums(RowPart[] parts)
 	    n.x = node.x;
 	    n.y = node.y + offset;
 	    offset += n.height;
-	    /*
-	    if (n.type == Node.Type.ROOT)
-		++offset;
-	    */
 	    calcPosition(n);
 	}
     }
