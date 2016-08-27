@@ -30,13 +30,12 @@ public class Node
 	SMIL_PARAGRAPH // daisy dtbook: Parallel time grouping in which multiple elements (e.g., text, audio, and image) play back simultaneously
     };
 
-    static public final int IMPORTANCE_REGULAR = 50;
-    protected static final int MIN_TABLE_CELL_WIDTH = 8;
+    static public final int IMPORTANCE_REGULAR = 0;
 
     protected Type type;
     public ExtraInfo extraInfo = null;
-    public int importance = IMPORTANCE_REGULAR;
-Node[] subnodes = new Node[0];
+    protected int importance = IMPORTANCE_REGULAR;
+protected Node[] subnodes = new Node[0];
     Node parentNode;
     protected final TitleRun titleRun = new TitleRun(this.getClass().getName());
 
@@ -107,20 +106,14 @@ public int getNodeHeight()
 	    n.commit();
 	}
 	if (type == Type.ORDERED_LIST || type == Type.UNORDERED_LIST)
-	    for(int i = 0;i < subnodes.length;++i)
-		if (subnodes[i].type != Node.Type.LIST_ITEM)
-		{
-		    final Node n = NodeFactory.newNode(Type.LIST_ITEM);
-		    n.subnodes = new Node[]{subnodes[i]};
-		    n.parentNode = this;
-		    n.commit();
-		    subnodes[i] = n;
-		}
+	    arrangeListItems();
     }
 
 void setEmptyMark()
     {
 	empty = true;
+	if (importance < 0)
+	    return;
 	if (subnodes == null || subnodes.length < 1)
 	    return;
 	for(Node n:subnodes)
@@ -150,16 +143,28 @@ void setEmptyMark()
 
     @Override public String toString()
     {
+	if (type == null)
+	    return "";
+	return type.toString() + " \"" + getCompleteText() + "\"";
+    }
+
+    public String getCompleteText()
+    {
 	if (subnodes == null)
 	    return "";
-	String s = "";
+	final StringBuilder b = new StringBuilder();
+	boolean first = true;
 	for(Node n: subnodes)
 	{
-	    if (!s.isEmpty())
-		s += " ";
-	    s += n.toString();
+	    final String value = n.getCompleteText();
+	    if (value.isEmpty())
+		continue;
+	    if (!first)
+		b.append(" ");
+	    first = false;
+	    b.append(value);
 	}
-	return s;
+	return new String(b);
     }
 
     /** 
@@ -212,5 +217,42 @@ void setEmptyMark()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
 	this.subnodes = subnodes;
+    }
+
+    public int getImportance()
+    {
+	return importance;
+    }
+
+    public void setImportance(int importance)
+    {
+	this.importance = importance;
+    }
+
+    public boolean hasNonParagraphs()
+    {
+	if (subnodes == null)
+	    return false;
+	for(Node n: subnodes)
+	    if (!(n instanceof Paragraph))
+		return true;
+	return false;
+    }
+
+protected void arrangeListItems()
+    {
+	NullCheck.notNullItems(subnodes, "subnodes");
+	    for(int i = 0;i < subnodes.length;++i)
+		if (!(subnodes[i] instanceof ListItem))
+		{
+		    Log.warning("doctree", "subnode of type " + subnodes[i].type + " found inside of a list" );
+		    final Node n = NodeFactory.newNode(Type.LIST_ITEM);
+		    n.subnodes = new Node[]{subnodes[i]};
+		    n.parentNode = this;
+		    n.commit();
+
+		    subnodes[i] = n;
+		}
+
     }
 }

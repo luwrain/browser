@@ -46,6 +46,8 @@ public class Paragraph extends Node
     @Override void setEmptyMark()
     {
 	empty = true;
+	if (importance < 0)
+	    return;
 	if (runs == null || runs.length < 1)
 	    return;
 	for(Run r: runs)
@@ -90,5 +92,24 @@ public class Paragraph extends Node
     public Run[] runs()
     {
 	return runs != null?runs:new Run[0];
+    }
+
+    @Override public String getCompleteText()
+    {
+	if (runs == null)
+	    return "";
+	final StringBuilder b = new StringBuilder();
+	boolean first = true;
+	for(Run r: runs)
+	{
+	    final String value = r.text();
+	    if (value.isEmpty())
+		continue;
+	    if (!first)
+		b.append(" ");
+	    first = false;
+	    b.append(value);
+	}
+	return new String(b);
     }
 }

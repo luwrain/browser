@@ -101,4 +101,10 @@ n.subnodes[0].parentNode = n;
 	}
 	    return true;
     }
+
+    public boolean isSingleCellTable()
+    {
+	NullCheck.notNullItems(subnodes, "subnodes");
+	return subnodes.length == 1 || subnodes[0].getSubnodes().length == 1;
+    }
 }

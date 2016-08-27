@@ -19,9 +19,25 @@ package org.luwrain.doctree;
 
 import java.util.*;
 
+import org.luwrain.core.*;
+
 public class ExtraInfo
 {
     public String name;
-public final HashMap<String, String> attrs = new HashMap<String, String>();
+    public final HashMap<String, String> attrs = new HashMap<String, String>();
     public ExtraInfo parent = null;
+
+    public String getName()
+    {
+	return name != null?name:"";
+    }
+
+    public String getAttr(String attrName)
+    {
+	NullCheck.notEmpty(attrName, "attrName");
+	if (attrs == null || !attrs.containsKey(attrName))
+	    return "";
+	return attrs.get(attrName);
+
+    }
 }

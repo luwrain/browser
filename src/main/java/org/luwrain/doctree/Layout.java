@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.*;
 
-class Layout
+public class Layout
 {
     private Document document;
     private Node root;
@@ -257,15 +257,27 @@ static void calcAbsRowNums(RowPart[] parts)
 	}
     }
 
-    static boolean hasTitleRun(Node node)
+    //May be called after width calculation
+    static public boolean hasTitleRun(Node node)
     {
 	NullCheck.notNull(node, "node");
 	switch(node.type)
 	{
+	case LIST_ITEM:
+	    if (node.hasNonParagraphs())
+		return true;
+return node.width <= 0 || node.getCompleteText().length() >= node.width;
 	case ROOT:
 	case TABLE:
 	case TABLE_ROW:
 	    return false;
+	    /*
+	case ORDERED_LIST:
+	case UNORDERED_LIST:
+	    return node.getSubnodes().length > 1;
+	    */
+	case TABLE_CELL:
+	    return !((TableCell)node).getTable().isSingleCellTable();
 	default:
 	    return true;
 	}
