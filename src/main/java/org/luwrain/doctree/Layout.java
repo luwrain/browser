@@ -24,7 +24,7 @@ public class Layout
     private Document document;
     private Node root;
     private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
-    public RowPart[] rowParts;
+    private RowPart[] rowParts;
     private Row[] rows;
     private Line[] lines = new Line[0];
 
@@ -118,7 +118,7 @@ public class Layout
 	return maxLineNum + 1;
     }
 
-static void calcAbsRowNums(RowPart[] parts)
+    static void calcAbsRowNums(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	if (parts.length < 1)
@@ -130,14 +130,12 @@ static void calcAbsRowNums(RowPart[] parts)
 	    final RowPart part = parts[i];
 	    if (!first.onTheSameRow(part))
 	    {
-	    part.absRowNum = first.absRowNum + 1;
-	    first = part;
-	    //	    System.out.println("new");
+		part.absRowNum = first.absRowNum + 1;
+		first = part;
 	    } else
 		part.absRowNum = first.absRowNum;
 	}
     }
-
 
     static Row[] buildRows(RowPart[] parts)
     {
@@ -209,7 +207,7 @@ static void calcAbsRowNums(RowPart[] parts)
 		if (tableRow.height < n.height)
 		    tableRow.height = n.height;
 	    if (hasTitleRun(node))
-	    ++node.height;//For title run
+		++node.height;//For title run
 	    return;
 	}
 	for(Node n: subnodes)
@@ -218,7 +216,7 @@ static void calcAbsRowNums(RowPart[] parts)
 	for(Node n: subnodes)
 	    node.height += n.height;
 	if (hasTitleRun(node))
-	++node.height;//For title run
+	    ++node.height;//For title run
     }
 
     static void calcPosition(Node node)
@@ -264,18 +262,20 @@ static void calcAbsRowNums(RowPart[] parts)
 	switch(node.type)
 	{
 	case LIST_ITEM:
+	case SECTION:
 	    if (node.hasNonParagraphs())
 		return true;
-return node.width <= 0 || node.getCompleteText().length() >= node.width;
+	    return node.width <= 0 || node.getCompleteText().length() >= node.width;
 	case ROOT:
 	case TABLE:
 	case TABLE_ROW:
 	    return false;
-	    /*
-	case ORDERED_LIST:
-	case UNORDERED_LIST:
-	    return node.getSubnodes().length > 1;
-	    */
+	      case ORDERED_LIST:
+	      case UNORDERED_LIST:
+		  for(Node n: node.getSubnodes())
+		      if (hasTitleRun(n))
+			  return true;
+		  return false;
 	case TABLE_CELL:
 	    return !((TableCell)node).getTable().isSingleCellTable();
 	default:

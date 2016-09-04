@@ -25,9 +25,8 @@ public class Node
 {
     public enum Type {
 	ROOT, SECTION, PARAGRAPH,
-	TABLE, TABLE_ROW,TABLE_CELL, 
+	TABLE, TABLE_ROW, TABLE_CELL,
 	UNORDERED_LIST, ORDERED_LIST, LIST_ITEM,
-	SMIL_PARAGRAPH // daisy dtbook: Parallel time grouping in which multiple elements (e.g., text, audio, and image) play back simultaneously
     };
 
     static public final int IMPORTANCE_REGULAR = 0;
@@ -35,7 +34,7 @@ public class Node
     protected Type type;
     public ExtraInfo extraInfo = null;
     protected int importance = IMPORTANCE_REGULAR;
-protected Node[] subnodes = new Node[0];
+    protected Node[] subnodes = new Node[0];
     Node parentNode;
     protected final TitleRun titleRun = new TitleRun(this.getClass().getName());
 
@@ -50,7 +49,7 @@ protected Node[] subnodes = new Node[0];
     int width = 0;
     int height = 0;
 
-    boolean empty = false;
+    protected boolean empty = false;
 
 	Node(Type type)
     {
@@ -239,20 +238,44 @@ void setEmptyMark()
 	return false;
     }
 
-protected void arrangeListItems()
+    protected void arrangeListItems()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
-	    for(int i = 0;i < subnodes.length;++i)
-		if (!(subnodes[i] instanceof ListItem))
-		{
-		    Log.warning("doctree", "subnode of type " + subnodes[i].type + " found inside of a list" );
-		    final Node n = NodeFactory.newNode(Type.LIST_ITEM);
-		    n.subnodes = new Node[]{subnodes[i]};
-		    n.parentNode = this;
-		    n.commit();
-
-		    subnodes[i] = n;
-		}
-
+	final LinkedList<Node> nodes = new LinkedList<Node>();
+	final LinkedList<Node> nextNodes = new LinkedList<Node>();
+	for(int i = 0;i < subnodes.length;++i)
+	{
+	    final Node n = subnodes[i];
+	    if (!(subnodes[i] instanceof ListItem))
+	    {
+		Log.warning("doctree", "subnode of type " + subnodes[i].type + " found inside of a list" );
+		nextNodes.add(n);
+		continue;
+	    }
+	    if (!nextNodes.isEmpty())
+	    {
+		final Node item = NodeFactory.newNode(Type.LIST_ITEM);
+		item.setSubnodes(nextNodes.toArray(new Node[nextNodes.size()]));
+		nextNodes.clear();
+		item.parentNode = this;
+		for(Node k: item.getSubnodes())
+		    k.parentNode = item;
+		nodes.add(item);
+	    }
+	    nodes.add(n);
+	}
+	if (!nextNodes.isEmpty())
+	{
+	    final Node item = NodeFactory.newNode(Type.LIST_ITEM);
+	    item.setSubnodes(nextNodes.toArray(new Node[nextNodes.size()]));
+	    nextNodes.clear();
+	    item.parentNode = this;
+	    for(Node k: item.getSubnodes())
+		k.parentNode = item;
+	    nodes.add(item);
+	}
+	subnodes = nodes.toArray(new Node[nodes.size()]);
+	for(Node n: subnodes)
+	    n.commit();
     }
 }

@@ -107,6 +107,25 @@ final Node parent = getFirstRunOfRow().getParentNode();
 return (parent instanceof Paragraph)?(Paragraph)parent:null;
     }
 
+    //Returns null if is at title row
+    public Node getParaContainer()
+    {
+	if (noContent())
+	    return null;
+	final Paragraph para = getParagraph();
+	return para != null?para.parentNode:null;
+    }
+
+    public boolean hasContainerInParents(Node container)
+    {
+	if (noContent())
+	    return false;
+	Node n = getParagraph();
+	while (n != null && n != container)
+	    n = n.parentNode;
+	return n == container;
+    }
+
     public boolean isTitleRow()
     {
 	final Row row = getRow();
@@ -120,6 +139,13 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	if (!isTitleRow())
 	    return null;
 	return getRow().getFirstPart().run().getParentNode();
+    }
+
+    public Node getNode()
+    {
+	if (isTitleRow())
+	    return getTitleParentNode();
+	return getParaContainer();
     }
 
 
@@ -171,6 +197,13 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	return para != null?para.getIndexInParentSubnodes():-1;
     }
 
+    public boolean isFirstPara()
+    {
+	if (noContent())
+	    return false;
+	return getParaIndex() == 0;
+    }
+
     public boolean coversPos(int x, int y)
     {
 	if (noContent())
@@ -185,13 +218,6 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	if (x > r.getRowX() + getText().length())
 	    return false;
 	return true;
-    }
-
-    public boolean isFirstPara()
-    {
-	if (noContent())
-	    return false;
-	return getParaIndex() == 0;
     }
 
     public String getText()
@@ -209,94 +235,18 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	return rows[current].getRunUnderPos(pos);
     }
 
-    public Node getParaContainer()
-    {
-	if (noContent())
-	    return null;
-	final Paragraph para = getParagraph();
-	return para != null?para.parentNode:null;
-    }
-
-    /*
-    public boolean isContainerTableCell()
+    public boolean canMoveNext()
     {
 	if (noContent())
 	    return false;
-	if (isEmptyRow())
-	    return false;
-	final Node container = getParaContainer();
-	return container.type == Node.Type.TABLE_CELL && (container instanceof TableCell);
+	return current + 1 < rows.length;
     }
-    */
 
-    /*
-    public TableCell getTableCell()
-    {
-	if (noContent())
-	    return null;
-	final Node container = getParaContainer();
-	if (container == null || !(container instanceof TableCell))
-	    return null;
-	return (TableCell)container;
-    }
-    */
-
-    /*
-    public boolean isContainerListItem()
+    public boolean canMovePrev()
     {
 	if (noContent())
 	    return false;
-	if (isEmptyRow())
-	    return false;
-	final Node container = getParaContainer();
-	return container.type == Node.Type.LIST_ITEM && (container instanceof ListItem);
-    }
-    */
-
-    /*
-    public ListItem getListItem()
-    {
-	if (noContent())
-	    return null;
-	final Node container = getParaContainer();
-	if (container == null || !(container instanceof ListItem))
-	    return null;
-	return (ListItem)container;
-    }
-    */
-
-    /*
-    public boolean isContainerSection()
-    {
-	if (noContent())
-	    return false;
-	if (isEmptyRow())
-	    return false;
-	final Node container = getParaContainer();
-	return container.type == Node.Type.SECTION && (container instanceof Section);
-    }
-    */
-
-    /*
-    public Section getSection()
-    {
-	if (noContent())
-	    return null;
-	final Node container = getParaContainer();
-	if (container == null || !(container instanceof Section))
-	    return null;
-	return (Section)container;
-    }
-    */
-
-    public boolean hasContainerInParents(Node container)
-    {
-	if (noContent())
-	    return false;
-	Node n = getParagraph();
-	while (n != null && n != container)
-	    n = n.parentNode;
-	return n == container;
+	return current > 0;
     }
 
     public boolean moveNext()
@@ -304,18 +254,6 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	if (!canMoveNext())
 	    return false;
 	++current;
-	return true;
-    }
-
-    public boolean moveNextUntilContainer(Node container)
-    {
-	final Iterator it = (Iterator)clone();
-	while (!it.hasContainerInParents(container))
-	    if (!it.moveNext())
-		break;
-	if (!it.hasContainerInParents(container))
-	    return false;
-	current = it.getRowAbsIndex();
 	return true;
     }
 
@@ -335,19 +273,5 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     public void moveHome()
     {
 	current = 0;
-    }
-
-    public boolean canMoveNext()
-    {
-	if (noContent())
-	    return false;
-	return current + 1 < rows.length;
-    }
-
-    public boolean canMovePrev()
-    {
-	if (noContent())
-	    return false;
-	return current > 0;
     }
 }

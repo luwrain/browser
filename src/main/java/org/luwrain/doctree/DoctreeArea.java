@@ -315,7 +315,7 @@ b.append(text.substring(0, pos + 1));
 	return true;
     }
 
-    private boolean onArrowDown(KeyboardEvent event, boolean briefAnnouncement)
+    private boolean onArrowDown(KeyboardEvent event, boolean quickNav)
     {
 	if (noContentCheck())
 	    return true;
@@ -324,7 +324,10 @@ b.append(text.substring(0, pos + 1));
 	    environment.hint(Hints.NO_LINES_BELOW);
 	    return true;
 	}
-	onNewHotPointY( briefAnnouncement );
+	if (quickNav)
+	    while(iterator.canMoveNext() && iterator.isTitleRow())
+		iterator.moveNext();
+	onNewHotPointY( quickNav);
 	return true;
     }
 
@@ -359,37 +362,56 @@ b.append(text.substring(0, pos + 1));
 	return true;
     }
 
-    private boolean onPageDown(KeyboardEvent event, boolean briefAnnouncement)
+    protected boolean onPageDown(KeyboardEvent event, boolean quickNav)
     {
-	/*
 	if (noContentCheck())
 	    return true;
-	if (!iterator.moveNext())
+	if (!quickNav)
 	{
-	    environment.hint(Hints.NO_LINES_BELOW);
-	    return true;
+	    final Node current = iterator.getParaContainer();//Will be null, if is at title row
+	    while(iterator.canMoveNext() &&
+		  (iterator.getNode().getType() != Node.Type.SECTION  ||
+		   iterator.getNode() == current))
+		iterator.moveNext();
+	    if (iterator.getNode().getType() != Node.Type.SECTION)
+	    {
+		environment.hint(Hints.NO_LINES_BELOW);
+		return true;
+	    }
+	} else
+	{
+	    //FIXME:
+	    return false;
 	}
-	while(!iterator.isContainerSection() && iterator.moveNext());
-	onNewHotPointY( briefAnnouncement );
-	*/
+	onNewHotPointY( quickNav, quickNav);
 	return true;
     }
 
-    private boolean onPageUp(KeyboardEvent event, boolean briefAnnouncement)
+    protected boolean onPageUp(KeyboardEvent event, boolean quickNav)
     {
-	/*
 	if (noContentCheck())
 	    return true;
-	if (!iterator.movePrev())
+	if (!quickNav)
 	{
-	    environment.hint(Hints.NO_LINES_ABOVE);
-	    return true;
+	    final Node current = iterator.getParaContainer();//Will be null, if is at title row
+	    while(iterator.canMovePrev() &&
+		  (iterator.getNode().getType() != Node.Type.SECTION  ||
+		   iterator.getNode() == current))
+		iterator.movePrev();
+	    if (iterator.getNode().getType() != Node.Type.SECTION)
+	    {
+		environment.hint(Hints.NO_LINES_ABOVE);
+		return true;
+	    }
+	} else
+	{
+	    //FIXME:
+	    return false;
 	}
-	while(!iterator.isContainerSection() && iterator.movePrev());
-	onNewHotPointY( briefAnnouncement );
-	*/
+	onNewHotPointY( quickNav, quickNav);
 	return true;
     }
+
 
     private boolean onRightSquareBracket(KeyboardEvent event)
     {
@@ -593,6 +615,11 @@ b.append(text.substring(0, pos + 1));
 	}
 	*/
 	return false;
+    }
+
+    private void onNewHotPointY(boolean briefAnnouncement, boolean alwaysSpeakTitleText)
+    {
+	onNewHotPointY(briefAnnouncement);
     }
 
     private void onNewHotPointY(boolean briefAnnouncement)
