@@ -87,10 +87,27 @@ class Daisy2 extends Base
 	}
 	if (smils.containsKey(noRefUrl))
 	{
+	    System.out.println("found in smils");
 	    final Smil.Entry entry = smils.get(noRefUrl);
+	    System.out.println("found entry " + entry);
 	    final Smil.Entry requested = entry.findById(url.getRef());
 	    if (requested != null)
 	    {
+		Log.debug("doctree", "requested entry type is " + requested.type());
+		if (requested.type() == Smil.Entry.Type.PAR || requested.type() == Smil.Entry.Type.SEQ)
+		{
+		    final LinkedList<String> links = new LinkedList<String>();
+		    collectTextStartingAtEntry(requested, links);
+		    Log.debug("doctree", "collected " + links.size() + " entries");
+		    if (!links.isEmpty())
+		    {
+			final String link = links.getFirst();
+			Log.debug("doctree", "using link " + link);
+			return getDocument(link);
+		    }
+		    Log.debug("doctree", "nothing found in SMILs");
+		    return null;
+		} else
 		if (requested.type() == Smil.Entry.Type.TEXT)
 		    return getDocument(requested.src()); else
 		{
