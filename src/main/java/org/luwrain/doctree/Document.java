@@ -55,7 +55,6 @@ public class Document
 
     public void buildView(int width)
     {
-
 	int deleted = 0;
 	do {
 	root.setEmptyMark();
@@ -79,12 +78,19 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	rows = Layout.buildRows(rowParts);
 	Log.debug("doctree", "" + rows.length + " rows prepared");
 	layout.calc();
+	setDefaultIteratorIndex();
     }
 
     public Iterator getIterator()
     {
 	return new Iterator(this);
     }
+
+    public Iterator getIterator(int startingIndex)
+    {
+	return new Iterator(this, startingIndex);
+    }
+
 
     public int getLineCount()
     {
@@ -136,4 +142,45 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
     public Row[] getRows() { return rows; }
     public RowPart[] getRowParts() { return rowParts; }
     public String[] getHrefs(){return hrefs;}
+
+    private void setDefaultIteratorIndex()
+    {
+	final String id = getProperty("startingref");
+		if (id.isEmpty())
+		{
+		setProperty("defaultiteratorindex", "");
+	    return;
+	}
+	Log.debug("doctree", "preparing default iterator index for " + id);
+	final Iterator it = getIterator();
+	while (it.canMoveNext())
+	{
+	    if (!it.isEmptyRow())
+	    {
+		final ExtraInfo data = it.getNode().extraInfo;
+		if (data != null && data.hasIdInChain(id))
+		    break;
+		final Run[] runs = it.getRunsOnRow();
+		Run foundRun = null;
+		for(Run r: runs)
+		    if (r instanceof TextRun)
+		    {
+			final TextRun textRun = (TextRun)r;
+			if (textRun.extraInfo.hasIdInChain(id))
+			    foundRun = textRun;
+		    }
+		if (foundRun != null)
+		    break;
+	    }
+	    it.moveNext();
+	}
+	if (!it.canMoveNext())//FIXME:
+	{
+	    Log.debug("doctree", "no iterator position found for " + id);
+	    setProperty("defaultiteratorindex", "");
+	    return;
+	}
+	setProperty("defaultiteratorindex", "" + it.getRowAbsIndex());
+	Log.debug("doctree", "default iterator index set to " + it.getRowAbsIndex());
+    }
 }

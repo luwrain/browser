@@ -104,7 +104,7 @@ public class Html
 		final TextNode textNode = (TextNode)n;
 		final String text = textNode.text();
 		if (text != null && !text.isEmpty())
-		    runs.add(new org.luwrain.doctree.TextRun(text, !hrefStack.isEmpty()?hrefStack.getLast():""));
+		    runs.add(new org.luwrain.doctree.TextRun(text, !hrefStack.isEmpty()?hrefStack.getLast():"", getCurrentExtraInfo()));
 		continue;
 	    }
 	    if (n instanceof Element)

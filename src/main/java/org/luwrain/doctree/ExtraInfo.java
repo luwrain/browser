@@ -40,4 +40,14 @@ public class ExtraInfo
 	return attrs.get(attrName);
 
     }
+
+    public boolean hasIdInChain(String idName)
+    {
+	NullCheck.notEmpty(idName, "idName");
+	if (getAttr("id").equals(idName))
+	    return true;
+	if (parent != null)
+	    return parent.hasIdInChain(idName);
+	return false;
+    }
 }

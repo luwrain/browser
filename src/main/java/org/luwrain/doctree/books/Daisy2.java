@@ -102,6 +102,9 @@ class Daisy2 extends Base
 	if (docs.containsKey(noRefUrl))
 	{
 	    final Document res = docs.get(noRefUrl);
+	    if (res != null && url.getRef() != null)
+		res.setProperty("startingref", url.getRef()); else
+		res.setProperty("startingref", "");
 	    return res;
 	}
 	return null;

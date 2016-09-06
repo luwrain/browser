@@ -48,6 +48,18 @@ public class DoctreeArea implements Area
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
+	int defaultIndex = -1;
+	if (!document.getProperty("defaultiteratorindex").isEmpty())
+	    try {
+		defaultIndex = Integer.parseInt(document.getProperty("defaultiteratorindex"));
+	    }
+	    catch (NumberFormatException e)
+	    {
+		e.printStackTrace();
+		defaultIndex = -1;
+	    }
+	if (defaultIndex >= 0)
+	iterator = document.getIterator(defaultIndex); else
 	iterator = document.getIterator();
 	hotPointX = 0;
 	environment.onAreaNewContent(this);

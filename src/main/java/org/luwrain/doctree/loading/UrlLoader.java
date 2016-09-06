@@ -42,6 +42,7 @@ public class UrlLoader implements UrlLoaderFactory
 
     private URL requestedUrl;
     private String requestedContentType;
+    private String requestedTagRef;
     private URL responseUrl;
     private String responseContentType;
     private String responseContentEncoding;
@@ -53,6 +54,7 @@ public class UrlLoader implements UrlLoaderFactory
     public UrlLoader(URL url) throws MalformedURLException
     {
 	NullCheck.notNull(url, "url");
+	requestedTagRef = url.getRef();
 	requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
 			       url.getPort(), url.getFile());
 	requestedContentType = "";
@@ -136,6 +138,8 @@ res.doc.setProperty("url", responseUrl.toString());
 res.doc.setProperty("format", format.toString());
 res.doc.setProperty("contenttype", selectedContentType);
 res.doc.setProperty("charset", selectedCharset);
+if (requestedTagRef != null)
+    res.doc.setProperty("startingref", requestedTagRef);
 		if (responseUrl.getFile().toLowerCase().endsWith("/ncc.html"))
 		{
 		    Log.debug("doctree", "daisy book detected");

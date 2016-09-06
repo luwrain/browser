@@ -45,7 +45,6 @@ ExtraInfo extraInfo)
     {
 	NullCheck.notNull(text, "text");
 	NullCheck.notNull(href, "href");
-	NullCheck.notNull(extraInfo, "extraInfo");
 	this.text = text;
 	this.href = href;
 	this.extraInfo = extraInfo;

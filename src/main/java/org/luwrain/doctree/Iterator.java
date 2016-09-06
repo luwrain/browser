@@ -69,6 +69,14 @@ protected Document document;
 	return false;
     }
 
+    public Run[] getRunsOnRow()
+    {
+	if (isEmptyRow())
+	    return new Run[0];
+return getRow().getRuns();
+    }
+
+
     public int runBeginsAt(Run run)
     {
 	NullCheck.notNull(run, "run");
