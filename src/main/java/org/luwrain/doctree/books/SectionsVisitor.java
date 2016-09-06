@@ -19,7 +19,7 @@ package org.luwrain.doctree.books;
 
 import java.util.*;
 
-import org.luwrain.core.NullCheck;
+import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
 class SectionsVisitor implements Visitor
@@ -32,7 +32,7 @@ class SectionsVisitor implements Visitor
 	final LinkedList<String> hrefs = new LinkedList<String>();
 	collectHrefs(node, hrefs);
 	if (!hrefs.isEmpty())
-	    sections.add(new Book.Section(node.getSectionLevel(), node.toString().trim(), hrefs.getFirst()));
+	    sections.add(new Book.Section(node.getSectionLevel(), node.getCompleteText().trim(), hrefs.getFirst()));
     }
 
     Book.Section[] getBookSections()
