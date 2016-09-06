@@ -56,7 +56,6 @@ class Daisy2 extends Base
 
 @Override public     String getHrefOfNoteDoc(Note note)
     {
-	System.out.println("start");
 	NullCheck.notNull(note, "note");
 	final String id = note.docId();
 	final String nccLocalPath = nccDoc.getProperty("daisy.localpath");
@@ -87,9 +86,7 @@ class Daisy2 extends Base
 	}
 	if (smils.containsKey(noRefUrl))
 	{
-	    System.out.println("found in smils");
 	    final Smil.Entry entry = smils.get(noRefUrl);
-	    System.out.println("found entry " + entry);
 	    final Smil.Entry requested = entry.findById(url.getRef());
 	    if (requested != null)
 	    {
@@ -154,10 +151,8 @@ class Daisy2 extends Base
     {
 	NullCheck.notNull(audioFileUrl, "audioFileUrl");
 	Log.debug("doctree-daisy", "text for " + audioFileUrl + " at " + msec);
-	//	System.out.println("" + smils.size() + " smils");
 	for(Map.Entry<URL, Smil.Entry> e: smils.entrySet())
 	{
-	    //	    System.out.println("Checking " + e.getKey().toString());
 	    final Smil.Entry entry = findSmilEntryWithAudio(e.getValue(), audioFileUrl, msec);
 	    if (entry != null)
 	    {
@@ -334,7 +329,6 @@ private Smil.Entry findSmilEntryWithAudio(Smil.Entry entry, String audioFileUrl,
 	switch(entry.type() )
 	{
 	case AUDIO:
-	    //	    System.out.println("audio " + entry.getAudioInfo().src());
 	    return entry.getAudioInfo().covers(audioFileUrl, msec, nccDocUrl)?entry:null;
 	case TEXT:
 	    return null;
