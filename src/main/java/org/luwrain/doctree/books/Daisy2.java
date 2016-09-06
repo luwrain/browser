@@ -14,10 +14,17 @@ import org.luwrain.util.*;
 
 class Daisy2 extends Base
 {
+    protected UrlLoaderFactory urlLoaderFactory = null;
     protected final HashMap<URL, Document> docs = new HashMap<URL, Document>();
     protected final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
     protected Document nccDoc;
     protected Book.Section[] bookSections = new Book.Section[0];
+
+    Daisy2(UrlLoaderFactory urlLoaderFactory)
+    {
+	NullCheck.notNull(urlLoaderFactory, "urlLoaderFactory");
+	this.urlLoaderFactory = urlLoaderFactory;
+    }
 
     @Override public Document[] getDocuments()
     {
@@ -232,8 +239,7 @@ class Daisy2 extends Base
 	    return;
 	UrlLoader.Result res;
 	try {
-	    //FIXME:	    res = Factory.fromUrl(url, "", "");
-	    res = null;
+res = loadDoc(url);
 	}
 	catch(Exception e)
 	{
@@ -404,4 +410,10 @@ class Daisy2 extends Base
 			collectTextStartingAtEntry(entry, links);
 			return !links.isEmpty()?links.getFirst():null;
 		    }
+
+    private UrlLoader.Result loadDoc(URL url) throws MalformedURLException, IOException
+    {
+final UrlLoader loader = urlLoaderFactory.newUrlLoader(url);
+return loader.load();
+    }
 }

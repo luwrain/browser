@@ -16,7 +16,7 @@ import org.luwrain.doctree.*;
 import org.luwrain.doctree.filters.*;
 import org.luwrain.doctree.books.BookFactory;
 
-public class UrlLoader
+public class UrlLoader implements UrlLoaderFactory
 {
     static public final String CONTENT_TYPE_DATA = "application/octet-stream";
     static public final String CONTENT_TYPE_PDF = "application/pdf";
@@ -56,6 +56,12 @@ public class UrlLoader
 	requestedUrl = new URL(url.getProtocol(), IDN.toASCII(url.getHost()),
 			       url.getPort(), url.getFile());
 	requestedContentType = "";
+    }
+
+    @Override public UrlLoader newUrlLoader(URL url) throws MalformedURLException
+    {
+	NullCheck.notNull(url, "url");
+	return new UrlLoader(url);
     }
 
     public UrlLoader(URL url, String contentType) throws MalformedURLException
@@ -125,14 +131,21 @@ r.setProperty("contenttype", selectedContentType);
 r.setProperty("url", responseUrl.toString());
 return r;
 	    }
-res.setProperty("url", responseUrl.toString());
-res.setProperty("format", format.toString());
-res.setProperty("contenttype", selectedContentType);
-res.setProperty("charset", selectedCharset);
+
 res.doc.setProperty("url", responseUrl.toString());
 res.doc.setProperty("format", format.toString());
 res.doc.setProperty("contenttype", selectedContentType);
 res.doc.setProperty("charset", selectedCharset);
+		if (responseUrl.getFile().toLowerCase().endsWith("/ncc.html"))
+		{
+		    Log.debug("doctree", "daisy book detected");
+		    res.book = BookFactory.initDaisy2(res.doc, this);
+			res.doc = null;
+		}
+res.setProperty("url", responseUrl.toString());
+res.setProperty("format", format.toString());
+res.setProperty("contenttype", selectedContentType);
+res.setProperty("charset", selectedCharset);
 	    return res;
 	}
 	finally {
