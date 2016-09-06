@@ -2,6 +2,7 @@
 package org.luwrain.doctree;
 
 import java.util.regex.*;
+import java.net.*;
 
 import org.luwrain.core.NullCheck;
 
@@ -49,6 +50,24 @@ long beginPos)
 	    return msec >= beginPos;
 	return msec >= beginPos && msec <= endPos;
     }
+
+    public boolean covers(String audioFileUrl, long msec, URL baseUrl)
+    {
+	NullCheck.notNull(baseUrl, "baseUrl");
+	try {
+	    if (!(new URL(baseUrl, src).toString()).equals(new URL(baseUrl,audioFileUrl).toString()))
+		return false;
+	}
+	catch(MalformedURLException e)
+	{
+	    e.printStackTrace();
+	    return false;
+	}
+	if (endPos < 0)
+	    return msec >= beginPos;
+	return msec >= beginPos && msec <= endPos;
+    }
+
 
     @Override public String toString()
     {

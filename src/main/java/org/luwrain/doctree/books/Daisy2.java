@@ -18,6 +18,7 @@ class Daisy2 extends Base
     protected final HashMap<URL, Document> docs = new HashMap<URL, Document>();
     protected final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
     protected Document nccDoc;
+    protected URL nccDocUrl;
     protected Book.Section[] bookSections = new Book.Section[0];
 
     Daisy2(UrlLoaderFactory urlLoaderFactory)
@@ -133,8 +134,10 @@ class Daisy2 extends Base
     {
 	NullCheck.notNull(audioFileUrl, "audioFileUrl");
 	Log.debug("doctree-daisy", "text for " + audioFileUrl + " at " + msec);
+	//	System.out.println("" + smils.size() + " smils");
 	for(Map.Entry<URL, Smil.Entry> e: smils.entrySet())
 	{
+	    //	    System.out.println("Checking " + e.getKey().toString());
 	    final Smil.Entry entry = findSmilEntryWithAudio(e.getValue(), audioFileUrl, msec);
 	    if (entry != null)
 	    {
@@ -178,6 +181,7 @@ class Daisy2 extends Base
 	    }
 	Log.debug("doctree-daisy", "" + docs.size() + " documents loaded");
 	this.nccDoc = nccDoc;
+	this.nccDocUrl = this.nccDoc.getUrl();
 	final SectionsVisitor visitor = new SectionsVisitor();
 	Visitor.walk(nccDoc.getRoot(), visitor);
 	final Book.Section[] sections = visitor.getBookSections();
@@ -303,14 +307,15 @@ res = loadDoc(url);
 	}
     }
 
-    static private Smil.Entry findSmilEntryWithAudio(Smil.Entry entry, String audioFileUrl, long msec)
+private Smil.Entry findSmilEntryWithAudio(Smil.Entry entry, String audioFileUrl, long msec)
     {
 	NullCheck.notNull(entry, "entry");
 	NullCheck.notNull(audioFileUrl, "audioFileUrl");
 	switch(entry.type() )
 	{
 	case AUDIO:
-	    return entry.getAudioInfo().covers(audioFileUrl, msec)?entry:null;
+	    //	    System.out.println("audio " + entry.getAudioInfo().src());
+	    return entry.getAudioInfo().covers(audioFileUrl, msec, nccDocUrl)?entry:null;
 	case TEXT:
 	    return null;
 	case FILE:
