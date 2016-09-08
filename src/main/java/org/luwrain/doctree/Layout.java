@@ -192,7 +192,7 @@ public class Layout
 	    for(RowPart p: para.getRowParts())
 		if (p.relRowNum() > maxRelRowNum)
 		    maxRelRowNum = p.relRowNum();
-	    para.height = maxRelRowNum + 1;
+	    para.height = maxRelRowNum + 2;//1 more for empty line above
 	    return;
 	}
 	final Node[] subnodes = node.getSubnodes();
@@ -238,7 +238,7 @@ public class Layout
 		calcPosition(n);
 	    }
 	    return;
-	}
+	} //table row
 	if  (node.type == Node.Type.ROOT)
 	{
 	    node.x = 0;
@@ -246,6 +246,8 @@ public class Layout
 	}
 	//Assuming node.x and node.y already set appropriately
 	int offset = hasTitleRun(node)?1:0;//1 for title run
+	if (node.type == Node.Type.PARAGRAPH && ((Paragraph)node).getRowParts().length > 0)
+	    offset = 1;
 	for(Node n: subnodes)
 	{
 	    n.x = node.x;
