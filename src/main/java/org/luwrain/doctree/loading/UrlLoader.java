@@ -30,12 +30,18 @@ public class UrlLoader implements UrlLoaderFactory
     static public final String CONTENT_TYPE_XML = "application/xml";
     static public final String CONTENT_TYPE_FB2 = "application/fb2";
 
+    static private final String DOCTYPE_FB2 = "fictionbook";
+
+    static public final String PARA_STYLE_EMPTY_LINES = "empty-lines";
+    static public final String PARA_STYLE_INDENT = "indent";
+    static public final String PARA_STYLE_EACH_LINE = "each-line";
+
     static public final String USER_AGENT = "Mozilla/5.0";
     static private final String DEFAULT_CHARSET = "UTF-8";
+    static private final Txt.ParaStyle DEFAULT_PARA_STYLE = Txt.ParaStyle.EMPTY_LINES;
 
     private enum Format {
-	TEXT_PARA_EMPTY_LINE, TEXT_PARA_INDENT, TEXT_PARA_EACH_LINE,
-	HTML, XML, DOC, DOCX,
+	TXT, HTML, XML, DOC, DOCX,
 	FB2, EPUB, SMIL,
 	ZIP, FB2_ZIP,
     };
@@ -133,7 +139,6 @@ r.setProperty("contenttype", selectedContentType);
 r.setProperty("url", responseUrl.toString());
 return r;
 	    }
-
 res.doc.setProperty("url", responseUrl.toString());
 res.doc.setProperty("format", format.toString());
 res.doc.setProperty("contenttype", selectedContentType);
@@ -266,12 +271,33 @@ res.setProperty("charset", selectedCharset);
 	    case DOCX:
 		res.doc = DocX.read(tmpFile);
 		return res;
+	    case FB2:
+res.doc = new Fb2(tmpFile, selectedCharset).createDoc();
+return res;
+/*
 	    case ZIP:
-		//		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
+res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
 		return res;
-	    case FB2_ZIP:
-		//		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
+	    case Fb2_ZIP:
+res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
 		return res;
+*/
+	    case TXT:
+		switch(extractParaStyle(selectedContentType))
+		{
+		case PARA_STYLE_EMPTY_LINES:
+		    res.doc = new Txt(Txt.ParaStyle.EMPTY_LINES, tmpFile, selectedCharset).constructDocument();
+		    return res;
+		case PARA_STYLE_INDENT:
+		    		    res.doc = new Txt(Txt.ParaStyle.INDENT, tmpFile, selectedCharset).constructDocument();
+		    return res;
+		case PARA_STYLE_EACH_LINE:
+		    res.doc = new Txt(Txt.ParaStyle.EACH_LINE, tmpFile, selectedCharset).constructDocument();
+		    return res;
+		default:
+		    res.doc = new Txt(DEFAULT_PARA_STYLE, tmpFile, selectedCharset).constructDocument();
+		    return res;
+		}
 	    default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	    }
@@ -293,8 +319,8 @@ res.setProperty("charset", selectedCharset);
 	Log.debug("doctree", "determined doctype is \'" + doctype + "\'");
 	switch(doctype.trim().toLowerCase())
 	{
-	case "fictionbook":
-	    return new FictionBook2(Files.newInputStream(tmpFile), selectedCharset).createDoc();
+	case DOCTYPE_FB2:
+	    return new Fb2(tmpFile, selectedCharset).createDoc();
 	}
 	return null;
     }
@@ -310,6 +336,8 @@ res.setProperty("charset", selectedCharset);
 	    return Format.XML;
 	case CONTENT_TYPE_FB2:
 	    return Format.FB2;
+	case CONTENT_TYPE_TXT:
+	    return Format.TXT;
 	case "application/fb2+zip":
 	    return Format.FB2_ZIP;
 	case "application/zip":
@@ -384,6 +412,22 @@ res.setProperty("charset", selectedCharset);
 	    return "";
 	}
     }
+
+    static private String extractParaStyle(String value)
+    {
+	NullCheck.notEmpty(value, "value");
+	try {
+	    final MimeType mime = new MimeType(value);
+	    final String res = mime.getParameter("parastyle");
+	    return res != null?res:"";
+	}
+	catch(MimeTypeParseException e)
+	{
+	    e.printStackTrace();
+	    return "";
+	}
+    }
+
 
     static private String getDoctypeName(InputStream s) throws IOException
     {

@@ -18,6 +18,7 @@
 package org.luwrain.doctree.filters;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -30,15 +31,23 @@ import org.luwrain.core.Log;
 import org.luwrain.core.NullCheck;
 import org.luwrain.doctree.*;
 
-public class FictionBook2
+public class Fb2
 {
 	    private Document jdoc = null;
 
-    public FictionBook2(InputStream stream,String charset) throws IOException
+    public Fb2(Path path,String charset) throws IOException
     {
-	NullCheck.notNull(stream, "stream");
+	NullCheck.notNull(path, "path");
 	NullCheck.notNull(charset, "charset");
-	jdoc = Jsoup.parse(stream, charset, "", Parser.xmlParser());
+	InputStream is = null;
+	try {
+	    is = Files.newInputStream(path);
+	jdoc = Jsoup.parse(is, charset, "", Parser.xmlParser());
+	}
+	finally {
+	    if (is != null)
+		is.close();
+	};
     }
 
     public org.luwrain.doctree.Document createDoc()
