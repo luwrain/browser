@@ -45,7 +45,9 @@ protected Document document;
 	this.root = document.getRoot();
 	this.paragraphs = document.getParagraphs();
 	this.rows = document.getRows();
-	current = index < rows.length?index:0;
+	if (index < 0 || index >= rows.length)
+	    throw new IllegalArgumentException("INvalid row index:" + index);
+	current = index;
     }
 
     public boolean noContent()

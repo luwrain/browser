@@ -105,6 +105,25 @@ public class DoctreeArea implements Area
 	return !isEmpty()?iterator.getRowAbsIndex():-1;
     }
 
+    public boolean setCurrentRowIndex(int index)
+    {
+	if (isEmpty())
+		      return false;
+	final Iterator newIt;
+	try {
+	    newIt = document.getIterator(index);
+	}
+	catch(IllegalArgumentException e)
+	{
+	    return false;
+	}
+	this.iterator = newIt;
+	hotPointX = 0;
+	environment.onAreaNewHotPoint(this);
+	return true;
+    }
+
+
     public java.net.URL getUrl()
     {
 	return !isEmpty()?document.getUrl():null;
