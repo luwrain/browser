@@ -25,6 +25,8 @@ import org.luwrain.core.Log;
 
 public class Document 
 {
+    static public final String DEFAULT_ITERATOR_INDEX_PROPERTY = "defaultiteratorindex";
+
     private final Properties props = new Properties();
     private String title;
     private String[] hrefs;
@@ -147,10 +149,7 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
     {
 	final String id = getProperty("startingref");
 		if (id.isEmpty())
-		{
-		setProperty("defaultiteratorindex", "");
 	    return;
-	}
 	Log.debug("doctree", "preparing default iterator index for " + id);
 	final Iterator it = getIterator();
 	while (it.canMoveNext())
@@ -177,7 +176,7 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	if (!it.canMoveNext())//FIXME:
 	{
 	    Log.debug("doctree", "no iterator position found for " + id);
-	    setProperty("defaultiteratorindex", "");
+	    setProperty(DEFAULT_ITERATOR_INDEX_PROPERTY, "");
 	    return;
 	}
 	setProperty("defaultiteratorindex", "" + it.getRowAbsIndex());

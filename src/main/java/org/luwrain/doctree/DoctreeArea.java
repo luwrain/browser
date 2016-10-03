@@ -38,10 +38,10 @@ public class DoctreeArea implements Area
     {
 	NullCheck.notNull(environment, "environment");
 	this.environment = environment;
-	this.document = document;
-	if (document != null)
-	    iterator = document.getIterator(); else
-	    iterator = null;
+	this.document = null;
+	    this.iterator = null;
+	    if (document != null)
+		setDocument(document);
     }
 
     public void setDocument(Document document)
@@ -49,14 +49,12 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(document, "document");
 	this.document = document;
 	int defaultIndex = -1;
-	if (!document.getProperty("defaultiteratorindex").isEmpty())
+	if (!document.getProperty(Document.DEFAULT_ITERATOR_INDEX_PROPERTY).isEmpty())
 	    try {
 		defaultIndex = Integer.parseInt(document.getProperty("defaultiteratorindex"));
 	    }
 	    catch (NumberFormatException e)
 	    {
-		e.printStackTrace();
-		defaultIndex = -1;
 	    }
 	if (defaultIndex >= 0)
 	iterator = document.getIterator(defaultIndex); else
@@ -78,36 +76,10 @@ public class DoctreeArea implements Area
 
     public Run getCurrentRun()
     {
-	NullCheck.notNull(iterator, "iterator");
+	if (isEmpty())
+	    return null;
 	return iterator.getRunUnderPos(hotPointX);
     }
-
-    /*
-    public boolean hasHref()
-    {
-	if (isEmpty() || iterator.isEmptyRow())
-	    return false;
-	return iterator.hasHrefUnderPos(hotPointX);
-    }
-    */
-
-    /*
-    public String getHref()
-    {
-	if (isEmpty() || iterator.isEmptyRow())
-	    return null;
-	return iterator.getHrefUnderPos(hotPointX);
-    }
-    */
-
-    /*
-    public String getHrefText()
-    {
-	if (isEmpty() || iterator.isEmptyRow())
-	    return null;
-	return iterator.getHrefTextUnderPos(hotPointX);
-    }
-    */
 
     public boolean findRun(Run run)
     {
@@ -128,14 +100,35 @@ public class DoctreeArea implements Area
 	return true;
     }
 
+    public int getCurrentRowIndex()
+    {
+	return !isEmpty()?iterator.getRowAbsIndex():-1;
+    }
+
+    public java.net.URL getUrl()
+    {
+	return !isEmpty()?document.getUrl():null;
+    }
+
+    public boolean reBuildView(int width)
+    {
+	if (isEmpty())
+	    return false;
+	final Run currentRun = getCurrentRun();
+	document.buildView(width);
+	if (currentRun != null)
+	    findRun(currentRun);
+	return true;
+    }
+
     @Override public int getLineCount()
     {
-	return document != null?document.getLineCount() + 1:1;
+	return !isEmpty()?document.getLineCount() + 1:1;
     }
 
     @Override public String getLine(int index)
     {
-	if (document == null)
+	if (isEmpty())
 	    return index == 0?noContentStr():"";
 	return index < document.getLineCount()?document.getLine(index):"";
     }
