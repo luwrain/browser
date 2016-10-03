@@ -25,6 +25,11 @@
   <target name="jar" depends="compile">
     <mkdir dir="jar"/>
     <jar jarfile="jar/luwrain-doctree.jar">
+      <manifest>
+        <section name="org/luwrain">
+          <attribute name="Extensions" value="org.luwrain.doctree.Extension"/>
+        </section>
+      </manifest>
       <fileset dir="./build/main">
         <include name="**/*.class"/>
       </fileset>

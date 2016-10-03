@@ -19,11 +19,11 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.*;
 import org.luwrain.core.extensions.*;
+import org.luwrain.doctree.loading.UrlLoader;
 
 public class Extension extends EmptyExtension
 {
-    private final String[] formatsList = FormatsList.getSupportedFormatsList();
-
+    static public final String FORMATS_OBJECT_NAME = "luwrain.doctree.formats";
     @Override public SharedObject[] getSharedObjects(Luwrain luwrain)
     {
 	return new SharedObject[]{
@@ -31,12 +31,23 @@ public class Extension extends EmptyExtension
 	    new SharedObject(){
 		@Override public String getName()
 		{
-		    return "luwrain.doctree.formats";
+		    return FORMATS_OBJECT_NAME;
 		}
 		@Override public Object getSharedObject()
 		{
-		    return formatsList;
-		    }
+		    return new String[]{
+			UrlLoader.CONTENT_TYPE_TXT + ";parastyle=" + UrlLoader.PARA_STYLE_EMPTY_LINES,
+			UrlLoader.CONTENT_TYPE_TXT + ";parastyle=" + UrlLoader.PARA_STYLE_INDENT,
+			UrlLoader.CONTENT_TYPE_TXT + ";parastyle=" + UrlLoader.PARA_STYLE_EACH_LINE,
+			UrlLoader.CONTENT_TYPE_DOC,
+			UrlLoader.CONTENT_TYPE_DOCX,
+			UrlLoader.CONTENT_TYPE_HTML,
+
+			UrlLoader.CONTENT_TYPE_FB2,
+
+
+		    };
+		}
 		},
 
 		    };
