@@ -57,8 +57,16 @@ public class DoctreeArea implements Area
 	    {
 	    }
 	if (defaultIndex >= 0)
-	iterator = document.getIterator(defaultIndex); else
-	iterator = document.getIterator();
+	{
+	    try {
+		iterator = document.getIterator(defaultIndex);
+	    }
+	    catch(IllegalArgumentException e)
+	    {
+		iterator = document.getIterator();
+	    }
+	} else
+	    iterator = document.getIterator();
 	hotPointX = 0;
 	environment.onAreaNewContent(this);
 	environment.onAreaNewHotPoint(this);
@@ -211,7 +219,6 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
 	{
-	case READING_POINT:
 	case MOVE_HOT_POINT:
 	    if (event instanceof MoveHotPointEvent)
 		return onMoveHotPoint((MoveHotPointEvent)event);
@@ -304,22 +311,38 @@ b.append(text.substring(0, pos + 1));
     private boolean onMoveHotPoint(MoveHotPointEvent event)
     {
 	NullCheck.notNull(event, "event");
-	if (document == null)
+	if (isEmpty())
 	    return false;
 	final Iterator it2 = document.getIterator();
 	final int x = event.getNewHotPointX();
 	final int y = event.getNewHotPointY();
 	if (x < 0 || y < 0)
 	    return false;
-	Log.debug("doctree", "area requested to move hot point at " + x + "," + y);
+	//	Log.debug("doctree", "area requested to move hot point at " + x + "," + y);
+	Iterator nearest = null;
 	while (it2.canMoveNext() && !it2.coversPos(x, y))
+	{
+	    if (it2.getRow() != null && it2.getRow().getRowY() == y)
+		nearest = (Iterator)it2.clone();
 	    it2.moveNext();
-	if (!it2.canMoveNext())
-	    return false;
+	}
+	if (it2.coversPos(x, y) &&
+	    it2.getRow() != null && x >= it2.getRow().getRowX())
+	{
 	iterator = it2;
 	hotPointX = x - iterator.getRow().getRowX();
 	environment.onAreaNewHotPoint(this);
 	return true;
+	}
+	if (event.precisely())
+	    return false;
+	if (nearest != null)
+	{
+	    iterator = nearest;
+	    hotPointX = 0;
+	    return true;
+	}
+	return false;
     }
 
     private boolean onTab(KeyboardEvent event, boolean briefAnnouncement)
