@@ -219,6 +219,8 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
 	{
+	case LISTENING_FINISHED:
+	    return onListeningFinishedEvent((ListeningFinishedEvent)event);
 	case MOVE_HOT_POINT:
 	    if (event instanceof MoveHotPointEvent)
 		return onMoveHotPoint((MoveHotPointEvent)event);
@@ -238,8 +240,8 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(query, "query");
 	switch(query.getQueryCode())
 	{
-	case AreaQuery.VOICED_FRAGMENT:
-	    return onVoicedFragmentQuery((VoicedFragmentQuery)query);
+	case AreaQuery.BEGIN_LISTENING:
+	    return onBeginListeningQuery((BeginListeningQuery)query);
 	default:
 	return region.onAreaQuery(query, getHotPointX(), getHotPointY());
 	}
@@ -271,6 +273,7 @@ public class DoctreeArea implements Area
 	return "";
     }
 
+    /*
     private boolean onVoicedFragmentQuery(VoicedFragmentQuery query)
     {
 	NullCheck.notNull(query, "query");
@@ -307,8 +310,66 @@ b.append(text.substring(0, pos + 1));
 	}
 	return false;
     }
+    */
 
-    private boolean onMoveHotPoint(MoveHotPointEvent event)
+protected boolean onBeginListeningQuery(BeginListeningQuery query)
+    {
+	NullCheck.notNull(query, "query");
+	if (isEmpty())
+	    return false;
+	//Checking if there is the end of sentence on the current row
+	String text = iterator.getText();
+	int pos = findEndOfSentence(text, hotPointX);
+	Log.debug("listen", "current row:" + text);
+	if (pos >= hotPointX)
+	{
+	    //final String resultText = text.substring(hotPointX, pos + 1);//+1 is safe here, pos is always inside of the bounds
+	    //	    Log.debug("listen", "taking text:" + text);
+	    while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
+		++pos;
+	    //	    Log.debug();
+	    query.answer(new BeginListeningQuery.Answer(text.substring(hotPointX, pos), new ListeningInfo(iterator, pos)));
+	    return true;
+	}
+	final Iterator newIt = (Iterator)iterator.clone();
+	final StringBuilder b = new StringBuilder();
+	b.append(text.substring(hotPointX));
+	Log.debug("listen", "checking other lines, taking:" + b.toString());
+	while(newIt.moveNext())
+	{
+	    text = newIt.getText();
+pos = findEndOfSentence(text, 0);
+if (pos < 0)
+{
+    b.append(" " + text);
+    continue;
+}
+//Yes, the end of sentence on the current row
+b.append(text.substring(0, pos + 1));
+while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
+    ++pos;
+query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(newIt, pos)));
+return true;
+	}
+	if (b.length() <= 0)//No text to listen at all
+	    return false;
+	query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(newIt, newIt.getText().length())));
+	return true;
+    }
+
+    protected boolean onListeningFinishedEvent(ListeningFinishedEvent event)
+    {
+	NullCheck.notNull(event, "event");
+	if (!(event.getExtraInfo() instanceof ListeningInfo))
+	    return false;
+	final ListeningInfo info = (ListeningInfo)event.getExtraInfo();
+	iterator = info.it;
+	hotPointX = info.pos;
+	environment.onAreaNewHotPoint(this);
+	return true;
+    }
+
+protected boolean onMoveHotPoint(MoveHotPointEvent event)
     {
 	NullCheck.notNull(event, "event");
 	if (isEmpty())
@@ -769,18 +830,34 @@ b.append(text.substring(0, pos + 1));
 	return false;
     }
 
-    static private int endOfSentence(String text, int startFrom)
+    static protected int findEndOfSentence(String text, int startFrom)
     {
+	NullCheck.notNull(text, "text");
 	for(int i = startFrom;i < text.length();++i)
-	    if (text.charAt(i) == '.' ||
-		text.charAt(i) == '?' ||
-		text.charAt(i) == '!')
+	    if (charOfSentenceEnd(text.charAt(i)))
 		return i;
 	return -1;
     }
 
-    static private int findNextSentence(Iterator it, int pos)
+    static protected boolean charOfSentenceEnd(char ch)
     {
+	switch(ch)
+	{
+	case '.':
+	case '!':
+	case '?':
+	    return true;
+	default:
+	    return false;
+	}
+    }
+
+    /*
+    static protected int findNextSentence(Iterator it, int pos)
+    {
+	NullCheck.notNull(it, "it");
+	if (it.isEmpty())
+	    return -1;
 	int start = pos;
 	do {
 	    final String text = it.getText();
@@ -792,6 +869,20 @@ b.append(text.substring(0, pos + 1));
 	    if (i < text.length())
 		return i;
 	} while(it.moveNext());
-	return pos;
+	return -1;
     }
+    */
+
+static protected class ListeningInfo
+{
+    final Iterator it;
+    final int pos;
+
+    ListeningInfo(Iterator it, int pos)
+    {
+	NullCheck.notNull(it, "it");
+	this.it = it;
+	this.pos = pos;
+    }
+}
 }
