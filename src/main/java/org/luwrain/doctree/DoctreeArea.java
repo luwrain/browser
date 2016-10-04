@@ -131,10 +131,31 @@ public class DoctreeArea implements Area
 	return true;
     }
 
-
     public java.net.URL getUrl()
     {
 	return !isEmpty()?document.getUrl():null;
+    }
+
+    public String[] getHtmlIds()
+    {
+	if (isEmpty() || iterator.isEmptyRow())
+	    return new String[0];
+	final LinkedList<String> res = new LinkedList<String>();
+	final Run run = iterator.getRunUnderPos(hotPointX);
+	if (run == null)
+	    return new String[0];
+	ExtraInfo info = run.extraInfo();
+	while (info != null)
+	{
+	    if (info.attrs.containsKey("id"))
+	    {
+		final String value = info.attrs.get("id");
+		if (!value.isEmpty())
+		    res.add(value);
+	    }
+	    info = info.parent;
+	}
+	return res.toArray(new String[res.size()]);
     }
 
     public boolean reBuildView(int width)
@@ -273,45 +294,6 @@ public class DoctreeArea implements Area
 	return "";
     }
 
-    /*
-    private boolean onVoicedFragmentQuery(VoicedFragmentQuery query)
-    {
-	NullCheck.notNull(query, "query");
-	if (noContentCheck())
-	    return false;
-	final Iterator it2 = (Iterator)iterator.clone();
-	String text = it2.getText();
-	int pos = endOfSentence(text, hotPointX);
-	if (pos > hotPointX)
-	{
-	    text = text.substring(hotPointX, pos + 1);
-	    pos = findNextSentence(it2, pos);
-	    if (pos < 0)
-		return false;
-	    query.answer(text, it2.getRow().getRowX() + pos, it2.getRow().getRowY());
-	    return true;
-	}
-	final StringBuilder b = new StringBuilder();
-	b.append(text.substring(hotPointX) + " ");
-	while(it2.moveNext())
-	{
-	    text = it2.getText();
-pos = endOfSentence(text, 0);
-if (pos < 0)
-{
-    b.append(text + " ");
-    continue;
-}
-b.append(text.substring(0, pos + 1));
-	    pos = findNextSentence(it2, pos);
-	    if (pos < 0)
-		return false;
-	    query.answer(new String(b), it2.getRow().getRowX() + pos, it2.getRow().getRowY());
-	}
-	return false;
-    }
-    */
-
 protected boolean onBeginListeningQuery(BeginListeningQuery query)
     {
 	NullCheck.notNull(query, "query");
@@ -320,40 +302,43 @@ protected boolean onBeginListeningQuery(BeginListeningQuery query)
 	//Checking if there is the end of sentence on the current row
 	String text = iterator.getText();
 	int pos = findEndOfSentence(text, hotPointX);
-	Log.debug("listen", "current row:" + text);
 	if (pos >= hotPointX)
 	{
-	    //final String resultText = text.substring(hotPointX, pos + 1);//+1 is safe here, pos is always inside of the bounds
-	    //	    Log.debug("listen", "taking text:" + text);
 	    while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
 		++pos;
-	    //	    Log.debug();
 	    query.answer(new BeginListeningQuery.Answer(text.substring(hotPointX, pos), new ListeningInfo(iterator, pos)));
 	    return true;
 	}
 	final Iterator newIt = (Iterator)iterator.clone();
+	final Node origNode = newIt.getNode();
+	if (origNode == null)
+	    return false;
 	final StringBuilder b = new StringBuilder();
 	b.append(text.substring(hotPointX));
-	Log.debug("listen", "checking other lines, taking:" + b.toString());
-	while(newIt.moveNext())
+	Iterator lastIt = (Iterator)newIt.clone();
+	//Continuing until the end of the entire document or the end of the node.
+	// In second case we must have what to speak right now anyway, otherwise going on.
+	while(newIt.moveNext() &&
+	      (b.length() == 0 || newIt.getNode() == origNode))
 	{
 	    text = newIt.getText();
 pos = findEndOfSentence(text, 0);
 if (pos < 0)
 {
     b.append(" " + text);
+    lastIt = (Iterator)newIt.clone();
     continue;
 }
 //Yes, the end of sentence on the current row
-b.append(text.substring(0, pos + 1));
 while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
     ++pos;
+b.append(" " + text.substring(0, pos));
 query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(newIt, pos)));
 return true;
 	}
 	if (b.length() <= 0)//No text to listen at all
 	    return false;
-	query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(newIt, newIt.getText().length())));
+	query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(lastIt, lastIt.getText().length())));
 	return true;
     }
 
@@ -379,7 +364,6 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	final int y = event.getNewHotPointY();
 	if (x < 0 || y < 0)
 	    return false;
-	//	Log.debug("doctree", "area requested to move hot point at " + x + "," + y);
 	Iterator nearest = null;
 	while (it2.canMoveNext() && !it2.coversPos(x, y))
 	{
@@ -406,7 +390,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return false;
     }
 
-    private boolean onTab(KeyboardEvent event, boolean briefAnnouncement)
+    protected boolean onTab(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -423,7 +407,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onArrowDown(KeyboardEvent event, boolean quickNav)
+    protected boolean onArrowDown(KeyboardEvent event, boolean quickNav)
     {
 	if (noContentCheck())
 	    return true;
@@ -439,7 +423,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onArrowUp(KeyboardEvent event, boolean briefAnnouncement)
+    protected boolean onArrowUp(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
@@ -452,7 +436,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onAltEnd(KeyboardEvent event)
+    protected boolean onAltEnd(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -461,7 +445,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onAltHome(KeyboardEvent event)
+    protected boolean onAltHome(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -520,8 +504,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-
-    private boolean onRightSquareBracket(KeyboardEvent event)
+protected boolean onRightSquareBracket(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -535,7 +518,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onLeftSquareBracket(KeyboardEvent event)
+    protected boolean onLeftSquareBracket(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -549,7 +532,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onArrowLeft(KeyboardEvent event)
+    protected boolean onArrowLeft(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -578,7 +561,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onArrowRight(KeyboardEvent event)
+    protected boolean onArrowRight(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -610,7 +593,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onAltLeft(KeyboardEvent event)
+    protected boolean onAltLeft(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -632,7 +615,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onAltRight(KeyboardEvent event)
+    protected boolean onAltRight(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -656,7 +639,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onHome(KeyboardEvent event)
+    protected boolean onHome(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -674,7 +657,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    private boolean onEnd(KeyboardEvent event)
+    protected boolean onEnd(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -725,12 +708,12 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return false;
     }
 
-    private void onNewHotPointY(boolean briefAnnouncement, boolean alwaysSpeakTitleText)
+    protected void onNewHotPointY(boolean briefAnnouncement, boolean alwaysSpeakTitleText)
     {
 	onNewHotPointY(briefAnnouncement);
     }
 
-    private void onNewHotPointY(boolean briefAnnouncement)
+    protected void onNewHotPointY(boolean briefAnnouncement)
     {
 	hotPointX = 0;
 	if (iterator.isEmptyRow())
@@ -755,15 +738,11 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 		final Table table = (Table)node;
 		environment.say("Table, " + table.getRowCount() + " rows, " + table.getColCount() + " columns, level " + table.getTableLevel());
 	    } else
-
 	    if (node instanceof TableCell)
 	    {
 		final TableCell cell = (TableCell)node;
 		environment.say("Cell, row " + cell.getRowIndex() + ", column " + cell.getColIndex());
 	    } else
-
-
-
 	    environment.say(node.getClass().getName());
 	    return;
 	}
@@ -782,29 +761,6 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 		break;
 	}
 	environment.say(b.toString());
-    }
-
-    public String[] getHtmlIds()
-    {
-	if (isEmpty() || iterator.isEmptyRow())
-	    return new String[0];
-	final LinkedList<String> res = new LinkedList<String>();
-	final Run run = iterator.getRunUnderPos(hotPointX);
-	if (run == null)
-	    return new String[0];
-	ExtraInfo info = run.extraInfo();
-	while (info != null)
-	{
-	    if (info.attrs.containsKey("id"))
-	    {
-		final String value = info.attrs.get("id");
-		if (!value.isEmpty())
-		    res.add(value);
-	    }
-	    info = info.parent;
-	}
-	return res.toArray(new String[res.size()]);
-
     }
 
     //Iterator may return true on isEmptyRow() even if this method returns false
@@ -852,37 +808,16 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	}
     }
 
-    /*
-    static protected int findNextSentence(Iterator it, int pos)
+    static protected class ListeningInfo
     {
-	NullCheck.notNull(it, "it");
-	if (it.isEmpty())
-	    return -1;
-	int start = pos;
-	do {
-	    final String text = it.getText();
-	    int i = start;
-	    start = 0;
-	    while (i < text.length() &&(
-					text.charAt(i) == '.' || text.charAt(i) == '?' || text.charAt(i) == '!'))
-		++i;
-	    if (i < text.length())
-		return i;
-	} while(it.moveNext());
-	return -1;
-    }
-    */
+	final Iterator it;
+	final int pos;
 
-static protected class ListeningInfo
-{
-    final Iterator it;
-    final int pos;
-
-    ListeningInfo(Iterator it, int pos)
-    {
-	NullCheck.notNull(it, "it");
-	this.it = it;
-	this.pos = pos;
+	ListeningInfo(Iterator it, int pos)
+	{
+	    NullCheck.notNull(it, "it");
+	    this.it = it;
+	    this.pos = pos;
+	}
     }
-}
 }
