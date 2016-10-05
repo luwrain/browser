@@ -158,7 +158,7 @@ public class DoctreeArea implements Area
 	return res.toArray(new String[res.size()]);
     }
 
-    public boolean reBuildView(int width)
+    public boolean rebuildView(int width)
     {
 	if (isEmpty())
 	    return false;
@@ -166,6 +166,9 @@ public class DoctreeArea implements Area
 	document.buildView(width);
 	if (currentRun != null)
 	    findRun(currentRun);
+	hotPointX = Math.min(hotPointX, iterator.getText().length());
+	environment.onAreaNewContent(this);
+	environment.onAreaNewHotPoint(this);
 	return true;
     }
 
