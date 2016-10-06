@@ -74,7 +74,8 @@ class Daisy2 extends Base
     @Override public Document getDocument(String href)
     {
 	NullCheck.notNull(href, "href");
-	URL url, noRefUrl;
+	final URL url;
+	final URL noRefUrl;
 	try {
 	    url = new URL(href);
 	    noRefUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
@@ -121,6 +122,14 @@ class Daisy2 extends Base
 		res.setProperty("startingref", "");
 	    return res;
 	}
+	if (nccDoc.getUrl().equals(url))
+	{
+	    if (url.getRef() != null)
+		nccDoc.setProperty("startingref", url.getRef()); else
+		nccDoc.setProperty("startingref", "");
+	    return nccDoc;
+	}
+	Log.warning("doctree", "unable to find a document in Daisy2 book for URL:" + url.toString());
 	return null;
     }
 
