@@ -264,6 +264,11 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(query, "query");
 	switch(query.getQueryCode())
 	{
+	case AreaQuery.OBJECT_UNIREF:
+	    if (isEmpty() || document.getUrl() == null)
+		return false;
+	    ((ObjectUniRefQuery)query).answer(document.getUrl().toString());
+	    return true;
 	case AreaQuery.BEGIN_LISTENING:
 	    return onBeginListeningQuery((BeginListeningQuery)query);
 	default:
