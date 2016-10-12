@@ -267,7 +267,7 @@ public class DoctreeArea implements Area
 	case AreaQuery.OBJECT_UNIREF:
 	    if (isEmpty() || document.getUrl() == null)
 		return false;
-	    ((ObjectUniRefQuery)query).answer(document.getUrl().toString());
+	    ((ObjectUniRefQuery)query).answer("url:" + document.getUrl().toString());
 	    return true;
 	case AreaQuery.BEGIN_LISTENING:
 	    return onBeginListeningQuery((BeginListeningQuery)query);

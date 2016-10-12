@@ -274,10 +274,7 @@ public class Layout
 	    return false;
 	      case ORDERED_LIST:
 	      case UNORDERED_LIST:
-		  for(Node n: node.getSubnodes())
-		      if (hasTitleRun(n))
-			  return true;
-		  return false;
+		  return node.getParentType() == Node.Type.LIST_ITEM;
 	case TABLE_CELL:
 	    return !((TableCell)node).getTable().isSingleCellTable();
 	default:
