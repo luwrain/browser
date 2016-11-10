@@ -1,5 +1,5 @@
 /*
-o   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of the LUWRAIN.
@@ -49,10 +49,10 @@ public class Opds
 	static public final String BASE_TYPE_CATALOG = "application/atom+xml";
 	static public final String PRIMARY_TYPE_IMAGE = "image";
 
-	private String url;
-	private String rel;
-	private String type;
-	private String profile;
+	private final String url;
+	private final String rel;
+	private final String type;
+	private final String profile;
 
 	Link(String url, String rel,
 	     String type, String profile)
@@ -149,18 +149,18 @@ public class Opds
 	    return "url=" + url + ",rel=" + rel + ",type=" + type + ",profile=" + getTypeProfile();
 	}
 
-	public String url(){return url;}
-	public String rel(){return rel;};
-	public String type(){return type;}
-	public String profile(){return profile;}
+	public String getUrl(){return url;}
+	public String getRel(){return rel;};
+	public String getType(){return type;}
+	public String getProfile(){return profile;}
     }
 
     static public class Entry 
     {
-	private String id;
-	private URL parentUrl;
-	private String title;
-	private Link[] links;
+	private final String id;
+	private final URL parentUrl;
+	private final String title;
+	private final Link[] links;
 
 	Entry(String id, URL parentUrl,
 	      String title, Link[] links)
@@ -212,85 +212,46 @@ public class Opds
 	    return title;
 	}
 
-	public String id(){return id;}
-	public URL parentUrl() {return parentUrl;}
-	public String title(){return title;}
-	public Link[] links(){return links;}
-    }
-
-    static public class Directory
-    {
-	private Entry[] entries;
-
-	Directory(Entry[] entries)
-	{
-	    this.entries = entries;
-	    NullCheck.notNullItems(entries, "entries");
-	}
-
-	public Entry[] entries(){return entries;}
+	public String getId(){return id;}
+	public URL getParentUrl() {return parentUrl;}
+	public String getTitle(){return title;}
+	public Link[] getLinks(){return links;}
     }
 
     static public class Result
     {
 	public enum Errors {FETCH, PARSE, NOERROR, NEEDPAY};
 
-	private Directory dir;
-	private Errors error;
+	private final Entry[] entries;
+	private final Errors error;
 	// file link if result is not a directory entry and mime type of it
 	//	private String filename;
 	//	private String mime;
 
 	Result(Errors error)
 	{
+	    NullCheck.notNull(error, "error");
 	    this.error = error;
-	    this.dir = null;
-	    //	    this.filename=null;
-	    //	    this.mime=null;
+	    this.entries = null;
 	}
 
-	Result(Directory dir)
+	Result(Entry[] entries)
 	{
+	    NullCheck.notNullItems(entries, "entries");
 	    this.error = Errors.NOERROR;
-	    this.dir = dir;
-	    NullCheck.notNull(dir, "dir");
+	    this.entries = entries;
     	}
 
-	/*
-	Result(String filename, String mime)
+	public Entry[] getEntries()
 	{
-	    this.error=Errors.NOERROR;
-	    this.dir=null;
-	    this.filename=filename;
-	    this.mime=mime;
-	}
-	*/
-
-	/*
-	public String getFileName()
-	{
-		return filename;
-	}
-	*/
-
-	/*
-	public String getMimeType()
-	{
-		return mime;
-	}
-	*/
-
-	public Directory directory(){return dir;}
-	public Errors error(){return error;}
-
-	public boolean isDirectory()
-	{
-		return (error==Errors.NOERROR&&dir!=null);
+	    return entries;
 	}
 
-	public boolean isBook()
+	public Errors getError(){return error;}
+
+	public boolean hasEntries()
 	{
-	    return (error==Errors.NOERROR);//&&filename!=null);
+	    return error == Errors.NOERROR && entries != null;
 	}
     }
 
@@ -325,7 +286,7 @@ public class Opds
 	    {
 		e.printStackTrace();
 	    }
-	return new Result(new Directory(res.toArray(new Entry[res.size()])));
+	return new Result(res.toArray(new Entry[res.size()]));
     }
 
     static private Entry parseEntry(URL parentUrl, Element el) throws Exception
