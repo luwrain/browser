@@ -39,19 +39,27 @@ public class DocX
 	this.path = path;
     }
 
-private  org.luwrain.doctree.Document process()
+    private  org.luwrain.doctree.Document process()
     {
+	Log.debug("doctree-docx", "starting reading of " + path.toString());
     	try
     	{
 	    final InputStream s = Files.newInputStream(path);
-	    XWPFDocument doc = new XWPFDocument(s);
-	    final org.luwrain .doctree.Document res = transform(doc);
-	    res.setProperty("format", "DOCX");
-	    res.setProperty("url", path.toUri().toURL().toString());
-	    s.close();
+	    final org.luwrain .doctree.Document res;
+	    try {
+		XWPFDocument doc = new XWPFDocument(s);
+		res = transform(doc);
+		res.setProperty("format", "DOCX");
+		res.setProperty("url", path.toUri().toURL().toString());
+	    }
+	    finally {
+		s.close();
+	    }
+	    Log.debug("doctree-docx", "reading of " + path.toString() + " finished");
 	    return res;
     	} catch (IOException e)
     	{
+	    Log.error("doctree-docx", "unable to parse " + path.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace();
 	    return null;
 	}

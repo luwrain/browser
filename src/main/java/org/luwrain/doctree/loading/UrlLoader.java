@@ -271,6 +271,9 @@ res.setProperty("charset", selectedCharset);
 	    case DOCX:
 		res.doc = DocX.read(tmpFile);
 		return res;
+	    case DOC:
+		res.doc = Doc.read(tmpFile);
+		return res;
 	    case FB2:
 res.doc = new Fb2(tmpFile, selectedCharset).createDoc();
 return res;

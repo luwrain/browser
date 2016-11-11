@@ -35,16 +35,16 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 
 public class Doc
 {
-    private Path path;
+    private final Path path;
     private String wholeText;
 
-    public Doc(Path path)
+    private Doc(Path path)
     {
 	NullCheck.notNull(path, "path");
 	this.path = path;
     }
 
-    public Document constructDocument()
+    public Document process()
     {
 	try {
 	    final InputStream s = Files.newInputStream(path);
@@ -210,4 +210,12 @@ private void parseParagraph(LinkedList<Node> subnodes, org.apache.poi.hwpf.userm
 		throw new NullPointerException("nodes[" + i + "] is null");
     }
     */
+
+    static public org.luwrain.doctree.Document read(Path path)
+    {
+	NullCheck.notNull(path, "path");
+	return new Doc(path).process();
+    }
+
+
 }
