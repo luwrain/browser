@@ -1,29 +1,14 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
-   This file is part of the LUWRAIN.
+package org.luwrain.doctree.control;
 
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
-
-package org.luwrain.doctree;
-
-import java.util.*;
+import java.util.LinkedList;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
-import org.luwrain.util.*;
+import org.luwrain.util.WordIterator;
+import org.luwrain.doctree.*;
 
 public class DoctreeArea implements Area
 {
@@ -280,14 +265,14 @@ public class DoctreeArea implements Area
     {
 	if (isEmpty())
 	    return 0;
-	return iterator.getRow().getRowX() + hotPointX;
+	return iterator.getX() + hotPointX;
     }
 
     @Override public int getHotPointY()
     {
 	if (isEmpty())
 	    return 0;
-	return iterator.getRow().getRowY();
+	return iterator.getY();
     }
 
     @Override public String getAreaName()
@@ -375,15 +360,15 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	Iterator nearest = null;
 	while (it2.canMoveNext() && !it2.coversPos(x, y))
 	{
-	    if (it2.getRow() != null && it2.getRow().getRowY() == y)
+	    if (it2.getY() == y)
 		nearest = (Iterator)it2.clone();
 	    it2.moveNext();
 	}
 	if (it2.coversPos(x, y) &&
-	    it2.getRow() != null && x >= it2.getRow().getRowX())
+	    x >= it2.getX())
 	{
 	iterator = it2;
-	hotPointX = x - iterator.getRow().getRowX();
+	hotPointX = x - iterator.getX();
 	environment.onAreaNewHotPoint(this);
 	return true;
 	}

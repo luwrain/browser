@@ -100,7 +100,18 @@ return getRow().getRuns();
 	return new Iterator(document, current);
     }
 
-    public Row getRow()
+    public int getX()
+    {
+	return getRow().x;
+    }
+
+    public int getY()
+    {
+	return getRow().y;
+    }
+
+
+Row getRow()
     {
 	if (noContent())
 	    return null;
