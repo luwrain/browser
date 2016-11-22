@@ -33,7 +33,7 @@ public class RowPartsBuilder
     /** Number of characters in the current (incomplete) row*/
     private int offset = 0;
 
-    void onNode(Node node)
+    public void onNode(Node node)
     {
 	NullCheck.notNull(node, "node"); 
 	onNode(node, 0);
@@ -158,12 +158,12 @@ public class RowPartsBuilder
 	return part;
     }
 
-    RowPart[] parts()
+    public RowPart[] getRowParts()
     {
 	return parts.toArray(new RowPart[parts.size()]);
     }
 
-    Paragraph[] paragraphs()
+    public Paragraph[] getParagraphs()
     {
 	return paragraphs.toArray(new Paragraph[paragraphs.size()]);
     }
@@ -173,7 +173,7 @@ public class RowPartsBuilder
 	NullCheck.notNull(para, "para");
 	final RowPartsBuilder builder = new RowPartsBuilder();
 	builder.onNode(para, width);
-	final RowPart[] parts = builder.parts();
+	final RowPart[] parts = builder.getRowParts();
 	    for(RowPart r: parts)
 		r.absRowNum = r.relRowNum();
 	final Row[] rows = Layout.buildRows(parts);

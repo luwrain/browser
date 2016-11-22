@@ -28,7 +28,7 @@ public class Layout
     private Row[] rows;
     private Line[] lines = new Line[0];
 
-    Layout(Document document)
+    public Layout(Document document)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
@@ -42,7 +42,7 @@ public class Layout
 	rows = document.getRows();
     }
 
-    void calc()
+    public void calc()
     {
 	init();
 	final int lineCount = calcRowsPosition();
@@ -62,12 +62,12 @@ public class Layout
 	}
     }
 
-    int getLineCount()
+    public int getLineCount()
     {
 	return lines != null?lines.length:0;
     }
 
-    String getLine(int index)
+    public String getLine(int index)
     {
 	final Line line = lines[index];
 	StringBuilder b = new StringBuilder();
@@ -118,7 +118,7 @@ public class Layout
 	return maxLineNum + 1;
     }
 
-    static void calcAbsRowNums(RowPart[] parts)
+    static public void calcAbsRowNums(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	if (parts.length < 1)
@@ -137,7 +137,7 @@ public class Layout
 	}
     }
 
-    static Row[] buildRows(RowPart[] parts)
+    static public Row[] buildRows(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	final Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
@@ -149,7 +149,7 @@ public class Layout
 	return rows;
     }
 
-    static void calcWidth(Node node, int recommended)
+    static public void calcWidth(Node node, int recommended)
     {
 	NullCheck.notNull(node, "node");
 	final Node[] subnodes = node.getSubnodes();
@@ -177,7 +177,7 @@ public class Layout
 	}
     }
 
-    static void calcHeight(Node node)
+    static public void calcHeight(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof Paragraph)
@@ -219,7 +219,7 @@ public class Layout
 	    ++node.height;//For title run
     }
 
-    static void calcPosition(Node node)
+    static public void calcPosition(Node node)
     {
 	NullCheck.notNull(node, "node");
 	final Node[] subnodes = node.getSubnodes();

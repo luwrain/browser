@@ -25,7 +25,7 @@ public class TextRun implements Run
     private String href = "";
 private TextAttr textAttr = new TextAttr();
     private Paragraph parentPara;
-    ExtraInfo extraInfo = null;
+    public ExtraInfo extraInfo = null;
 
     public TextRun(String text)
     {

@@ -67,12 +67,12 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	Layout.calcWidth(root, width);
 	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
 	rowPartsBuilder.onNode(root);
-	rowParts = rowPartsBuilder.parts();
+	rowParts = rowPartsBuilder.getRowParts();
 	NullCheck.notNullItems(rowParts, "rowParts");
 	Log.debug("doctree", "" + rowParts.length + " row parts prepared");
 	if (rowParts.length <= 0)
 	    return;
-	paragraphs = rowPartsBuilder.paragraphs();
+	paragraphs = rowPartsBuilder.getParagraphs();
 	//	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
 	Layout.calcHeight(root);
 	Layout.calcAbsRowNums(rowParts);

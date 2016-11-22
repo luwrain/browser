@@ -28,7 +28,7 @@ protected Document document;
 
     protected int current = 0;
 
-    Iterator(Document document)
+    public Iterator(Document document)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
@@ -38,7 +38,7 @@ protected Document document;
 	current = 0;
     }
 
-    Iterator(Document document, int index)
+    public Iterator(Document document, int index)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;

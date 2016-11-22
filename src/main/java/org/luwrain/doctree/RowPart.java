@@ -19,7 +19,7 @@ package org.luwrain.doctree;
 
 import org.luwrain.core.NullCheck;
 
-class RowPart
+public class RowPart
 {
     private Run run;
 

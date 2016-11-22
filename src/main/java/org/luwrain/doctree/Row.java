@@ -20,7 +20,7 @@ package org.luwrain.doctree;
     import java.util.*;
 import org.luwrain.core.NullCheck;
 
-class Row
+public class Row
 {
     /** Absolute horizontal position in the area*/
 int x = 0;
