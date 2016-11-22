@@ -23,7 +23,7 @@ public class View
 	NullCheck.notNull(doc, "doc");
 	this.doc = doc;
 	this.root = doc.getRoot();
-	this.layout = new Layout(doc);
+	this.layout = new Layout(doc, this);
     }
 
     public void build(int width)
@@ -47,14 +47,14 @@ public class View
 	setDefaultIteratorIndex();
     }
 
-    public org.luwrain.doctree.Iterator getIterator()
+    public org.luwrain.doctree.view.Iterator getIterator()
     {
-	return new org.luwrain.doctree.Iterator(doc);
+	return new Iterator(doc, this);
     }
 
-    public org.luwrain.doctree.Iterator getIterator(int startingIndex)
+    public org.luwrain.doctree.view.Iterator getIterator(int startingIndex)
     {
-	return new org.luwrain.doctree.Iterator(doc, startingIndex);
+	return new Iterator(doc, this, startingIndex);
     }
 
 
@@ -78,7 +78,7 @@ public class View
 		if (id.isEmpty())
 	    return;
 	Log.debug("doctree", "preparing default iterator index for " + id);
-	final org.luwrain.doctree.Iterator it = getIterator();
+	final org.luwrain.doctree.view.Iterator it = getIterator();
 	while (it.canMoveNext())
 	{
 	    if (!it.isEmptyRow())

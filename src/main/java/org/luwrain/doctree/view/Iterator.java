@@ -1,50 +1,40 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
-
-package org.luwrain.doctree;
+package org.luwrain.doctree.view;
 
 import org.luwrain.core.*;
+import org.luwrain.doctree.*;
 
 public class Iterator
 {
-protected Document document;
-    protected Node root;
-    protected Paragraph[] paragraphs;
-    protected Row[] rows;
+protected final Document document;
+    protected final View view ;
+    protected final Node root;
+    protected final Paragraph[] paragraphs;
+    protected final Row[] rows;
 
     protected int current = 0;
 
-    public Iterator(Document document)
+    public Iterator(Document document, View view)
     {
 	NullCheck.notNull(document, "document");
+	NullCheck.notNull(view, "view");
 	this.document = document;
+	this.view = view;
 	this.root = document.getRoot();
-	this.paragraphs = document.getParagraphs();
-	this.rows = document.getRows();
+	this.paragraphs = view.getParagraphs();
+	this.rows = view.getRows();
 	current = 0;
     }
 
-    public Iterator(Document document, int index)
+    public Iterator(Document document, View view, int index)
     {
 	NullCheck.notNull(document, "document");
+	NullCheck.notNull(view, "view");
 	this.document = document;
+	this.view = view;
 	this.root = document.getRoot();
-	this.paragraphs = document.getParagraphs();
-	this.rows = document.getRows();
+	this.paragraphs = view.getParagraphs();
+	this.rows = view.getRows();
 	if (index < 0 || index >= rows.length)
 	    throw new IllegalArgumentException("INvalid row index:" + index);
 	current = index;
@@ -97,7 +87,7 @@ return getRow().getRuns();
 
     @Override public Object clone()
     {
-	return new Iterator(document, current);
+	return new Iterator(document, view, current);
     }
 
     public int getX()
@@ -134,7 +124,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	if (noContent())
 	    return null;
 	final Paragraph para = getParagraph();
-	return para != null?para.parentNode:null;
+	return para != null?para.getParentNode():null;
     }
 
     public boolean hasContainerInParents(Node container)
@@ -143,7 +133,7 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
 	    return false;
 	Node n = getParagraph();
 	while (n != null && n != container)
-	    n = n.parentNode;
+	    n = n.getParentNode();
 	return n == container;
     }
 

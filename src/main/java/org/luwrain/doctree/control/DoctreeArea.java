@@ -9,6 +9,7 @@ import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 import org.luwrain.util.WordIterator;
 import org.luwrain.doctree.*;
+import org.luwrain.doctree.view.*;
 
 public class DoctreeArea implements Area
 {
@@ -16,23 +17,26 @@ public class DoctreeArea implements Area
     protected final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
     private String areaName = null;//FIXME:No corresponding constructor;
     protected Document document;
-    protected org.luwrain.doctree.Iterator iterator;
+    protected View view = null;
+    protected org.luwrain.doctree.view.Iterator iterator;
     protected int hotPointX = 0;
 
-    public DoctreeArea(ControlEnvironment environment, Document document)
+    public DoctreeArea(ControlEnvironment environment, Document document, int width)
     {
 	NullCheck.notNull(environment, "environment");
 	this.environment = environment;
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
-		setDocument(document);
+		setDocument(document, width);
     }
 
-    public void setDocument(Document document)
+    public void setDocument(Document document, int width)
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
+	this.view = new View(document);
+	this.view.build(width);
 	int defaultIndex = -1;
 	if (!document.getProperty(Document.DEFAULT_ITERATOR_INDEX_PROPERTY).isEmpty())
 	    try {
@@ -44,14 +48,14 @@ public class DoctreeArea implements Area
 	if (defaultIndex >= 0)
 	{
 	    try {
-		iterator = document.getIterator(defaultIndex);
+		iterator = view.getIterator(defaultIndex);
 	    }
 	    catch(IllegalArgumentException e)
 	    {
-		iterator = document.getIterator();
+		iterator = view.getIterator();
 	    }
 	} else
-	    iterator = document.getIterator();
+	    iterator = view.getIterator();
 	hotPointX = 0;
 	environment.onAreaNewContent(this);
 	environment.onAreaNewHotPoint(this);
@@ -79,7 +83,7 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(run, "run");
 	if (isEmpty())
 	    return false;
-	final Iterator newIt = document.getIterator();
+	final Iterator newIt = view.getIterator();
 	while(newIt.canMoveNext() && !newIt.hasRunOnRow(run))
 	    newIt.moveNext();
 	if (!newIt.hasRunOnRow(run))
@@ -104,7 +108,7 @@ public class DoctreeArea implements Area
 		      return false;
 	final Iterator newIt;
 	try {
-	    newIt = document.getIterator(index);
+	    newIt = view.getIterator(index);
 	}
 	catch(IllegalArgumentException e)
 	{
@@ -148,7 +152,8 @@ public class DoctreeArea implements Area
 	if (isEmpty())
 	    return false;
 	final Run currentRun = getCurrentRun();
-	document.buildView(width);
+	view = new View(document);
+	view.build(width);
 	if (currentRun != null)
 	    findRun(currentRun);
 	hotPointX = Math.min(hotPointX, iterator.getText().length());
@@ -159,14 +164,14 @@ public class DoctreeArea implements Area
 
     @Override public int getLineCount()
     {
-	return !isEmpty()?document.getLineCount() + 1:1;
+	return !isEmpty()?view.getLineCount() + 1:1;
     }
 
     @Override public String getLine(int index)
     {
 	if (isEmpty())
 	    return index == 0?noContentStr():"";
-	return index < document.getLineCount()?document.getLine(index):"";
+	return index < view.getLineCount()?view.getLine(index):"";
     }
 
     @Override public boolean onKeyboardEvent(KeyboardEvent event) 
@@ -352,7 +357,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	NullCheck.notNull(event, "event");
 	if (isEmpty())
 	    return false;
-	final Iterator it2 = document.getIterator();
+	final Iterator it2 = view.getIterator();
 	final int x = event.getNewHotPointX();
 	final int y = event.getNewHotPointY();
 	if (x < 0 || y < 0)

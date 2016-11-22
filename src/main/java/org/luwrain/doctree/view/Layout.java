@@ -1,50 +1,44 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
-
-package org.luwrain.doctree;
+package org.luwrain.doctree.view;
 
 import org.luwrain.core.*;
+import org.luwrain.doctree.*;
 
-public class Layout
+class Layout
 {
-    private Document document;
-    private Node root;
-    private Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
-    private RowPart[] rowParts;
-    private Row[] rows;
+    private final Document document;
+    private final Node root;
+    private final Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    private final RowPart[] rowParts;
+    private final Row[] rows;
     private Line[] lines = new Line[0];
 
-    public Layout(Document document)
+    public Layout(Document document, View view)
     {
 	NullCheck.notNull(document, "document");
+	NullCheck.notNull(view, "view");
 	this.document = document;
+
+	root = document.getRoot();
+	paragraphs = view.getParagraphs();
+	rowParts = view.getRowParts();
+	rows = view.getRows();
+
     }
 
+    /*
     private void init()
     {
 	root = document.getRoot();
 	paragraphs = document.getParagraphs();
 	rowParts = document.getRowParts();
 	rows = document.getRows();
+
     }
+    */
 
     public void calc()
     {
-	init();
 	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
 	for(int i = 0;i < lines.length;++i)
@@ -189,7 +183,7 @@ public class Layout
 		return;
 	    }
 	    int maxRelRowNum = 0;
-	    for(RowPart p: para.getRowParts())
+	    for(RowPart p: (RowPart[])para.getRowParts())
 		if (p.relRowNum() > maxRelRowNum)
 		    maxRelRowNum = p.relRowNum();
 	    para.height = maxRelRowNum + 2;//1 more for empty line above
@@ -239,14 +233,14 @@ public class Layout
 	    }
 	    return;
 	} //table row
-	if  (node.type == Node.Type.ROOT)
+	if  (node.getType() == Node.Type.ROOT)
 	{
 	    node.x = 0;
 	    node.y = 0;
 	}
 	//Assuming node.x and node.y already set appropriately
 	int offset = hasTitleRun(node)?1:0;//1 for title run
-	if (node.type == Node.Type.PARAGRAPH && ((Paragraph)node).getRowParts().length > 0)
+	if (node.getType() == Node.Type.PARAGRAPH && ((Paragraph)node).getRowParts().length > 0)
 	    offset = 1;
 	for(Node n: subnodes)
 	{
@@ -261,7 +255,7 @@ public class Layout
     static public boolean hasTitleRun(Node node)
     {
 	NullCheck.notNull(node, "node");
-	switch(node.type)
+	switch(node.getType())
 	{
 	case LIST_ITEM:
 	case SECTION:

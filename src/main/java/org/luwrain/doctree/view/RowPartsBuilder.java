@@ -1,27 +1,12 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
-
-package org.luwrain.doctree;
+package org.luwrain.doctree.view;
 
 import java.util.*;
-import org.luwrain.core.NullCheck;
-import org.luwrain.core.Log;
 
-public class RowPartsBuilder
+import org.luwrain.core.*;
+import org.luwrain.doctree.*;
+
+class RowPartsBuilder
 {
     private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
     private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();

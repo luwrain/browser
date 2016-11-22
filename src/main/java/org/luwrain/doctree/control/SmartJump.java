@@ -3,6 +3,7 @@ package org.luwrain.doctree.control;
 
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
+import org.luwrain.doctree.view.*;
 
 class SmartJump
 {

@@ -42,12 +42,12 @@ public class Node
     int level = 0;
 
     /**Absolute horizontal position in the area*/
-    int x = -1;
+    public int x = -1;
 
     /**Absolute vertical position in the area*/
-    int y = -1;
-    int width = 0;
-    int height = 0;
+    public int y = -1;
+    public int width = 0;
+    public int height = 0;
 
     protected boolean empty = false;
 
@@ -169,7 +169,7 @@ void setEmptyMark()
     /** 
      * @return -1 if there is no a parent node or there is a consistency error
      */
-    Node.Type getParentType()
+    public Node.Type getParentType()
     {
 	return parentNode != null && parentNode.subnodes != null?parentNode.type:null;
     }
@@ -181,7 +181,7 @@ void setEmptyMark()
     }
 
     /** @return -1 if it is impossible to understand;*/
-    int getIndexInParentSubnodes()
+    public int getIndexInParentSubnodes()
     {
 	if (parentNode == null || parentNode.subnodes == null)
 	    return -1;
@@ -191,16 +191,10 @@ void setEmptyMark()
 	return -1;
     }
 
-    /*
-    boolean isLastInParentSubnodes()
+    public Node getParentNode()
     {
-	final int count = getParentSubnodeCount();
-	final int index = getIndexInParentSubnodes();
-	if (index < 0 || count < 0)
-	    return false;
-	return index + 1 == count;
+	return parentNode;
     }
-    */
 
     public TitleRun getTitleRun()
     {
