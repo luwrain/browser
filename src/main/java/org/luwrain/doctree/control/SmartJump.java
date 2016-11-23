@@ -60,7 +60,7 @@ class SmartJump
 		return false;
 	while (true)
 	{
-	    if (it.getRowRelIndex() == 0)
+	    if (it.getIndexInParagraph() == 0)
 		return true;
 	    if (!it.moveNext())
 		return false;

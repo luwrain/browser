@@ -44,7 +44,7 @@ public class Announcement
 
     protected void onTitle(Iterator it)
     {
-	final Node node = it.getTitleParentNode();
+	final Node node = it.getNode();
 	if (node.getType() == Node.Type.ORDERED_LIST)
 	    onOrderedList(it); else
 	    if (node.getType() == Node.Type.UNORDERED_LIST)
@@ -75,7 +75,8 @@ public class Announcement
     }
 
     private void onTableCell(Iterator it)
-    {it.getTitleParentNode();
+    {
+	//it.getTitleParentNode();
 	final TableCell cell = (TableCell)it.getNode();
 	final int rowIndex = cell.getRowIndex();
 	final int colIndex = cell.getColIndex();
@@ -98,7 +99,7 @@ public class Announcement
 	}
 	//Checking should we use any specific sound
 final Sounds sound;
-	if (it.getRowRelIndex() == 0 && it.getNode() != null)
+	if (it.getIndexInParagraph() == 0 && it.getNode() != null)
 	{
 		switch(it.getNode().getType())
 		{
@@ -121,7 +122,7 @@ final Sounds sound;
 	}
 	//Speaking with paragraph sound if it is a first row
 
-	if (it.getRowRelIndex() == 0)
+	if (it.getIndexInParagraph() == 0)
 	    environment.say(it.getText(), Sounds.PARAGRAPH); else
 		environment.say(it.getText());
     }

@@ -114,7 +114,7 @@ public class DoctreeArea implements Area
 
     public int getCurrentRowIndex()
     {
-	return !isEmpty()?iterator.getRowAbsIndex():-1;
+	return !isEmpty()?iterator.getIndex():-1;
     }
 
     public boolean setCurrentRowIndex(int index)
@@ -526,7 +526,7 @@ protected boolean onRightSquareBracket(KeyboardEvent event)
 	    environment.hint(Hints.NO_LINES_BELOW);
 	    return true;
 	}
-	while(!iterator.isFirstRow() && iterator.moveNext());
+	while(!iterator.isParagraphBeginning() && iterator.moveNext());
 	onNewHotPointY(false);
 	return true;
     }
@@ -540,7 +540,7 @@ protected boolean onRightSquareBracket(KeyboardEvent event)
 	    environment.hint(Hints.NO_LINES_ABOVE);
 	    return true;
 	}
-	while(!iterator.isFirstRow() && iterator.movePrev());
+	while(!iterator.isParagraphBeginning() && iterator.movePrev());
 	onNewHotPointY( false);
 	return true;
     }

@@ -106,7 +106,7 @@ public class View
 	    doc.setProperty(DEFAULT_ITERATOR_INDEX_PROPERTY, "");
 	    return;
 	}
-	doc.setProperty("defaultiteratorindex", "" + it.getRowAbsIndex());
-	Log.debug("doctree", "default iterator index set to " + it.getRowAbsIndex());
+	doc.setProperty("defaultiteratorindex", "" + it.getIndex());
+	Log.debug("doctree", "default iterator index set to " + it.getIndex());
     }
 }

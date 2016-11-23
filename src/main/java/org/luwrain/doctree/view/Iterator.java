@@ -6,7 +6,7 @@ import org.luwrain.doctree.*;
 
 public class Iterator
 {
-protected final Document document;
+    protected final Document document;
     protected final View view ;
     protected final Node root;
     protected final Paragraph[] paragraphs;
@@ -49,34 +49,6 @@ protected final Document document;
 	return false;
     }
 
-    public boolean hasRunOnRow(Run run)
-    {
-	NullCheck.notNull(run, "run");
-	if (isEmptyRow())
-	    return false;
-	final Run[] runs = getRow().getRuns();
-	for(Run r: runs)
-	    if (run == r)
-		return true;
-	return false;
-    }
-
-    public Run[] getRunsOnRow()
-    {
-	if (isEmptyRow())
-	    return new Run[0];
-return getRow().getRuns();
-    }
-
-
-    public int runBeginsAt(Run run)
-    {
-	NullCheck.notNull(run, "run");
-	if (isEmptyRow())
-	    return -1;
-	return getRow().runBeginsAt(run);
-    }
-
     @Override public boolean equals(Object o)
     {
 	if (o == null || !(o instanceof Iterator))
@@ -88,162 +60,6 @@ return getRow().getRuns();
     @Override public Object clone()
     {
 	return new Iterator(document, view, current);
-    }
-
-    public int getX()
-    {
-	return getRow().x;
-    }
-
-    public int getY()
-    {
-	return getRow().y;
-    }
-
-
-Row getRow()
-    {
-	if (noContent())
-	    return null;
-	if (current < 0 || current >= rows.length)
-	    return null;
-	return rows[current];
-    }
-
-    public Paragraph getParagraph()
-    {
-	if (noContent() || isEmptyRow())
-	    return null;
-final Node parent = getFirstRunOfRow().getParentNode();
-return (parent instanceof Paragraph)?(Paragraph)parent:null;
-    }
-
-    //Returns null if is at title row
-    public Node getParaContainer()
-    {
-	if (noContent())
-	    return null;
-	final Paragraph para = getParagraph();
-	return para != null?para.getParentNode():null;
-    }
-
-    public boolean hasContainerInParents(Node container)
-    {
-	if (noContent())
-	    return false;
-	Node n = getParagraph();
-	while (n != null && n != container)
-	    n = n.getParentNode();
-	return n == container;
-    }
-
-    public boolean isTitleRow()
-    {
-	final Row row = getRow();
-	if (row == null)
-	    return false;
-	return row.getFirstPart().run() instanceof TitleRun;
-    }
-
-    public Node getTitleParentNode()
-    {
-	if (!isTitleRow())
-	    return null;
-	return getRow().getFirstPart().run().getParentNode();
-    }
-
-    public Node getNode()
-    {
-	if (isTitleRow())
-	    return getTitleParentNode();
-	return getParaContainer();
-    }
-
-
-
-
-    //returns -1 if no content
-    public int getRowAbsIndex()
-    {
-	if (noContent())
-	    return -1;
-	return current;
-    }
-
-    //returns -1 if no content
-    public int getRowRelIndex()
-    {
-	if (noContent())
-	    return -1;
-	//	return current - getParagraph().topRowIndex;
-	return getRow().getFirstPart().relRowNum();
-    }
-
-    public boolean isFirstRow()
-    {
-	return getRowRelIndex() == 0;
-    }
-
-    public boolean isEmptyRow()
-    {
-	if (noContent())
-	    return true;
-	return rows[current].isEmpty();
-    }
-
-
-    private Run getFirstRunOfRow()
-    {
-	if (noContent())
-	    return null;
-	return rows[current].getFirstPart().run();
-    }
-
-    //returns -1 if no content 
-    public int getParaIndex()
-    {
-	if (noContent())
-	    return -1;
-	final Paragraph para = getParagraph();
-	return para != null?para.getIndexInParentSubnodes():-1;
-    }
-
-    public boolean isFirstPara()
-    {
-	if (noContent())
-	    return false;
-	return getParaIndex() == 0;
-    }
-
-    public boolean coversPos(int x, int y)
-    {
-	if (noContent())
-	    return false;
-	if (isEmptyRow())
-	    return false;
-	final Row r = getRow();
-	if (r.getRowY() != y)
-	    return false;
-	if (x < r.getRowX())
-	    return false;
-	if (x > r.getRowX() + getText().length())
-	    return false;
-	return true;
-    }
-
-    public String getText()
-    {
-	if (noContent())
-	    return "";
-	final Row row = rows[current];
-	return !row.isEmpty()?row.text():"";
-    }
-
-    public Run getRunUnderPos(int pos)
-    {
-	if (noContent())
-	    return null;
-	return rows[current].getRunUnderPos(pos);
     }
 
     public boolean canMoveNext()
@@ -284,5 +100,157 @@ return (parent instanceof Paragraph)?(Paragraph)parent:null;
     public void moveHome()
     {
 	current = 0;
+    }
+
+    public String getText()
+    {
+	if (noContent())
+	    return "";
+	final Row row = rows[current];
+	return !row.isEmpty()?row.text():"";
+    }
+
+    //returns -1 if no content
+    public int getIndex()
+    {
+	if (noContent())
+	    return -1;
+	return current;
+    }
+
+    //returns -1 if no content
+    public int getIndexInParagraph()
+    {
+	if (noContent())
+	    return -1;
+	//	return current - getParagraph().topRowIndex;
+	return getRow().getFirstPart().relRowNum();
+    }
+
+    public boolean isParagraphBeginning()
+    {
+	return getIndexInParagraph() == 0;
+    }
+
+    public boolean hasRunOnRow(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	if (isEmptyRow())
+	    return false;
+	final Run[] runs = getRow().getRuns();
+	for(Run r: runs)
+	    if (run == r)
+		return true;
+	return false;
+    }
+
+    public Run[] getRunsOnRow()
+    {
+	if (isEmptyRow())
+	    return new Run[0];
+	return getRow().getRuns();
+    }
+
+    public int runBeginsAt(Run run)
+    {
+	NullCheck.notNull(run, "run");
+	if (isEmptyRow())
+	    return -1;
+	return getRow().runBeginsAt(run);
+    }
+
+    public int getX()
+    {
+	return getRow().x;
+    }
+
+    public int getY()
+    {
+	return getRow().y;
+    }
+
+    public boolean isTitleRow()
+    {
+	final Row row = getRow();
+	if (row == null)
+	    return false;
+	return row.getFirstPart().run() instanceof TitleRun;
+    }
+
+    public Node getNode()
+    {
+	if (isTitleRow())
+	    return getTitleParentNode();
+	return getParaContainer();
+    }
+
+    public Paragraph getParagraph()
+    {
+	if (noContent() || isEmptyRow())
+	    return null;
+	final Node parent = getFirstRunOfRow().getParentNode();
+	return (parent instanceof Paragraph)?(Paragraph)parent:null;
+    }
+
+    //Returns null if is at title row
+    public Node getParaContainer()
+    {
+	if (noContent())
+	    return null;
+	final Paragraph para = getParagraph();
+	return para != null?para.getParentNode():null;
+    }
+
+    public boolean isEmptyRow()
+    {
+	if (noContent())
+	    return true;
+	return rows[current].isEmpty();
+    }
+
+    public boolean coversPos(int x, int y)
+    {
+	if (noContent())
+	    return false;
+	if (isEmptyRow())
+	    return false;
+	final Row r = getRow();
+	if (r.getRowY() != y)
+	    return false;
+	if (x < r.getRowX())
+	    return false;
+	if (x > r.getRowX() + getText().length())
+	    return false;
+	return true;
+    }
+
+    public Run getRunUnderPos(int pos)
+    {
+	if (noContent())
+	    return null;
+	return rows[current].getRunUnderPos(pos);
+    }
+
+    protected Row getRow()
+    {
+	if (noContent())
+	    return null;
+	if (current < 0 || current >= rows.length)
+	    return null;
+	return rows[current];
+    }
+
+    protected Run getFirstRunOfRow()
+    {
+	if (noContent())
+	    return null;
+	return rows[current].getFirstPart().run();
+    }
+
+    protected Node getTitleParentNode()
+    {
+	if (!isTitleRow())
+	    return null;
+	return getRow().getFirstPart().run().getParentNode();
     }
 }
