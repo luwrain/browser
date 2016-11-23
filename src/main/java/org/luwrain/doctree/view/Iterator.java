@@ -124,7 +124,7 @@ public class Iterator
 	if (noContent())
 	    return -1;
 	//	return current - getParagraph().topRowIndex;
-	return getRow().getFirstPart().relRowNum();
+	return getRow().getFirstPart().relRowNum;
     }
 
     public boolean isParagraphBeginning()
@@ -174,7 +174,7 @@ public class Iterator
 	final Row row = getRow();
 	if (row == null)
 	    return false;
-	return row.getFirstPart().run() instanceof TitleRun;
+	return row.getFirstPart().run instanceof TitleRun;
     }
 
     public Node getNode()
@@ -244,13 +244,13 @@ public class Iterator
     {
 	if (noContent())
 	    return null;
-	return rows[current].getFirstPart().run();
+	return rows[current].getFirstPart().run;
     }
 
     protected Node getTitleParentNode()
     {
 	if (!isTitleRow())
 	    return null;
-	return getRow().getFirstPart().run().getParentNode();
+	return getRow().getFirstPart().run.getParentNode();
     }
 }

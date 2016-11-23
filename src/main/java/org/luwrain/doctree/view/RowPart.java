@@ -6,23 +6,23 @@ import org.luwrain.doctree.*;
 
 class RowPart
 {
-    private Run run;
+    /** The run this part is associated with*/
+    final Run run;
 
     /** Starting position in the text of the corresponding run*/
-    private int posFrom = 0;
+    final int posFrom;
 
     /** Ending position in the text of the corresponding run*/
-    private int posTo = 0;
-
-    /** Absolute row index in a document*/
-    int absRowNum = 0;
+    final int posTo;
 
     /** Index in the corresponding paragraph*/
-    private int relRowNum = 0;
+    final int relRowNum;
 
-    RowPart(Run run, 
-	    int posFrom, int posTo,
-int relRowNum)
+    /** Absolute row index in the document*/
+    int absRowNum = 0;
+
+    RowPart(Run run, int posFrom, int posTo,
+	    int relRowNum)
     {
 	NullCheck.notNull(run, "run");
 	this.run = run;
@@ -31,10 +31,8 @@ int relRowNum)
 	this.relRowNum = relRowNum;
     }
 
-    String text()
+    String getText()
     {
-	if (run == null)
-	    throw new NullPointerException("run may not be null");
 	return run.text().substring(posFrom, posTo);
     }
 
@@ -44,9 +42,4 @@ int relRowNum)
 	NullCheck.notNull(rowPart, "rowPart");
 	return run.getParentNode() == rowPart.run.getParentNode() && relRowNum == rowPart.relRowNum;
     }
-
-    Run run() {return run;}
-    int posFrom() {return posFrom;}
-    int posTo() {return posTo;}
-    int relRowNum() {return relRowNum;}
 }

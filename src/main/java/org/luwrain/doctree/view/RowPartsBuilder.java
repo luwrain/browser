@@ -160,7 +160,7 @@ public class RowPartsBuilder
 	builder.onNode(para, width);
 	final RowPart[] parts = builder.getRowParts();
 	    for(RowPart r: parts)
-		r.absRowNum = r.relRowNum();
+		r.absRowNum = r.relRowNum;
 	final Row[] rows = Layout.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
 	for(Row r: rows)

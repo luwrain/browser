@@ -31,7 +31,7 @@ int x = 0;
 	final int index = getPartIndexUnderPos(pos);
 	if (index < 0)
     return null;
-	return parts[index].run();
+	return parts[index].run;
     }
 
     //returns null if there is no suitable
@@ -42,7 +42,7 @@ int x = 0;
 	final Vector<Run> res = new Vector<Run>();
 	for(int i = partsFrom;i < partsTo;++i)
 	{
-	    final Run run = parts[i].run();
+	    final Run run = parts[i].run;
 	    int k = 0;
 	    for(k = 0;k < res.size();++k)
 		if (res.get(k) == run)
@@ -63,10 +63,10 @@ int x = 0;
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
-	    final String text = parts[i].text();
+	    final String text = parts[i].getText();
 	    if (text == null || text.isEmpty())
 		continue;
-	    if (parts[i].run() == run)
+	    if (parts[i].run == run)
 		return offset;
 	    offset += text.length();
 	}
@@ -79,7 +79,7 @@ int x = 0;
 	    return "";
 	final StringBuilder b = new StringBuilder();
 	for(int i = partsFrom;i < partsTo;++i)
-	    b.append(parts[i].text());
+	    b.append(parts[i].getText());
 	return b.toString();
     }
 
@@ -113,7 +113,7 @@ int x = 0;
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
-	    final String text = parts[i].text();
+	    final String text = parts[i].getText();
 	    if (text == null || text.isEmpty())
 		continue;
 	    if (pos >= offset && pos < offset + text.length())

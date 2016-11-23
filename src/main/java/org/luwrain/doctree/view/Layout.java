@@ -94,7 +94,7 @@ void calc()
 		++lastY;
 		continue;
 	    }
-	    final Run run = r.getFirstPart().run();
+	    final Run run = r.getFirstPart().run;
 	    NullCheck.notNull(run, "run");
 	    final Node parent = run.getParentNode();
 	    NullCheck.notNull(parent, "parent");
@@ -102,7 +102,7 @@ void calc()
 	    {
 		final Paragraph paragraph = (Paragraph)parent;
 		r.x = paragraph.getNodeX();
-		r.y = paragraph.getNodeY() + r.getFirstPart().relRowNum();
+		r.y = paragraph.getNodeY() + r.getFirstPart().relRowNum;
 	    } else 
 	    {
 		r.x = parent.getNodeX();
@@ -188,8 +188,8 @@ void calc()
 	    }
 	    int maxRelRowNum = 0;
 	    for(RowPart p: (RowPart[])para.getRowParts())
-		if (p.relRowNum() > maxRelRowNum)
-		    maxRelRowNum = p.relRowNum();
+		if (p.relRowNum > maxRelRowNum)
+		    maxRelRowNum = p.relRowNum;
 	    para.setNodeHeight(maxRelRowNum + 2);//1 more for empty line above
 	    return;
 	}
