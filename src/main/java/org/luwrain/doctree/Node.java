@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 
-public class Node
+public class Node extends org.luwrain.doctree.view.NodeBase
 {
     public enum Type {
 	ROOT, SECTION, PARAGRAPH,
@@ -41,13 +41,6 @@ public class Node
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
 
-    /**Absolute horizontal position in the area*/
-    public int x = -1;
-
-    /**Absolute vertical position in the area*/
-    public int y = -1;
-    public int width = 0;
-    public int height = 0;
 
     protected boolean empty = false;
 
@@ -64,26 +57,6 @@ public class Node
     public int getSubnodeCount()
     {
 	return subnodes != null?subnodes.length:0;
-    }
-
-    public int getNodeX()
-    {
-	return x;
-    }
-
-public int getNodeY()
-    {
-	return y;
-    }
-
-public int getNodeWidth()
-    {
-	return width;
-    }
-
-public int getNodeHeight()
-    {
-	return height;
     }
 
     public boolean noSubnodes()

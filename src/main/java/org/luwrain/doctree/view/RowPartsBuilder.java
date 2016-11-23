@@ -37,7 +37,7 @@ class RowPartsBuilder
 		    onRun(r, width > 0?width:para.width);
 	    if (!currentParaParts.isEmpty())
 	    {
-		para.rowParts = currentParaParts.toArray(new RowPart[currentParaParts.size()]);
+		para.setRowParts(currentParaParts.toArray(new RowPart[currentParaParts.size()]));
 		paragraphs.add(para);
 		for(RowPart p: currentParaParts)
 		    parts.add(p);

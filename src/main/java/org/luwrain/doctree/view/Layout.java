@@ -97,12 +97,12 @@ class Layout
 	    if (parent instanceof Paragraph)
 	    {
 		final Paragraph paragraph = (Paragraph)parent;
-		r.x = paragraph.x;
-		r.y = paragraph.y + r.getFirstPart().relRowNum();
+		r.x = paragraph.getNodeX();
+		r.y = paragraph.getNodeY() + r.getFirstPart().relRowNum();
 	    } else 
 	    {
-		r.x = parent.x;
-		r.y = parent.y;
+		r.x = parent.getNodeX();
+		r.y = parent.getNodeY();
 	    }
 	    lastX = r.x;
 	    lastY = r.y;
@@ -179,14 +179,14 @@ class Layout
 	    final Paragraph para = (Paragraph)node;
 	    if (para.getRowParts().length == 0)
 	    {
-		para.height = 0;
+		para.setNodeHeight(0);
 		return;
 	    }
 	    int maxRelRowNum = 0;
 	    for(RowPart p: (RowPart[])para.getRowParts())
 		if (p.relRowNum() > maxRelRowNum)
 		    maxRelRowNum = p.relRowNum();
-	    para.height = maxRelRowNum + 2;//1 more for empty line above
+	    para.setNodeHeight(maxRelRowNum + 2);//1 more for empty line above
 	    return;
 	}
 	final Node[] subnodes = node.getSubnodes();
@@ -196,21 +196,21 @@ class Layout
 	    final TableRow tableRow = (TableRow)node;
 	    for(Node n: subnodes)
 		calcHeight(n);
-	    tableRow.height = 0;
+	    tableRow.setNodeHeight(0);
 	    for(Node n: subnodes)
-		if (tableRow.height < n.height)
-		    tableRow.height = n.height;
+		if (tableRow.getNodeHeight() < n.getNodeHeight())
+		    tableRow.setNodeHeight(n.getNodeHeight());
 	    if (hasTitleRun(node))
-		++node.height;//For title run
+		node.setNodeHeight(node.getNodeHeight() + 1);//For title run
 	    return;
 	}
 	for(Node n: subnodes)
 	    calcHeight(n);
-	node.height = 0;
+	node.setNodeHeight(0);
 	for(Node n: subnodes)
-	    node.height += n.height;
+	    node.setNodeHeight(node.getNodeHeight() + n.getNodeHeight());
 	if (hasTitleRun(node))
-	    ++node.height;//For title run
+	    node.setNodeHeight(node.getNodeHeight() + 1);//For title run
     }
 
     static public void calcPosition(Node node)
@@ -224,19 +224,19 @@ class Layout
 	    int offset = 0;
 	    for(Node n: subnodes)
 	    {
-		n.x = tableRow.x + offset;
+		n.setNodeX(tableRow.getNodeX() + offset);
 		offset += (n.width + 1);
-		n.y = node.y;
+		n.setNodeY(node.getNodeY());
 		if (hasTitleRun(node))
-		    ++n.y;
+		    n.setNodeY(n.getNodeY());
 		calcPosition(n);
 	    }
 	    return;
 	} //table row
 	if  (node.getType() == Node.Type.ROOT)
 	{
-	    node.x = 0;
-	    node.y = 0;
+	    node.setNodeX(0);
+	    node.setNodeY(0);
 	}
 	//Assuming node.x and node.y already set appropriately
 	int offset = hasTitleRun(node)?1:0;//1 for title run
@@ -244,9 +244,9 @@ class Layout
 	    offset = 1;
 	for(Node n: subnodes)
 	{
-	    n.x = node.x;
-	    n.y = node.y + offset;
-	    offset += n.height;
+	    n.setNodeX(node.getNodeX());
+	    n.setNodeY(node.getNodeY() + offset);
+	    offset += n.getNodeHeight();
 	    calcPosition(n);
 	}
     }

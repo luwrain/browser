@@ -22,7 +22,7 @@ import java.util.*;
 public class Paragraph extends Node
 {
     public Run[] runs = new Run[0];
-    public Object[] rowParts = null;
+
 
     Paragraph()
     {
@@ -67,11 +67,6 @@ public class Paragraph extends Node
 	if (k > 0)
 	    runs = Arrays.copyOf(runs, runs.length - k);
 	return k;
-    }
-
-    public Object[] getRowParts()
-    {
-	return rowParts != null?rowParts:new Object[0];
     }
 
     int getParaIndex()

@@ -87,6 +87,7 @@ n.subnodes[0].parentNode = n;
 	return count;
     }
 
+    /*
     public boolean isSingleLineRow(int index)
     {
 	for(Node n: subnodes[index].subnodes)
@@ -96,11 +97,12 @@ n.subnodes[0].parentNode = n;
 	    if (n.subnodes[0].type != Node.Type.PARAGRAPH || !(n.subnodes[0] instanceof Paragraph))
 		return false;
 	    final Paragraph p = (Paragraph)n.subnodes[0];
-	    if (p.height > 1)
+	    if (p.getNodeHeight() > 1)
 		return false;
 	}
 	    return true;
     }
+    */
 
     public boolean isSingleCellTable()
     {
