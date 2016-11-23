@@ -13,7 +13,7 @@ public class View
 
     protected final Document doc;
     protected final Node root;
-    protected final Layout layout;
+    protected Layout layout = null;
     protected Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     protected RowPart[] rowParts;
     protected Row[] rows;
@@ -23,7 +23,6 @@ public class View
 	NullCheck.notNull(doc, "doc");
 	this.doc = doc;
 	this.root = doc.getRoot();
-	this.layout = new Layout(doc, this);
     }
 
     public void build(int width)
@@ -43,6 +42,7 @@ public class View
 	Layout.calcPosition(root);
 	rows = Layout.buildRows(rowParts);
 	Log.debug("doctree", "" + rows.length + " rows prepared");
+	layout = new Layout(doc, root, rows, rowParts, paragraphs);
 	layout.calc();
 	setDefaultIteratorIndex();
     }

@@ -4,7 +4,7 @@ package org.luwrain.doctree.view;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-class Layout
+public class Layout
 {
     private final Document document;
     private final Node root;
@@ -13,17 +13,20 @@ class Layout
     private final Row[] rows;
     private Line[] lines = new Line[0];
 
-    public Layout(Document document, View view)
+    public Layout(Document document, Node root,
+		  Row[] rows, RowPart[] rowParts,
+Paragraph[] paragraphs)
     {
 	NullCheck.notNull(document, "document");
-	NullCheck.notNull(view, "view");
+	NullCheck.notNull(root, "root");
+	NullCheck.notNullItems(rows, "rows");
+	NullCheck.notNullItems(rowParts, "rowParts");
+	NullCheck.notNullItems(paragraphs, "paragraphs");
 	this.document = document;
-
-	root = document.getRoot();
-	paragraphs = view.getParagraphs();
-	rowParts = view.getRowParts();
-	rows = view.getRows();
-
+	this.root = root;
+	this.paragraphs = paragraphs;
+	this.rows = rows;
+	this.rowParts = rowParts;
     }
 
     /*
@@ -37,7 +40,7 @@ class Layout
     }
     */
 
-    public void calc()
+void calc()
     {
 	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
@@ -80,6 +83,7 @@ class Layout
 	int maxLineNum = 0;
 	int lastX = 0;
 	int lastY = 0;
+	NullCheck.notNullItems(rows, "rows");
 	for(Row r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts

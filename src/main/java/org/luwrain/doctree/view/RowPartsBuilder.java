@@ -6,7 +6,7 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-class RowPartsBuilder
+public class RowPartsBuilder
 {
     private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
     private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();

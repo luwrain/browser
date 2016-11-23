@@ -13,18 +13,33 @@ import org.luwrain.doctree.view.*;
 
 public class DoctreeArea implements Area
 {
-    protected ControlEnvironment environment;
+    protected final ControlEnvironment environment;
     protected final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
     private String areaName = null;//FIXME:No corresponding constructor;
+    protected final Announcement announcement;
+
     protected Document document;
     protected View view = null;
     protected org.luwrain.doctree.view.Iterator iterator;
     protected int hotPointX = 0;
 
-    public DoctreeArea(ControlEnvironment environment, Document document, int width)
+    public DoctreeArea(ControlEnvironment environment, Announcement announcement)
     {
 	NullCheck.notNull(environment, "environment");
+	NullCheck.notNull(announcement, "announcement");
 	this.environment = environment;
+	this.announcement = announcement;
+	this.document = null;
+	    this.iterator = null;
+    }
+
+    public DoctreeArea(ControlEnvironment environment, Announcement announcement,
+		       Document document, int width)
+    {
+	NullCheck.notNull(environment, "environment");
+	NullCheck.notNull(announcement, "announcement");
+	this.environment = environment;
+	this.announcement = announcement;
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
@@ -723,28 +738,7 @@ protected boolean onRightSquareBracket(KeyboardEvent event)
     protected void announceRow(Iterator it, boolean briefAnnouncement)
     {
 	NullCheck.notNull(it, "it");
-	if (it.isEmptyRow())
-	{
-	    environment.hint(Hints.EMPTY_LINE);
-	    return;
-	}
-	if (it.isTitleRow())
-	{
-	    final Node node = it.getTitleParentNode();
-	    if (node instanceof Table)
-	    {
-		final Table table = (Table)node;
-		environment.say("Table, " + table.getRowCount() + " rows, " + table.getColCount() + " columns, level " + table.getTableLevel());
-	    } else
-	    if (node instanceof TableCell)
-	    {
-		final TableCell cell = (TableCell)node;
-		environment.say("Cell, row " + cell.getRowIndex() + ", column " + cell.getColIndex());
-	    } else
-	    environment.say(node.getClass().getName());
-	    return;
-	}
-	    environment.say(it.getText());
+	announcement.announce(it, briefAnnouncement);
     }
 
     protected 	void announceFragment(Iterator itFrom, Iterator itTo)
