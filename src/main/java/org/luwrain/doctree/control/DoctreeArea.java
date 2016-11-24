@@ -200,13 +200,15 @@ public class DoctreeArea implements Area
 	    case '[':
 		return onLeftSquareBracket(event);
 	    case ']':
-		return onRightSquareBracket(event);
+		return onNextParagraph(event);
 	    }
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
 	    {
+		/*
 	    case TAB:
 		return onTab(event, false);
+		*/
 	    case ARROW_DOWN:
 		return onArrowDown(event, false);
 	    case ARROW_UP:
@@ -246,6 +248,8 @@ public class DoctreeArea implements Area
     @Override public boolean onEnvironmentEvent(EnvironmentEvent event)
     {
 	NullCheck.notNull(event, "event");
+	if (event.getType() != EnvironmentEvent.Type.REGULAR)
+	    return false;
 	switch(event.getCode())
 	{
 	case LISTENING_FINISHED:
@@ -403,23 +407,6 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return false;
     }
 
-    protected boolean onTab(KeyboardEvent event, boolean briefAnnouncement)
-    {
-	if (noContentCheck())
-	    return true;
-	final SmartJump jump = new SmartJump((Iterator)iterator.clone(), true);
-	if (!jump.jumpForward())
-	{
-	    environment.hint(Hints.NO_LINES_BELOW);
-	    return true;
-	}
-	iterator = jump.it;
-	announceFragment((Iterator)iterator.clone(), jump.speakToIt);
-	environment.onAreaNewHotPoint(this);
-	//onNewHotPointY() should not be called
-	return true;
-    }
-
     protected boolean onArrowDown(KeyboardEvent event, boolean quickNav)
     {
 	if (noContentCheck())
@@ -517,17 +504,19 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-protected boolean onRightSquareBracket(KeyboardEvent event)
+protected boolean onNextParagraph(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
-	if (!iterator.moveNext())
+	final Jump jump = Jump.nextParagraph(iterator, hotPointX);
+	NullCheck.notNull(jump, "jump");
+	jump.announce(environment);
+	if (!jump.isEmpty())
 	{
-	    environment.hint(Hints.NO_LINES_BELOW);
-	    return true;
+	    iterator = jump.it;
+	    hotPointX = jump.pos;
+	    environment.onAreaNewHotPoint(this);
 	}
-	while(!iterator.isParagraphBeginning() && iterator.moveNext());
-	onNewHotPointY(false);
 	return true;
     }
 
