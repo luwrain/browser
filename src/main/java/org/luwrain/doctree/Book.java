@@ -82,9 +82,9 @@ protected int level;
     //Expecting that href is absolute
     Document getDocument(String href);
     Section[] getBookSections();
-    Note[] getNotes();
-    boolean addNote(Note note);
-    boolean deleteNote(Note node);
-    Note createNote(Document doc, int rowIndex);
-    String getHrefOfNoteDoc(Note note);
+    //    Note[] getNotes();
+    //    boolean addNote(Note note);
+    //    boolean deleteNote(Note node);
+    //    Note createNote(Document doc, int rowIndex);
+    //    String getHrefOfNoteDoc(Note note);
 }

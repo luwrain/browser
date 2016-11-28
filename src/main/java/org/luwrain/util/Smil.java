@@ -118,14 +118,24 @@ src = new URL(base, src).toString();
 	NullCheck.notNull(url, "url");
 	try {
 	if (url.getProtocol().equals("file"))
-	    return fromPath(Paths.get(url.toURI()));
-	}
-	catch(URISyntaxException e)
 	{
+	    final Path tmpFile = Files.createTempFile("lwr-smil", "");
+	    try {
+		Files.copy(url.openStream(), tmpFile, StandardCopyOption.REPLACE_EXISTING);
+	    return fromPath(tmpFile);
+	    }
+	    finally {
+		Files.delete(tmpFile);
+	    }
+	}
+	}
+	catch(IOException e)
+	{
+	    Log.error("docree-smil", "unable to read SMIL from file: URL:" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace();
 	    return null;
 	}
-	org.jsoup.nodes.Document doc = null;
+	final org.jsoup.nodes.Document doc;
 	try {
 	    final Connection con=Jsoup.connect(url.toString());
 	    con.userAgent(org.luwrain.doctree.loading.UrlLoader.USER_AGENT);
@@ -134,6 +144,7 @@ src = new URL(base, src).toString();
 	}
 	catch(Exception e)
 	{
+	    Log.error("doctree-smil", "unable to fetch SMIL from URL " + url.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace(); 
 	    return null;
 	}
@@ -145,12 +156,13 @@ src = new URL(base, src).toString();
     static public Entry fromPath(Path path)
     {
 	NullCheck.notNull(path, "path");
-	org.jsoup.nodes.Document doc = null;
+	final org.jsoup.nodes.Document doc;
 	try {
 	    doc = Jsoup.parse(Files.newInputStream(path), "utf-8", "", Parser.xmlParser());
 	}
 	catch(Exception e)
 	{
+	    Log.error("doctree-smil", "unable to parse " + path.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace(); 
 	    return null;
 	}

@@ -227,7 +227,7 @@ res.setProperty("charset", selectedCharset);
     private void downloadToTmpFile(InputStream s) throws IOException
     {
 	NullCheck.notNull(s, "s");
-	tmpFile = Files.createTempFile("lwrdoctree-download", "");
+	tmpFile = Files.createTempFile("lwr-doctree", "");
 	Log.debug("doctree", "creating temporary file " + tmpFile.toString());
 	Files.copy(s, tmpFile, StandardCopyOption.REPLACE_EXISTING);
     }

@@ -14,7 +14,7 @@ import org.luwrain.util.*;
 
 class Daisy2 extends Base
 {
-    protected UrlLoaderFactory urlLoaderFactory = null;
+    protected final UrlLoaderFactory urlLoaderFactory;
     protected final HashMap<URL, Document> docs = new HashMap<URL, Document>();
     protected final HashMap<URL, Smil.Entry> smils = new HashMap<URL, Smil.Entry>();
     protected Document nccDoc;
@@ -45,6 +45,7 @@ class Daisy2 extends Base
 	return nccDoc;
     }
 
+    /*
     @Override public Note createNote(Document doc, int rowIndex)
     {
 	NullCheck.notNull(doc, "doc");
@@ -53,7 +54,9 @@ class Daisy2 extends Base
 	return new Note(localPath, rowIndex);
 	return null;
     }
+    */
 
+    /*
 @Override public     String getHrefOfNoteDoc(Note note)
     {
 	NullCheck.notNull(note, "note");
@@ -70,6 +73,7 @@ class Daisy2 extends Base
 	}
 	return "";
     }
+    */
 
     @Override public Document getDocument(String href)
     {
@@ -227,6 +231,7 @@ class Daisy2 extends Base
 	    }
 	}
 	this.bookSections = sections;
+	/*
 	try {
 	    this.bookPath = Paths.get(nccDoc.getUrl().toURI()).getParent().resolve("luwrain.book");
 	}
@@ -238,6 +243,7 @@ class Daisy2 extends Base
 	if (bookPath != null)
 	    Log.debug("doctree-daisy", "book path set to " + bookPath.toString()); else
 	    Log.debug("doctree-daisy", "book path isn\'t set");
+	*/
     }
 
     @Override public Book.Section[] getBookSections()
@@ -247,9 +253,14 @@ class Daisy2 extends Base
 
     private void loadSmil(URL url, LinkedList<String> textSrcs)
     {
+	NullCheck.notNull(url, "url");
 	if (smils.containsKey(url))
 	    return;
 	final Smil.Entry smil = Smil.fromUrl(url);
+	if (smil == null)
+	{
+	    Log.error("doctree-daisy", "unable to read SMIL " + url.toString());
+	}
 	smils.put(url, smil);
 	smil.saveTextSrc(textSrcs);
 	try {
