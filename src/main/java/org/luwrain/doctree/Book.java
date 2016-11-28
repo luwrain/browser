@@ -10,9 +10,9 @@ public interface Book
 {
     static public class Section
     {
-protected int level;
-	protected String title;
-	protected String href;
+	public final int level;
+	public final String title;
+	public final String href;
 
 	public Section(int level,
 		       String title, String href)
@@ -28,49 +28,6 @@ protected int level;
 	{
 	    return title;
 	}
-
-	public int level() {return level;}
-	public String title() {return title;}
-	public String href() {return href;}
-    }
-
-    static public class Note
-    {
-	protected String docId;
-	protected int associatedPos;
-	protected String text;
-	protected String uniRef;
-
-	public Note(String docId, int associatedPos)
-	{
-	    NullCheck.notNull(docId, "docId");
-	    this.docId = docId;
-	    this.associatedPos = associatedPos;
-	    this.text = "";
-	    this.uniRef = "";
-	}
-
-	public void setText(String value)
-	{
-	    NullCheck.notNull(value, "value");
-	    this.text = value;
-	}
-
-	public void setUniRef(String value)
-	{
-	    NullCheck.notNull(value, "value");
-	    this.uniRef = value;
-	}
-
-	@Override public String toString()
-	{
-	    return text;
-	}
-
-	public String docId() {return docId;}
-	public int associatedPos() {return associatedPos;}
-	public String text() {return text;}
-	public String uniRef() {return uniRef;}
     }
 
     Document[] getDocuments();

@@ -216,13 +216,13 @@ class Daisy2 extends Base
 	for(int i = 0;i < sections.length;++i)
 	{
 	    try {
-		final URL url = new URL(sections[i].href());
+		final URL url = new URL(sections[i].href);
 		final URL fileUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
 		if (fileUrl.getFile().toLowerCase().endsWith(".smil") && !url.getRef().isEmpty())
 		{
 		    final String text = smilEntryToText(fileUrl, url.getRef());
 		    if (text != null)
-			sections[i] = new Book.Section(sections[i].level(), sections[i].title(), text);
+			sections[i] = new Book.Section(sections[i].level, sections[i].title, text);
 		}
 	    }
 	    catch(MalformedURLException e)
