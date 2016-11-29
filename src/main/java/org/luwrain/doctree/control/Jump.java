@@ -60,7 +60,7 @@ class Jump
 	    return new Jump();
 		do {
 		    if (it.isParagraphBeginning() && !it.isEmptyRow() && !it.isTitleRow())
-		return new Jump(it, 0, getParagraphText(it), chooseSound(it));
+			return new Jump(it, 0, getParagraphText(it), chooseSound(it, 0));
 		} while (it.moveNext());
 	return new Jump();
     }
@@ -89,10 +89,10 @@ class Jump
 	    if (pos >= 0)
 	    {
 		if (pos < it.getText().length())
-		    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it));
+		    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it, pos));
 		//Ops, we have only sentence end here, beginning of the next sentence is somewhere on next iterator positions
 		it = findTextBelow(it);
-		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it, 0));
 	    }
 	}
 	//It is necessary to check next iterator positions
@@ -103,15 +103,15 @@ class Jump
 		continue;
 	    Log.debug("reader", "checking " + it.getText());
 	    if (it.isParagraphBeginning())
-	    return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it, 0));
 		    final int pos = findNextSentenceBeginning(it.getText(), 0);
 	if (pos >= 0)
 	{
 	    if (pos < it.getText().length())
-	    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it));
+		return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it, pos));
 		//Ops, we have only sentence end here, beginning of the next sentence is somewhere on next iterator positions
 		it = findTextBelow(it);
-		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it, 0));
 	}
 		} while (it.moveNext());
 	return new Jump();
@@ -189,10 +189,10 @@ class Jump
 	return new String(b);
     }
 
-    static private Sounds chooseSound(Iterator it)
+    static private Sounds chooseSound(Iterator it, int pos)
     {
 	NullCheck.notNull(it, "it");
-	if (it.isEmptyRow() || !it.isParagraphBeginning())
+	if (it.isEmptyRow() || !it.isParagraphBeginning() || pos > 0)
 	    return null;
 	switch(it.getNode().getType())
 	{

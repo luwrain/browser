@@ -316,49 +316,11 @@ public class DoctreeArea implements Area
 protected boolean onBeginListeningQuery(BeginListeningQuery query)
     {
 	NullCheck.notNull(query, "query");
-	if (isEmpty())
+	final Jump jump = Jump.nextSentence(iterator, hotPointX);
+	if (jump.isEmpty())
 	    return false;
-	//Checking if there is the end of sentence on the current row
-	String text = iterator.getText();
-	int pos = findEndOfSentence(text, hotPointX);
-	if (pos >= hotPointX)
-	{
-	    while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
-		++pos;
-	    query.answer(new BeginListeningQuery.Answer(text.substring(hotPointX, pos), new ListeningInfo(iterator, pos)));
-	    return true;
-	}
-	final Iterator newIt = (Iterator)iterator.clone();
-	final Node origNode = newIt.getNode();
-	if (origNode == null)
-	    return false;
-	final StringBuilder b = new StringBuilder();
-	b.append(text.substring(hotPointX));
-	Iterator lastIt = (Iterator)newIt.clone();
-	//Continuing until the end of the entire document or the end of the node.
-	// In second case we must have what to speak right now anyway, otherwise going on.
-	while(newIt.moveNext() &&
-	      (b.length() == 0 || newIt.getNode() == origNode))
-	{
-	    text = newIt.getText();
-pos = findEndOfSentence(text, 0);
-if (pos < 0)
-{
-    b.append(" " + text);
-    lastIt = (Iterator)newIt.clone();
-    continue;
-}
-//Yes, the end of sentence on the current row
-while (pos < text.length() && charOfSentenceEnd(text.charAt(pos)))
-    ++pos;
-b.append(" " + text.substring(0, pos));
-query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(newIt, pos)));
+	query.answer(new BeginListeningQuery.Answer(textUntil(jump.it, jump.pos), new ListeningInfo(jump.it, jump.pos)));
 return true;
-	}
-	if (b.length() <= 0)//No text to listen at all
-	    return false;
-	query.answer(new BeginListeningQuery.Answer(new String(b), new ListeningInfo(lastIt, lastIt.getText().length())));
-	return true;
     }
 
     protected boolean onListeningFinishedEvent(ListeningFinishedEvent event)
@@ -819,5 +781,23 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    this.it = it;
 	    this.pos = pos;
 	}
+    }
+
+    //Method does not check if current position is prior to the required position
+    protected String textUntil(Iterator itTo, int posTo)
+    {
+	NullCheck.notNull(itTo, "itTo");
+	final Iterator tmpIt = (Iterator)iterator.clone();
+	if (tmpIt.equals(itTo))
+	    return tmpIt.getText().substring(hotPointX, posTo);
+	final StringBuilder b = new StringBuilder();
+	b.append(tmpIt.getText().substring(hotPointX));
+	while(tmpIt.moveNext() && !tmpIt.equals(itTo))
+	    b.append(" " + tmpIt.getText());
+	if (tmpIt.equals(itTo))
+	    b.append(tmpIt.getText().substring(0, posTo));
+	return new String(b);
+
+
     }
 }
