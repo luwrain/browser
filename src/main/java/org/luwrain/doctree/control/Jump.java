@@ -81,26 +81,56 @@ class Jump
     static Jump nextSentence(Iterator fromIt, int fromPos)
     {
 	NullCheck.notNull(fromIt, "fromIt");
-	if (fromIt.isEmptyRow())
-	    return new Jump();
-	int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
-	//Do we have new sentence at the current iterator position
-	if (pos >= 0)
-	    return new Jump(fromIt, pos, getSentenceText(fromIt, pos), chooseSound(fromIt));
+	Iterator it = (Iterator)fromIt.clone();
+	if (!it.isEmptyRow() && !it.isTitleRow())
+	{
+	    final int pos = findNextSentenceBeginning(it.getText(), fromPos);
+	    //Do we have new sentence at the current iterator position
+	    if (pos >= 0)
+	    {
+		if (pos < it.getText().length())
+		    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it));
+		//Ops, we have only sentence end here, beginning of the next sentence is somewhere on next iterator positions
+		it = findTextBelow(it);
+		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+	    }
+	}
 	//It is necessary to check next iterator positions
-	final Iterator it = (Iterator)fromIt.clone();
 	if (!it.moveNext())
 	    return new Jump();
-		do {
-		    if (it.isEmptyRow() || it.isTitleRow())
-			continue;
-		    Log.debug("doctree", "checking " + it.getText());
-		    pos = findNextSentenceBeginning(it.getText(), 0);
-		    Log.debug("doctree", "pos=" + pos);
+	do {
+	    if (it.isEmptyRow() || it.isTitleRow())
+		continue;
+	    Log.debug("reader", "checking " + it.getText());
+	    if (it.isParagraphBeginning())
+	    return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+		    final int pos = findNextSentenceBeginning(it.getText(), 0);
 	if (pos >= 0)
+	{
+	    if (pos < it.getText().length())
 	    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it));
+		//Ops, we have only sentence end here, beginning of the next sentence is somewhere on next iterator positions
+		it = findTextBelow(it);
+		return new Jump(it, 0, getSentenceText(it, 0), chooseSound(it));
+	}
 		} while (it.moveNext());
 	return new Jump();
+    }
+
+    //Returns any new position with any text or the same position as given, if there is no text below
+    static private Iterator findTextBelow(Iterator fromIt)
+    {
+	NullCheck.notNull(fromIt, "fromIt");
+	final Iterator it = (Iterator)fromIt;
+	if (!it.moveNext())
+	    return fromIt;
+	do {
+	    if (it.isEmptyRow() || it.isTitleRow())
+		continue;
+	    if (!it.getText().trim().isEmpty())
+		return it;
+	} while(it.moveNext());
+	return fromIt;
     }
 
     // Returns:
@@ -132,12 +162,13 @@ class Jump
     static private String getSentenceText(Iterator fromIt, int fromPos)
     {
 	NullCheck.notNull(fromIt, "fromIt");
-	if (fromIt.isEmptyRow())
-	    return "";
-	int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
-	if (pos >= 0)
-	    return fromIt.getText().substring(fromPos, pos);
-	final StringBuilder b = new StringBuilder();
+	if (!fromIt.isEmptyRow() && !fromIt.isTitleRow())
+	{
+	    final int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
+	    if (pos >= 0)
+		return fromIt.getText().substring(fromPos, pos);
+	}
+	    final StringBuilder b = new StringBuilder();
 	b.append(fromIt.getText().substring(fromPos));
 	final Iterator it = (Iterator)fromIt.clone();
 	if (!it.moveNext())
@@ -145,7 +176,9 @@ class Jump
 	do {
 	    if (it.isEmptyRow() || it.isTitleRow())
 		continue;
-	    pos = findNextSentenceBeginning(it.getText(), 0);
+	    if (it.isParagraphBeginning())
+		return new String(b);
+	    final int pos = findNextSentenceBeginning(it.getText(), 0);
 	    if (pos >= 0)
 	    {
 		b.append(" " + it.getText().substring(0, pos));
