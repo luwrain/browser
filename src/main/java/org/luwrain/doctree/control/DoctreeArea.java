@@ -201,6 +201,8 @@ public class DoctreeArea implements Area
 		return onLeftSquareBracket(event);
 	    case ']':
 		return onNextParagraph(event);
+	    case '.':
+		return onNextSentence(event);
 	    }
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
@@ -519,6 +521,23 @@ protected boolean onNextParagraph(KeyboardEvent event)
 	}
 	return true;
     }
+
+protected boolean onNextSentence(KeyboardEvent event)
+    {
+	if (noContentCheck())
+	    return true;
+	final Jump jump = Jump.nextSentence(iterator, hotPointX);
+	NullCheck.notNull(jump, "jump");
+	jump.announce(environment);
+	if (!jump.isEmpty())
+	{
+	    iterator = jump.it;
+	    hotPointX = jump.pos;
+	    environment.onAreaNewHotPoint(this);
+	}
+	return true;
+    }
+
 
     protected boolean onLeftSquareBracket(KeyboardEvent event)
     {

@@ -59,7 +59,7 @@ class Jump
 	if (!it.moveNext())
 	    return new Jump();
 		do {
-		    if (it.isParagraphBeginning() && !it.isTitleRow())
+		    if (it.isParagraphBeginning() && !it.isEmptyRow() && !it.isTitleRow())
 		return new Jump(it, 0, getParagraphText(it), chooseSound(it));
 		} while (it.moveNext());
 	return new Jump();
@@ -76,6 +76,84 @@ class Jump
 	    b.append(it.getText() + " ");
 	} while(it.moveNext() && !it.isParagraphBeginning());
 	return new String(b).trim();
+    }
+
+    static Jump nextSentence(Iterator fromIt, int fromPos)
+    {
+	NullCheck.notNull(fromIt, "fromIt");
+	if (fromIt.isEmptyRow())
+	    return new Jump();
+	int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
+	//Do we have new sentence at the current iterator position
+	if (pos >= 0)
+	    return new Jump(fromIt, pos, getSentenceText(fromIt, pos), chooseSound(fromIt));
+	//It is necessary to check next iterator positions
+	final Iterator it = (Iterator)fromIt.clone();
+	if (!it.moveNext())
+	    return new Jump();
+		do {
+		    if (it.isEmptyRow() || it.isTitleRow())
+			continue;
+		    Log.debug("doctree", "checking " + it.getText());
+		    pos = findNextSentenceBeginning(it.getText(), 0);
+		    Log.debug("doctree", "pos=" + pos);
+	if (pos >= 0)
+	    return new Jump(it, pos, getSentenceText(it, pos), chooseSound(it));
+		} while (it.moveNext());
+	return new Jump();
+    }
+
+    // Returns:
+    // -1 if nothing found
+    // any number less than the length of the text, if there is beginning of the next sentence on the current line
+    // the length of the text, if there is end of the current sentence, but there is no beginning of the next sentence
+    static private int findNextSentenceBeginning(String text, int posFrom)
+    {
+	NullCheck.notNull(text, "text");
+	int pos = posFrom;
+	//Looking for any character of the end of the sentence 
+	while (pos < text.length() && (
+				       text.charAt(pos) != '.' && text.charAt(pos) != '!' && text.charAt(pos) != '?'))
+	    ++pos;
+	if (pos >= text.length())
+	    return -1;
+	//Skipping all the characters of the sentence end
+	while (pos < text.length() && (
+				       text.charAt(pos) == '.' || text.charAt(pos) == '!' || text.charAt(pos) == '?'))
+	    ++pos;
+	if (pos >= text.length())
+	    return text.length();
+	//Skipping all spaces before the beginning of the next sentence
+	while (pos < text.length() && Character.isSpace(text.charAt(pos)))
+	    ++pos;
+	return pos;
+    }
+
+    static private String getSentenceText(Iterator fromIt, int fromPos)
+    {
+	NullCheck.notNull(fromIt, "fromIt");
+	if (fromIt.isEmptyRow())
+	    return "";
+	int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
+	if (pos >= 0)
+	    return fromIt.getText().substring(fromPos, pos);
+	final StringBuilder b = new StringBuilder();
+	b.append(fromIt.getText().substring(fromPos));
+	final Iterator it = (Iterator)fromIt.clone();
+	if (!it.moveNext())
+	    return new String(b);
+	do {
+	    if (it.isEmptyRow() || it.isTitleRow())
+		continue;
+	    pos = findNextSentenceBeginning(it.getText(), 0);
+	    if (pos >= 0)
+	    {
+		b.append(" " + it.getText().substring(0, pos));
+		return new String(b);
+	    }
+	    b.append(" " + it.getText());
+	} while (it.moveNext());
+	return new String(b);
     }
 
     static private Sounds chooseSound(Iterator it)
