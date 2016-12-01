@@ -353,11 +353,7 @@ res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/f
     static private Format chooseFilterByFileName(URL url)
     {
 	NullCheck.notNull(url, "url");
-	final String fileName = url.getFile();
-	if (fileName.isEmpty())
-	    return null;
-	Log.debug("doctree", "trying to choose the filter using file name \'" + fileName + "\'");
-	final String ext = org.luwrain.core.FileTypes.getExtension(fileName).trim().toLowerCase();
+	final String ext = org.luwrain.core.FileTypes.getExtension(url).toLowerCase();
 	if (ext.isEmpty())
 	    return null;
 	Log.debug("doctree", "extracted extension is \'" + ext + "\'");
