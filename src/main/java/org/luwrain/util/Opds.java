@@ -1,30 +1,9 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
-
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.util;
 
 import java.util.*;
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.FileWriter;
 import java.io.IOException;
-//import java.io.InputStream;
 import java.net.*;
-import javax.activation.*;
 
 import org.jsoup.*;
 import org.jsoup.nodes.*;
@@ -45,14 +24,11 @@ public class Opds
 
     static public class Link
     {
-	static public final String PROFILE_CATALOG = "opds-catalog";
-	static public final String BASE_TYPE_CATALOG = "application/atom+xml";
-	static public final String PRIMARY_TYPE_IMAGE = "image";
 
-	private final String url;
-	private final String rel;
-	private final String type;
-	private final String profile;
+	public final String url;
+	public final String rel;
+	public final String type;
+	public final String profile;
 
 	Link(String url, String rel,
 	     String type, String profile)
@@ -64,103 +40,18 @@ public class Opds
 	    this.profile = profile;
 	}
 
-	public boolean isCatalog()
-	{
-	    if (getTypeProfile().toLowerCase().equals(PROFILE_CATALOG))
-		return true;
-	    return getBaseType().equals(BASE_TYPE_CATALOG);
-	}
-
-	public boolean isImage()
-	{
-	    return getPrimaryType().toLowerCase().trim().equals(PRIMARY_TYPE_IMAGE);
-	}
-
-	//Never returns null
-	public String getBaseType()
-	{
-	    if (type == null)
-		return "";
-	    try {
-		final MimeType mime = new MimeType(type);
-		final String value = mime.getBaseType();
-		return value != null?value:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
-	}
-
-	//Never returns null
-	public String getPrimaryType()
-	{
-	    if (type == null)
-		return "";
-	    try {
-		final MimeType mime = new MimeType(type);
-		final String value = mime.getPrimaryType();
-		return value != null?value:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
-	}
-
-	//Never returns null
-	public String getSubType()
-	{
-	    if (type == null)
-		return "";
-	    try {
-		final MimeType mime = new MimeType(type);
-		final String value = mime.getSubType();
-		return value != null?value:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
-	}
-
-	//Never returns null
-	public String getTypeProfile()
-	{
-	    if (type == null)
-		return "";
-	    try {
-		final MimeType mime = new MimeType(type);
-		final String value = mime.getParameter("profile");
-		return value != null?value:"";
-	    }
-	    catch(MimeTypeParseException e)
-	    {
-		e.printStackTrace();
-		return "";
-	    }
-	}
-
 	@Override public String toString()
 	{
-	    return "url=" + url + ",rel=" + rel + ",type=" + type + ",profile=" + getTypeProfile();
+	    return "url=" + url + ",rel=" + rel + ",type=" + type;
 	}
-
-	public String getUrl(){return url;}
-	public String getRel(){return rel;};
-	public String getType(){return type;}
-	public String getProfile(){return profile;}
     }
 
     static public class Entry 
     {
-	private final String id;
-	private final URL parentUrl;
-	private final String title;
-	private final Link[] links;
+	public final String id;
+	public final URL parentUrl;
+	public final String title;
+	public final Link[] links;
 
 	Entry(String id, URL parentUrl,
 	      String title, Link[] links)
@@ -175,47 +66,10 @@ public class Opds
 	    this.links = links != null?links:new Link[0];
 	}
 
-	public Link getCatalogLink()
-	{
-	    for(Link link: links)
-		if (link.isCatalog())
-		    return link;
-	    return null;
-	}
-
-	public boolean isCatalogOnly()
-	{
-	    for(Link link: links)
-		if (!link.isCatalog())
-		    return false;
-	    return true;
-	}
-
-	public boolean hasCatalogLinks()
-	{
-	    for(Link link: links)
-		if (link.isCatalog())
-		    return true;
-	    return false;
-	}
-
-	public boolean hasBooks()
-	{
-	    for(Link link: links)
-		if (!link.isCatalog() && !link.isImage())
-		    return true;
-	    return false;
-	}
-
 	@Override public String toString()
 	{
 	    return title;
 	}
-
-	public String getId(){return id;}
-	public URL getParentUrl() {return parentUrl;}
-	public String getTitle(){return title;}
-	public Link[] getLinks(){return links;}
     }
 
     static public class Result
