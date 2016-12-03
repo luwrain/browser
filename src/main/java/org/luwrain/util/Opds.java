@@ -9,7 +9,7 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
 
-import org.luwrain.core.NullCheck;
+import org.luwrain.core.*;
 
 /**
  * OPDS (Open Publication Distribution System) parser. This class
@@ -24,7 +24,6 @@ public class Opds
 
     static public class Link
     {
-
 	public final String url;
 	public final String rel;
 	public final String type;
@@ -46,24 +45,45 @@ public class Opds
 	}
     }
 
+static public class Author
+    {
+	public final String name;
+
+	Author(String name)
+	{
+	    NullCheck.notNull(name, "name");
+	    this.name = name;
+	    //	    Log.debug("opds", "name:" + name);
+	}
+
+	@Override public String toString()
+	{
+	    return name;
+	}
+    }
+
     static public class Entry 
     {
 	public final String id;
 	public final URL parentUrl;
 	public final String title;
 	public final Link[] links;
+	public final Author[] authors;
 
 	Entry(String id, URL parentUrl,
-	      String title, Link[] links)
+	      String title, Link[] links,
+Author[] authors)
 	{
 	    NullCheck.notNull(id, "id");
 	    NullCheck.notNull(parentUrl, "parentUrl");
 	    NullCheck.notNull(title, "title");
 	    NullCheck.notNullItems(links, "links");
+	    NullCheck.notNullItems(authors, "authors");
 	    this.id = id;
 	    this.parentUrl = parentUrl;;
 	    this.title = title;
 	    this.links = links != null?links:new Link[0];
+	    this.authors = authors;
 	}
 
 	@Override public String toString()
@@ -113,31 +133,27 @@ public class Opds
     {
 	NullCheck.notNull(url, "url");
 	final LinkedList<Entry> res = new LinkedList<Entry>();
-	org.jsoup.nodes.Document doc = null;
+	final org.jsoup.nodes.Document doc;
 	try {
 	    final Connection con=Jsoup.connect(url.toString());
 	    con.userAgent(org.luwrain.doctree.loading.UrlLoader.USER_AGENT);
 	    con.timeout(30000);
 	    doc = con.get();
 	}
-	catch(UnsupportedMimeTypeException e)
-	{
-	    e.printStackTrace(); 
-	    return new Result(Result.Errors.FETCH);
-	}
 	catch(IOException e)
 	{
+	    Log.error("doctree-opds", "unable to fetch " + url.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace(); 
 	    return new Result(Result.Errors.FETCH);
 	}
 	for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
 	    try {
 		final Entry entry = parseEntry(url, node);
-		if (entry != null)
 		    res.add(entry);
 	    }
 	    catch (Exception e)
 	    {
+		Log.warning("doctree-opds", "reading " + url.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 		e.printStackTrace();
 	    }
 	return new Result(res.toArray(new Entry[res.size()]));
@@ -149,6 +165,7 @@ public class Opds
 	String id = "";
 	String title = "";
 	final LinkedList<Link> links = new LinkedList<Link>();
+	final LinkedList<Author> authors = new LinkedList<Author>();
 	for(Element node:el.getElementsByTag("title"))
 	    title = node.text();
 	for(Element node:el.getElementsByTag("id"))
@@ -158,8 +175,18 @@ public class Opds
 			       node.attributes().get("rel"),
 			       node.attributes().get("type"),
 			       node.attributes().get("profile")));
-	if (id != null && title != null && !links.isEmpty())
-	    return new Entry(id, parentUrl, title, links.toArray(new Link[links.size()]));
-	return null;
+	for(Element node:el.getElementsByTag("author"))
+	{
+	    String name = null;
+	for(Element nameNode:el.getElementsByTag("name"))
+	    name = nameNode.text();
+	if (name != null)
+	    authors.add(new Author(name));
+	}
+			if (id == null)
+			    id = "---";
+			if (title == null)
+			    title = "---";
+			return new Entry(id, parentUrl, title, links.toArray(new Link[links.size()]), authors.toArray(new Author[authors.size()]));
     }
 }
