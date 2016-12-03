@@ -1,19 +1,3 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
-
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.doctree.filters;
 
@@ -21,6 +5,7 @@ import java.util.*;
 import java.util.zip.*;
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 
 import org.luwrain.doctree.*;
 import org.luwrain.doctree.loading.*;
@@ -28,47 +13,38 @@ import org.luwrain.core.*;
 
 public class Zip
 {
-    String fileName = "";
-    private String itemsContentType = "";
-    private String itemsCharset = "";
-    private URL itemsBaseUrl;
+    private final Path path;
+    private ItemLoader itemLoader;
 
-    //itemsContentType and itemsCharset may be empty (but not null), it content type is empty filter will be suggested using file names
-    public Zip(String fileName, String itemsContentType,
-	       String itemsCharset, URL itemsBaseUrl) throws IOException
+    public Zip(Path path, ItemLoader itemLoader)
     {
-	NullCheck.notNull(fileName, "fileName");
-	NullCheck.notNull(itemsContentType, "itemsContentType");
-	NullCheck.notNull(itemsCharset, "itemsCharset");
-	NullCheck.notNull(itemsBaseUrl, "itemsBaseurl");
-	this.fileName = fileName;
-	this.itemsContentType = itemsContentType;
-	this.itemsCharset = itemsCharset;
-	this.itemsBaseUrl = itemsBaseUrl;
+	NullCheck.notNull(path, "path");
+	NullCheck.notNull(itemLoader, "itemLoader");
+	this.path = path;
+	this.itemLoader = itemLoader;
     }
 
-    public Document createDoc() throws Exception
+    public Document createDoc() throws IOException
     {
-	ZipFile zip = null;
-	try {
+	Log.debug("doctree-zip", "reading zip file " + path.toString());
 	    final Node root = NodeFactory.newNode(Node.Type.ROOT);
 	    final LinkedList<Node> subnodes = new LinkedList<Node>();
-	    zip = new ZipFile(fileName);
-	    //	    Enumeration<ZipEntry> entries = zip.entries();
+	ZipFile zip = null;
+	try {
+	    zip = new ZipFile(path.toString());
 	    for(Enumeration e = zip.entries();e.hasMoreElements();)
 	    {
 		final ZipEntry entry = (ZipEntry)e.nextElement();
 		Log.debug("doctree-zip", "reading zip entry with name \'" + entry.getName() + "\'");
 		if(entry.isDirectory()) 
 		    continue;
-		final UrlLoader.Result res = null;//Factory.fromInputStream(zip.getInputStream(entry), itemsContentType, itemsCharset, itemsBaseUrl, Factory.chooseFilterByExtension(entry.getName()));
-		if (res.type() == UrlLoader.Result.Type.OK)
+		final Document subdoc = itemLoader.load(zip.getInputStream(entry));
+		if (subdoc != null)
 		{
-		    final Document subdoc = res.doc();
 		    for(Node node: subdoc.getRoot().getSubnodes())
 			subnodes.add(node);
 		} else
-		    Log.error("doctree-zip", "subdoc parser has returned code " + res.type());
+		    Log.error("doctree-zip", "unable to read zip subdoc with name " + entry.getName());
 	    }
 	    root.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
 	    return new Document(root);
@@ -78,4 +54,9 @@ public class Zip
 		zip.close();
 	}
     }
+
+public interface ItemLoader
+{
+    Document load(InputStream stream);
+}
 }

@@ -29,6 +29,7 @@ public class UrlLoader implements UrlLoaderFactory
     static public final String CONTENT_TYPE_TXT = "text/plain";
     static public final String CONTENT_TYPE_XML = "application/xml";
     static public final String CONTENT_TYPE_FB2 = "application/fb2";
+    static public final String CONTENT_TYPE_FB2_ZIP = "application/fb2+zip";
 
     static private final String DOCTYPE_FB2 = "fictionbook";
 
@@ -42,8 +43,7 @@ public class UrlLoader implements UrlLoaderFactory
 
     private enum Format {
 	TXT, HTML, XML, DOC, DOCX,
-	FB2, EPUB, SMIL,
-	ZIP, FB2_ZIP,
+	FB2, FB2_ZIP, EPUB, SMIL,
     };
 
     private URL requestedUrl;
@@ -277,14 +277,18 @@ res.setProperty("charset", selectedCharset);
 	    case FB2:
 res.doc = new Fb2(tmpFile, selectedCharset).createDoc();
 return res;
-/*
-	    case ZIP:
-res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "", charset, baseUrl).createDoc();
+	    case FB2_ZIP:
+		res.doc = new org.luwrain.doctree.filters.Zip(tmpFile, (is)->{
+			try {
+return new Fb2(is, selectedCharset).createDoc();
+			}
+			catch (IOException e)
+			{
+			    Log.error("doctree", "unable to read FB2 subdoc in ZIP:" + e.getClass().getName() + ":" + e.getMessage());
+			    return null;
+			}
+}).createDoc();
 		return res;
-	    case Fb2_ZIP:
-res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/fb2", charset, baseUrl).createDoc();
-		return res;
-*/
 	    case TXT:
 		switch(extractParaStyle(selectedContentType))
 		{
@@ -341,10 +345,8 @@ res.doc = new org.luwrain.doctree.filters.Zip(tmpFile.toString(), "application/f
 	    return Format.FB2;
 	case CONTENT_TYPE_TXT:
 	    return Format.TXT;
-	case "application/fb2+zip":
+	case CONTENT_TYPE_FB2_ZIP:
 	    return Format.FB2_ZIP;
-	case "application/zip":
-	    return Format.ZIP;
 	default:
 	    return null;
 	}
