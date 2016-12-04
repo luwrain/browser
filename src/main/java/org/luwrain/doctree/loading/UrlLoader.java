@@ -343,10 +343,11 @@ return new Fb2(is, selectedCharset).createDoc();
 	    return Format.XML;
 	case CONTENT_TYPE_FB2:
 	    return Format.FB2;
+	case CONTENT_TYPE_FB2_ZIP:
+	case CONTENT_TYPE_ZIP:
+	    return Format.FB2_ZIP;
 	case CONTENT_TYPE_TXT:
 	    return Format.TXT;
-	case CONTENT_TYPE_FB2_ZIP:
-	    return Format.FB2_ZIP;
 	default:
 	    return null;
 	}
