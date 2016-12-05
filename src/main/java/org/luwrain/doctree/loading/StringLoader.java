@@ -37,7 +37,7 @@ public class StringLoader
 	this.url = url;
     }
 
-    public Result load() throws IOException
+    public Result load()
     {
 	    UrlLoader.Format format = UrlLoader.chooseFilterByContentType(UrlLoader.extractBaseContentType(contentType));
 	    if (format == null)
@@ -78,7 +78,7 @@ charset = UrlLoader.extractCharset(contentType);
 charset = DEFAULT_CHARSET;
     }
 
-    private Result parse(UrlLoader.Format format) throws IOException
+    private Result parse(UrlLoader.Format format)
     {
 	NullCheck.notNull(format, "format");
 	Log.debug("doctree", "parsing the document as " + format.toString());
@@ -87,10 +87,8 @@ charset = DEFAULT_CHARSET;
 	    switch(format)
 	    {
 	    case HTML:
-		/*
-		res.doc = new Html(stream, selectedCharset, responseUrl).constructDocument();
+		res.doc = new Html(text, url).constructDocument();
 		return res;
-		*/
 	    default:
 		return new Result(Result.Type.UNRECOGNIZED_FORMAT);
 	    }

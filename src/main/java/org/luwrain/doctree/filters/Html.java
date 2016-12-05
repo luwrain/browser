@@ -1,19 +1,3 @@
-/*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
-
-   This file is part of the LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.doctree.filters;
 
@@ -27,7 +11,6 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
-//import org.luwrain.doctree.Node;
 import org.luwrain.doctree.NodeFactory;
 import org.luwrain.doctree.ExtraInfo;
 import org.luwrain.core.NullCheck;
@@ -35,8 +18,9 @@ import org.luwrain.core.Log;
 
 public class Html
 {
-    private Document jsoupDoc;
-    private URL docUrl;
+    private final Document jsoupDoc;
+    private final URL docUrl;
+
     private final LinkedList<String> hrefStack = new LinkedList<String>();
     private final LinkedList<ExtraInfo> extraInfoStack = new LinkedList<ExtraInfo>();
     private final LinkedList<String> allHrefs = new LinkedList<String>();
@@ -51,6 +35,17 @@ public class Html
 	jsoupDoc = Jsoup.parse(Files.newInputStream(path), charset, path.toString());
 	this.docUrl = docUrl;
     }
+
+    public Html(String text, /*String charset,*/
+		URL docUrl)
+    {
+	NullCheck.notNull(text, "text");
+	//	NullCheck.notNull(charset, "charset");
+	NullCheck.notNull(docUrl, "docUrl");
+	jsoupDoc = Jsoup.parse(text);
+	this.docUrl = docUrl;
+    }
+
 
     public Html(InputStream is, String charset,
 		URL docUrl) throws IOException
@@ -71,7 +66,6 @@ public class Html
 	final org.luwrain.doctree.Document doc = new org.luwrain.doctree.Document(jsoupDoc.title(), res);
 	doc.setProperty("url", docUrl.toString());
 	doc.setHrefs(allHrefs.toArray(new String[allHrefs.size()]));
-	//	doc.setInfoAttr(meta);
 	return doc;
     }
 
