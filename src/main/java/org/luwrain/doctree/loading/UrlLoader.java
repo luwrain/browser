@@ -41,7 +41,7 @@ public class UrlLoader implements UrlLoaderFactory
     static private final String DEFAULT_CHARSET = "UTF-8";
     static private final Txt.ParaStyle DEFAULT_PARA_STYLE = Txt.ParaStyle.EMPTY_LINES;
 
-    private enum Format {
+    enum Format {
 	TXT, HTML, XML, DOC, DOCX,
 	FB2, FB2_ZIP, EPUB, SMIL,
     };
@@ -332,7 +332,7 @@ return new Fb2(is, selectedCharset).createDoc();
 	return null;
     }
 
-    static private Format chooseFilterByContentType(String contentType)
+    static Format chooseFilterByContentType(String contentType)
     {
 	NullCheck.notEmpty(contentType, "contentType");
 	switch(contentType.toLowerCase().trim())
@@ -385,7 +385,7 @@ return new Fb2(is, selectedCharset).createDoc();
 	return res != null?res:"";
     }
 
-    static private String extractBaseContentType(String value)
+    static String extractBaseContentType(String value)
     {
 	NullCheck.notEmpty(value, "value");
 	try {
@@ -400,7 +400,7 @@ return new Fb2(is, selectedCharset).createDoc();
 	}
     }
 
-    static private String extractCharset(String value)
+    static String extractCharset(String value)
     {
 	NullCheck.notEmpty(value, "value");
 	try {
