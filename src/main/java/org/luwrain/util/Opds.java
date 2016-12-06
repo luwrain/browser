@@ -94,7 +94,7 @@ Author[] authors)
 
     static public class Result
     {
-	public enum Errors {FETCH, PARSE, NOERROR, NEEDPAY};
+	public enum Errors {FETCHING_PROBLEM, OK};
 
 	private final Entry[] entries;
 	private final Errors error;
@@ -112,7 +112,7 @@ Author[] authors)
 	Result(Entry[] entries)
 	{
 	    NullCheck.notNullItems(entries, "entries");
-	    this.error = Errors.NOERROR;
+	    this.error = Errors.OK;
 	    this.entries = entries;
     	}
 
@@ -125,7 +125,7 @@ Author[] authors)
 
 	public boolean hasEntries()
 	{
-	    return error == Errors.NOERROR && entries != null;
+	    return error == Errors.OK && entries != null;
 	}
     }
 
@@ -144,7 +144,7 @@ Author[] authors)
 	{
 	    Log.error("doctree-opds", "unable to fetch " + url.toString() + ":" + e.getClass().getName() + ":" + e.getMessage());
 	    e.printStackTrace(); 
-	    return new Result(Result.Errors.FETCH);
+	    return new Result(Result.Errors.FETCHING_PROBLEM);
 	}
 	for(org.jsoup.nodes.Element node:doc.getElementsByTag("entry"))
 	    try {

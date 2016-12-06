@@ -795,9 +795,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	while(tmpIt.moveNext() && !tmpIt.equals(itTo))
 	    b.append(" " + tmpIt.getText());
 	if (tmpIt.equals(itTo))
-	    b.append(tmpIt.getText().substring(0, posTo));
+	    b.append(" " + tmpIt.getText().substring(0, posTo));
 	return new String(b);
-
-
     }
 }
