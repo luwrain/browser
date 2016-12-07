@@ -21,16 +21,16 @@ public class Table extends Node
 		Log.warning("doctree", "table has a subnode of class " + subnodes[i].getClass().getName() + ", it will be put into newly created table row");
 		final Node n = NodeFactory.newNode(Type.TABLE_ROW);
 		n.subnodes = new Node[]{subnodes[i]};
-n.subnodes[0].parentNode = n;
+		n.subnodes[0].parentNode = n;
 		n.parentNode = this;
 		subnodes[i] = n;
-	    	    }
-		int maxCellCount = 0;
-		for(Node n: subnodes)
-		    if (maxCellCount < n.getSubnodeCount())
-			maxCellCount = n.getSubnodeCount();
-		for(Node n: subnodes)
-		    ((TableRow)n).addEmptyCells(maxCellCount);
+	    }
+	int maxCellCount = 0;
+	for(Node n: subnodes)
+	    if (maxCellCount < n.getSubnodeCount())
+		maxCellCount = n.getSubnodeCount();
+	for(Node n: subnodes)
+	    ((TableRow)n).addEmptyCells(maxCellCount);
 	super.commit();
     }
 

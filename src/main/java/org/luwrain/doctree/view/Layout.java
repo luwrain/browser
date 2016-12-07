@@ -4,7 +4,7 @@ package org.luwrain.doctree.view;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-public class Layout
+class Layout
 {
     private final Document document;
     private final Node root;
@@ -29,17 +29,6 @@ Paragraph[] paragraphs)
 	this.rowParts = rowParts;
     }
 
-    /*
-    private void init()
-    {
-	root = document.getRoot();
-	paragraphs = document.getParagraphs();
-	rowParts = document.getRowParts();
-	rows = document.getRows();
-
-    }
-    */
-
 void calc()
     {
 	final int lineCount = calcRowsPosition();
@@ -59,12 +48,12 @@ void calc()
 	}
     }
 
-    public int getLineCount()
+    int getLineCount()
     {
 	return lines != null?lines.length:0;
     }
 
-    public String getLine(int index)
+    String getLine(int index)
     {
 	final Line line = lines[index];
 	StringBuilder b = new StringBuilder();
@@ -116,7 +105,7 @@ void calc()
 	return maxLineNum + 1;
     }
 
-    static public void calcAbsRowNums(RowPart[] parts)
+    static void calcAbsRowNums(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	if (parts.length < 1)
@@ -135,7 +124,7 @@ void calc()
 	}
     }
 
-    static public Row[] buildRows(RowPart[] parts)
+    static Row[] buildRows(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	final Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
@@ -147,7 +136,7 @@ void calc()
 	return rows;
     }
 
-    static public void calcWidth(Node node, int recommended)
+    static void calcWidth(Node node, int recommended)
     {
 	NullCheck.notNull(node, "node");
 	final Node[] subnodes = node.getSubnodes();
@@ -175,7 +164,7 @@ void calc()
 	}
     }
 
-    static public void calcHeight(Node node)
+    static void calcHeight(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof Paragraph)
@@ -183,6 +172,7 @@ void calc()
 	    final Paragraph para = (Paragraph)node;
 	    if (para.getRowParts().length == 0)
 	    {
+		Log.warning("doctree", "there is a paragraph without runs");
 		para.setNodeHeight(0);
 		return;
 	    }
@@ -190,7 +180,7 @@ void calc()
 	    for(RowPart p: (RowPart[])para.getRowParts())
 		if (p.relRowNum > maxRelRowNum)
 		    maxRelRowNum = p.relRowNum;
-	    para.setNodeHeight(maxRelRowNum + 2);//1 more for empty line above
+	    para.setNodeHeight(maxRelRowNum + (para.withEmptyLine()?2:1));
 	    return;
 	}
 	final Node[] subnodes = node.getSubnodes();
@@ -217,7 +207,7 @@ void calc()
 	    node.setNodeHeight(node.getNodeHeight() + 1);//For title run
     }
 
-    static public void calcPosition(Node node)
+    static void calcPosition(Node node)
     {
 	NullCheck.notNull(node, "node");
 	final Node[] subnodes = node.getSubnodes();
@@ -255,8 +245,8 @@ void calc()
 	}
     }
 
-    //May be called after width calculation
-    static public boolean hasTitleRun(Node node)
+    //May be called after width calculation only
+    static boolean hasTitleRun(Node node)
     {
 	NullCheck.notNull(node, "node");
 	switch(node.getType())

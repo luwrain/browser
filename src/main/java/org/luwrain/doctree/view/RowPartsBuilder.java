@@ -141,7 +141,7 @@ public class RowPartsBuilder
     static private RowPart makeTitlePart(Run run)
     {
 	NullCheck.notNull(run, "run");
-	final RowPart part = new RowPart(run, 0, 1, 0);
+	final RowPart part = new RowPart(run, 0, 0, 0);//Title runs are always without a text
 	/*
 	part.run = run;
 	part.relRowNum = index;

@@ -107,4 +107,9 @@ public class Paragraph extends Node
 	}
 	return new String(b);
     }
+
+    public boolean withEmptyLine()
+    {
+	return parentNode.getType() == Type.ROOT;
+    }
 }
