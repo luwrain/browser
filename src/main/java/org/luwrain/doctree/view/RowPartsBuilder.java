@@ -27,7 +27,15 @@ public class RowPartsBuilder
     private void onNode(Node node, int width)
     {
 	NullCheck.notNull(node, "node");
-	if (node instanceof Paragraph)
+	if (node instanceof EmptyLine)
+	{
+	    final Paragraph para = (Paragraph)node;
+	    final RowPart part = new RowPart(para.runs[0], 0, 0, 0);
+	    para.setRowParts(new RowPart[]{part});
+	    parts.add(part);
+	    return;
+	}
+   	if (node instanceof Paragraph)
 	{
 	    offset = 0;
 	    index = 0;
