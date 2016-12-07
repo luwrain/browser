@@ -29,7 +29,7 @@ public class Paragraph extends Node
 	super(Node.Type.PARAGRAPH);
     }
 
-    @Override void commit()
+    @Override void preprocess()
     {
 	subnodes = null;
 	if (runs == null)

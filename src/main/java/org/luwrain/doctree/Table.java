@@ -12,7 +12,7 @@ public class Table extends Node
 	super(Node.Type.TABLE);
     }
 
-    @Override void commit()
+    @Override void preprocess()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
 	for(int i = 0;i < subnodes.length;++i)
@@ -31,7 +31,7 @@ public class Table extends Node
 		maxCellCount = n.getSubnodeCount();
 	for(Node n: subnodes)
 	    ((TableRow)n).addEmptyCells(maxCellCount);
-	super.commit();
+	super.preprocess();
     }
 
     public TableCell getCell(int col, int row)

@@ -12,7 +12,7 @@ public class TableRow extends Node
 	super(Node.Type.TABLE_ROW);
     }
 
-    @Override void commit()
+    @Override void preprocess()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
 	for(int i = 0;i < subnodes.length;++i)
@@ -25,7 +25,7 @@ public class TableRow extends Node
 		n.parentNode = this;
 		subnodes[i] = n;
 	    }
-	super.commit();
+	super.preprocess();
     }
 
     void addEmptyCells(int num)

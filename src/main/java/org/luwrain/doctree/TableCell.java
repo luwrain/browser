@@ -26,7 +26,7 @@ public class TableCell extends Node
 	super(Node.Type.TABLE_CELL);
     }
 
-    @Override public void commit()
+    @Override public void preprocess()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");
 	for(Node n: subnodes)
@@ -38,7 +38,7 @@ public class TableCell extends Node
 	    if (n instanceof ListItem)
 		Log.warning("doctree", "table cell contains list item what is very odd and looks like a bug");
 	}
-	super.commit();
+	super.preprocess();
     }
 
     public Table getTable()

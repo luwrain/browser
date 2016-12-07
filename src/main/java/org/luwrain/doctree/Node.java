@@ -64,7 +64,7 @@ public class Node extends org.luwrain.doctree.view.NodeBase
 	return subnodes == null || subnodes.length < 1;
     }
 
-    void commit()
+    void preprocess()
     {
 	if (type == Type.ROOT)
 	    parentNode = null;
@@ -75,7 +75,7 @@ public class Node extends org.luwrain.doctree.view.NodeBase
 	for(Node n: subnodes)
 	{
 	    n.parentNode = this;
-	    n.commit();
+	    n.preprocess();
 	}
 	if (type == Type.ORDERED_LIST || type == Type.UNORDERED_LIST)
 	    arrangeListItems();
@@ -243,6 +243,6 @@ void setEmptyMark()
 	}
 	subnodes = nodes.toArray(new Node[nodes.size()]);
 	for(Node n: subnodes)
-	    n.commit();
+	    n.preprocess();
     }
 }

@@ -40,7 +40,6 @@ public class Document
 	NullCheck.notNull(root, "root");
 	this.root = root;
 	this.title = "";
-	commit();
     }
 
     public Document(String title, Node root)
@@ -49,10 +48,9 @@ public class Document
 	NullCheck.notNull(title, "title");
 	this.root = root;
 	this.title = title;
-	commit();
     }
 
-private void commit()
+    public void commit()
     {
 	int deleted = 0;
 	do {
@@ -60,7 +58,7 @@ private void commit()
 deleted = root.prune();
 Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	} while (deleted > 0);
-	root.commit();
+	root.preprocess();
     }
 
     public void setProperty(String propName, String value)
