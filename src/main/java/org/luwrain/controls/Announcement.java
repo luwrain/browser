@@ -1,5 +1,5 @@
 
-package org.luwrain.doctree.control;
+package org.luwrain.controls.doctree;
 
 import org.luwrain.core.*;
 import org.luwrain.controls.*;

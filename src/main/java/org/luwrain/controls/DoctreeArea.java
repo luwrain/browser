@@ -1,5 +1,5 @@
 
-package org.luwrain.doctree.control;
+package org.luwrain.controls.doctree;
 
 import java.util.LinkedList;
 
