@@ -205,6 +205,18 @@ void setEmptyMark()
 	return false;
     }
 
+    public void addSubnode(Node subnode)
+    {
+	NullCheck.notNull(subnode, "subnode");
+	if (subnodes == null)
+	{
+	    subnodes = new Node[]{subnode};
+	    return;
+	}
+	subnodes = Arrays.copyOf(subnodes, subnodes.length + 1);
+	subnodes[subnodes.length - 1] = subnode;
+    }
+
     protected void arrangeListItems()
     {
 	NullCheck.notNullItems(subnodes, "subnodes");

@@ -242,6 +242,7 @@ public class Html
 	case "dl":
 	case "dt":
 	case "dd":
+	case "time":
 	case "aside":
 	    commitPara(nodes, runs);
 	addExtraInfo(el);
