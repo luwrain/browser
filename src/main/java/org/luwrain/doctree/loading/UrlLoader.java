@@ -392,13 +392,12 @@ return new Fb2(is, selectedCharset).createDoc();
     static private String extractCharset(Path path) throws IOException
     {
 	NullCheck.notNull(path, "path");
-	final BufferedReader r = new BufferedReader(new InputStreamReader(Files.newInputStream(path), StandardCharsets.US_ASCII));
-	final StringBuilder b = new StringBuilder();
-	String line;
-	while ( (line = r.readLine()) != null)
-	    b.append(line + "\n");
-	final String res = HtmlEncoding.getEncoding(new String(b));
-	return res != null?res:"";
+		Log.debug("doctree", "trying to get charset information from HTML header in " + path);
+	final String res = HtmlEncoding.getEncoding(path);
+	if (res == null)
+	    return "";
+	Log.debug("doctree", "determined charset is \'" + res + "\'");
+	return res;
     }
 
     static String extractBaseContentType(String value)
