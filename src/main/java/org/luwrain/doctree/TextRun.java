@@ -24,6 +24,7 @@ public class TextRun implements Run
     private String text = "";
     private String href = "";
 private TextAttr textAttr = new TextAttr();
+    private Object associatedObject = null;
     private Paragraph parentPara;
     public ExtraInfo extraInfo = null;
 
@@ -110,5 +111,15 @@ ExtraInfo extraInfo)
     public Node getParentNode()
     {
 	return parentPara;
+    }
+
+    public Object getAssociatedObject()
+    {
+	return associatedObject;
+    }
+
+    public void setAssociatedObject(Object associatedObject)
+    {
+	this.associatedObject = associatedObject;
     }
 }

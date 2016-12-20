@@ -37,6 +37,7 @@ public class Node extends org.luwrain.doctree.view.NodeBase
     protected Node[] subnodes = new Node[0];
     Node parentNode;
     protected final TitleRun titleRun = new TitleRun(this.getClass().getName());
+    protected Object associatedObject = null;
 
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
@@ -256,5 +257,15 @@ void setEmptyMark()
 	subnodes = nodes.toArray(new Node[nodes.size()]);
 	for(Node n: subnodes)
 	    n.preprocess();
+    }
+
+    public Object getAssociatedObject()
+    {
+	return associatedObject;
+    }
+
+    public void setAssociatedObject(Object associatedObject)
+    {
+	this.associatedObject = associatedObject;
     }
 }
