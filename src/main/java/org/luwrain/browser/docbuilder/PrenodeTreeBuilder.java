@@ -23,7 +23,7 @@ import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.browser.selectors.*;
 
-class NodeInfoTreeBuilder
+class PrenodeTreeBuilder
 {
     static private final String LOG_COMPONENT = DocumentBuilder.LOG_COMPONENT;
 
@@ -31,7 +31,7 @@ class NodeInfoTreeBuilder
     private final Prenode tempRoot;
     private Prenode[] nodes = new Prenode[0];
 
-    NodeInfoTreeBuilder(Browser browser, Prenode tempRoot)
+    PrenodeTreeBuilder(Browser browser, Prenode tempRoot)
     {
 	NullCheck.notNull(browser, "browser");
 	NullCheck.notNull(tempRoot, "tempRoot");

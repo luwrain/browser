@@ -43,7 +43,7 @@ public class DocumentBuilder
 	this.browser = browser;
 	this.baseUrl = prepareBaseUrl(browser);
 	Log.debug(LOG_COMPONENT, "starting building of doctree document for " + (baseUrl != null?baseUrl.toString():""));
-	nodes = new NodeInfoTreeBuilder(browser, tempRoot).build();
+	nodes = new PrenodeTreeBuilder(browser, tempRoot).build();
 	Log.debug(LOG_COMPONENT, "" + nodes.length + " nodes saved for document construction");
     }
 
