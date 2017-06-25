@@ -24,7 +24,7 @@ import org.luwrain.core.*;
 class Cleaning
 {
     //FIXME: make it more wisely, do not remove interactive elements with onclick and soon 
-    static int clean(NodeInfo node)
+    static int clean(Prenode node)
     {
 	int count=0;
 	if(node.children.isEmpty())
@@ -62,26 +62,26 @@ class Cleaning
 		}
 	    }
 	} else
-	    for(NodeInfo child:node.children)
+	    for(Prenode child:node.children)
 		count += clean(child);
-	Iterator<NodeInfo> i=node.children.iterator();
+	Iterator<Prenode> i=node.children.iterator();
 	while (i.hasNext())
 	{
-	    NodeInfo child=i.next();
+	    Prenode child=i.next();
 	    if(child.toDelete)
 		i.remove();
 	}
 	return count;
     }
 
-    static void mergeSingleChildrenNodes(NodeInfo node)
+    static void mergeSingleChildrenNodes(Prenode node)
     {
 	NullCheck.notNull(node, "node");
 	if(node.children.isEmpty())
 	    return;
 	if(node.children.size() == 1)
 	{
-	    final NodeInfo child = node.children.firstElement();
+	    final Prenode child = node.children.firstElement();
 	    final String tagName = child.browserIt.getHtmlTagName().toLowerCase();
 	    switch(tagName)
 	    {
@@ -103,7 +103,7 @@ class Cleaning
 		return;
 	    }
 	} else
-	    for(NodeInfo child:node.children)
+	    for(Prenode child:node.children)
 		mergeSingleChildrenNodes(child);
     }
     }

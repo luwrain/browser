@@ -25,9 +25,9 @@ class ItemWrapper
 {
     final Run run;
     final Node node;
-    final NodeInfo nodeInfo;
+    final Prenode nodeInfo;
 
-    ItemWrapper(Run run, NodeInfo nodeInfo)
+    ItemWrapper(Run run, Prenode nodeInfo)
     {
 	NullCheck.notNull(run, "run");
 	NullCheck.notNull(nodeInfo, "nodeInfo");
@@ -36,7 +36,7 @@ class ItemWrapper
 	this.nodeInfo = nodeInfo;
     }
 
-    ItemWrapper(Node node, NodeInfo nodeInfo)
+    ItemWrapper(Node node, Prenode nodeInfo)
     {
 	NullCheck.notNull(node, "node");
 	NullCheck.notNull(nodeInfo, "nodeInfo");

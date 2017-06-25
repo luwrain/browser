@@ -22,23 +22,23 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 
-class NodeInfo
+public class Prenode
 {
-    final NodeInfo parent;
+    final Prenode parent;
 BrowserIterator browserIt;
-    Vector<NodeInfo> children = new Vector<NodeInfo>();
+    Vector<Prenode> children = new Vector<Prenode>();
 
 final Vector<BrowserIterator> mixed = new Vector<BrowserIterator>();
     boolean toDelete = false;
 
     /**A constructor for the root node*/
-    NodeInfo()
+    Prenode()
     {
 	this.parent = null;
 	this.browserIt = null;
     }
 
-    NodeInfo(NodeInfo parent, BrowserIterator browserIt)
+Prenode(Prenode parent, BrowserIterator browserIt)
     {
 	NullCheck.notNull(parent, "parent");
 	NullCheck.notNull(browserIt, "browserIt");

@@ -28,10 +28,10 @@ class NodeInfoTreeBuilder
     static private final String LOG_COMPONENT = DocumentBuilder.LOG_COMPONENT;
 
     private final Browser browser;
-    private final NodeInfo tempRoot;
-    private NodeInfo[] nodes = new NodeInfo[0];
+    private final Prenode tempRoot;
+    private Prenode[] nodes = new Prenode[0];
 
-    NodeInfoTreeBuilder(Browser browser, NodeInfo tempRoot)
+    NodeInfoTreeBuilder(Browser browser, Prenode tempRoot)
     {
 	NullCheck.notNull(browser, "browser");
 	NullCheck.notNull(tempRoot, "tempRoot");
@@ -39,7 +39,7 @@ class NodeInfoTreeBuilder
 	this.tempRoot = tempRoot;
     }
 
-    NodeInfo[] build()
+    Prenode[] build()
     {
 	final AllNodesSelector allVisibleNodes = new AllNodesSelector(true);
 	final LinkedList<BrowserIterator> nodesList = new LinkedList<BrowserIterator>();
@@ -50,7 +50,7 @@ class NodeInfoTreeBuilder
 		maxPos = Math.max(maxPos, it.getPos());
 		nodesList.add(it.clone());
 	    } while(allVisibleNodes.moveNext(it));
-	nodes = new NodeInfo[maxPos + 1];
+	nodes = new Prenode[maxPos + 1];
 	for(int i = 0;i < nodes.length;++i)
 	    nodes[i] = null;
 	for(BrowserIterator itInList: nodesList)
@@ -58,13 +58,13 @@ class NodeInfoTreeBuilder
 	return nodes;
     }
 
-    private NodeInfo ensureRegistered(BrowserIterator it)
+    private Prenode ensureRegistered(BrowserIterator it)
     {
 	NullCheck.notNull(it, "it");
 	final int pos = it.getPos();
 	if (nodes[pos] != null)
 	    return nodes[pos];
-	final NodeInfo parentNodeInfo;
+	final Prenode parentNodeInfo;
 	final BrowserIterator parentIt = it.getParent();
 	if (parentIt != null)
 	{
@@ -79,7 +79,7 @@ class NodeInfoTreeBuilder
 		return null;
 	} else
 	    parentNodeInfo = tempRoot;
-	final NodeInfo newNodeInfo = new NodeInfo(parentNodeInfo, it);
+	final Prenode newNodeInfo = new Prenode(parentNodeInfo, it);
 	parentNodeInfo.children.add(newNodeInfo);
 	nodes[pos] = newNodeInfo;
 	return newNodeInfo;

@@ -32,8 +32,8 @@ public class DocumentBuilder
 
     private final Browser browser;
     private final URL baseUrl;
-    private final NodeInfo tempRoot = new NodeInfo();
-    private final NodeInfo[] nodes;
+    private final Prenode tempRoot = new Prenode();
+    private final Prenode[] nodes;
 
     LinkedList<Integer> watch = new LinkedList<Integer>();
 
@@ -66,7 +66,7 @@ Log.debug(LOG_COMPONENT, "document construction finished");
 return res;
     }
 
-    private Node[] makeNodes(NodeInfo nodeInfo)
+    private Node[] makeNodes(Prenode nodeInfo)
     {
 	NullCheck.notNull(nodeInfo, "nodeInfo");
 	final LinkedList<Node> res = new LinkedList<Node>();
@@ -108,7 +108,7 @@ return res;
 	return para;
     }
 
-    private ItemWrapper[] makeWrappers(NodeInfo node)
+    private ItemWrapper[] makeWrappers(Prenode node)
     {
 	NullCheck.notNull(node, "node");
 	if(node.children.isEmpty())
@@ -123,7 +123,7 @@ return res;
 	case "ul": // li element can be mixed with contents, but each child of node is a li
 	    Node listNode=NodeFactory.newNode(tagName.equals("ol")?Node.Type.ORDERED_LIST:Node.Type.UNORDERED_LIST);
 	LinkedList<Node> listItems=new LinkedList<Node>();
-	for(NodeInfo child:node.children)
+	for(Prenode child:node.children)
 	{
 	    Node listItem=NodeFactory.newNode(Node.Type.LIST_ITEM);
 	    final Node[] listItemNodes = makeNodes(child);
@@ -140,7 +140,7 @@ return res;
 	break;
 	default:
 	    // unknown group mixed to run list, it would be splited to paragraphs later
-	    for(NodeInfo child:node.children)
+	    for(Prenode child:node.children)
 		for (ItemWrapper childToAdd: makeWrappers(child))
 		    res.add(childToAdd);
 	    break;
@@ -148,16 +148,16 @@ return res;
 	return res.toArray(new ItemWrapper[res.size()]);
     }
 
-    private ItemWrapper createRunInfoForTable(NodeInfo tableNodeInfo)
+    private ItemWrapper createRunInfoForTable(Prenode tableNodeInfo)
     {
 	NullCheck.notNull(tableNodeInfo, "tableNodeInfo");
 	final LinkedList<LinkedList<Node>> table = new LinkedList<LinkedList<Node>>();
 	//All children are rows, no additional checking is required 
-	for(NodeInfo rowNodeInfo: tableNodeInfo.children)
+	for(Prenode rowNodeInfo: tableNodeInfo.children)
 	{ // each rows contains a table cell or header cell, but also we can see tbody, tfoor, thead, we must enter into
 	    final LinkedList<Node> row = new LinkedList<Node>();
 	    // detect thead, tbody, tfoot
-NodeInfo child_ = rowNodeInfo;
+Prenode child_ = rowNodeInfo;
 	    final String tagName = rowNodeInfo.browserIt.getHtmlTagName().toLowerCase();
 	    switch(tagName)
 	    {
@@ -171,7 +171,7 @@ NodeInfo child_ = rowNodeInfo;
 	    break;
 	    }
 	    //Cells
-	    for(NodeInfo cellChild: child_.children)
+	    for(Prenode cellChild: child_.children)
 	    {
 		//collspan detection
 		final String tagName2 = cellChild.browserIt.getHtmlTagName().toLowerCase();
@@ -228,7 +228,7 @@ catch(NumberFormatException e)
 	return new ItemWrapper(tableNode, tableNodeInfo);
     }
 
-    private ItemWrapper makeWrapperForLeaf(NodeInfo nodeInfo)
+    private ItemWrapper makeWrapperForLeaf(Prenode nodeInfo)
     {
 	NullCheck.notNull(nodeInfo, "nodeInfo");
 	WebInfo webInfo = null;
