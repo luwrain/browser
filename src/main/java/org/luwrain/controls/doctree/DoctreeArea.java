@@ -30,7 +30,7 @@ import org.luwrain.doctree.view.*;
 public class DoctreeArea implements Area
 {
     protected final ControlEnvironment environment;
-    protected final RegionTranslator region = new RegionTranslator(new LinesRegionProvider(this));
+    protected final ClipboardTranslator clipboardTranslator;
     private String areaName = null;//FIXME:No corresponding constructor;
     protected final Announcement announcement;
 
@@ -45,6 +45,7 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(announcement, "announcement");
 	this.environment = environment;
 	this.announcement = announcement;
+	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->environment.getClipboard()));
 	this.document = null;
 	    this.iterator = null;
     }
@@ -56,6 +57,7 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(announcement, "announcement");
 	this.environment = environment;
 	this.announcement = announcement;
+	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->environment.getClipboard()));
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
@@ -277,7 +279,7 @@ public class DoctreeArea implements Area
 		return onMoveHotPoint((MoveHotPointEvent)event);
 	    return false;
 	default:
-	    return region.onEnvironmentEvent(event, getHotPointX(), getHotPointY());
+	    return clipboardTranslator.onEnvironmentEvent(event, getHotPointX(), getHotPointY());
 	}
     }
 
@@ -299,7 +301,7 @@ public class DoctreeArea implements Area
 	case AreaQuery.BEGIN_LISTENING:
 	    return onBeginListeningQuery((BeginListeningQuery)query);
 	default:
-	return region.onAreaQuery(query, getHotPointX(), getHotPointY());
+	return false;
 	}
     }
 
