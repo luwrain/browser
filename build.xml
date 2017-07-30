@@ -1,4 +1,4 @@
-<project name="luwrain-doctree" default="jar" basedir=".">
+<project name="luwrain-browser" default="jar" basedir=".">
   <path id="classpath">
     <pathelement location="."/>
      <fileset dir="lib">
@@ -24,11 +24,8 @@
   </target>
   <target name="jar" depends="compile">
     <mkdir dir="jar"/>
-    <jar jarfile="jar/luwrain-doctree.jar">
+    <jar jarfile="jar/luwrain-browser.jar">
       <manifest>
-        <section name="org/luwrain">
-          <attribute name="Extensions" value="org.luwrain.doctree.Extension"/>
-        </section>
       </manifest>
       <fileset dir="./build/main">
         <include name="**/*.class"/>
@@ -46,7 +43,7 @@
     </javac>
   </target>
   <target name="jar-tests" depends="compile-tests">
-    <jar jarfile="jar/luwrain-doctree-tests.jar">
+    <jar jarfile="jar/luwrain-browser-tests.jar">
       <fileset dir="./build/tests">
         <include name="**/*.class"/>
       </fileset>
