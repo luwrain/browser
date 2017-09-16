@@ -29,35 +29,34 @@ import org.luwrain.doctree.view.*;
 
 public class DoctreeArea implements Area
 {
-    protected final ControlEnvironment environment;
+    protected final ControlEnvironment context;
     protected final ClipboardTranslator clipboardTranslator;
     private String areaName = null;//FIXME:No corresponding constructor;
     protected final Announcement announcement;
 
-    protected Document document;
+    protected Document document = null;
     protected View view = null;
-    protected org.luwrain.doctree.view.Iterator iterator;
+    protected org.luwrain.doctree.view.Iterator iterator = null;
     protected int hotPointX = 0;
 
-    public DoctreeArea(ControlEnvironment environment, Announcement announcement)
+    public DoctreeArea(ControlEnvironment context, Announcement announcement)
     {
-	NullCheck.notNull(environment, "environment");
+	NullCheck.notNull(context, "context");
 	NullCheck.notNull(announcement, "announcement");
-	this.environment = environment;
+	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->environment.getClipboard()));
+	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->context.getClipboard()));
 	this.document = null;
 	    this.iterator = null;
     }
 
-    public DoctreeArea(ControlEnvironment environment, Announcement announcement,
-		       Document document, int width)
+    public DoctreeArea(ControlEnvironment context, Announcement announcement, Document document, int width)
     {
-	NullCheck.notNull(environment, "environment");
+	NullCheck.notNull(context, "context");
 	NullCheck.notNull(announcement, "announcement");
-	this.environment = environment;
+	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->environment.getClipboard()));
+	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->context.getClipboard()));
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
@@ -90,8 +89,8 @@ public class DoctreeArea implements Area
 	} else
 	    iterator = view.getIterator();
 	hotPointX = 0;
-	environment.onAreaNewContent(this);
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewContent(this);
+	context.onAreaNewHotPoint(this);
     }
 
     public boolean hasDocument()
@@ -126,7 +125,7 @@ public class DoctreeArea implements Area
 	    return false;
 	iterator = newIt;
 	hotPointX = pos;
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -149,7 +148,7 @@ public class DoctreeArea implements Area
 	}
 	this.iterator = newIt;
 	hotPointX = 0;
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -190,8 +189,8 @@ public class DoctreeArea implements Area
 	if (currentRun != null)
 	    findRun(currentRun);
 	hotPointX = Math.min(hotPointX, iterator.getText().length());
-	environment.onAreaNewContent(this);
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewContent(this);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -230,17 +229,17 @@ public class DoctreeArea implements Area
 		return onTab(event, false);
 		*/
 	    case ARROW_DOWN:
-		return onArrowDown(event, false);
+		return onMoveDown(event, false);
 	    case ARROW_UP:
-		return onArrowUp(event, false);
+		return onMoveUp(event, false);
 	    case ALTERNATIVE_ARROW_DOWN:
-		return onArrowDown(event, true);
+		return onMoveDown(event, true);
 	    case ALTERNATIVE_ARROW_UP:
-		return onArrowUp(event, true);
+		return onMoveUp(event, true);
 	    case ARROW_LEFT:
-		return onArrowLeft(event);
+		return onMoveLeft(event);
 	    case ARROW_RIGHT:
-		return onArrowRight(event);
+		return onMoveRight(event);
 	    case ALTERNATIVE_ARROW_LEFT:
 		return onAltLeft(event);
 	    case ALTERNATIVE_ARROW_RIGHT:
@@ -349,7 +348,7 @@ return true;
 	final ListeningInfo info = (ListeningInfo)event.getExtraInfo();
 	iterator = info.it;
 	hotPointX = info.pos;
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -375,7 +374,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	{
 	iterator = it2;
 	hotPointX = x - iterator.getX();
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewHotPoint(this);
 	return true;
 	}
 	if (event.precisely())
@@ -389,13 +388,13 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return false;
     }
 
-    protected boolean onArrowDown(KeyboardEvent event, boolean quickNav)
+    protected boolean onMoveDown(KeyboardEvent event, boolean quickNav)
     {
 	if (noContentCheck())
 	    return true;
 	if (!iterator.moveNext())
 	{
-	    environment.hint(Hints.NO_LINES_BELOW);
+	    context.hint(Hints.NO_LINES_BELOW);
 	    return true;
 	}
 	if (quickNav)
@@ -405,13 +404,13 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    protected boolean onArrowUp(KeyboardEvent event, boolean briefAnnouncement)
+    protected boolean onMoveUp(KeyboardEvent event, boolean briefAnnouncement)
     {
 	if (noContentCheck())
 	    return true;
 	if (!iterator.movePrev())
 	{
-	    environment.hint(Hints.NO_LINES_ABOVE);
+	    context.hint(Hints.NO_LINES_ABOVE);
 	    return true;
 	}
 	onNewHotPointY( briefAnnouncement);
@@ -449,7 +448,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 		iterator.moveNext();
 	    if (iterator.getNode().getType() != Node.Type.SECTION)
 	    {
-		environment.hint(Hints.NO_LINES_BELOW);
+		context.hint(Hints.NO_LINES_BELOW);
 		return true;
 	    }
 	} else
@@ -474,7 +473,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 		iterator.movePrev();
 	    if (iterator.getNode().getType() != Node.Type.SECTION)
 	    {
-		environment.hint(Hints.NO_LINES_ABOVE);
+		context.hint(Hints.NO_LINES_ABOVE);
 		return true;
 	    }
 	} else
@@ -492,12 +491,12 @@ protected boolean onNextParagraph(KeyboardEvent event)
 	    return true;
 	final Jump jump = Jump.nextParagraph(iterator, hotPointX);
 	NullCheck.notNull(jump, "jump");
-	jump.announce(environment);
+	jump.announce(context);
 	if (!jump.isEmpty())
 	{
 	    iterator = jump.it;
 	    hotPointX = jump.pos;
-	    environment.onAreaNewHotPoint(this);
+	    context.onAreaNewHotPoint(this);
 	}
 	return true;
     }
@@ -508,16 +507,15 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	final Jump jump = Jump.nextSentence(iterator, hotPointX);
 	NullCheck.notNull(jump, "jump");
-	jump.announce(environment);
+	jump.announce(context);
 	if (!jump.isEmpty())
 	{
 	    iterator = jump.it;
 	    hotPointX = jump.pos;
-	    environment.onAreaNewHotPoint(this);
+	    context.onAreaNewHotPoint(this);
 	}
 	return true;
     }
-
 
     protected boolean onLeftSquareBracket(KeyboardEvent event)
     {
@@ -525,7 +523,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (!iterator.movePrev())
 	{
-	    environment.hint(Hints.NO_LINES_ABOVE);
+	    context.hint(Hints.NO_LINES_ABOVE);
 	    return true;
 	}
 	while(!iterator.isParagraphBeginning() && iterator.movePrev());
@@ -533,36 +531,35 @@ protected boolean onNextSentence(KeyboardEvent event)
 	return true;
     }
 
-    protected boolean onArrowLeft(KeyboardEvent event)
+    protected boolean onMoveLeft(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
 	if (!iterator.isEmptyRow())
 	{
-	final String text = iterator.getText();
-	if (hotPointX > text.length())
-	    hotPointX = text.length();
+	    final String text = iterator.getText();
+	    hotPointX = Math.min(hotPointX, text.length());
 	if (hotPointX > 0)
 	{
 	    --hotPointX;
-	    environment.sayLetter(text.charAt(hotPointX));
-	    environment.onAreaNewHotPoint(this);
+	    context.sayLetter(text.charAt(hotPointX));
+	    context.onAreaNewHotPoint(this);
 	    return true;
 	}
-    }
+	}
 	if (!iterator.canMovePrev())
 	{
-	    environment.hint(Hints.BEGIN_OF_TEXT);
+	    context.hint(Hints.BEGIN_OF_TEXT);
 	    return true;
 	}
 	iterator.movePrev();
 	final String prevRowText = iterator.getText();
 	hotPointX = prevRowText.length();
-	environment.hint(Hints.END_OF_LINE);
+	context.hint(Hints.END_OF_LINE);
 	return true;
     }
 
-    protected boolean onArrowRight(KeyboardEvent event)
+    protected boolean onMoveRight(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
@@ -573,24 +570,24 @@ protected boolean onNextSentence(KeyboardEvent event)
 	{
 	    ++hotPointX;
 	    if (hotPointX < text.length())
-		environment.sayLetter(text.charAt(hotPointX)); else
-		environment.hint(Hints.END_OF_LINE);
-	    environment.onAreaNewContent(this);
+		context.sayLetter(text.charAt(hotPointX)); else
+		context.hint(Hints.END_OF_LINE);
+	    context.onAreaNewHotPoint(this);
 	    return true;
 	}
 }
 	if (!iterator.canMoveNext())
 	{
-	    environment.hint(Hints.END_OF_TEXT);
+	    context.hint(Hints.END_OF_TEXT);
 	    return true;
 	}
 	iterator.moveNext();
 	final String nextRowText = iterator.getText();
 	hotPointX = 0;
 	if (nextRowText.isEmpty())
-	    environment.hint(Hints.END_OF_LINE); else
-	    environment.sayLetter(nextRowText.charAt(0));
-	environment.onAreaNewHotPoint(this);
+	    context.hint(Hints.END_OF_LINE); else
+	    context.sayLetter(nextRowText.charAt(0));
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -600,19 +597,19 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (iterator.isEmptyRow())
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
 	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepBackward())
 	{
-	    environment.hint(Hints.BEGIN_OF_LINE);
+	    context.hint(Hints.BEGIN_OF_LINE);
 	    return true;
 	}
 	hotPointX = it.pos();
-	environment.say(it.announce());
-	environment.onAreaNewHotPoint(this);
+	context.say(it.announce());
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -622,21 +619,21 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (iterator.isEmptyRow())
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
 	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepForward())
 	{
-	    environment.hint(Hints.END_OF_LINE);
+	    context.hint(Hints.END_OF_LINE);
 	    return true;
 	}
 	hotPointX = it.pos();
 	if (it.announce().length() > 0)
-	    environment.say(it.announce()); else
-	    environment.hint(Hints.END_OF_LINE);
-	environment.onAreaNewHotPoint(this);
+	    context.say(it.announce()); else
+	    context.hint(Hints.END_OF_LINE);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -646,15 +643,15 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (iterator.isEmptyRow())
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
 	final String text = iterator.getText();
 	hotPointX = 0;
 	if (!text.isEmpty())
-	    environment.sayLetter(text.charAt(0)); else
-	    environment.hint(Hints.EMPTY_LINE);
-	environment.onAreaNewHotPoint(this);
+	    context.sayLetter(text.charAt(0)); else
+	    context.hint(Hints.EMPTY_LINE);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -664,13 +661,13 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (iterator.isEmptyRow())
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
 	final String text = iterator.getText();
 	hotPointX = text.length();
-	environment.hint(Hints.END_OF_LINE);
-	environment.onAreaNewHotPoint(this);
+	context.hint(Hints.END_OF_LINE);
+	context.onAreaNewHotPoint(this);
 	return true;
     }
 
@@ -683,8 +680,8 @@ protected boolean onNextSentence(KeyboardEvent event)
 	if (pos >= 0)
 	{
 	    hotPointX = pos;
-	    environment.say(getHrefText());
-	    environment.onAreaNewHotPoint(this);
+	    context.say(getHrefText());
+	    context.onAreaNewHotPoint(this);
 	    return true;
 	}
 	while (iterator.moveNext())
@@ -692,16 +689,16 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    if (iterator.hasHrefUnderPos(0))
 	    {
 		hotPointX = 0;
-		environment.say(getHrefText());
-		environment.onAreaNewHotPoint(this);
+		context.say(getHrefText());
+		context.onAreaNewHotPoint(this);
 		return true;
 	    }
 	    pos = iterator.findNextHref(0);
 	    if (pos >= 0)
 	    {
 		hotPointX = pos;
-		environment.say(getHrefText());
-		environment.onAreaNewHotPoint(this);
+		context.say(getHrefText());
+		context.onAreaNewHotPoint(this);
 		return true;
 	    }
 	}
@@ -718,9 +715,9 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	hotPointX = 0;
 	if (iterator.isEmptyRow())
-	    environment.hint(Hints.EMPTY_LINE); else
+	    context.hint(Hints.EMPTY_LINE); else
 	    announceRow(iterator, briefAnnouncement);
-	environment.onAreaNewHotPoint(this);
+	context.onAreaNewHotPoint(this);
     }
 
     protected void announceRow(Iterator it, boolean briefAnnouncement)
@@ -740,7 +737,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    if (!it.moveNext())
 		break;
 	}
-	environment.say(b.toString());
+	context.say(b.toString());
     }
 
     //Iterator may return true on isEmptyRow() even if this method returns false
@@ -753,14 +750,14 @@ protected boolean onNextSentence(KeyboardEvent event)
 
     protected String noContentStr()
     {
-	return environment.getStaticStr("DocumentNoContent");
+	return context.getStaticStr("DocumentNoContent");
     }
 
     private boolean noContentCheck()
     {
 	if (isEmpty())
 	{
-	    environment.hint(noContentStr(), Hints.NO_CONTENT);
+	    context.hint(noContentStr(), Hints.NO_CONTENT);
 	    return true;
 	}
 	return false;

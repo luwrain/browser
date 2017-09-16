@@ -179,7 +179,7 @@ public class BrowserArea extends DoctreeArea
 
     protected void noContentMsg()
     {
-	environment.hint(Hints.NO_CONTENT);
+	context.hint(Hints.NO_CONTENT);
     }
 
     protected boolean noContent()
