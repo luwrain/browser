@@ -27,7 +27,7 @@ import org.luwrain.util.WordIterator;
 import org.luwrain.doctree.*;
 import org.luwrain.doctree.view.*;
 
-public class DoctreeArea implements Area
+public class DoctreeArea implements Area, ClipboardTranslator.Provider
 {
     protected final ControlEnvironment context;
     protected final ClipboardTranslator clipboardTranslator;
@@ -45,7 +45,7 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(announcement, "announcement");
 	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->context.getClipboard()));
+	this.clipboardTranslator = new ClipboardTranslator(this);
 	this.document = null;
 	    this.iterator = null;
     }
@@ -56,7 +56,7 @@ public class DoctreeArea implements Area
 	NullCheck.notNull(announcement, "announcement");
 	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(new LinesClipboardProvider(this, ()->context.getClipboard()));
+	this.clipboardTranslator = new ClipboardTranslator(this);
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
@@ -328,6 +328,21 @@ public class DoctreeArea implements Area
 	    return title != null?title:"";
 	}
 	return "";
+    }
+
+    @Override public boolean onClipboardCopyAll()
+    {
+	return false;
+    }
+
+@Override public boolean onClipboardCopy(int fromX, int fromY, int toX, int toY, boolean withDeleting)
+    {
+	return false;
+    }
+
+@Override public boolean onDeleteRegion(int fromX, int fromY, int toX, int toY)
+    {
+	return false;
     }
 
 protected boolean onBeginListeningQuery(BeginListeningQuery query)
