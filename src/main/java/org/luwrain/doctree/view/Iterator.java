@@ -73,7 +73,7 @@ public class Iterator
 	return document == it2.document && current == it2.current;
     }
 
-    @Override public Object clone()
+    @Override public org.luwrain.doctree.view.Iterator clone()
     {
 	return new Iterator(document, view, current);
     }
@@ -244,6 +244,8 @@ public class Iterator
     {
 	if (noContent())
 	    return null;
+	if (pos < 0)
+	    throw new IllegalArgumentException("pos may not be negative");
 	return rows[current].getRunUnderPos(pos);
     }
 

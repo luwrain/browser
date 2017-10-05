@@ -26,11 +26,10 @@ class Row
 {
     /** Absolute horizontal position in the area*/
 int x = 0;
-
     /** Absolute vertical position in the area*/
     int y = 0;
 
-    private RowPart[] parts;
+    private final RowPart[] parts;
     private int partsFrom = -1;
     private int partsTo = -1;
 
@@ -42,6 +41,8 @@ int x = 0;
     //returns null if there is no suitable
     Run getRunUnderPos(int pos)
     {
+	if (pos < 0)
+	    throw new IllegalArgumentException("pos may not be negative");
 	if (isEmpty())
 	    return null;
 	final int index = getPartIndexUnderPos(pos);
@@ -124,6 +125,8 @@ int x = 0;
     //returns -1 if there is no matching pos
     private int getPartIndexUnderPos(int pos)
     {
+	if (pos < 0)
+	    throw new IllegalArgumentException("pos may not be negative");
 	if (isEmpty())
 	    return -1;
 	int offset = 0;
@@ -141,6 +144,10 @@ int x = 0;
 
     void mustIncludePart(int index)
     {
+	if (index < 0)
+	    throw new IllegalArgumentException("index may not be negative");
+	if (index > parts.length)
+	    throw new IllegalArgumentException("index (" + index + ") may not be greater than number of parts (" + parts.length + ")");
 	//We are registering a first part only
 	if (partsFrom < 0)
 	    partsFrom = index;

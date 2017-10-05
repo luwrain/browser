@@ -73,7 +73,6 @@ public class View
 	return new Iterator(doc, this, startingIndex);
     }
 
-
     public int getLineCount()
     {
 	return layout.getLineCount();
