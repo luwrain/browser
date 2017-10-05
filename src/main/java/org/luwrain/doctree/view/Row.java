@@ -38,6 +38,16 @@ int x = 0;
 	this.parts = parts;
     }
 
+    Row(RowPart[] parts, int partsFrom, int partsTo)
+    {
+	NullCheck.notNull(parts, "parts");
+	this.parts = parts;
+	this.partsFrom = partsFrom;
+	this.partsTo = partsTo;
+	
+    }
+
+
     //returns null if there is no suitable
     Run getRunUnderPos(int pos)
     {

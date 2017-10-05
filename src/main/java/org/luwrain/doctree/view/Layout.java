@@ -143,12 +143,25 @@ void calc()
     static Row[] buildRows(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
-	final Row[] rows = new Row[parts[parts.length - 1].absRowNum + 1];
-	for(int i = 0;i < rows.length;++i)
-	    rows[i] = new Row(parts);
-	int current = -1;
+	final int rowCount = parts[parts.length - 1].absRowNum + 1;
+	final int[] fromParts = new int[rowCount];
+	final int[] toParts = new int[rowCount];
+	for(int i = 0;i < rowCount;++i)
+	{
+	    fromParts[i] = -1;
+	    toParts[i] = -1;
+	}
 	for(int i = 0;i < parts.length;++i)
-	    rows[parts[i].absRowNum].mustIncludePart(i);
+	{
+	    final int rowIndex = parts[i].absRowNum;
+	    if (fromParts[rowIndex] == -1 || toParts[rowIndex] > i)
+		fromParts[rowIndex] = i;
+	    if(toParts[rowIndex] < i + 1)
+		toParts[rowIndex] = i + 1;
+	}
+	final Row[] rows = new Row[rowCount];
+	for (int i = 0;i < rowCount;++i)
+	    rows[i] = new Row(parts, fromParts[i], toParts[i]);
 	return rows;
     }
 
