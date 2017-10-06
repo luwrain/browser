@@ -61,7 +61,26 @@ public class View
 	setDefaultIteratorIndex();
     }
 
-    static Row[] buildRows(RowPart[] parts)
+        static protected void calcAbsRowNums(RowPart[] parts)
+    {
+	NullCheck.notNullItems(parts, "parts");
+	if (parts.length < 1)
+	    return;
+	RowPart first = parts[0];
+	parts[0].absRowNum = 0;
+	for(int i = 1;i < parts.length;++i)
+	{
+	    final RowPart part = parts[i];
+	    if (!first.onTheSameRow(part))
+	    {
+		part.absRowNum = first.absRowNum + 1;
+		first = part;
+	    } else
+		part.absRowNum = first.absRowNum;
+	}
+    }
+
+    static protected Row[] buildRows(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	final int rowCount = parts[parts.length - 1].absRowNum + 1;

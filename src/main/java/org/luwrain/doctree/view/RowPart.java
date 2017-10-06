@@ -61,9 +61,14 @@ if (posFrom >= posTo)
 	this.relRowNum = relRowNum;
     }
 
+    public boolean isEmpty()
+    {
+	return partsFrom == partsTo;
+    }
+
     String getText()
     {
-	if (posFrom < 0 || posFrom < 0)//It's a title run
+	if (isEmpty())
 	    return "";
 	return run.text().substring(posFrom, posTo);
     }
@@ -72,6 +77,8 @@ if (posFrom >= posTo)
     boolean onTheSameRow(RowPart rowPart)
     {
 	NullCheck.notNull(rowPart, "rowPart");
+	if (isEmpty())
+	    return false;
 	return run.getParentNode() == rowPart.run.getParentNode() && relRowNum == rowPart.relRowNum;
     }
 }

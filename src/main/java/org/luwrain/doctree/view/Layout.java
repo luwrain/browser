@@ -123,6 +123,7 @@ void calc()
 	return maxLineNum + 1;
     }
 
+    /*
     static void calcAbsRowNums(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
@@ -141,6 +142,7 @@ void calc()
 		part.absRowNum = first.absRowNum;
 	}
     }
+    */
 
     static void calcWidth(Node node, int recommended)
     {
