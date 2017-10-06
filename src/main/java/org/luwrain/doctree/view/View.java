@@ -61,7 +61,7 @@ public class View
 	setDefaultIteratorIndex();
     }
 
- static Row[] buildRows(RowPart[] parts)
+    static Row[] buildRows(RowPart[] parts)
     {
 	NullCheck.notNullItems(parts, "parts");
 	final int rowCount = parts[parts.length - 1].absRowNum + 1;
@@ -87,7 +87,6 @@ public class View
 		rows[i] = new Row();
 	return rows;
     }
-
 
     public org.luwrain.doctree.view.Iterator getIterator()
     {

@@ -47,6 +47,8 @@ int x = 0;
 	    throw new IllegalArgumentException("partsFrom (" + partsFrom + ") may not be negative");
 		if (partsTo < 0)
 	    throw new IllegalArgumentException("partsTo (" + partsTo + ") may not be negative");
+		if (partsFrom >= partsTo)
+		    throw new IllegalArgumentException("partsFrom (" + partsFrom + ") must be less than partsTo (" + partsTo + ")");
 				this.parts = parts;
 	this.partsFrom = partsFrom;
 	this.partsTo = partsTo;
@@ -73,7 +75,7 @@ int x = 0;
 	if (pos < 0)
 	    throw new IllegalArgumentException("pos may not be negative");
 	if (isEmpty())
-	    return null;
+	    throw new RuntimeException("Row is empty");
 	final int index = getPartIndexUnderPos(pos);
 	if (index < 0)
     return null;
@@ -103,7 +105,7 @@ int x = 0;
     {
 	NullCheck.notNull(run, "run");
 	if (isEmpty())
-	    return -1;
+	    throw new RuntimeException("Row is empty");
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
@@ -117,6 +119,21 @@ int x = 0;
 	return offset;
     }
 
+    //Row number in the paragraph
+    int getRelNum()
+    {
+	if (isEmpty())
+	    throw new RuntimeException("Row is empty");
+	return getFirstPart().relRowNum;
+    }
+
+    Run getFirstRun()
+    {
+	if (isEmpty())
+	    throw new RuntimeException("Row is empty");
+	return getFirstPart().run;
+    }
+
     public int getRowX()
     {
 	return x;
@@ -127,10 +144,10 @@ int x = 0;
 	return y;
     }
 
-    RowPart getFirstPart()
+    private RowPart getFirstPart()
     {
 	if (isEmpty())
-	    return null;
+	    throw new RuntimeException("Row is empty");
 	return parts[partsFrom];
     }
 
