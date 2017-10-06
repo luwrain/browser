@@ -42,7 +42,7 @@ void onNode(Node node)
 	onNode(node, 0);
     }
 
-    private void onNode(Node node, int width)
+    void onNode(Node node, int width)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof EmptyLine)
@@ -165,20 +165,5 @@ return new RowPart(run);
     public Paragraph[] getParagraphs()
     {
 	return paragraphs.toArray(new Paragraph[paragraphs.size()]);
-    }
-
-    static public String[] paraToLines(Paragraph para, int width)
-    {
-	NullCheck.notNull(para, "para");
-	final RowPartsBuilder builder = new RowPartsBuilder();
-	builder.onNode(para, width);
-	final RowPart[] parts = builder.getRowParts();
-	    for(RowPart r: parts)
-		r.absRowNum = r.relRowNum;
-	final Row[] rows = View.buildRows(parts);
-	final LinkedList<String> lines = new LinkedList<String>();
-	for(Row r: rows)
-	    lines.add(r.getText());
-	return lines.toArray(new String[lines.size()]);
     }
 }

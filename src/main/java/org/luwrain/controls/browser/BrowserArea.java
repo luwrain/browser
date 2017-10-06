@@ -75,7 +75,7 @@ public class BrowserArea extends DoctreeArea
 	final int y=getHotPointY();
 	doc = documentBuilder.build(browser);
 	//   	page.setWatchNodes(builder.watch);
-	doc.commit();
+	//	doc.commit();
 	setDocument(doc, callback.getAreaVisibleWidth(this));
 	this.onMoveHotPoint(new MoveHotPointEvent(x,y,false));
     }

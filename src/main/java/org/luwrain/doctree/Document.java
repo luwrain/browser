@@ -20,26 +20,23 @@ package org.luwrain.doctree;
 import java.net.*;
 import java.util.*;
 
-import org.luwrain.core.NullCheck;
-import org.luwrain.core.Log;
+import org.luwrain.core.*;
 
 public class Document 
 {
     static public final String DEFAULT_ITERATOR_INDEX_PROPERTY = "defaultiteratorindex";
 
-    private final Properties props = new Properties();
-    private String title;
-    private String[] hrefs;
-
-    private Node root;
-
-    //    public HashMap<String,Node> idx=new HashMap<String,Node>();
+    protected final Node root;
+    protected final Properties props = new Properties();
+    protected final String title;
+    protected String[] hrefs;
 
     public Document(Node root)
     {
 	NullCheck.notNull(root, "root");
 	this.root = root;
 	this.title = "";
+	clean();
     }
 
     public Document(String title, Node root)
@@ -48,17 +45,27 @@ public class Document
 	NullCheck.notNull(title, "title");
 	this.root = root;
 	this.title = title;
+	clean();
     }
 
-    public void commit()
+    public void clean()
     {
 	int deleted = 0;
 	do {
-	root.setEmptyMark();
-deleted = root.prune();
-Log.debug("doctree", "prune pass: " + deleted + " deleted");
+	    root.setEmptyMark();
+	    deleted = root.prune();
 	} while (deleted > 0);
 	root.preprocess();
+    }
+
+    public String getTitle() 
+    {
+	return title != null?title:""; 
+    }
+
+    public Node getRoot()
+    {
+	return root; 
     }
 
     public void setProperty(String propName, String value)
@@ -81,6 +88,11 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	this.hrefs = hrefs;
     }
 
+    public String[] getHrefs()
+    {
+	return hrefs;
+    }
+
     public URL getUrl()
     {
 	final String value = getProperty("url");
@@ -93,20 +105,5 @@ Log.debug("doctree", "prune pass: " + deleted + " deleted");
 	{
 	    return null;
 	}
-    }
-
-    public String getTitle() 
-    {
-	return title != null?title:""; 
-    }
-
-    public Node getRoot()
-    {
-	return root; 
-    }
-
-    public String[] getHrefs()
-    {
-	return hrefs;
     }
 }

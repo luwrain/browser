@@ -149,4 +149,19 @@ public class View
 	doc.setProperty("defaultiteratorindex", "" + it.getIndex());
 	Log.debug("doctree", "default iterator index set to " + it.getIndex());
     }
+
+    static public String[] getParagraphLines(Paragraph para, int width)
+    {
+	NullCheck.notNull(para, "para");
+	final RowPartsBuilder builder = new RowPartsBuilder();
+	builder.onNode(para, width);
+	final RowPart[] parts = builder.getRowParts();
+	for(RowPart r: parts)
+	    r.absRowNum = r.relRowNum;
+	final Row[] rows = buildRows(parts);
+	final List<String> lines = new LinkedList<String>();
+	for(Row r: rows)
+	    lines.add(r.getText());
+	return lines.toArray(new String[lines.size()]);
+    }
 }
