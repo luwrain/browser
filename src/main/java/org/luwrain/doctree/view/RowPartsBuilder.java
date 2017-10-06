@@ -22,11 +22,13 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-public class RowPartsBuilder
+class RowPartsBuilder
 {
-    private final LinkedList<RowPart> parts = new LinkedList<RowPart>();
-    private final LinkedList<RowPart> currentParaParts = new LinkedList<RowPart>();
-    private final LinkedList<Paragraph> paragraphs = new LinkedList<Paragraph>();
+    static private final String LOG_COMPONENT = "doctree";
+    
+    private final List<RowPart> parts = new LinkedList<RowPart>();
+    private final List<RowPart> currentParaParts = new LinkedList<RowPart>();
+    private final List<Paragraph> paragraphs = new LinkedList<Paragraph>();
 
     /** The index of the next row to be added to the current paragraph*/
     private int index = 0;
@@ -34,7 +36,7 @@ public class RowPartsBuilder
     /** Number of characters in the current (incomplete) row*/
     private int offset = 0;
 
-    public void onNode(Node node)
+void onNode(Node node)
     {
 	NullCheck.notNull(node, "node"); 
 	onNode(node, 0);
@@ -46,7 +48,7 @@ public class RowPartsBuilder
 	if (node instanceof EmptyLine)
 	{
 	    final Paragraph para = (Paragraph)node;
-	    final RowPart part = new RowPart(para.runs[0], 0, 0, 0);
+	    final RowPart part = new RowPart(para.runs[0]);
 	    para.setRowParts(new RowPart[]{part});
 	    parts.add(part);
 	    return;
@@ -97,6 +99,7 @@ public class RowPartsBuilder
 	    if (remains <= available)
 	    {
 		//We have a chunk for the last row for this run
+		if (!text.isEmpty())
 		currentParaParts.add(makeTextPart(run, posFrom, text.length()));
 		offset += remains;
 		posFrom = text.length();
@@ -125,9 +128,10 @@ public class RowPartsBuilder
 		posTo = posFrom + available;
 	    }
 	    if (posFrom == posTo)
-		Log.warning("doctree", "having posFrom equal to posTo (" + posFrom + ")");
+		Log.warning(LOG_COMPONENT, "having posFrom equal to posTo (" + posFrom + ")");
 	    if (posTo - posFrom > available)
-		Log.warning("doctree", "getting the line with length greater than line length limit");
+		Log.warning(LOG_COMPONENT, "getting the line with length greater than line length limit");
+	    if (posTo > posFrom)
 	    currentParaParts.add(makeTextPart(run, posFrom, posTo));
 	    ++index;
 	    offset = 0;
@@ -141,30 +145,16 @@ public class RowPartsBuilder
 	}
     }
 
-    private RowPart makeTextPart(Run run,
-				int posFrom, int posTo)
+    private RowPart makeTextPart(Run run, int posFrom, int posTo)
     {
-	final RowPart part = new RowPart(run, posFrom, posTo, index);
-	/*
-	part.run = run;
-	part.relRowNum = index;
-	part.posFrom = posFrom;
-	part.posTo = posTo;
-	*/
-	return part;
+	NullCheck.notNull(run, "run");
+return new RowPart(run, posFrom, posTo, index);
     }
 
     static private RowPart makeTitlePart(Run run)
     {
 	NullCheck.notNull(run, "run");
-	final RowPart part = new RowPart(run, 0, 0, 0);//Title runs are always without a text
-	/*
-	part.run = run;
-	part.relRowNum = index;
-	part.posFrom = 0;
-	part.posTo = 1;
-	*/
-	return part;
+return new RowPart(run);
     }
 
     public RowPart[] getRowParts()

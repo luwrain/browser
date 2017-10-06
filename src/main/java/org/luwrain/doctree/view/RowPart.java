@@ -24,23 +24,37 @@ class RowPart
 {
     /** The run this part is associated with*/
     final Run run;
-
     /** Starting position in the text of the corresponding run*/
     final int posFrom;
-
     /** Ending position in the text of the corresponding run*/
     final int posTo;
-
     /** Index in the corresponding paragraph*/
     final int relRowNum;
-
     /** Absolute row index in the document*/
     int absRowNum = 0;
 
-    RowPart(Run run, int posFrom, int posTo,
-	    int relRowNum)
+
+    //For empty runs
+        RowPart(Run run)
     {
 	NullCheck.notNull(run, "run");
+	this.run = run;
+	this.posFrom = -1;
+	this.posTo = -1;
+	this.relRowNum = 0;
+    }
+
+    RowPart(Run run, int posFrom, int posTo, int relRowNum)
+    {
+	NullCheck.notNull(run, "run");
+	if (posFrom < 0)
+	    throw new IllegalArgumentException("posFrom (" + posFrom + ") may not be negative");
+	if (posTo < 0)
+	    throw new IllegalArgumentException("posTo (" + posTo + ") may not be negative");
+if (posFrom >= posTo)
+  throw new IllegalArgumentException("posFrom (" + posFrom + ") must be less than posTo (" + posTo + ")");
+	if (relRowNum < 0)
+	    throw new IllegalArgumentException("relRowNum (" + relRowNum + ") may not be negative");
 	this.run = run;
 	this.posFrom = posFrom;
 	this.posTo = posTo;
@@ -49,6 +63,8 @@ class RowPart
 
     String getText()
     {
+	if (posFrom < 0 || posFrom < 0)//It's a title run
+	    return "";
 	return run.text().substring(posFrom, posTo);
     }
 
