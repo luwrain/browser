@@ -29,35 +29,33 @@ public class View
 
     protected final Document doc;
     protected final Node root;
-    protected Layout layout = null;
-    protected Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
-    protected RowPart[] rowParts;
-    protected Row[] rows;
+    protected final Layout layout;
+    protected final Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
+    protected final RowPart[] rowParts;
+    protected final Row[] rows;
 
-    public View(Document doc)
+    public View(Document doc, int width)
     {
 	NullCheck.notNull(doc, "doc");
 	this.doc = doc;
 	this.root = doc.getRoot();
-    }
-
-    public void build(int width)
-    {
 	Layout.calcWidth(root, width);
 	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
 	rowPartsBuilder.onNode(root);
 	rowParts = rowPartsBuilder.getRowParts();
 	NullCheck.notNullItems(rowParts, "rowParts");
-	Log.debug("doctree", "" + rowParts.length + " row parts prepared");
 	if (rowParts.length <= 0)
+	{
+	    paragraphs = new Paragraph[0];
+	    rows = new Row[0];
+	    layout = null;
 	    return;
+	}
 	paragraphs = rowPartsBuilder.getParagraphs();
-	//	    Log.debug("doctree", "" + paragraphs.length + " paragraphs prepared");
 	Layout.calcHeight(root);
 	Layout.calcAbsRowNums(rowParts);
 	Layout.calcPosition(root);
 	rows = buildRows(rowParts);
-	Log.debug("doctree", "" + rows.length + " rows prepared");
 	layout = new Layout(doc, root, rows, rowParts, paragraphs);
 	layout.calc();
 	setDefaultIteratorIndex();

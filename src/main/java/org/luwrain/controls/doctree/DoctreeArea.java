@@ -67,8 +67,8 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
     {
 	NullCheck.notNull(document, "document");
 	this.document = document;
-	this.view = new View(document);
-	this.view.build(width);
+	this.view = new View(document, width);
+	//	this.view.build(width);
 	int defaultIndex = -1;
 	if (!document.getProperty(Document.DEFAULT_ITERATOR_INDEX_PROPERTY).isEmpty())
 	    try {
@@ -184,8 +184,8 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	if (isEmpty())
 	    return false;
 	final Run currentRun = getCurrentRun();
-	view = new View(document);
-	view.build(width);
+	view = new View(document, width);
+	//	view.build(width);
 	if (currentRun != null)
 	    findRun(currentRun);
 	hotPointX = Math.min(hotPointX, iterator.getText().length());
