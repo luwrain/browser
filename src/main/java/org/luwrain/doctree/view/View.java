@@ -56,12 +56,40 @@ public class View
 	Layout.calcHeight(root);
 	Layout.calcAbsRowNums(rowParts);
 	Layout.calcPosition(root);
-	rows = Layout.buildRows(rowParts);
+	rows = buildRows(rowParts);
 	Log.debug("doctree", "" + rows.length + " rows prepared");
 	layout = new Layout(doc, root, rows, rowParts, paragraphs);
 	layout.calc();
 	setDefaultIteratorIndex();
     }
+
+ static Row[] buildRows(RowPart[] parts)
+    {
+	NullCheck.notNullItems(parts, "parts");
+	final int rowCount = parts[parts.length - 1].absRowNum + 1;
+	final int[] fromParts = new int[rowCount];
+	final int[] toParts = new int[rowCount];
+	for(int i = 0;i < rowCount;++i)
+	{
+	    fromParts[i] = -1;
+	    toParts[i] = -1;
+	}
+	for(int i = 0;i < parts.length;++i)
+	{
+	    final int rowIndex = parts[i].absRowNum;
+	    if (fromParts[rowIndex] == -1 || toParts[rowIndex] > i)
+		fromParts[rowIndex] = i;
+	    if(toParts[rowIndex] < i + 1)
+		toParts[rowIndex] = i + 1;
+	}
+	final Row[] rows = new Row[rowCount];
+	for (int i = 0;i < rowCount;++i)
+	    if (fromParts[i] >= 0 && toParts[i] >= 0)
+		rows[i] = new Row(parts, fromParts[i], toParts[i]); else
+		rows[i] = new Row();
+	return rows;
+    }
+
 
     public org.luwrain.doctree.view.Iterator getIterator()
     {

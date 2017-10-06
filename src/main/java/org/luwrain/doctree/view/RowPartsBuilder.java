@@ -185,10 +185,10 @@ public class RowPartsBuilder
 	final RowPart[] parts = builder.getRowParts();
 	    for(RowPart r: parts)
 		r.absRowNum = r.relRowNum;
-	final Row[] rows = Layout.buildRows(parts);
+	final Row[] rows = View.buildRows(parts);
 	final LinkedList<String> lines = new LinkedList<String>();
 	for(Row r: rows)
-	    lines.add(r.text());
+	    lines.add(r.getText());
 	return lines.toArray(new String[lines.size()]);
     }
 }

@@ -123,7 +123,7 @@ public class Iterator
 	if (noContent())
 	    return "";
 	final Row row = rows[current];
-	return !row.isEmpty()?row.text():"";
+	return !row.isEmpty()?row.getText():"";
     }
 
     //returns -1 if no content

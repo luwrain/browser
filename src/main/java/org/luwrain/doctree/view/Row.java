@@ -30,23 +30,42 @@ int x = 0;
     int y = 0;
 
     private final RowPart[] parts;
-    private int partsFrom = -1;
-    private int partsTo = -1;
+    private final int partsFrom;
+    private final int partsTo;
 
-    Row(RowPart[] parts)
+    Row()
     {
-	this.parts = parts;
+	this.parts = null;
+	this.partsFrom = -1;
+	this.partsTo = -1;
     }
 
     Row(RowPart[] parts, int partsFrom, int partsTo)
     {
 	NullCheck.notNull(parts, "parts");
-	this.parts = parts;
+	if (partsFrom < 0)
+	    throw new IllegalArgumentException("partsFrom (" + partsFrom + ") may not be negative");
+		if (partsTo < 0)
+	    throw new IllegalArgumentException("partsTo (" + partsTo + ") may not be negative");
+				this.parts = parts;
 	this.partsFrom = partsFrom;
 	this.partsTo = partsTo;
-	
     }
 
+        public boolean isEmpty()
+    {
+	return parts == null;
+    }
+
+        public String getText()
+    {
+	if (isEmpty())
+	    return "";
+	final StringBuilder b = new StringBuilder();
+	for(int i = partsFrom;i < partsTo;++i)
+	    b.append(parts[i].getText());
+	return b.toString();
+    }
 
     //returns null if there is no suitable
     Run getRunUnderPos(int pos)
@@ -61,7 +80,6 @@ int x = 0;
 	return parts[index].run;
     }
 
-    //returns null if there is no suitable
     Run[] getRuns()
     {
 	if (isEmpty())
@@ -83,7 +101,6 @@ int x = 0;
     //returns -1 if index is invalid
     public int runBeginsAt(Run run)
     {
-	NullCheck.notNull(parts, "parts");
 	NullCheck.notNull(run, "run");
 	if (isEmpty())
 	    return -1;
@@ -98,21 +115,6 @@ int x = 0;
 	    offset += text.length();
 	}
 	return offset;
-    }
-
-    public String text()
-    {
-	if (isEmpty())
-	    return "";
-	final StringBuilder b = new StringBuilder();
-	for(int i = partsFrom;i < partsTo;++i)
-	    b.append(parts[i].getText());
-	return b.toString();
-    }
-
-    public boolean isEmpty()
-    {
-	return partsFrom < 0 || partsTo < 0;
     }
 
     public int getRowX()
@@ -150,18 +152,5 @@ int x = 0;
 	    offset += text.length();
 	}
 	return -1;
-    }
-
-    void mustIncludePart(int index)
-    {
-	if (index < 0)
-	    throw new IllegalArgumentException("index may not be negative");
-	if (index > parts.length)
-	    throw new IllegalArgumentException("index (" + index + ") may not be greater than number of parts (" + parts.length + ")");
-	//We are registering a first part only
-	if (partsFrom < 0)
-	    partsFrom = index;
-	if (partsTo < index + 1)
-	    partsTo = index + 1;
     }
 }
