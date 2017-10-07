@@ -29,7 +29,6 @@ public class View
 
     protected final Document doc;
     protected final Node root;
-    protected final Layout layout;
     protected final Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     protected final RowPart[] rowParts;
     protected final Row[] rows;
@@ -48,7 +47,6 @@ public class View
 	{
 	    paragraphs = new Paragraph[0];
 	    rows = new Row[0];
-	    layout = null;
 	    return;
 	}
 	paragraphs = rowPartsBuilder.getParagraphs();
@@ -56,9 +54,12 @@ public class View
 	calcAbsRowNums(rowParts);
 	NodeGeom.calcPosition(root);
 	rows = buildRows(rowParts);
-	layout = new Layout(doc, root, rows, rowParts, paragraphs);
-	layout.calc();
 	setDefaultIteratorIndex();
+    }
+
+    public Layout createLayout()
+    {
+	return 	new Layout(doc, root, rows, rowParts, paragraphs);
     }
 
         static protected void calcAbsRowNums(RowPart[] parts)
@@ -115,16 +116,6 @@ public class View
     public org.luwrain.doctree.view.Iterator getIterator(int startingIndex)
     {
 	return new Iterator(doc, this, startingIndex);
-    }
-
-    public int getLineCount()
-    {
-	return layout.getLineCount();
-    }
-
-    public String getLine(int index)
-    {
-	return layout.getLine(index);
     }
 
     public Paragraph[] getParagraphs() { return paragraphs; }

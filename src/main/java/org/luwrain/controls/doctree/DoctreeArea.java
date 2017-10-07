@@ -36,6 +36,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 
     protected Document document = null;
     protected View view = null;
+    protected Layout layout = null;
     protected org.luwrain.doctree.view.Iterator iterator = null;
     protected int hotPointX = 0;
 
@@ -68,7 +69,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	NullCheck.notNull(document, "document");
 	this.document = document;
 	this.view = new View(document, width);
-	//	this.view.build(width);
+	this.layout = view.createLayout();
 	int defaultIndex = -1;
 	if (!document.getProperty(Document.DEFAULT_ITERATOR_INDEX_PROPERTY).isEmpty())
 	    try {
@@ -185,7 +186,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	    return false;
 	final Run currentRun = getCurrentRun();
 	view = new View(document, width);
-	//	view.build(width);
+	layout = view.createLayout();
 	if (currentRun != null)
 	    findRun(currentRun);
 	hotPointX = Math.min(hotPointX, iterator.getText().length());
@@ -196,14 +197,16 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 
     @Override public int getLineCount()
     {
-	return !isEmpty()?view.getLineCount() + 1:1;
+	return !isEmpty()?layout.getLineCount() + 1:1;
     }
 
     @Override public String getLine(int index)
     {
+	if (index < 0)
+	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
 	if (isEmpty())
 	    return index == 0?noContentStr():"";
-	return index < view.getLineCount()?view.getLine(index):"";
+	return index < layout.getLineCount()?layout.getLine(index):"";
     }
 
     @Override public boolean onKeyboardEvent(KeyboardEvent event) 
