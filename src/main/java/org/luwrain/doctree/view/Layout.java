@@ -17,6 +17,8 @@
 
 package org.luwrain.doctree.view;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
@@ -43,26 +45,21 @@ public class Layout
 	this.paragraphs = paragraphs;
 	this.rows = rows;
 	this.rowParts = rowParts;
-	//	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
 	for(int i = 0;i < lines.length;++i)
 	    lines[i] = new Line();
-	for(int k = 0;k < rows.length;++k)
+	for(Row row: rows)
 	{
-	    if (rows[k].isEmpty())
+	    if (row.isEmpty())
 		continue;
-	    final Line line = lines[rows[k].y];
-	    final int[] oldRows = line.rows;
-	    line.rows = new int[oldRows.length + 1];
-	    for(int i = 0;i < oldRows.length;++i)
-		line.rows[i] = oldRows[i];
-	    line.rows[oldRows.length] = k;
+	    final Line line = lines[row.y];
+	    line.add(row);
 	}
     }
 
     public int getLineCount()
     {
-	return lines != null?lines.length:0;
+	return lines.length;
     }
 
     public String getLine(int index)
@@ -71,9 +68,8 @@ public class Layout
 	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
 	final Line line = lines[index];
 	StringBuilder b = new StringBuilder();
-	for(int r: line.rows)
+	for(Row row: line.rows)
 	{
-	    final Row row = rows[r];
 	    while(b.length() < row.x)
 		b.append(" ");
 	    b.append(row.getText());
@@ -81,9 +77,15 @@ public class Layout
 	return b.toString();
     }
 
-
     static protected class Line
     {
-	int[] rows = new int[0];
+	Row[] rows = new Row[0];
+
+	void add(Row row)
+	{
+	    NullCheck.notNull(row, "row");
+	    rows = Arrays.copyOf(rows, rows.length + 1);
+	    rows[rows.length - 1] = row;
+	}
     }
 }
