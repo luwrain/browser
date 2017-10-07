@@ -77,7 +77,7 @@ if (posFrom >= posTo)
     boolean onTheSameRow(RowPart rowPart)
     {
 	NullCheck.notNull(rowPart, "rowPart");
-	if (isEmpty())
+	if (isEmpty() || rowPart.isEmpty())
 	    return false;
 	return run.getParentNode() == rowPart.run.getParentNode() && relRowNum == rowPart.relRowNum;
     }

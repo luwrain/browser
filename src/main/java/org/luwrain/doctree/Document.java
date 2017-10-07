@@ -36,7 +36,7 @@ public class Document
 	NullCheck.notNull(root, "root");
 	this.root = root;
 	this.title = "";
-	clean();
+	commit();
     }
 
     public Document(String title, Node root)
@@ -45,10 +45,10 @@ public class Document
 	NullCheck.notNull(title, "title");
 	this.root = root;
 	this.title = title;
-	clean();
+	commit();
     }
 
-    public void clean()
+    public void commit()
     {
 	int deleted = 0;
 	do {

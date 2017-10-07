@@ -53,8 +53,8 @@ public class View
 	}
 	paragraphs = rowPartsBuilder.getParagraphs();
 	NodeGeom.calcHeight(root);
+		NodeGeom.calcPosition(root);
 	calcAbsRowNums(rowParts);
-	NodeGeom.calcPosition(root);
 	rows = buildRows(rowParts);
 	lineCount = calcRowsPosition(rows);
 	setDefaultIteratorIndex();
@@ -107,7 +107,8 @@ public class View
 	for (int i = 0;i < rowCount;++i)
 	    if (fromParts[i] >= 0 && toParts[i] >= 0)
 		rows[i] = new Row(parts, fromParts[i], toParts[i]); else
-		rows[i] = new Row();
+		throw new RuntimeException("Trying to create an empty row");
+		//		rows[i] = new Row();
 	return rows;
     }
 

@@ -124,19 +124,12 @@ class NodeGeom
 	{
 	case LIST_ITEM:
 	case SECTION:
-	    /*
-	    	    if (node.hasNonParagraphs())
-		return true;
-	    return node.width <= 0 || node.getCompleteText().length() >= node.width;
-	    */
-	    return false;
 	case ROOT:
 	case TABLE:
 	case TABLE_ROW:
 	    return false;
 	      case ORDERED_LIST:
 	      case UNORDERED_LIST:
-		  //		  return node.getParentType() == Node.Type.LIST_ITEM;
 		  return false;
 	case TABLE_CELL:
 	    return !((TableCell)node).getTable().isSingleCellTable();

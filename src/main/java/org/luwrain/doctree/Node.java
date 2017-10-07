@@ -67,12 +67,19 @@ public class Node extends org.luwrain.doctree.view.NodeBase
 
     void preprocess()
     {
-	if (type == Type.ROOT)
-	    parentNode = null;
-	if (titleRun != null)
-	    titleRun.setParentNode(this);
 	if (subnodes == null)
 	    subnodes = new Node[0];
+	if (type == Type.ROOT)
+	{
+	    parentNode = null;
+	    if (subnodes.length != 0 && !(subnodes[subnodes.length - 1] instanceof EmptyLine))
+	    {
+		subnodes = Arrays.copyOf(subnodes, subnodes.length + 1);
+		subnodes[subnodes.length - 1] = new EmptyLine();
+	    }
+	}
+	if (titleRun != null)
+	    titleRun.setParentNode(this);
 	for(Node n: subnodes)
 	{
 	    n.parentNode = this;
