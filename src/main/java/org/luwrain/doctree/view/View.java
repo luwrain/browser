@@ -39,7 +39,7 @@ public class View
 	NullCheck.notNull(doc, "doc");
 	this.doc = doc;
 	this.root = doc.getRoot();
-	Layout.calcWidth(root, width);
+	NodeGeom.calcWidth(root, width);
 	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
 	rowPartsBuilder.onNode(root);
 	rowParts = rowPartsBuilder.getRowParts();
@@ -52,9 +52,9 @@ public class View
 	    return;
 	}
 	paragraphs = rowPartsBuilder.getParagraphs();
-	Layout.calcHeight(root);
-	Layout.calcAbsRowNums(rowParts);
-	Layout.calcPosition(root);
+	NodeGeom.calcHeight(root);
+	calcAbsRowNums(rowParts);
+	NodeGeom.calcPosition(root);
 	rows = buildRows(rowParts);
 	layout = new Layout(doc, root, rows, rowParts, paragraphs);
 	layout.calc();

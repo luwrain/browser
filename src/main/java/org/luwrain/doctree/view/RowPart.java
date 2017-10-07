@@ -63,7 +63,7 @@ if (posFrom >= posTo)
 
     public boolean isEmpty()
     {
-	return partsFrom == partsTo;
+	return posFrom == posTo;
     }
 
     String getText()
