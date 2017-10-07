@@ -448,7 +448,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
     {
 	if (noContentCheck())
 	    return true;
-	iterator.moveHome();
+	iterator.moveBeginning();
 	onNewHotPointY( false);
 	return true;
     }

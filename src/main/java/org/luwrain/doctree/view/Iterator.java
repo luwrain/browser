@@ -27,60 +27,69 @@ public class Iterator
 	boolean isRowMatching(Node node, Paragraph paragraph, Row row);
     }
 
-    protected final Document document;
     protected final View view ;
-    protected final Node root;
     protected final Paragraph[] paragraphs;
     protected final Row[] rows;
-
     protected int current = 0;
 
-    public Iterator(Document document, View view)
+    public Iterator(View view)
     {
-	NullCheck.notNull(document, "document");
 	NullCheck.notNull(view, "view");
-	this.document = document;
-	this.view = view;
-	this.root = document.getRoot();
-	this.paragraphs = view.getParagraphs();
+this.view = view;
+this.paragraphs = view.getParagraphs();
+NullCheck.notNullItems(paragraphs, "paragraphs");
 	this.rows = view.getRows();
+	NullCheck.notNullItems(rows, "rows");
 	current = 0;
     }
 
-    public Iterator(Document document, View view, int index)
+    public Iterator(View view, int initialPos)
     {
-	NullCheck.notNull(document, "document");
 	NullCheck.notNull(view, "view");
-	this.document = document;
-	this.view = view;
-	this.root = document.getRoot();
+		this.view = view;
 	this.paragraphs = view.getParagraphs();
+	NullCheck.notNull(paragraphs, "paragraphs");
 	this.rows = view.getRows();
-	if (index < 0 || index >= rows.length)
-	    throw new IllegalArgumentException("INvalid row index:" + index);
-	current = index;
+	NullCheck.notNull(rows, "rows");
+	if (initialPos < 0 || initialPos >= rows.length)
+	    throw new IllegalArgumentException("INvalid row initialPos (" + initialPos + "), row count is " + rows.length);
+	current = initialPos;
     }
 
     public boolean noContent()
     {
-	if (document == null)
-	    return true;
-	if (rows == null || rows.length < 1)
-	    return true;
-	return false;
+	return rows.length == 0;
     }
+
+        public int getIndex()
+    {
+	if (noContent())
+	    return -1;
+	return current;
+    }
+
+    public int getCount()
+    {
+	return rows.length;
+    }
+
+    public View getView()
+    {
+	return view;
+    }
+
 
     @Override public boolean equals(Object o)
     {
 	if (o == null || !(o instanceof Iterator))
 	    return false;
-	final Iterator it2 = (Iterator)o;
-	return document == it2.document && current == it2.current;
+	final Iterator it = (Iterator)o;
+	return current == it.current;
     }
 
     @Override public org.luwrain.doctree.view.Iterator clone()
     {
-	return new Iterator(document, view, current);
+	return new Iterator(view, current);
     }
 
     public boolean canMoveNext()
@@ -118,7 +127,7 @@ public class Iterator
 	current = rows.length > 0?rows.length - 1:0;
     }
 
-    public void moveHome()
+    public void moveBeginning()
     {
 	current = 0;
     }
@@ -158,7 +167,6 @@ public class Iterator
 	    return false;
 	return search(matching, searchFrom, -1);
 	    }
-
 
     protected boolean search(Matching matching, int searchFrom, int step)
     {
@@ -203,12 +211,6 @@ public class Iterator
     }
 
     //returns -1 if no content
-    public int getIndex()
-    {
-	if (noContent())
-	    return -1;
-	return current;
-    }
 
     //returns -1 if no content
     public int getIndexInParagraph()

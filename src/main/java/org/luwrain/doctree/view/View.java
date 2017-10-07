@@ -153,12 +153,12 @@ public class View
 
     public org.luwrain.doctree.view.Iterator getIterator()
     {
-	return new Iterator(doc, this);
+	return new Iterator(this);
     }
 
     public org.luwrain.doctree.view.Iterator getIterator(int startingIndex)
     {
-	return new Iterator(doc, this, startingIndex);
+	return new Iterator(this, startingIndex);
     }
 
     public Paragraph[] getParagraphs() { return paragraphs; }
