@@ -32,6 +32,7 @@ public class View
     protected final Paragraph[] paragraphs; //Only paragraphs which appear in document, no paragraphs without row parts
     protected final RowPart[] rowParts;
     protected final Row[] rows;
+    protected final int lineCount;
 
     public View(Document doc, int width)
     {
@@ -47,6 +48,7 @@ public class View
 	{
 	    paragraphs = new Paragraph[0];
 	    rows = new Row[0];
+	    lineCount = 0;
 	    return;
 	}
 	paragraphs = rowPartsBuilder.getParagraphs();
@@ -54,12 +56,13 @@ public class View
 	calcAbsRowNums(rowParts);
 	NodeGeom.calcPosition(root);
 	rows = buildRows(rowParts);
+	lineCount = calcRowsPosition(rows);
 	setDefaultIteratorIndex();
     }
 
     public Layout createLayout()
     {
-	return 	new Layout(doc, root, rows, rowParts, paragraphs);
+	return 	new Layout(doc, root, rows, rowParts, paragraphs, lineCount);
     }
 
         static protected void calcAbsRowNums(RowPart[] parts)
@@ -107,6 +110,45 @@ public class View
 		rows[i] = new Row();
 	return rows;
     }
+
+    static protected int calcRowsPosition(Row[] rows)
+    {
+		NullCheck.notNullItems(rows, "rows");
+	int maxLineNum = 0;
+	int lastX = 0;
+	int lastY = 0;
+	for(Row r: rows)
+	{
+	    //Generally admissible situation as not all rows should have associated parts
+	    if (r.isEmpty())
+	    {
+		r.x = lastX;
+		r.y = lastY + 1;
+		++lastY;
+		continue;
+	    }
+	    final Run run = r.getFirstRun();
+	    NullCheck.notNull(run, "run");
+	    final Node parent = run.getParentNode();
+	    NullCheck.notNull(parent, "parent");
+	    if (parent instanceof Paragraph)
+	    {
+		final Paragraph paragraph = (Paragraph)parent;
+		r.x = paragraph.getNodeX();
+		r.y = paragraph.getNodeY() + r.getRelNum();
+	    } else 
+	    {
+		r.x = parent.getNodeX();
+		r.y = parent.getNodeY();
+	    }
+	    lastX = r.x;
+	    lastY = r.y;
+	    if (r.y > maxLineNum)
+		maxLineNum = r.y;
+	}
+	return maxLineNum + 1;
+    }
+
 
     public org.luwrain.doctree.view.Iterator getIterator()
     {

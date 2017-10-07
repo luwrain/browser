@@ -31,7 +31,7 @@ public class Layout
 
     Layout(Document document, Node root,
 	   Row[] rows, RowPart[] rowParts,
-	   Paragraph[] paragraphs)
+	   Paragraph[] paragraphs, int lineCount)
     {
 	NullCheck.notNull(document, "document");
 	NullCheck.notNull(root, "root");
@@ -43,7 +43,7 @@ public class Layout
 	this.paragraphs = paragraphs;
 	this.rows = rows;
 	this.rowParts = rowParts;
-	final int lineCount = calcRowsPosition();
+	//	final int lineCount = calcRowsPosition();
 	lines = new Line[lineCount];
 	for(int i = 0;i < lines.length;++i)
 	    lines[i] = new Line();
@@ -81,43 +81,6 @@ public class Layout
 	return b.toString();
     }
 
-protected int calcRowsPosition()
-    {
-	int maxLineNum = 0;
-	int lastX = 0;
-	int lastY = 0;
-	NullCheck.notNullItems(rows, "rows");
-	for(Row r: rows)
-	{
-	    //Generally admissible situation as not all rows should have associated parts
-	    if (r.isEmpty())
-	    {
-		r.x = lastX;
-		r.y = lastY + 1;
-		++lastY;
-		continue;
-	    }
-	    final Run run = r.getFirstRun();
-	    NullCheck.notNull(run, "run");
-	    final Node parent = run.getParentNode();
-	    NullCheck.notNull(parent, "parent");
-	    if (parent instanceof Paragraph)
-	    {
-		final Paragraph paragraph = (Paragraph)parent;
-		r.x = paragraph.getNodeX();
-		r.y = paragraph.getNodeY() + r.getRelNum();
-	    } else 
-	    {
-		r.x = parent.getNodeX();
-		r.y = parent.getNodeY();
-	    }
-	    lastX = r.x;
-	    lastY = r.y;
-	    if (r.y > maxLineNum)
-		maxLineNum = r.y;
-	}
-	return maxLineNum + 1;
-    }
 
     static protected class Line
     {
