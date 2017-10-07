@@ -22,7 +22,7 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-class Row
+public class Row
 {
     /** Absolute horizontal position in the area*/
 int x = 0;
@@ -54,13 +54,6 @@ int x = 0;
 	this.partsTo = partsTo;
     }
 
-    /*
-        public boolean isEmpty()
-    {
-	return parts == null;
-    }
-    */
-
         public String getText()
     {
 	//	if (isEmpty())
@@ -84,7 +77,7 @@ int x = 0;
 	return parts[index].run;
     }
 
-    Run[] getRuns()
+    public Run[] getRuns()
     {
 	//	if (isEmpty())
 	//	    return new Run[0];
@@ -122,14 +115,14 @@ int x = 0;
     }
 
     //Row number in the paragraph
-    int getRelNum()
+    public int getRelNum()
     {
 	//	if (isEmpty())
 	//	    throw new RuntimeException("Row is empty");
 	return getFirstPart().relRowNum;
     }
 
-    Run getFirstRun()
+    public Run getFirstRun()
     {
 	//	if (isEmpty())
 	//	    throw new RuntimeException("Row is empty");

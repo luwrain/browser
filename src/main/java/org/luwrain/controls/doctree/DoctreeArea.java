@@ -459,16 +459,13 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	    return true;
 	if (!quickNav)
 	{
-	    final Node current = iterator.getParaContainer();//Will be null, if is at title row
-	    while(iterator.canMoveNext() &&
-		  (iterator.getNode().getType() != Node.Type.SECTION  ||
-		   iterator.getNode() == current))
-		iterator.moveNext();
-	    if (iterator.getNode().getType() != Node.Type.SECTION)
-	    {
-		context.hint(Hints.NO_LINES_BELOW);
-		return true;
-	    }
+	    final Node currentNode = iterator.getNode();
+	    if (!iterator.searchForward((node,para,row)->{
+			if (node == currentNode)
+			    return false;
+			return node.getType() == Node.Type.SECTION;
+		    }, iterator.getIndex()))
+		return false;
 	} else
 	{
 	    //FIXME:

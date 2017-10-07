@@ -123,13 +123,22 @@ public class Iterator
 	current = 0;
     }
 
-    boolean search(Matching matching)
+    public boolean searchForward(Matching matching)
     {
 	NullCheck.notNull(matching, "matching");
 	if (noContent())
 	    return false;
+	return searchForward(matching, 0);
+    }
 
-	for(int i = 0;i < rows.length;++i)
+    public boolean searchForward(Matching matching, int searchFrom)
+    {
+	NullCheck.notNull(matching, "matching");
+	if (searchFrom < 0)
+	    throw new IllegalArgumentException("searchFrom (" + searchFrom + ") may not be negative");
+	if (noContent())
+	    return false;
+	for(int i = searchFrom;i < rows.length;++i)
 	{
 	    final Row row = rows[i];
 	    final Run firstRun = row.getFirstRun();
