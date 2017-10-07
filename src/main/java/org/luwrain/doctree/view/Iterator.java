@@ -138,7 +138,36 @@ public class Iterator
 	    throw new IllegalArgumentException("searchFrom (" + searchFrom + ") may not be negative");
 	if (noContent())
 	    return false;
-	for(int i = searchFrom;i < rows.length;++i)
+	return search(matching, searchFrom, 1);
+	    }
+
+        public boolean searchBackward(Matching matching)
+    {
+	NullCheck.notNull(matching, "matching");
+	if (noContent())
+	    return false;
+	return searchBackward(matching, rows.length - 1);
+    }
+
+    public boolean searchBackward(Matching matching, int searchFrom)
+    {
+	NullCheck.notNull(matching, "matching");
+	if (searchFrom < 0)
+	    throw new IllegalArgumentException("searchFrom (" + searchFrom + ") may not be negative");
+	if (noContent())
+	    return false;
+	return search(matching, searchFrom, -1);
+	    }
+
+
+    protected boolean search(Matching matching, int searchFrom, int step)
+    {
+	NullCheck.notNull(matching, "matching");
+	if (searchFrom < 0)
+	    throw new IllegalArgumentException("searchFrom (" + searchFrom + ") may not be negative");
+	if (noContent())
+	    return false;
+	for(int i = searchFrom;i < rows.length;i += step)
 	{
 	    final Row row = rows[i];
 	    final Run firstRun = row.getFirstRun();
