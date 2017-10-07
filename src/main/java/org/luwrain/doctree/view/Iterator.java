@@ -22,6 +22,11 @@ import org.luwrain.doctree.*;
 
 public class Iterator
 {
+    public interface Matching
+    {
+	boolean isRowMatching(Node node, Paragraph paragraph, Row row);
+    }
+
     protected final Document document;
     protected final View view ;
     protected final Node root;
@@ -117,6 +122,38 @@ public class Iterator
     {
 	current = 0;
     }
+
+    boolean search(Matching matching)
+    {
+	NullCheck.notNull(matching, "matching");
+	if (noContent())
+	    return false;
+
+	for(int i = 0;i < rows.length;++i)
+	{
+	    final Row row = rows[i];
+	    final Run firstRun = row.getFirstRun();
+	    final Paragraph para;
+	    final Node node;
+	    if (firstRun instanceof TitleRun)
+	    {
+		para = null;
+		node = firstRun.getParentNode();
+	    } else
+	    {
+		if (!(firstRun.getParentNode() instanceof Paragraph))
+		    throw new RuntimeException("Row " + i + " isn\'t a title row, but its parent isn\'t a paragraph");
+		para = (Paragraph)firstRun.getParentNode();
+		node = para.getParentNode();
+	    }
+	    if (matching.isRowMatching(node, para, row))
+	    {
+		current = i;
+		return true;
+	    }
+	}
+	return false;
+	    }
 
     public String getText()
     {
@@ -218,20 +255,11 @@ public class Iterator
     //Returns null if is at title row
     public Node getParaContainer()
     {
-	if (noContent())
+	if (noContent() || isTitleRow())
 	    return null;
 	final Paragraph para = getParagraph();
 	return para != null?para.getParentNode():null;
     }
-
-    /*
-    public boolean isEmptyRow()
-    {
-	if (noContent())
-	    return true;
-	return rows[current].isEmpty();
-    }
-    */
 
     public boolean coversPos(int x, int y)
     {
