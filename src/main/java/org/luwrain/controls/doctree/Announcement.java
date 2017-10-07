@@ -39,7 +39,7 @@ public class Announcement
     public void announce(Iterator it, boolean briefIntroduction)
     {
 	NullCheck.notNull(it, "it");
-	if (it.noContent() || it.isEmptyRow())
+	if (it.noContent()/* || it.isEmptyRow()*/)
 	{
 	    environment.hint(Hints.EMPTY_LINE);
 	    return;

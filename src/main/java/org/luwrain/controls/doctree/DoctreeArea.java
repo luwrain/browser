@@ -160,7 +160,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 
     public String[] getHtmlIds()
     {
-	if (isEmpty() || iterator.isEmptyRow())
+	if (isEmpty()/* || iterator.isEmptyRow()*/)
 	    return new String[0];
 	final LinkedList<String> res = new LinkedList<String>();
 	final Run run = iterator.getRunUnderPos(hotPointX);
@@ -553,7 +553,7 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
-	if (!iterator.isEmptyRow())
+	//	if (!iterator.isEmptyRow())
 	{
 	    final String text = iterator.getText();
 	    hotPointX = Math.min(hotPointX, text.length());
@@ -581,7 +581,7 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
-	if (!iterator.isEmptyRow())
+	//	if (!iterator.isEmptyRow())
 	{
 	final String text = iterator.getText();
 	if (hotPointX < text.length())
@@ -613,11 +613,13 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
+	/*
 	if (iterator.isEmptyRow())
 	{
 	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
+	*/
 	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepBackward())
@@ -635,11 +637,13 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
+	/*
 	if (iterator.isEmptyRow())
 	{
 	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
+	*/
 	final String text = iterator.getText();
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepForward())
@@ -659,11 +663,13 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
+	/*
 	if (iterator.isEmptyRow())
 	{
 	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
+	*/
 	final String text = iterator.getText();
 	hotPointX = 0;
 	if (!text.isEmpty())
@@ -677,11 +683,13 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (noContentCheck())
 	    return true;
+	/*
 	if (iterator.isEmptyRow())
 	{
 	    context.hint(Hints.EMPTY_LINE);
 	    return true;
 	}
+	*/
 	final String text = iterator.getText();
 	hotPointX = text.length();
 	context.hint(Hints.END_OF_LINE);
@@ -732,8 +740,10 @@ protected boolean onNextSentence(KeyboardEvent event)
     protected void onNewHotPointY(boolean briefAnnouncement)
     {
 	hotPointX = 0;
+	/*
 	if (iterator.isEmptyRow())
 	    context.hint(Hints.EMPTY_LINE); else
+	*/
 	    announceRow(iterator, briefAnnouncement);
 	context.onAreaNewHotPoint(this);
     }
@@ -750,7 +760,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	Iterator it = itFrom;
 	while(!it.equals(itTo))
 	{
-	    if (!it.isEmptyRow())
+	    //	    if (!it.isEmptyRow())
 		b.append(it.getText());
 	    if (!it.moveNext())
 		break;

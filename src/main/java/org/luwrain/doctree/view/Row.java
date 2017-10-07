@@ -54,15 +54,17 @@ int x = 0;
 	this.partsTo = partsTo;
     }
 
+    /*
         public boolean isEmpty()
     {
 	return parts == null;
     }
+    */
 
         public String getText()
     {
-	if (isEmpty())
-	    return "";
+	//	if (isEmpty())
+	//	    return "";
 	final StringBuilder b = new StringBuilder();
 	for(int i = partsFrom;i < partsTo;++i)
 	    b.append(parts[i].getText());
@@ -74,8 +76,8 @@ int x = 0;
     {
 	if (pos < 0)
 	    throw new IllegalArgumentException("pos may not be negative");
-	if (isEmpty())
-	    throw new RuntimeException("Row is empty");
+	//	if (isEmpty())
+	//	    throw new RuntimeException("Row is empty");
 	final int index = getPartIndexUnderPos(pos);
 	if (index < 0)
     return null;
@@ -84,8 +86,8 @@ int x = 0;
 
     Run[] getRuns()
     {
-	if (isEmpty())
-	    return new Run[0];
+	//	if (isEmpty())
+	//	    return new Run[0];
 	final Vector<Run> res = new Vector<Run>();
 	for(int i = partsFrom;i < partsTo;++i)
 	{
@@ -104,8 +106,8 @@ int x = 0;
     public int runBeginsAt(Run run)
     {
 	NullCheck.notNull(run, "run");
-	if (isEmpty())
-	    throw new RuntimeException("Row is empty");
+	//	if (isEmpty())
+	//	    throw new RuntimeException("Row is empty");
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{
@@ -122,15 +124,15 @@ int x = 0;
     //Row number in the paragraph
     int getRelNum()
     {
-	if (isEmpty())
-	    throw new RuntimeException("Row is empty");
+	//	if (isEmpty())
+	//	    throw new RuntimeException("Row is empty");
 	return getFirstPart().relRowNum;
     }
 
     Run getFirstRun()
     {
-	if (isEmpty())
-	    throw new RuntimeException("Row is empty");
+	//	if (isEmpty())
+	//	    throw new RuntimeException("Row is empty");
 	return getFirstPart().run;
     }
 
@@ -146,8 +148,8 @@ int x = 0;
 
     private RowPart getFirstPart()
     {
-	if (isEmpty())
-	    throw new RuntimeException("Row is empty");
+	//	if (isEmpty())
+	//	    throw new RuntimeException("Row is empty");
 	return parts[partsFrom];
     }
 
@@ -156,8 +158,8 @@ int x = 0;
     {
 	if (pos < 0)
 	    throw new IllegalArgumentException("pos may not be negative");
-	if (isEmpty())
-	    return -1;
+	//	if (isEmpty())
+	//	    return -1;
 	int offset = 0;
 	for(int i = partsFrom;i < partsTo;++i)
 	{

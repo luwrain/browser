@@ -123,7 +123,8 @@ public class Iterator
 	if (noContent())
 	    return "";
 	final Row row = rows[current];
-	return !row.isEmpty()?row.getText():"";
+	//	return !row.isEmpty()?row.getText():"";
+	return row.getText();
     }
 
     //returns -1 if no content
@@ -151,8 +152,10 @@ public class Iterator
     public boolean hasRunOnRow(Run run)
     {
 	NullCheck.notNull(run, "run");
+	/*
 	if (isEmptyRow())
 	    return false;
+	*/
 	final Run[] runs = getRow().getRuns();
 	for(Run r: runs)
 	    if (run == r)
@@ -162,16 +165,20 @@ public class Iterator
 
     public Run[] getRunsOnRow()
     {
+	/*
 	if (isEmptyRow())
 	    return new Run[0];
+	*/
 	return getRow().getRuns();
     }
 
     public int runBeginsAt(Run run)
     {
 	NullCheck.notNull(run, "run");
+	/*
 	if (isEmptyRow())
 	    return -1;
+	*/
 	return getRow().runBeginsAt(run);
     }
 
@@ -202,7 +209,7 @@ public class Iterator
 
     public Paragraph getParagraph()
     {
-	if (noContent() || isEmptyRow())
+	if (noContent()/* || isEmptyRow()*/)
 	    return null;
 	final Node parent = getFirstRunOfRow().getParentNode();
 	return (parent instanceof Paragraph)?(Paragraph)parent:null;
@@ -217,19 +224,21 @@ public class Iterator
 	return para != null?para.getParentNode():null;
     }
 
+    /*
     public boolean isEmptyRow()
     {
 	if (noContent())
 	    return true;
 	return rows[current].isEmpty();
     }
+    */
 
     public boolean coversPos(int x, int y)
     {
 	if (noContent())
 	    return false;
-	if (isEmptyRow())
-	    return false;
+	//	if (isEmptyRow())
+	//	    return false;
 	final Row r = getRow();
 	if (r.getRowY() != y)
 	    return false;

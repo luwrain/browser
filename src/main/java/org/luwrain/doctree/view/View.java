@@ -121,13 +121,13 @@ public class View
 	for(Row r: rows)
 	{
 	    //Generally admissible situation as not all rows should have associated parts
-	    if (r.isEmpty())
-	    {
-		r.x = lastX;
-		r.y = lastY + 1;
-		++lastY;
-		continue;
-	    }
+	    //	    if (r.isEmpty())
+	    //	    {
+	    //		r.x = lastX;
+	    //		r.y = lastY + 1;
+	    //		++lastY;
+	    //		continue;
+	    //	    }
 	    final Run run = r.getFirstRun();
 	    NullCheck.notNull(run, "run");
 	    final Node parent = run.getParentNode();
@@ -174,7 +174,7 @@ public class View
 	final org.luwrain.doctree.view.Iterator it = getIterator();
 	while (it.canMoveNext())
 	{
-	    if (!it.isEmptyRow())
+	    //	    if (!it.isEmptyRow())
 	    {
 		final ExtraInfo data = it.getNode().extraInfo;
 		if (data != null && data.hasIdInChain(id))

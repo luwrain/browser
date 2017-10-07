@@ -50,8 +50,8 @@ public class Layout
 	    lines[i] = new Line();
 	for(Row row: rows)
 	{
-	    if (row.isEmpty())
-		continue;
+	    //	    if (row.isEmpty())
+	    //		continue;
 	    final Line line = lines[row.y];
 	    line.add(row);
 	}

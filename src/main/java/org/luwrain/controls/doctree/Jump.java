@@ -68,14 +68,14 @@ class Jump
     static Jump nextParagraph(Iterator fromIt, int fromPos)
     {
 	NullCheck.notNull(fromIt, "fromIt");
-	if (fromIt.isEmptyRow())
-	    return new Jump();
+	//	if (fromIt.isEmptyRow())
+	//	    return new Jump();
 	//Looking for the beginning of the next paragraph
 	final Iterator it = (Iterator)fromIt.clone();
 	if (!it.moveNext())
 	    return new Jump();
 		do {
-		    if (it.isParagraphBeginning() && !it.isEmptyRow() && !it.isTitleRow())
+		    if (it.isParagraphBeginning() && /*!it.isEmptyRow() &&*/ !it.isTitleRow())
 			return new Jump(it, 0, getParagraphText(it), chooseSound(it, 0));
 		} while (it.moveNext());
 	return new Jump();
@@ -84,8 +84,8 @@ class Jump
     static private String getParagraphText(Iterator fromIt)
     {
 	NullCheck.notNull(fromIt, "fromIt");
-	if (fromIt.isEmptyRow())
-	    return "";
+	//	if (fromIt.isEmptyRow())
+	//	    return "";
 	final Iterator it = (Iterator)fromIt.clone();
 	final StringBuilder b = new StringBuilder();
 	do {
@@ -98,7 +98,7 @@ class Jump
     {
 	NullCheck.notNull(fromIt, "fromIt");
 	Iterator it = (Iterator)fromIt.clone();
-	if (!it.isEmptyRow() && !it.isTitleRow())
+	if (/*!it.isEmptyRow() &&*/ !it.isTitleRow())
 	{
 	    final int pos = findNextSentenceBeginning(it.getText(), fromPos);
 	    //Do we have new sentence at the current iterator position
@@ -115,7 +115,7 @@ class Jump
 	if (!it.moveNext())
 	    return new Jump();
 	do {
-	    if (it.isEmptyRow() || it.isTitleRow())
+	    if (/*it.isEmptyRow() ||*/ it.isTitleRow())
 		continue;
 	    Log.debug("reader", "checking " + it.getText());
 	    if (it.isParagraphBeginning())
@@ -141,7 +141,7 @@ class Jump
 	if (!it.moveNext())
 	    return fromIt;
 	do {
-	    if (it.isEmptyRow() || it.isTitleRow())
+	    if (/*it.isEmptyRow() ||*/ it.isTitleRow())
 		continue;
 	    if (!it.getText().trim().isEmpty())
 		return it;
@@ -178,7 +178,7 @@ class Jump
     static private String getSentenceText(Iterator fromIt, int fromPos)
     {
 	NullCheck.notNull(fromIt, "fromIt");
-	if (!fromIt.isEmptyRow() && !fromIt.isTitleRow())
+	if (/*!fromIt.isEmptyRow() &&*/ !fromIt.isTitleRow())
 	{
 	    final int pos = findNextSentenceBeginning(fromIt.getText(), fromPos);
 	    if (pos >= 0)
@@ -190,7 +190,7 @@ class Jump
 	if (!it.moveNext())
 	    return new String(b);
 	do {
-	    if (it.isEmptyRow() || it.isTitleRow())
+	    if (/*it.isEmptyRow() ||*/ it.isTitleRow())
 		continue;
 	    if (it.isParagraphBeginning())
 		return new String(b);
@@ -208,7 +208,7 @@ class Jump
     static private Sounds chooseSound(Iterator it, int pos)
     {
 	NullCheck.notNull(it, "it");
-	if (it.isEmptyRow() || !it.isParagraphBeginning() || pos > 0)
+	if (/*it.isEmptyRow() ||*/ !it.isParagraphBeginning() || pos > 0)
 	    return null;
 	switch(it.getNode().getType())
 	{
