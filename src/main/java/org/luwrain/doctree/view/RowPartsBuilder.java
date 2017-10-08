@@ -72,7 +72,11 @@ void onNode(Node node)
 	    final Paragraph para = (Paragraph)node;
 	    currentParaParts.clear();
 	    for(Run r: para.runs())
-		    onRun(r, width > 0?width:para.width);
+	    {
+		final String text = r.text();
+		NullCheck.notNull(text, "text");
+		onRun(r, text, 0, text.length(), width > 0?width:para.width);
+	    }
 	    if (!currentParaParts.isEmpty())
 	    {
 		para.setRowParts(currentParaParts.toArray(new RowPart[currentParaParts.size()]));
@@ -89,18 +93,26 @@ void onNode(Node node)
     }
 
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars;
-    private void onRun(Run run, int maxRowLen)
+    private void onRun(Run run, String text, int boundFrom, int boundTo, int maxRowLen)
     {
-	final String text = run.text();
-	final int boundTo = text.length();
+	NullCheck.notNull(run, "run");
 	NullCheck.notNull(text, "text");
-	if (text.isEmpty())
+	if (boundFrom < 0 || boundTo < 0)
+	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") and boundTo (" + boundTo + ") may not be negative");
+	if (boundFrom > text.length() || boundTo > text.length())
+	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") and boundTo (" + boundTo + ") may not be greater than length of the text (" + text.length() + ")");
+	if (boundFrom > boundTo)
+	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") may not be greater than boundTo (" + boundTo + ")");
+	if (offset > maxRowLen)
+	    throw new RuntimeException("offset (" + offset + ") may not be greater than maxRowLen (" + maxRowLen + ")");
+	if (boundFrom == boundTo)
 	    return;
-	int stepFrom = 0;
-	while (stepFrom < boundTo)
+	int nextStepFrom = boundFrom;
+	while (nextStepFrom < boundTo)
 	{
+	    final int stepFrom = nextStepFrom;
 	    final int roomOnLine = maxRowLen - offset;//Available space on current line
-	    if (roomOnLine <= 0)
+	    if (roomOnLine == 0)
 	    {
 		//Try again on the next line
 		++index;
@@ -136,21 +148,23 @@ void onNode(Node node)
 	    currentParaParts.add(makeTextPart(run, stepFrom, stepTo));
 	    ++index;
 	    offset = 0;
-	    stepFrom = findNextWord(stepTo, text, boundTo);
+	    nextStepFrom = findNextWord(stepTo, text, boundTo);
 	} //main loop;
     }
 
-    private int findWordsFittingOnLIne(String text, int posFrom, int boundTo, int roomOnLine)
+    private int findWordsFittingOnLIne(String text, int posFrom, int boundTo, int lenRestriction)
     {
-	int pos = posFrom;
+	int pos = 0;
 		    int nextWordEnd = posFrom;
-	    while (nextWordEnd - posFrom <= roomOnLine && nextWordEnd > pos)
+	    while (nextWordEnd - posFrom <= lenRestriction)
 	    {
 		pos = nextWordEnd;//It is definitely before the row end
 		while (nextWordEnd < boundTo && Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
 		    ++nextWordEnd;
 		while (nextWordEnd < boundTo && !Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
 		    ++nextWordEnd;
+		if (nextWordEnd == pos)
+		    return pos;
 			    }
 	    return pos;
     }
