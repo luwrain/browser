@@ -175,7 +175,7 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
 	    throw new IllegalArgumentException("searchFrom (" + searchFrom + ") may not be negative");
 	if (noContent())
 	    return false;
-	for(int i = searchFrom;i < rows.length;i += step)
+	for(int i = searchFrom;i >= 0 && i < rows.length;i += step)
 	{
 	    final Row row = rows[i];
 	    final Run firstRun = row.getFirstRun();
@@ -293,7 +293,7 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
     }
 
     //Returns null if is at title row
-    public Node getParaContainer()
+    protected Node getParaContainer()
     {
 	if (noContent() || isTitleRow())
 	    return null;

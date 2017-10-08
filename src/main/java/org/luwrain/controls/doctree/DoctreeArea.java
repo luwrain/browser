@@ -256,13 +256,13 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	    case ALTERNATIVE_END:
 		return onAltEnd(event);
 	    case PAGE_UP:
-		return onPageUp(event, false);
+		return findPrevSection( false);
 	    case PAGE_DOWN:
-		return onPageDown(event, false);
+		return findNextSection(false);
 	    case ALTERNATIVE_PAGE_UP:
-		return onPageUp(event, true);
+		return findPrevSection(true);
 	    case ALTERNATIVE_PAGE_DOWN:
-		return onPageDown(event, true);
+		return findNextSection(true);
 	    }
 	return false;
     }
@@ -453,13 +453,22 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    protected boolean onPageDown(KeyboardEvent event, boolean quickNav)
+    protected boolean findNextSection(boolean sameLevel)
     {
 	if (noContentCheck())
 	    return true;
-	if (!quickNav)
+	final Node currentNode = iterator.getNode();
+	if (currentNode == null)//Actually very strange, should never happen
+	    return false;
+	final int currentSectLevel; 
+	if (currentNode instanceof Section)
 	{
-	    final Node currentNode = iterator.getNode();
+	    final Section sect = (Section)currentNode;
+	    currentSectLevel = sect.getSectionLevel();
+	} else
+	    currentSectLevel = -1;
+	if (!sameLevel || currentSectLevel < 0)
+	{
 	    if (!iterator.searchForward((node,para,row)->{
 			if (node == currentNode)
 			    return false;
@@ -468,35 +477,55 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 		return false;
 	} else
 	{
-	    //FIXME:
-	    return false;
+	    if (!iterator.searchForward((node,para,row)->{
+			if (node == currentNode)
+			    return false;
+			if (node.getType() != Node.Type.SECTION)
+			    return false;
+			final Section sect = (Section)node;
+			return sect.getSectionLevel() <= currentSectLevel;
+		    }, iterator.getIndex()))
+		return false;
 	}
-	onNewHotPointY( quickNav, quickNav);
+	onNewHotPointY(false);
 	return true;
     }
 
-    protected boolean onPageUp(KeyboardEvent event, boolean quickNav)
+    protected boolean findPrevSection(boolean sameLevel)
     {
-	if (noContentCheck())
+		if (noContentCheck())
 	    return true;
-	if (!quickNav)
+	final Node currentNode = iterator.getNode();
+	if (currentNode == null)//Actually very strange, should never happen
+	    return false;
+	final int currentSectLevel; 
+	if (currentNode instanceof Section)
 	{
-	    final Node current = iterator.getParaContainer();//Will be null, if is at title row
-	    while(iterator.canMovePrev() &&
-		  (iterator.getNode().getType() != Node.Type.SECTION  ||
-		   iterator.getNode() == current))
-		iterator.movePrev();
-	    if (iterator.getNode().getType() != Node.Type.SECTION)
-	    {
-		context.hint(Hints.NO_LINES_ABOVE);
-		return true;
-	    }
+	    final Section sect = (Section)currentNode;
+	    currentSectLevel = sect.getSectionLevel();
+	} else
+	    currentSectLevel = -1;
+	if (!sameLevel || currentSectLevel < 0)
+	{
+	    if (!iterator.searchBackward((node,para,row)->{
+			if (node == currentNode || row.getRelNum() > 0)
+			    return false;
+			return node.getType() == Node.Type.SECTION;
+		    }, iterator.getIndex()))
+		return false;
 	} else
 	{
-	    //FIXME:
-	    return false;
+	    if (!iterator.searchBackward((node,para,row)->{
+			if (node == currentNode || row.getRelNum() > 0)
+			    return false;
+			if (node.getType() != Node.Type.SECTION)
+			    return false;
+			final Section sect = (Section)node;
+			return sect.getSectionLevel() <= currentSectLevel;
+		    }, iterator.getIndex()))
+		return false;
 	}
-	onNewHotPointY( quickNav, quickNav);
+	onNewHotPointY(false);
 	return true;
     }
 
