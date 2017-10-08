@@ -229,10 +229,6 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
     public boolean hasRunOnRow(Run run)
     {
 	NullCheck.notNull(run, "run");
-	/*
-	if (isEmptyRow())
-	    return false;
-	*/
 	final Run[] runs = getRow().getRuns();
 	for(Run r: runs)
 	    if (run == r)
@@ -240,22 +236,16 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
 	return false;
     }
 
-    public Run[] getRunsOnRow()
+    public Run[] getRuns()
     {
-	/*
-	if (isEmptyRow())
+	if (noContent())
 	    return new Run[0];
-	*/
 	return getRow().getRuns();
     }
 
     public int runBeginsAt(Run run)
     {
 	NullCheck.notNull(run, "run");
-	/*
-	if (isEmptyRow())
-	    return -1;
-	*/
 	return getRow().runBeginsAt(run);
     }
 
@@ -319,17 +309,17 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
 
     public Run getRunUnderPos(int pos)
     {
-	if (noContent())
-	    return null;
 	if (pos < 0)
 	    throw new IllegalArgumentException("pos may not be negative");
+		if (noContent())
+	    throw new RuntimeException("Iterator is without content");
 	return rows[current].getRunUnderPos(pos);
     }
 
-    protected Row getRow()
+public Row getRow()
     {
 	if (noContent())
-	    return null;
+	    throw new RuntimeException("Iterator is without content");
 	if (current < 0 || current >= rows.length)
 	    return null;
 	return rows[current];

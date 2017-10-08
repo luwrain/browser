@@ -216,7 +216,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	    switch(event.getChar())
 	    {
 	    case ' ':
-		return onSpace(event);
+		return findNextHref();
 	    case '[':
 		return onLeftSquareBracket(event);
 	    case ']':
@@ -723,39 +723,54 @@ protected boolean onNextSentence(KeyboardEvent event)
 	return true;
     }
 
-    protected boolean onSpace(KeyboardEvent event)
+    public boolean findNextHref()
     {
-	/*
-	if (noContentCheck())
+		if (noContentCheck())
 	    return true;
-	int pos = iterator.findNextHref(hotPointX);
-	if (pos >= 0)
-	{
-	    hotPointX = pos;
-	    context.say(getHrefText());
+		final Run currentRun = iterator.getRunUnderPos(hotPointX);
+		if (currentRun != null)
+		{
+		    //Trying to find the run with href on the current row
+		    final Run[] runs = iterator.getRuns();
+		    boolean skipping = true;
+		    for(Run r: runs)
+		    {
+			if (r == currentRun)
+			{
+			    skipping = false;
+			    continue;
+			}
+			if (skipping)
+			    continue;
+			if (r.href() != null && !r.href().trim().isEmpty())
+			{
+			    		    hotPointX = iterator.runBeginsAt(r);
+					    context.say(r.text());
 	    context.onAreaNewHotPoint(this);
-	    return true;
-	}
-	while (iterator.moveNext())
-	{
-	    if (iterator.hasHrefUnderPos(0))
-	    {
-		hotPointX = 0;
-		context.say(getHrefText());
-		context.onAreaNewHotPoint(this);
-		return true;
-	    }
-	    pos = iterator.findNextHref(0);
-	    if (pos >= 0)
-	    {
-		hotPointX = pos;
-		context.say(getHrefText());
-		context.onAreaNewHotPoint(this);
-		return true;
-	    }
-	}
-	*/
-	return false;
+	    return true;    
+			    			}
+		    }
+		}
+		if (iterator.getIndex() + 1 >= iterator.getCount())
+		    return false;
+		if (!iterator.searchForward((node,para,row)->{
+			    final Run[] runs = row.getRuns();
+			    for(Run r: runs)
+				if (r.href() != null && !r.href().trim().isEmpty())
+				    return true;
+			    return false;
+			}, iterator.getIndex() + 1))
+		    return false;
+		    final Run[] runs = iterator.getRuns();
+		    int k = 0;
+		    while (k < runs.length && runs[k].href() != null && !runs[k].href().trim().isEmpty())
+			++k;
+		    if (k >= runs.length)//Should never happen
+			return false;
+		    hotPointX = iterator.runBeginsAt(runs[k]);
+		    context.say(runs[k].text());
+	    context.onAreaNewHotPoint(this);
+	    return true;    
     }
 
     protected void onNewHotPointY(boolean briefAnnouncement, boolean alwaysSpeakTitleText)

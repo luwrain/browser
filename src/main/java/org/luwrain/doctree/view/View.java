@@ -179,7 +179,7 @@ public class View
 		final ExtraInfo data = it.getNode().extraInfo;
 		if (data != null && data.hasIdInChain(id))
 		    break;
-		final Run[] runs = it.getRunsOnRow();
+		final Run[] runs = it.getRuns();
 		Run foundRun = null;
 		for(Run r: runs)
 		    if (r instanceof TextRun)
