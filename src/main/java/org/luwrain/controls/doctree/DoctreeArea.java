@@ -216,7 +216,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	    switch(event.getChar())
 	    {
 	    case ' ':
-		return findNextHref();
+		return onFindNextHref();
 	    case '[':
 		return onLeftSquareBracket(event);
 	    case ']':
@@ -256,13 +256,13 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	    case ALTERNATIVE_END:
 		return onAltEnd(event);
 	    case PAGE_UP:
-		return findPrevSection( false);
+		return onFindPrevSection( false);
 	    case PAGE_DOWN:
-		return findNextSection(false);
+		return onFindNextSection(false);
 	    case ALTERNATIVE_PAGE_UP:
-		return findPrevSection(true);
+		return onFindPrevSection(true);
 	    case ALTERNATIVE_PAGE_DOWN:
-		return findNextSection(true);
+		return onFindNextSection(true);
 	    }
 	return false;
     }
@@ -453,7 +453,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    protected boolean findNextSection(boolean sameLevel)
+    protected boolean onFindNextSection(boolean sameLevel)
     {
 	if (noContentCheck())
 	    return true;
@@ -491,7 +491,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	return true;
     }
 
-    protected boolean findPrevSection(boolean sameLevel)
+    protected boolean onFindPrevSection(boolean sameLevel)
     {
 		if (noContentCheck())
 	    return true;
@@ -723,7 +723,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	return true;
     }
 
-    public boolean findNextHref()
+    protected boolean onFindNextHref()
     {
 		if (noContentCheck())
 	    return true;
