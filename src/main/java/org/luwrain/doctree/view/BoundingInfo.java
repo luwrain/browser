@@ -41,7 +41,7 @@ class BoundingInfo
 	    {
 		if (r == runTo)
 		{
-		    acceptor.accept(run, 0, Math.min(r.getText().length(), posTo));
+		    acceptor.accept(r, 0, Math.min(r.text().length(), posTo));
 		    return;
 		    		}
 	    } else
@@ -52,10 +52,10 @@ class BoundingInfo
 		    if (r == runTo)
 		    {
 			//runFrom == runTo, nothing strange
-			acceptor.accept(r, Math.min(r.getText().length(), posFrom), Math.min(r.getText().length(), posTo));
+			acceptor.accept(r, Math.min(r.text().length(), posFrom), Math.min(r.text().length(), posTo));
 			return;
 		    }
-		    acceptor.accept(r, Math.min(r.getText().length(), posFrom), r.getText().length());
+		    acceptor.accept(r, Math.min(r.text().length(), posFrom), r.text().length());
 		    accepting = true;
 		    continue;
 		}
@@ -64,7 +64,7 @@ class BoundingInfo
 	    }
 	    //r != runFrom and r != runTo
 	    if (accepting)
-		acceptor.acceptor(r, 0, r.getText().length());
+		acceptor.accept(r, 0, r.text().length());
 	}
     }
 }

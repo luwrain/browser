@@ -25,16 +25,28 @@ import org.luwrain.doctree.*;
 class RowPartsBuilder
 {
     static private final String LOG_COMPONENT = "doctree";
-    
+
     private final List<RowPart> parts = new LinkedList<RowPart>();
     private final List<RowPart> currentParaParts = new LinkedList<RowPart>();
     private final List<Paragraph> paragraphs = new LinkedList<Paragraph>();
 
     /** The index of the next row to be added to the current paragraph*/
     private int index = 0;
-
     /** Number of characters in the current (incomplete) row*/
     private int offset = 0;
+
+    private final BoundingInfo boundingInfo;
+
+    RowPartsBuilder()
+    {
+	this.boundingInfo = null;
+    }
+
+    RowPartsBuilder(BoundingInfo boundingInfo)
+    {
+	NullCheck.notNull(boundingInfo, "boundingInfo");
+	this.boundingInfo = boundingInfo;
+    }
 
 void onNode(Node node)
     {
@@ -86,8 +98,8 @@ void onNode(Node node)
 	int posFrom = 0;
 	while (posFrom < text.length())
 	{
-	    final int available = maxRowLen - offset;//Available space on current line
-	    if (available <= 0)
+	    final int roomOnLine = maxRowLen - offset;//Available space on current line
+	    if (roomOnLine <= 0)
 	    {
 		//Try again on the next line
 		++index;
@@ -96,7 +108,7 @@ void onNode(Node node)
 	    }
 	    final int remains = text.length() - posFrom;
 	    //Both remains and available are greater than zero
-	    if (remains <= available)
+	    if (remains <= roomOnLine)
 	    {
 		//We have a chunk for the last row for this run
 		if (!text.isEmpty())
@@ -107,7 +119,7 @@ void onNode(Node node)
 	    }
 	    int posTo = posFrom;
 	    int nextWordEnd = posTo;
-	    while (nextWordEnd - posFrom <= available)
+	    while (nextWordEnd - posFrom <= roomOnLine)
 	    {
 		posTo = nextWordEnd;//It is definitely before the row end
 		while (nextWordEnd < text.length() && Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
@@ -125,11 +137,11 @@ void onNode(Node node)
 		    continue;
 		}
 		//The only thing we can do is split the line in the middle of the word, no another way
-		posTo = posFrom + available;
+		posTo = posFrom + roomOnLine;
 	    }
 	    if (posFrom == posTo)
 		Log.warning(LOG_COMPONENT, "having posFrom equal to posTo (" + posFrom + ")");
-	    if (posTo - posFrom > available)
+	    if (posTo - posFrom > roomOnLine)
 		Log.warning(LOG_COMPONENT, "getting the line with length greater than line length limit");
 	    if (posTo > posFrom)
 	    currentParaParts.add(makeTextPart(run, posFrom, posTo));
