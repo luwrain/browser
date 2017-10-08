@@ -748,7 +748,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 					    context.say(r.text());
 	    context.onAreaNewHotPoint(this);
 	    return true;    
-			    			}
+			}
 		    }
 		}
 		if (iterator.getIndex() + 1 >= iterator.getCount())
@@ -763,7 +763,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 		    return false;
 		    final Run[] runs = iterator.getRuns();
 		    int k = 0;
-		    while (k < runs.length && runs[k].href() != null && !runs[k].href().trim().isEmpty())
+		    while (k < runs.length && (runs[k].href() == null || runs[k].href().trim().isEmpty()))
 			++k;
 		    if (k >= runs.length)//Should never happen
 			return false;
