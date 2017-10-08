@@ -92,11 +92,12 @@ void onNode(Node node)
     private void onRun(Run run, int maxRowLen)
     {
 	final String text = run.text();
+	final int boundTo = text.length();
 	NullCheck.notNull(text, "text");
 	if (text.isEmpty())
 	    return;
-	int posFrom = 0;
-	while (posFrom < text.length())
+	int stepFrom = 0;
+	while (stepFrom < boundTo)
 	{
 	    final int roomOnLine = maxRowLen - offset;//Available space on current line
 	    if (roomOnLine <= 0)
@@ -106,28 +107,17 @@ void onNode(Node node)
 		offset = 0;
 		continue;
 	    }
-	    final int remains = text.length() - posFrom;
-	    //Both remains and available are greater than zero
+	    final int remains = boundTo - stepFrom;
+	    //Both remains and roomOnLine are greater than zero
 	    if (remains <= roomOnLine)
 	    {
-		//We have a chunk for the last row for this run
-		if (!text.isEmpty())
-		currentParaParts.add(makeTextPart(run, posFrom, text.length()));
+		//Everything fits on the current line
+		currentParaParts.add(makeTextPart(run, stepFrom, boundTo));
 		offset += remains;
-		posFrom = text.length();
-		continue;
+		return;
 	    }
-	    int posTo = posFrom;
-	    int nextWordEnd = posTo;
-	    while (nextWordEnd - posFrom <= roomOnLine)
-	    {
-		posTo = nextWordEnd;//It is definitely before the row end
-		while (nextWordEnd < text.length() && Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
-		    ++nextWordEnd;
-		while (nextWordEnd < text.length() && !Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
-		    ++nextWordEnd;
-	    }
-	    if (posTo == posFrom)//No word ends before the end of the row
+	    int stepTo = findWordsFittingOnLIne(text, stepFrom, boundTo, roomOnLine);
+	    if (stepTo == stepFrom)//No word ends before the end of the row
 	    {
 		if (offset > 0)
 		{
@@ -137,24 +127,43 @@ void onNode(Node node)
 		    continue;
 		}
 		//The only thing we can do is split the line in the middle of the word, no another way
-		posTo = posFrom + roomOnLine;
-	    }
-	    if (posFrom == posTo)
-		Log.warning(LOG_COMPONENT, "having posFrom equal to posTo (" + posFrom + ")");
-	    if (posTo - posFrom > roomOnLine)
-		Log.warning(LOG_COMPONENT, "getting the line with length greater than line length limit");
-	    if (posTo > posFrom)
-	    currentParaParts.add(makeTextPart(run, posFrom, posTo));
+		stepTo = stepFrom + roomOnLine;
+	    } //no fitting words
+	    	    if (stepTo <= stepFrom)
+			throw new RuntimeException("stepTo (" + stepTo + ") == stepFrom (" + stepFrom + ")");
+	    	    if (stepTo - stepFrom > roomOnLine)
+			throw new RuntimeException("Exceeding room on line (" + roomOnLine + "), stepFrom=" + stepFrom + ", stepTo=" + stepTo);
+	    currentParaParts.add(makeTextPart(run, stepFrom, stepTo));
 	    ++index;
 	    offset = 0;
-	    posFrom = posTo;
-	    //Trying to find the beginning of the next word
-	    final int rollBack = posFrom;
-	    while (posFrom < text.length() && Character.isSpace(text.charAt(posFrom)))
-		++posFrom;
-	    if (posFrom >= text.length())
-		posFrom = rollBack;
-	}
+	    stepFrom = findNextWord(stepTo, text, boundTo);
+	} //main loop;
+    }
+
+    private int findWordsFittingOnLIne(String text, int posFrom, int boundTo, int roomOnLine)
+    {
+	int pos = posFrom;
+		    int nextWordEnd = posFrom;
+	    while (nextWordEnd - posFrom <= roomOnLine && nextWordEnd > pos)
+	    {
+		pos = nextWordEnd;//It is definitely before the row end
+		while (nextWordEnd < boundTo && Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
+		    ++nextWordEnd;
+		while (nextWordEnd < boundTo && !Character.isSpace(text.charAt(nextWordEnd)))//FIXME:nbsp
+		    ++nextWordEnd;
+			    }
+	    return pos;
+    }
+
+    private int findNextWord(int pos, String text, int boundTo)
+    {
+	NullCheck.notNull(text, "text");
+	int i = pos;
+	    while (i < boundTo && Character.isSpace(text.charAt(i)))
+		++i;
+	    if (i >= boundTo)
+		return pos;
+	    return i;
     }
 
     private RowPart makeTextPart(Run run, int posFrom, int posTo)
