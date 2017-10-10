@@ -228,26 +228,36 @@ catch(NumberFormatException e)
 	return new ItemWrapper(tableNode, tableNodeInfo);
     }
 
-    private ItemWrapper makeWrapperForLeaf(Prenode nodeInfo)
+    private ItemWrapper makeWrapperForLeaf(Prenode prenode)
     {
-	NullCheck.notNull(nodeInfo, "nodeInfo");
-	WebInfo webInfo = null;
-	final BrowserIterator it = nodeInfo.browserIt;
+	NullCheck.notNull(prenode, "prenode");
+	final BrowserIterator it = prenode.browserIt;
+	final String text = it.getText() != null?it.getText():"";
 	final String tagName = it.getHtmlTagName().toLowerCase();
-	String txt = "";
 	switch(tagName)
 	{
-	case "img":
-	    txt = "[картинка]";
-	    break;
-	case "video":
-	    txt = "[Видео ]";
-	    break;
+	    //	case "img":
+	    //	case "video":
 	case "input":
 	case "select":
 	case "button":
-	    return onFormItem(nodeInfo, tagName);
-	    /*
+	    return onFormItem(prenode, tagName);
+	case "#text":
+	    //FIXME:href
+	    	    return new ItemWrapper(new TextRun(text), prenode);
+	default:
+	    return new ItemWrapper(new TextRun("FIXME:UNKNOWN TAG:" + tagName + ":" + text), prenode);
+	}
+	//	txt = cleanupText(txt);
+	//	txt += " "+cleanupText(it.getAltText());
+	//	final TextRun run = new TextRun(txt.trim()+" ");
+	//	if(webInfo != null)
+	//	    run.setAssociatedObject(webInfo);
+	//	watch.add(nodeInfo.browserIt.getPos());
+	//	return new ItemWrapper(run, nodeInfo);
+	}
+
+    	    /*
 	if(!nodeInfo.mixed.isEmpty())
 	{ // check for A tag inside mixed
 	    for(BrowserIterator e: nodeInfo.getMixedinfo())
@@ -278,18 +288,7 @@ catch(NumberFormatException e)
 		    }
 	    }
 	    */
-	}
-	// any non edit elements was UNKNOWN
-	if(webInfo == null)
-	    webInfo = new WebInfo(WebInfo.ActionType.UNKNOWN, nodeInfo.browserIt);
-	txt = cleanupText(txt);
-	txt += " "+cleanupText(it.getAltText());
-	final TextRun run = new TextRun(txt.trim()+" ");
-	if(webInfo != null)
-	    run.setAssociatedObject(webInfo);
-	watch.add(nodeInfo.browserIt.getPos());
-	return new ItemWrapper(run, nodeInfo);
-	}
+
 
     private ItemWrapper onFormItem(Prenode prenode, String tagName)
 {
@@ -307,7 +306,6 @@ catch(NumberFormatException e)
 		/*
 	    case "image":
 	    case "button":
-	    case "submit":
 	    case "radio":
 	    case "checkbox":
 		*/
