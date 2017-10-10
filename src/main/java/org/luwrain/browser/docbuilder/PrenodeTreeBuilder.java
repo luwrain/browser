@@ -39,7 +39,7 @@ private Prenode[] nodes = new Prenode[0];
 	this.tempRoot = tempRoot;
     }
 
-    Prenode[] build()
+    void build()
     {
 	final AllNodesSelector allVisibleNodes = new AllNodesSelector(true);
 	final List<BrowserIterator> nodesList = new LinkedList<BrowserIterator>();
@@ -56,7 +56,7 @@ private Prenode[] nodes = new Prenode[0];
 	    nodes[i] = null;
 	for(BrowserIterator itInList: nodesList)
 	    ensureRegistered(itInList);
-	return nodes;
+	//	return nodes;
     }
 
     private Prenode ensureRegistered(BrowserIterator it)

@@ -32,8 +32,7 @@ public class DocumentBuilder
 
     private final Browser browser;
     private final URL baseUrl;
-    private final Prenode tempRoot = new Prenode();
-    private final Prenode[] nodes;
+    private final Prenode prenodesRoot = new Prenode();
 
     LinkedList<Integer> watch = new LinkedList<Integer>();
 
@@ -42,54 +41,49 @@ public class DocumentBuilder
 	NullCheck.notNull(browser, "browser");
 	this.browser = browser;
 	this.baseUrl = prepareBaseUrl(browser);
-	Log.debug(LOG_COMPONENT, "starting building of doctree document for " + (baseUrl != null?baseUrl.toString():""));
-	nodes = new PrenodeTreeBuilder(browser, tempRoot).build();
-	//	for(Prenode n: nodes)
-	//	    System.out.println(n.browserIt.getHtmlTagName());
+	new PrenodeTreeBuilder(browser, prenodesRoot).build();
     }
 
     public Document build()
     {
-	watch.clear();
-	while(Cleaning.clean(tempRoot) != 0){}
-	Cleaning.mergeSingleChildrenNodes(tempRoot);
+	//	watch.clear();
+	while(Cleaning.clean(prenodesRoot) != 0){}
+	Cleaning.mergeSingleChildrenNodes(prenodesRoot);
 	return makeDocument();
     }
 
     private Document makeDocument()
     {
 	final Node root=NodeFactory.newNode(Node.Type.ROOT);
-	final Node[] subnodes = makeNodes(tempRoot);
+	final Node[] subnodes = makeNodes(prenodesRoot);
 	root.setSubnodes(subnodes);
 final org.luwrain.doctree.Document res = new Document(root);
 return res;
     }
 
-    private Node[] makeNodes(Prenode nodeInfo)
+    private Node[] makeNodes(Prenode prenode)
     {
-	NullCheck.notNull(nodeInfo, "nodeInfo");
+	NullCheck.notNull(prenode, "prenode");
 	final List<Node> res = new LinkedList<Node>();
-	// TODO: search elements with same X screen (equals for x pos) and different Y - same group
-	// TODO: search elements with different Y and same X (intersect intervals! not equal like for X)
 	final List<Run> subruns = new LinkedList<Run>();
 	Rectangle rect = null;
-	for(ItemWrapper runInfo: makeWrappers(nodeInfo))
+	for(ItemWrapper w: makeWrappers(prenode))
 	{
-	    if(runInfo.isNode())
+	    if(w.isNode())
 	    {
 		res.add(createPara(subruns));
-		res.add(runInfo.node);
+		res.add(w.node);
 		continue;
 	    }
 	    // first rect compare with itself
 	    if(rect == null)
-		rect = runInfo.nodeInfo.browserIt.getRect();
+		rect = w.nodeInfo.browserIt.getRect();
 	    // check, if next r in the same Y interval like previous
-	    final Rectangle curRect = runInfo.nodeInfo.browserIt.getRect();
+	    final Rectangle curRect = w.nodeInfo.browserIt.getRect();
 	    if(!((curRect.y>=rect.y&&curRect.y<rect.y+rect.height)
 		 ||(rect.y>=curRect.y&&rect.y<curRect.y+curRect.height)))
 		res.add(createPara(subruns));
-	    subruns.add(runInfo.run);
+	    subruns.add(w.run);
 	    rect = curRect;
 	} //for();
 	res.add(createPara(subruns));
