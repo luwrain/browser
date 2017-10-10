@@ -33,6 +33,7 @@ public class DocumentBuilder
     private final Browser browser;
     private final URL baseUrl;
     private final Prenode prenodesRoot = new Prenode();
+    private final LinkedList<String> hrefs = new LinkedList<String>();
 
     LinkedList<Integer> watch = new LinkedList<Integer>();
 
@@ -97,18 +98,32 @@ return res;
 	return para;
     }
 
+    //This method must call makeNodes() for block nodes and makeWrappers() for inline nodes
     private ItemWrapper[] makeWrappers(Prenode node)
     {
 	NullCheck.notNull(node, "node");
 		Log.debug(LOG_COMPONENT, "makeWrappers(" + node.tagName + ")");
 		NullCheck.notNull(node.children, "node.children");
-	if(node.children.isEmpty())
+	if(node.children == null || node.children.isEmpty())
 	    return new ItemWrapper[]{makeLeafWrapper(node)};
 	final List<ItemWrapper> res = new LinkedList<ItemWrapper>();
 	final BrowserIterator it = node.browserIt;
 	final String tagName = node.tagName;
 	switch(tagName)
 	{
+	case "a":
+	    {
+		final String href = it.getAttribute("href");
+		if (href != null && !href.isEmpty())
+		    hrefs.add(href);
+		for(Prenode p: node.children)
+		    for(ItemWrapper w: makeWrappers(p))
+			res.add(w);
+		if (href != null && !href.isEmpty())
+		    hrefs.pollLast();
+		break;
+	    }
+
 	case "ol":
 	case "ul":
 	    {
@@ -136,7 +151,6 @@ return res;
 				    		case "h9":
 				    {
 					Log.debug(LOG_COMPONENT, "header " + tagName);
-
 					final Node sect = NodeFactory.newSection(1);//FIXME:proper section level
 					final List<Node> subnodes = new LinkedList<Node>();
 					for(Prenode p: node.children)
@@ -146,10 +160,6 @@ return res;
 					res.add(new ItemWrapper(sect, node));
 					break;
 				    }
-
-
-	
-
 
 	case "table": // table can be mixed with any other element, for example parent form
 	case "tbody": // but if tbody not exist, table would exist as single, because tr/td/th can't be mixed
