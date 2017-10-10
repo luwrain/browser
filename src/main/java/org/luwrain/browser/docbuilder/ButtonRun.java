@@ -5,16 +5,16 @@ import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 import org.luwrain.browser.*;
 
-public class EditRun implements Run
+public class ButtonRun implements Run
 {
     protected final BrowserIterator it;
-    protected String text;
+    protected final String text;
 
     protected final TextAttr textAttr = new TextAttr();
     protected final ExtraInfo extraInfo = new ExtraInfo();
     protected Node parentNode = null;
 
-    EditRun(BrowserIterator it)
+    ButtonRun(BrowserIterator it)
     {
 	NullCheck.notNull(it, "it");
 	this.it = it;
@@ -59,6 +59,6 @@ public class EditRun implements Run
 
     @Override public String text()
     {
-	return "Ввод текста " + text;
+	return "Кнопка " + text;
     }
 }

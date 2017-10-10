@@ -234,73 +234,29 @@ catch(NumberFormatException e)
 	WebInfo webInfo = null;
 	final BrowserIterator it = nodeInfo.browserIt;
 	final String tagName = it.getHtmlTagName().toLowerCase();
-
-	if (tagName.toLowerCase().trim().equals("video"))
-	{
-	    Log.debug(LOG_COMPONENT, "video found");
-	}
 	String txt = "";
 	switch(tagName)
 	{
 	case "img":
 	    txt = "[картинка]";
 	    break;
-
 	case "video":
 	    txt = "[Видео ]";
 	    break;
-
-
 	case "input":
-String type = it.getAttribute("type");
-	    if(type == null)
-type = "";
-	    switch(type)
-	    {
-	    case "image":
-	    case "button":
-	    case "submit":
-		txt = "[кнопка " + it.getText() + "]";
-	    webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
-	    break;
-	    case "radio":
-		txt = "Radio: " + it.getText();
-		webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
-		break;
-	    case "checkbox":
-		txt = "Checkbox: " + it.getText();
-		webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
-		break;
-	    case "text":
-	    default:
-		txt = "Edit: " + it.getText();
-	    webInfo = new WebInfo(WebInfo.ActionType.EDIT, nodeInfo.browserIt);
-	    break;
-	    }
-	    break;
-	case "button":
-	    txt = "Button: " + it.getText();
-webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
-	    break;
 	case "select":
-	    txt = "Select: " + it.getText();
-	    webInfo = new WebInfo(WebInfo.ActionType.SELECT, nodeInfo.browserIt);
-	    break;
-	default:
-	    txt = it.getText();
-	    break;
-	}
+	case "button":
+	    return onFormItem(nodeInfo, tagName);
+	    /*
 	if(!nodeInfo.mixed.isEmpty())
 	{ // check for A tag inside mixed
 	    for(BrowserIterator e: nodeInfo.getMixedinfo())
 	    {
 		final String etag = e.getHtmlTagName().toLowerCase();
-
 		if(etag.equals("video"))
 		{
 		    Log.debug(LOG_COMPONENT, "video found");
 		}
-
 		if(etag.equals("a"))
 		{
 		    final String url;
@@ -321,10 +277,11 @@ webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
 			break;
 		    }
 	    }
+	    */
 	}
 	// any non edit elements was UNKNOWN
 	if(webInfo == null)
-webInfo = new WebInfo(WebInfo.ActionType.UNKNOWN, nodeInfo.browserIt);
+	    webInfo = new WebInfo(WebInfo.ActionType.UNKNOWN, nodeInfo.browserIt);
 	txt = cleanupText(txt);
 	txt += " "+cleanupText(it.getAltText());
 	final TextRun run = new TextRun(txt.trim()+" ");
@@ -332,7 +289,54 @@ webInfo = new WebInfo(WebInfo.ActionType.UNKNOWN, nodeInfo.browserIt);
 	    run.setAssociatedObject(webInfo);
 	watch.add(nodeInfo.browserIt.getPos());
 	return new ItemWrapper(run, nodeInfo);
+	}
+
+    private ItemWrapper onFormItem(Prenode prenode, String tagName)
+{
+    NullCheck.notNull(prenode, "prenode");
+    NullCheck.notEmpty(tagName, "tagName");
+    final BrowserIterator it = prenode.browserIt;
+    NullCheck.notNull(it, "it");
+    if (tagName.equals("input"))
+    {
+	    final String type = it.getAttribute("type");
+	    if (type == null || type.trim().isEmpty())
+						return new ItemWrapper(new EditRun(it), prenode);
+	    switch(type)
+	    {
+		/*
+	    case "image":
+	    case "button":
+	    case "submit":
+	    case "radio":
+	    case "checkbox":
+		*/
+	    case "submit":
+						return new ItemWrapper(new ButtonRun(it), prenode);
+	    case "text":
+				return new ItemWrapper(new EditRun(it), prenode);
+	    default:
+		Log.warning(LOG_COMPONENT, "unknown input type:" + type);
+		return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT:" + type + ":" + it.getText()), prenode);
+	    }
     }
+    switch(tagName)
+    {
+	case "button":
+	    //	    txt = "Button: " + it.getText();
+	    //	    webInfo = new WebInfo(WebInfo.ActionType.CLICK, nodeInfo.browserIt);
+	    break;
+	case "select":
+	    //	    txt = "Select: " + it.getText();
+	    //	    webInfo = new WebInfo(WebInfo.ActionType.SELECT, nodeInfo.browserIt);
+	    break;
+	default:
+	    //	    txt = it.getText();
+	    //	    break;
+	    		return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
+	}
+    	    		return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
+}
 
     private String constructUrl(String url)
     {
