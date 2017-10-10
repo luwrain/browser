@@ -48,7 +48,6 @@ public class DocumentBuilder
     {
 	//	watch.clear();
 	while(Cleaning.clean(prenodesRoot) != 0){}
-	Cleaning.mergeSingleChildrenNodes(prenodesRoot);
 	return makeDocument();
     }
 
@@ -64,29 +63,28 @@ return res;
     private Node[] makeNodes(Prenode prenode)
     {
 	NullCheck.notNull(prenode, "prenode");
+	Log.debug(LOG_COMPONENT, "makeNodes(" + prenode.tagName + ")");
 	final List<Node> res = new LinkedList<Node>();
-	final List<Run> subruns = new LinkedList<Run>();
+	final List<Run> runs = new LinkedList<Run>();
 	Rectangle rect = null;
 	for(ItemWrapper w: makeWrappers(prenode))
 	{
 	    if(w.isNode())
 	    {
-		res.add(createPara(subruns));
+		res.add(createPara(runs));
 		res.add(w.node);
 		continue;
 	    }
-	    // first rect compare with itself
 	    if(rect == null)
 		rect = w.nodeInfo.browserIt.getRect();
-	    // check, if next r in the same Y interval like previous
 	    final Rectangle curRect = w.nodeInfo.browserIt.getRect();
 	    if(!((curRect.y>=rect.y&&curRect.y<rect.y+rect.height)
 		 ||(rect.y>=curRect.y&&rect.y<curRect.y+curRect.height)))
-		res.add(createPara(subruns));
-	    subruns.add(w.run);
+		res.add(createPara(runs));
+	    runs.add(w.run);
 	    rect = curRect;
-	} //for();
-	res.add(createPara(subruns));
+	} //for(wrappers)
+	res.add(createPara(runs));
 	return res.toArray(new Node[res.size()]);
     }
 
@@ -102,12 +100,13 @@ return res;
     private ItemWrapper[] makeWrappers(Prenode node)
     {
 	NullCheck.notNull(node, "node");
+		Log.debug(LOG_COMPONENT, "makeWrappers(" + node.tagName + ")");
+		NullCheck.notNull(node.children, "node.children");
 	if(node.children.isEmpty())
 	    return new ItemWrapper[]{makeLeafWrapper(node)};
 	final List<ItemWrapper> res = new LinkedList<ItemWrapper>();
 	final BrowserIterator it = node.browserIt;
-	final String tagName = it.getHtmlTagName().toLowerCase();
-		Log.debug(LOG_COMPONENT, "block tag:" + tagName);
+	final String tagName = node.tagName;
 	switch(tagName)
 	{
 	case "ol":
@@ -126,7 +125,7 @@ return res;
 	break;
 	}
 
-		case "h1":
+			case "h1":
 		    		case "h2":
 				    		case "h3":
 				    		case "h4":
@@ -135,18 +134,22 @@ return res;
 				    		case "h7":
 				    		case "h8":
 				    		case "h9":
-				    	    {
-						final Node sect = NodeFactory.newSection(1);//FIXME:real section level
-						final List<Node> subnodes = new LinkedList<Node>();
-	for(Prenode child: node.children)
-	{
-	    for(Node n: makeNodes(child))
-	subnodes.add(n);
-	}
-sect.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
-	res.add(new ItemWrapper(sect,node));
-	break;
-					    }
+				    {
+					Log.debug(LOG_COMPONENT, "header " + tagName);
+
+					final Node sect = NodeFactory.newSection(1);//FIXME:proper section level
+					final List<Node> subnodes = new LinkedList<Node>();
+					for(Prenode p: node.children)
+					    for(Node n: makeNodes(p))
+						subnodes.add(n);
+					sect.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
+					res.add(new ItemWrapper(sect, node));
+					break;
+				    }
+
+
+	
+
 
 	case "table": // table can be mixed with any other element, for example parent form
 	case "tbody": // but if tbody not exist, table would exist as single, because tr/td/th can't be mixed
@@ -256,7 +259,7 @@ catch(NumberFormatException e)
 	NullCheck.notNull(prenode, "prenode");
 	final BrowserIterator it = prenode.browserIt;
 	final String text = it.getText() != null?it.getText():"";
-	final String tagName = it.getHtmlTagName().toLowerCase();
+	final String tagName = prenode.tagName;
 	switch(tagName)
 	{
 	    //	case "img":
@@ -264,21 +267,14 @@ catch(NumberFormatException e)
 	case "input":
 	case "select":
 	case "button":
-	    return onFormItem(prenode, tagName);
+return onFormItem(prenode, tagName);
 	case "#text":
 	    //FIXME:href
 	    	    return new ItemWrapper(new TextRun(text), prenode);
 	default:
 	    return new ItemWrapper(new TextRun("FIXME:UNKNOWN TAG:" + tagName + ":" + text), prenode);
 	}
-	//	txt = cleanupText(txt);
-	//	txt += " "+cleanupText(it.getAltText());
-	//	final TextRun run = new TextRun(txt.trim()+" ");
-	//	if(webInfo != null)
-	//	    run.setAssociatedObject(webInfo);
-	//	watch.add(nodeInfo.browserIt.getPos());
-	//	return new ItemWrapper(run, nodeInfo);
-	}
+    }
 
     	    /*
 	if(!nodeInfo.mixed.isEmpty())

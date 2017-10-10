@@ -73,37 +73,4 @@ class Cleaning
 	}
 	return count;
     }
-
-    static void mergeSingleChildrenNodes(Prenode node)
-    {
-	NullCheck.notNull(node, "node");
-	if(node.children.isEmpty())
-	    return;
-	if(node.children.size() == 1)
-	{
-	    final Prenode child = node.children.firstElement();
-	    final String tagName = child.browserIt.getHtmlTagName().toLowerCase();
-	    switch(tagName)
-	    {
-	    case "option": // html SELECT option's nodes
-	    case "td": // table cells
-	    case "tr": // table rows
-	    case "th": // table cells
-	    case "li": // element list
-		mergeSingleChildrenNodes(child);
-	    return;
-	    default:
-		// move this element to parent and mark for deletion
-		node.mixed.add(0,node.browserIt);
-		node.browserIt = child.browserIt;
-		node.children=child.children;
-		//child.toDelete=true;
-		//
-		mergeSingleChildrenNodes(node);
-		return;
-	    }
-	} else
-	    for(Prenode child:node.children)
-		mergeSingleChildrenNodes(child);
-    }
     }

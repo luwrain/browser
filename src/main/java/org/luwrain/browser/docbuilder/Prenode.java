@@ -26,16 +26,18 @@ public class Prenode
 {
     final Prenode parent;
 BrowserIterator browserIt;
-    Vector<Prenode> children = new Vector<Prenode>();
+    final Vector<Prenode> children = new Vector<Prenode>();
+    final String tagName;
 
-final Vector<BrowserIterator> mixed = new Vector<BrowserIterator>();
-    boolean toDelete = false;
+    private final Vector<BrowserIterator> mixed = new Vector<BrowserIterator>();
+boolean toDelete = false;
 
     /**A constructor for the root node*/
     Prenode()
     {
 	this.parent = null;
 	this.browserIt = null;
+	this.tagName = "";
     }
 
 Prenode(Prenode parent, BrowserIterator browserIt)
@@ -44,10 +46,14 @@ Prenode(Prenode parent, BrowserIterator browserIt)
 	NullCheck.notNull(browserIt, "browserIt");
 	this.parent = parent;
 	this.browserIt = browserIt.clone();
+	final String s = this.browserIt.getHtmlTagName();
+	if (s != null)
+	    this.tagName = s.toLowerCase().trim(); else
+	    this.tagName = "";
     }
 
     /** return element and reversed mixed in list */
-    Vector<BrowserIterator> getMixedinfo()
+    private Vector<BrowserIterator> getMixedinfo()
     {
 	final Vector<BrowserIterator> res = new Vector<BrowserIterator>();
 	res.add(browserIt);
