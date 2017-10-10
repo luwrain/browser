@@ -44,7 +44,8 @@ public class DocumentBuilder
 	this.baseUrl = prepareBaseUrl(browser);
 	Log.debug(LOG_COMPONENT, "starting building of doctree document for " + (baseUrl != null?baseUrl.toString():""));
 	nodes = new PrenodeTreeBuilder(browser, tempRoot).build();
-	Log.debug(LOG_COMPONENT, "" + nodes.length + " nodes saved for document construction");
+	//	for(Prenode n: nodes)
+	//	    System.out.println(n.browserIt.getHtmlTagName());
     }
 
     public Document build()
@@ -60,19 +61,17 @@ public class DocumentBuilder
 	final Node root=NodeFactory.newNode(Node.Type.ROOT);
 	final Node[] subnodes = makeNodes(tempRoot);
 	root.setSubnodes(subnodes);
-	Log.debug(LOG_COMPONENT, "finalizing");
 final org.luwrain.doctree.Document res = new Document(root);
-Log.debug(LOG_COMPONENT, "document construction finished");
 return res;
     }
 
     private Node[] makeNodes(Prenode nodeInfo)
     {
 	NullCheck.notNull(nodeInfo, "nodeInfo");
-	final LinkedList<Node> res = new LinkedList<Node>();
+	final List<Node> res = new LinkedList<Node>();
 	// TODO: search elements with same X screen (equals for x pos) and different Y - same group
 	// TODO: search elements with different Y and same X (intersect intervals! not equal like for X)
-	final LinkedList<Run> subruns = new LinkedList<Run>();
+	final List<Run> subruns = new LinkedList<Run>();
 	Rectangle rect = null;
 	for(ItemWrapper runInfo: makeWrappers(nodeInfo))
 	{
@@ -82,11 +81,9 @@ return res;
 		res.add(runInfo.node);
 		continue;
 	    }
-
 	    // first rect compare with itself
 	    if(rect == null)
 		rect = runInfo.nodeInfo.browserIt.getRect();
-
 	    // check, if next r in the same Y interval like previous
 	    final Rectangle curRect = runInfo.nodeInfo.browserIt.getRect();
 	    if(!((curRect.y>=rect.y&&curRect.y<rect.y+rect.height)
@@ -99,7 +96,7 @@ return res;
 	return res.toArray(new Node[res.size()]);
     }
 
-    private Paragraph createPara(LinkedList<Run> runs)
+    private Paragraph createPara(List<Run> runs)
     {
 	NullCheck.notNull(runs, "run");
 	final Paragraph para = NodeFactory.newPara();
@@ -112,38 +109,70 @@ return res;
     {
 	NullCheck.notNull(node, "node");
 	if(node.children.isEmpty())
-	    return new ItemWrapper[]{makeWrapperForLeaf(node)};
-	final LinkedList<ItemWrapper> res = new LinkedList<ItemWrapper>();
+	    return new ItemWrapper[]{makeLeafWrapper(node)};
+	final List<ItemWrapper> res = new LinkedList<ItemWrapper>();
 	final BrowserIterator it = node.browserIt;
 	final String tagName = it.getHtmlTagName().toLowerCase();
+		Log.debug(LOG_COMPONENT, "block tag:" + tagName);
 	switch(tagName)
 	{
-	    // list
 	case "ol":
-	case "ul": // li element can be mixed with contents, but each child of node is a li
-	    Node listNode=NodeFactory.newNode(tagName.equals("ol")?Node.Type.ORDERED_LIST:Node.Type.UNORDERED_LIST);
-	LinkedList<Node> listItems=new LinkedList<Node>();
-	for(Prenode child:node.children)
+	case "ul":
+	    {
+	    final Node listNode = NodeFactory.newNode(tagName.equals("ol")?Node.Type.ORDERED_LIST:Node.Type.UNORDERED_LIST);
+	final List<Node> listItems = new LinkedList<Node>();
+	for(Prenode child: node.children)
 	{
-	    Node listItem=NodeFactory.newNode(Node.Type.LIST_ITEM);
-	    final Node[] listItemNodes = makeNodes(child);
-	    listItem.setSubnodes(listItemNodes);
-	    listItems.add(listItem);
+	    final Node item = NodeFactory.newNode(Node.Type.LIST_ITEM);
+	    item.setSubnodes(makeNodes(child));
+	    listItems.add(item);
 	}
 	listNode.setSubnodes(listItems.toArray(new Node[listItems.size()]));
 	res.add(new ItemWrapper(listNode,node));
 	break;
-	// table
+	}
+
+		case "h1":
+		    		case "h2":
+				    		case "h3":
+				    		case "h4":
+				    		case "h5":
+				    		case "h6":
+				    		case "h7":
+				    		case "h8":
+				    		case "h9":
+				    	    {
+						final Node sect = NodeFactory.newSection(1);//FIXME:real section level
+						final List<Node> subnodes = new LinkedList<Node>();
+	for(Prenode child: node.children)
+	{
+	    for(Node n: makeNodes(child))
+	subnodes.add(n);
+	}
+sect.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
+	res.add(new ItemWrapper(sect,node));
+	break;
+					    }
+
 	case "table": // table can be mixed with any other element, for example parent form
 	case "tbody": // but if tbody not exist, table would exist as single, because tr/td/th can't be mixed
 	    res.add(createRunInfoForTable(node));
 	break;
-	default:
-	    // unknown group mixed to run list, it would be splited to paragraphs later
-	    for(Prenode child:node.children)
+
+	case "div":
+	    {
+			    for(Prenode child: node.children)
 		for (ItemWrapper childToAdd: makeWrappers(child))
 		    res.add(childToAdd);
-	    break;
+
+			    break;			    
+	    }
+	    
+	default:
+	    Log.warning(LOG_COMPONENT, "unknown block tag:" + tagName);
+	    for(Prenode child: node.children)
+		for (ItemWrapper childToAdd: makeWrappers(child))
+		    res.add(childToAdd);
 	}
 	return res.toArray(new ItemWrapper[res.size()]);
     }
@@ -228,7 +257,7 @@ catch(NumberFormatException e)
 	return new ItemWrapper(tableNode, tableNodeInfo);
     }
 
-    private ItemWrapper makeWrapperForLeaf(Prenode prenode)
+    private ItemWrapper makeLeafWrapper(Prenode prenode)
     {
 	NullCheck.notNull(prenode, "prenode");
 	final BrowserIterator it = prenode.browserIt;

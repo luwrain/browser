@@ -29,7 +29,7 @@ class PrenodeTreeBuilder
 
     private final Browser browser;
     private final Prenode tempRoot;
-    private Prenode[] nodes = new Prenode[0];
+private Prenode[] nodes = new Prenode[0];
 
     PrenodeTreeBuilder(Browser browser, Prenode tempRoot)
     {
@@ -42,13 +42,14 @@ class PrenodeTreeBuilder
     Prenode[] build()
     {
 	final AllNodesSelector allVisibleNodes = new AllNodesSelector(true);
-	final LinkedList<BrowserIterator> nodesList = new LinkedList<BrowserIterator>();
+	final List<BrowserIterator> nodesList = new LinkedList<BrowserIterator>();
 	int maxPos = 0;
 	final BrowserIterator it = browser.createIterator();
 	if(allVisibleNodes.moveFirst(it))
 	    do {
 		maxPos = Math.max(maxPos, it.getPos());
 		nodesList.add(it.clone());
+		//		Log.debug(LOG_COMPONENT, "prenode:" + it.getHtmlTagName());
 	    } while(allVisibleNodes.moveNext(it));
 	nodes = new Prenode[maxPos + 1];
 	for(int i = 0;i < nodes.length;++i)
