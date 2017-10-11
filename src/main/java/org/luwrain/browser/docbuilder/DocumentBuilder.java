@@ -102,13 +102,13 @@ return res;
     private ItemWrapper[] makeWrappers(Prenode node)
     {
 	NullCheck.notNull(node, "node");
-		Log.debug(LOG_COMPONENT, "makeWrappers(" + node.tagName + ")");
-		NullCheck.notNull(node.children, "node.children");
+	Log.debug(LOG_COMPONENT, "makeWrappers(" + node.tagName + ")");
+	NullCheck.notNull(node.children, "node.children");
 	if(node.children == null || node.children.isEmpty())
 	    return new ItemWrapper[]{makeLeafWrapper(node)};
-	final List<ItemWrapper> res = new LinkedList<ItemWrapper>();
 	final BrowserIterator it = node.browserIt;
 	final String tagName = node.tagName;
+	final List<ItemWrapper> res = new LinkedList<ItemWrapper>();
 	switch(tagName)
 	{
 	case "a":
@@ -127,39 +127,38 @@ return res;
 	case "ol":
 	case "ul":
 	    {
-	    final Node listNode = NodeFactory.newNode(tagName.equals("ol")?Node.Type.ORDERED_LIST:Node.Type.UNORDERED_LIST);
-	final List<Node> listItems = new LinkedList<Node>();
-	for(Prenode child: node.children)
-	{
-	    final Node item = NodeFactory.newNode(Node.Type.LIST_ITEM);
-	    item.setSubnodes(makeNodes(child));
-	    listItems.add(item);
-	}
-	listNode.setSubnodes(listItems.toArray(new Node[listItems.size()]));
-	res.add(new ItemWrapper(listNode,node));
-	break;
-	}
+		final Node listNode = NodeFactory.newNode(tagName.equals("ol")?Node.Type.ORDERED_LIST:Node.Type.UNORDERED_LIST);
+		final List<Node> listItems = new LinkedList<Node>();
+		for(Prenode child: node.children)
+		{
+		    final Node item = NodeFactory.newNode(Node.Type.LIST_ITEM);
+		    item.setSubnodes(makeNodes(child));
+		    listItems.add(item);
+		}
+		listNode.setSubnodes(listItems.toArray(new Node[listItems.size()]));
+		res.add(new ItemWrapper(listNode,node));
+		break;
+	    }
 
-			case "h1":
-		    		case "h2":
-				    		case "h3":
-				    		case "h4":
-				    		case "h5":
-				    		case "h6":
-				    		case "h7":
-				    		case "h8":
-				    		case "h9":
-				    {
-					Log.debug(LOG_COMPONENT, "header " + tagName);
-					final Node sect = NodeFactory.newSection(1);//FIXME:proper section level
-					final List<Node> subnodes = new LinkedList<Node>();
-					for(Prenode p: node.children)
-					    for(Node n: makeNodes(p))
-						subnodes.add(n);
-					sect.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
-					res.add(new ItemWrapper(sect, node));
-					break;
-				    }
+	case "h1":
+	case "h2":
+	case "h3":
+	case "h4":
+	case "h5":
+	case "h6":
+	case "h7":
+	case "h8":
+	case "h9":
+	    {
+		final Node sect = NodeFactory.newSection(1);//FIXME:proper section level
+		final List<Node> subnodes = new LinkedList<Node>();
+		for(Prenode p: node.children)
+		    for(Node n: makeNodes(p))
+			subnodes.add(n);
+		sect.setSubnodes(subnodes.toArray(new Node[subnodes.size()]));
+		res.add(new ItemWrapper(sect, node));
+		break;
+	    }
 
 	case "table": // table can be mixed with any other element, for example parent form
 	case "tbody": // but if tbody not exist, table would exist as single, because tr/td/th can't be mixed
@@ -168,18 +167,17 @@ return res;
 
 	case "div":
 	    {
-			    for(Prenode child: node.children)
-		for (ItemWrapper childToAdd: makeWrappers(child))
-		    res.add(childToAdd);
-
-			    break;			    
+		for(Prenode child: node.children)
+		    for (ItemWrapper childToAdd: makeWrappers(child))
+			res.add(childToAdd);
+		break;			    
 	    }
-	    
+
 	default:
 	    Log.warning(LOG_COMPONENT, "unknown block tag:" + tagName);
-	    for(Prenode child: node.children)
-		for (ItemWrapper childToAdd: makeWrappers(child))
-		    res.add(childToAdd);
+	    for(Prenode p: node.children)
+		for (ItemWrapper w: makeWrappers(p))
+		    res.add(w);
 	}
 	return res.toArray(new ItemWrapper[res.size()]);
     }
@@ -279,8 +277,7 @@ catch(NumberFormatException e)
 	case "button":
 return onFormItem(prenode, tagName);
 	case "#text":
-	    //FIXME:href
-	    	    return new ItemWrapper(new TextRun(text), prenode);
+	    return new ItemWrapper(new WebTextRun(it, getLastHref()), prenode);
 	default:
 	    return new ItemWrapper(new TextRun("FIXME:UNKNOWN TAG:" + tagName + ":" + text), prenode);
 	}
@@ -360,9 +357,9 @@ return onFormItem(prenode, tagName);
 	default:
 	    //	    txt = it.getText();
 	    //	    break;
-	    		return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
+	    return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
 	}
-    	    		return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
+    return new ItemWrapper(new TextRun("FIXME:UNKNOWN INPUT TAG:" + tagName + ":" + it.getText()), prenode);
 }
 
     private String constructUrl(String url)
@@ -397,5 +394,10 @@ return onFormItem(prenode, tagName);
     static private String cleanupText(String txt)
     {
 	return txt.replace("/\\s+/g"," ").trim();
+    }
+
+    private String getLastHref()
+    {
+	return !hrefs.isEmpty()?hrefs.getLast():"";
     }
 }

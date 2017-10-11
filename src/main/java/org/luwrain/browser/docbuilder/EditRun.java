@@ -5,60 +5,33 @@ import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 import org.luwrain.browser.*;
 
-public class EditRun implements Run
+public class EditRun extends WebRun
 {
-    protected final BrowserIterator it;
-    protected String text;
-
-    protected final TextAttr textAttr = new TextAttr();
-    protected final ExtraInfo extraInfo = new ExtraInfo();
-    protected Node parentNode = null;
+    protected final String text;
 
     EditRun(BrowserIterator it)
     {
+	super(it);
 	NullCheck.notNull(it, "it");
-	this.it = it;
 	final String s = it.getText();
 	this.text = s != null?s:"";
-    }
-
-    @Override public Node getParentNode()
-    {
-	return parentNode;
-    }
-
-    @Override public void setParentNode(Node node)
-    {
-	NullCheck.notNull(node, "node");
-	this.parentNode = node;
-    }
-
-    @Override public TextAttr textAttr()
-    {
-	return textAttr;
-    }
-
-    @Override public void prepareText()
-    {
-    }
-
-    @Override public ExtraInfo extraInfo()
-    {
-	return extraInfo;
-    }
-
-    @Override public String href()
-    {
-	return "";
-    }
-
-    @Override public boolean isEmpty()
-    {
-	return false;
     }
 
     @Override public String text()
     {
 	return "Ввод текста " + text;
+    }
+
+    //IOnly in browser thread
+    public String getText()
+    {
+	return it.getText();
+    }
+
+    //Only in browser thread
+    public void setText(String value)
+    {
+	NullCheck.notNull(value, "value");
+	it.setText(value);
     }
 }

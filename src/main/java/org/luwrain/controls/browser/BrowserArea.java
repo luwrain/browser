@@ -116,6 +116,20 @@ public class BrowserArea extends DoctreeArea
 	return true;
     }
 
+    public String getBrowserTitle()
+    {
+	if (isEmpty())
+	    return "";
+	return browser.getTitle();
+    }
+
+    public String getBrowserUrl()
+    {
+	if (isEmpty())
+	    return "";
+	return browser.getUrl();
+    }
+
     @Override public String getAreaName()
     {
 	final String title = browser.getTitle();
