@@ -49,14 +49,12 @@ private Prenode[] nodes = new Prenode[0];
 	    do {
 		maxPos = Math.max(maxPos, it.getPos());
 		nodesList.add(it.clone());
-		//		Log.debug(LOG_COMPONENT, "prenode:" + it.getHtmlTagName());
 	    } while(allVisibleNodes.moveNext(it));
 	nodes = new Prenode[maxPos + 1];
 	for(int i = 0;i < nodes.length;++i)
 	    nodes[i] = null;
 	for(BrowserIterator itInList: nodesList)
 	    ensureRegistered(itInList);
-	//	return nodes;
     }
 
     private Prenode ensureRegistered(BrowserIterator it)
@@ -65,7 +63,7 @@ private Prenode[] nodes = new Prenode[0];
 	final int pos = it.getPos();
 	if (nodes[pos] != null)
 	    return nodes[pos];
-	final Prenode parentNodeInfo;
+	final Prenode parent;
 	final BrowserIterator parentIt = it.getParent();
 	if (parentIt != null)
 	{
@@ -75,15 +73,15 @@ private Prenode[] nodes = new Prenode[0];
 		Log .warning(LOG_COMPONENT, "node without visible parent");
 		return null;
 	    }
-	    parentNodeInfo = ensureRegistered(visibleParent);
-	    if (parentNodeInfo == null)
+	    parent = ensureRegistered(visibleParent);
+	    if (parent == null)
 		return null;
 	} else
-	    parentNodeInfo = tempRoot;
-	final Prenode newNodeInfo = new Prenode(parentNodeInfo, it);
-	parentNodeInfo.children.add(newNodeInfo);
-	nodes[pos] = newNodeInfo;
-	return newNodeInfo;
+	    parent = tempRoot;
+	final Prenode prenode = new Prenode(parent, it);
+	parent.children.add(prenode);
+	nodes[pos] = prenode;
+	return prenode;
     }
 
     private BrowserIterator getVisibleParent(BrowserIterator element)

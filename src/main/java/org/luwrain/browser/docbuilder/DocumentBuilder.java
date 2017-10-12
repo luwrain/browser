@@ -48,7 +48,7 @@ public class DocumentBuilder
     public Document build()
     {
 	//	watch.clear();
-	while(Cleaning.clean(prenodesRoot) != 0){}
+	//	while(Cleaning.clean(prenodesRoot) != 0){}
 	return makeDocument();
     }
 
