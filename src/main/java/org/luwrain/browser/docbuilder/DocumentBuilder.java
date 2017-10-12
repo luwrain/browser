@@ -43,6 +43,7 @@ public class DocumentBuilder
 	this.browser = browser;
 	this.baseUrl = prepareBaseUrl(browser);
 	new PrenodeTreeBuilder(browser, prenodesRoot).build();
+	new PrenodeTreeDump(browser, prenodesRoot, "/tmp/lwr-browser-dumps").dump();
     }
 
     public Document build()
