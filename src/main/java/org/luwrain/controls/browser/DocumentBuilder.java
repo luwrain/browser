@@ -21,5 +21,6 @@ import org.luwrain.doctree.*;
 
 public interface DocumentBuilder
 {
+    //Always called in browser thread
     Document build(org.luwrain.browser.Browser browser);
 }

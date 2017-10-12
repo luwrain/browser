@@ -85,9 +85,4 @@ class Events implements org.luwrain.browser.BrowserEvents
 	    return false;
 	return (boolean)clientThread.runSync(()->callback.confirm(message));
     }
-
-    @Override public void onPageChanged()
-    {
-	clientThread.runAsync(()->area.onContentChanged());
-    }
 };

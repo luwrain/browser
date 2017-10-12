@@ -55,7 +55,7 @@ abstract public class WebRun implements Run
 
 
     //May be called in browser thread only
-    public void emulateClick()
+    public void click()
     {
 	it.emulateClick();
     }

@@ -26,9 +26,6 @@ public interface Callback
     void onBrowserRunning();
     void onBrowserSuccess(String title);
     void onBrowserFailed();
-    void onBrowserContentChanged(long lastTimeChanged);
-    String askFormTextValue(String currentValue);
-    String askFormListValue(String[] items, boolean fromListOnly);
     int getAreaVisibleWidth(Area area);
     boolean confirm(String text);
     String prompt(String message, String text);

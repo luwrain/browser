@@ -34,7 +34,6 @@ public class BrowserArea extends DoctreeArea
     protected final Callback callback;
     protected final DocumentBuilder documentBuilder;
     protected final Browser browser;
-    protected Document doc=null;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
 
@@ -61,23 +60,27 @@ public class BrowserArea extends DoctreeArea
      *
      * @return true if the browser is free and able to do the refreshing, false otherwise
      */
-    boolean refresh()
+        boolean refresh()
     {
-	final long t1=new Date().getTime();
+	//Without reloading the page
 	browser.rescanDom();
 	updateView();
+	context.playSound(Sounds.OK);
 	return true;
     }
 
-    protected void updateView()
+    protected boolean updateView()
     {
    	final int x=getHotPointX();
 	final int y=getHotPointY();
-	doc = documentBuilder.build(browser);
-	//   	page.setWatchNodes(builder.watch);
-	//	doc.commit();
-	setDocument(doc, callback.getAreaVisibleWidth(this));
+	final Object obj = browser.runSafely(()->{
+return documentBuilder.build(browser);
+	    });
+	if (obj == null || !(obj instanceof Document))
+	    return false;
+	setDocument((Document)obj, callback.getAreaVisibleWidth(this));
 	this.onMoveHotPoint(new MoveHotPointEvent(x,y,false));
+	return true;
     }
 
     /**Checks if the browser has valid loaded page
@@ -174,19 +177,13 @@ public class BrowserArea extends DoctreeArea
 	}
     }
 
-    void onContentChanged()
-    {
-    	refresh();
-	callback.onBrowserContentChanged(browser.getLastTimeChanged());
-    }
-
-    public void onProgress(Number progress)
+    void onProgress(Number progress)
     {
 	NullCheck.notNull(progress, "progress");
 	this.progress = (int)(progress==null?0:Math.floor(progress.doubleValue()*100));
     }
 
-    public void onDownloadStart(String url)
+void onDownloadStart(String url)
     {
 	//FIXME:
     }
