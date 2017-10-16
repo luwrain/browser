@@ -63,5 +63,21 @@ class PrenodeTreeDump
 	if (dir.exists())
 	    return;
 	dir.mkdir();
+	int counter = 1;
+	for(Prenode n: prenode.children)
+	{
+	    final String subdir = formatInt(counter) + n.tagName;
+	    ++counter;
+	    dumpPrenode(new File(dir, subdir), n);
+	}
+    }
+
+    private String formatInt(int value)
+    {
+	if (value < 10)
+	    return "00" + value;
+	if (value < 100)
+	    return "0" + value;
+	return "" + value;
     }
 }

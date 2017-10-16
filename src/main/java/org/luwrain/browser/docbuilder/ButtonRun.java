@@ -21,4 +21,10 @@ public class ButtonRun extends WebRun
     {
 	return "Кнопка " + text;
     }
+
+    //In browser thread only
+    public void submit()
+    {
+	it.emulateSubmit();
+    }
 }
