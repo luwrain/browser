@@ -190,7 +190,7 @@ void onDownloadStart(String url)
 
     protected void noContentMsg()
     {
-	context.hint(Hints.NO_CONTENT);
+	context.setEventResponse(DefaultEventResponse.hint(Hint.NO_CONTENT));
     }
 
     protected boolean noContent()

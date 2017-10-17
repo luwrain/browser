@@ -41,7 +41,7 @@ public class Announcement
 	NullCheck.notNull(it, "it");
 	if (it.noContent()/* || it.isEmptyRow()*/)
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    environment.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE));
 	    return;
 	}
 	if (it.getNode() == null)
@@ -110,7 +110,7 @@ public class Announcement
 	//Checking if there is nothing to say
 	if (it.getText().trim().isEmpty())
 	{
-	    environment.hint(Hints.EMPTY_LINE);
+	    environment.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE));
 	    return;
 	}
 	//Checking should we use any specific sound

@@ -412,7 +412,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	    return true;
 	if (!iterator.moveNext())
 	{
-	    context.hint(Hints.NO_LINES_BELOW);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_LINES_BELOW));
 	    return true;
 	}
 	if (quickNav)
@@ -428,7 +428,7 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
 	    return true;
 	if (!iterator.movePrev())
 	{
-	    context.hint(Hints.NO_LINES_ABOVE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_LINES_ABOVE));
 	    return true;
 	}
 	onNewHotPointY( briefAnnouncement);
@@ -567,7 +567,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    return true;
 	if (!iterator.movePrev())
 	{
-	    context.hint(Hints.NO_LINES_ABOVE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_LINES_ABOVE));
 	    return true;
 	}
 	while(!iterator.isParagraphBeginning() && iterator.movePrev());
@@ -593,13 +593,13 @@ protected boolean onNextSentence(KeyboardEvent event)
 	}
 	if (!iterator.canMovePrev())
 	{
-	    context.hint(Hints.BEGIN_OF_TEXT);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.BEGIN_OF_TEXT));
 	    return true;
 	}
 	iterator.movePrev();
 	final String prevRowText = iterator.getText();
 	hotPointX = prevRowText.length();
-	context.hint(Hints.END_OF_LINE);
+	context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	return true;
     }
 
@@ -615,21 +615,21 @@ protected boolean onNextSentence(KeyboardEvent event)
 	    ++hotPointX;
 	    if (hotPointX < text.length())
 		context.sayLetter(text.charAt(hotPointX)); else
-		context.hint(Hints.END_OF_LINE);
+		context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	    context.onAreaNewHotPoint(this);
 	    return true;
 	}
 }
 	if (!iterator.canMoveNext())
 	{
-	    context.hint(Hints.END_OF_TEXT);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_TEXT));
 	    return true;
 	}
 	iterator.moveNext();
 	final String nextRowText = iterator.getText();
 	hotPointX = 0;
 	if (nextRowText.isEmpty())
-	    context.hint(Hints.END_OF_LINE); else
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE)); else
 	    context.sayLetter(nextRowText.charAt(0));
 	context.onAreaNewHotPoint(this);
 	return true;
@@ -642,7 +642,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	/*
 	if (iterator.isEmptyRow())
 	{
-	    context.hint(Hints.EMPTY_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE));
 	    return true;
 	}
 	*/
@@ -650,7 +650,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepBackward())
 	{
-	    context.hint(Hints.BEGIN_OF_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.BEGIN_OF_LINE));
 	    return true;
 	}
 	hotPointX = it.pos();
@@ -666,7 +666,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	/*
 	if (iterator.isEmptyRow())
 	{
-	    context.hint(Hints.EMPTY_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE);
 	    return true;
 	}
 	*/
@@ -674,13 +674,13 @@ protected boolean onNextSentence(KeyboardEvent event)
 	final WordIterator it = new WordIterator(text, hotPointX);
 	if (!it.stepForward())
 	{
-	    context.hint(Hints.END_OF_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	    return true;
 	}
 	hotPointX = it.pos();
 	if (it.announce().length() > 0)
 	    context.say(it.announce()); else
-	    context.hint(Hints.END_OF_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	context.onAreaNewHotPoint(this);
 	return true;
     }
@@ -692,7 +692,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	/*
 	if (iterator.isEmptyRow())
 	{
-	    context.hint(Hints.EMPTY_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE);
 	    return true;
 	}
 	*/
@@ -700,7 +700,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	hotPointX = 0;
 	if (!text.isEmpty())
 	    context.sayLetter(text.charAt(0)); else
-	    context.hint(Hints.EMPTY_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE));
 	context.onAreaNewHotPoint(this);
 	return true;
     }
@@ -712,13 +712,13 @@ protected boolean onNextSentence(KeyboardEvent event)
 	/*
 	if (iterator.isEmptyRow())
 	{
-	    context.hint(Hints.EMPTY_LINE);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE);
 	    return true;
 	}
 	*/
 	final String text = iterator.getText();
 	hotPointX = text.length();
-	context.hint(Hints.END_OF_LINE);
+	context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	context.onAreaNewHotPoint(this);
 	return true;
     }
@@ -783,7 +783,7 @@ protected boolean onNextSentence(KeyboardEvent event)
 	hotPointX = 0;
 	/*
 	if (iterator.isEmptyRow())
-	    context.hint(Hints.EMPTY_LINE); else
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE)); else
 	*/
 	    announceRow(iterator, briefAnnouncement);
 	context.onAreaNewHotPoint(this);
@@ -826,7 +826,7 @@ protected boolean onNextSentence(KeyboardEvent event)
     {
 	if (isEmpty())
 	{
-	    context.hint(noContentStr(), Hints.NO_CONTENT);
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_CONTENT, noContentStr()));
 	    return true;
 	}
 	return false;
