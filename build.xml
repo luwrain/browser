@@ -25,8 +25,6 @@
   <target name="jar" depends="compile">
     <mkdir dir="jar"/>
     <jar jarfile="jar/luwrain-browser.jar">
-      <manifest>
-      </manifest>
       <fileset dir="./build/main">
         <include name="**/*.class"/>
       </fileset>
