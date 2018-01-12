@@ -30,6 +30,7 @@ import org.luwrain.doctree.view.*;
 public class DoctreeArea implements Area, ClipboardTranslator.Provider
 {
     protected final ControlEnvironment context;
+    protected final RegionPoint regionPoint = new RegionPoint();
     protected final ClipboardTranslator clipboardTranslator;
     private String areaName = null;//FIXME:No corresponding constructor;
     protected final Announcement announcement;
@@ -46,7 +47,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	NullCheck.notNull(announcement, "announcement");
 	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(this);
+	this.clipboardTranslator = new ClipboardTranslator(this, regionPoint);
 	this.document = null;
 	    this.iterator = null;
     }
@@ -57,7 +58,7 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
 	NullCheck.notNull(announcement, "announcement");
 	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(this);
+	this.clipboardTranslator = new ClipboardTranslator(this, regionPoint);
 	this.document = null;
 	    this.iterator = null;
 	    if (document != null)
