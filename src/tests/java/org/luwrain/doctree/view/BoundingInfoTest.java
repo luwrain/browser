@@ -21,21 +21,21 @@ import org.junit.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-public class RowPartsBuilderTest extends Assert
+public class BoundingInfoTest extends Assert
 {
-    @Test public void shortRowInsideWordsSplitting()
+    @Test public void everything()
     {
-	final Paragraph para = NodeFactory.newPara("123456789");
-	assertNotNull(para);
-	final RowPartsBuilder builder = new RowPartsBuilder();
-	builder.onNode(para, 3);
-	final Paragraph[] paragraphs = builder.getParagraphs();
-	assertTrue(paragraphs.length == 1);
-	assertTrue(paragraphs[0] == para);
-	final RowPart[] parts = builder.getRowParts();
-	assertTrue(parts.length == 3);
-	assertTrue(parts[0].getText().equals("123"));
-		assertTrue(parts[1].getText().equals("456"));
-			assertTrue(parts[2].getText().equals("789"));
+	final Run[] runs = new Run[3];
+	runs[0] = new TextRun("123");
+	runs[1] = new TextRun("456");
+	runs[2] = new TextRun("789");
+	BoundingInfo info = new BoundingInfo(runs[0], 0, runs[2], runs[2].text().length());
+	final StringBuilder b = new StringBuilder();
+	info.filter(runs, (run,posFrom,posTo)->{
+		assertTrue(posFrom >= 0);
+		assertTrue(posTo >= 0);
+		b.append(run.text().substring(posFrom, posTo));
+	    });
+	assertTrue("123456789".equals(new String(b)));
     }
-	}
+    }
