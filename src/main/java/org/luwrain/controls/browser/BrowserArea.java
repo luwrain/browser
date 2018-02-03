@@ -27,7 +27,7 @@ import org.luwrain.controls.*;
 import org.luwrain.controls.doctree.*;
 import org.luwrain.doctree.*;
 
-public class BrowserArea extends DoctreeArea
+public class BrowserArea extends DocumentArea
 {
     static private final String LOG_COMPONENT = "browser";
 

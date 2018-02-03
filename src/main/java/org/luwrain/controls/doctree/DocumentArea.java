@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -15,6 +15,8 @@
    General Public License for more details.
 */
 
+//LWR_API 1.0
+
 package org.luwrain.controls.doctree;
 
 import java.util.LinkedList;
@@ -27,11 +29,13 @@ import org.luwrain.util.WordIterator;
 import org.luwrain.doctree.*;
 import org.luwrain.doctree.view.*;
 
-public class DoctreeArea implements Area, ClipboardTranslator.Provider
+public class DocumentArea implements Area, ClipboardTranslator.Provider
 {
+    public enum State {LOADING, READY};
+
     protected final ControlEnvironment context;
     protected final RegionPoint regionPoint = new RegionPoint();
-    protected final ClipboardTranslator clipboardTranslator;
+    protected final ClipboardTranslator clipboardTranslator = new ClipboardTranslator(this, regionPoint);
     private String areaName = null;//FIXME:No corresponding constructor;
     protected final Announcement announcement;
 
@@ -41,33 +45,30 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
     protected org.luwrain.doctree.view.Iterator iterator = null;
     protected int hotPointX = 0;
 
-    public DoctreeArea(ControlEnvironment context, Announcement announcement)
+        public DocumentArea(ControlEnvironment context, Announcement announcement, Document document, int width)
     {
 	NullCheck.notNull(context, "context");
 	NullCheck.notNull(announcement, "announcement");
 	this.context = context;
 	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(this, regionPoint);
-	this.document = null;
-	    this.iterator = null;
+	    if (document != null)
+	    {
+		if (width < 0)
+		    throw new IllegalArgumentException("width (" + width + ") may not be negative");
+		setDocument(document, width);
+	    }
     }
 
-    public DoctreeArea(ControlEnvironment context, Announcement announcement, Document document, int width)
+    public DocumentArea(ControlEnvironment context, Announcement announcement)
     {
-	NullCheck.notNull(context, "context");
-	NullCheck.notNull(announcement, "announcement");
-	this.context = context;
-	this.announcement = announcement;
-	this.clipboardTranslator = new ClipboardTranslator(this, regionPoint);
-	this.document = null;
-	    this.iterator = null;
-	    if (document != null)
-		setDocument(document, width);
+	this(context, announcement, null, 0);
     }
 
     public void setDocument(Document document, int width)
     {
 	NullCheck.notNull(document, "document");
+	if (width < 0)
+	    throw new IllegalArgumentException("width (" + width + ") may not be negative");
 	this.document = document;
 	this.view = new View(document, width);
 	this.layout = view.createLayout();
@@ -98,6 +99,11 @@ public class DoctreeArea implements Area, ClipboardTranslator.Provider
     public boolean hasDocument()
     {
 	return document != null && iterator != null;
+    }
+
+    public boolean isEmpty()
+    {
+	return !hasDocument() || iterator.noContent();
     }
 
     public Document getDocument()
@@ -808,14 +814,6 @@ protected boolean onNextSentence(KeyboardEvent event)
 		break;
 	}
 	context.say(b.toString());
-    }
-
-    //Iterator may return true on isEmptyRow() even if this method returns false
-    public boolean isEmpty()
-    {
-	if (document ==null || iterator == null)
-	    return true;
-	return iterator.noContent();
     }
 
     protected String noContentStr()
