@@ -34,8 +34,80 @@ public class BoundingInfoTest extends Assert
 	info.filter(runs, (run,posFrom,posTo)->{
 		assertTrue(posFrom >= 0);
 		assertTrue(posTo >= 0);
+		assertTrue(posFrom <= run.text().length());
+		assertTrue(posTo <= run.text().length());
 		b.append(run.text().substring(posFrom, posTo));
 	    });
 	assertTrue("123456789".equals(new String(b)));
     }
+
+    @Test public void around()
+    {
+	final Run[] runs = new Run[3];
+	runs[0] = new TextRun("123");
+	runs[1] = new TextRun("456");
+	runs[2] = new TextRun("789");
+	BoundingInfo info = new BoundingInfo(runs[0], 1, runs[2], runs[2].text().length() - 1);
+	final StringBuilder b = new StringBuilder();
+	info.filter(runs, (run,posFrom,posTo)->{
+		assertTrue(posFrom >= 0);
+		assertTrue(posTo >= 0);
+		assertTrue(posFrom <= run.text().length());
+		assertTrue(posTo <= run.text().length());
+		b.append(run.text().substring(posFrom, posTo));
+	    });
+	assertTrue("2345678".equals(new String(b)));
     }
+
+    @Test public void center()
+    {
+	final Run[] runs = new Run[3];
+	runs[0] = new TextRun("123");
+	runs[1] = new TextRun("456");
+	runs[2] = new TextRun("789");
+	BoundingInfo info = new BoundingInfo(runs[1], 1, runs[1], runs[1].text().length() - 1);
+	final StringBuilder b = new StringBuilder();
+	info.filter(runs, (run,posFrom,posTo)->{
+		assertTrue(posFrom >= 0);
+		assertTrue(posTo >= 0);
+		assertTrue(posFrom <= run.text().length());
+		assertTrue(posTo <= run.text().length());
+		b.append(run.text().substring(posFrom, posTo));
+	    });
+	assertTrue("5".equals(new String(b)));
+    }
+
+    @Test public void noLeft()
+    {
+	final Run[] runs = new Run[3];
+	runs[0] = new TextRun("123");
+	runs[1] = new TextRun("456");
+	runs[2] = new TextRun("789");
+	BoundingInfo info = new BoundingInfo(null, -1, runs[2], runs[2].text().length() - 1);
+	final StringBuilder b = new StringBuilder();
+	info.filter(runs, (run,posFrom,posTo)->{
+		assertTrue(posFrom >= 0);
+		assertTrue(posTo >= 0);
+		assertTrue(posFrom <= run.text().length());
+		assertTrue(posTo <= run.text().length());
+		b.append(run.text().substring(posFrom, posTo));
+	    });
+	assertTrue("12345678".equals(new String(b)));
+    }
+
+    @Test public void noRight()
+    {
+	final Run[] runs = new Run[3];
+	runs[0] = new TextRun("123");
+	runs[1] = new TextRun("456");
+	runs[2] = new TextRun("789");
+	BoundingInfo info = new BoundingInfo(runs[0], 1, null, -1);
+	final StringBuilder b = new StringBuilder();
+	info.filter(runs, (run,posFrom,posTo)->{
+		assertTrue(posFrom >= 0);
+		assertTrue(posTo >= 0);
+		b.append(run.text().substring(posFrom, posTo));
+	    });
+	assertTrue("23456789".equals(new String(b)));
+    }
+}

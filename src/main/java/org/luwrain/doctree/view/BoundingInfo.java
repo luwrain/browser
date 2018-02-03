@@ -40,6 +40,10 @@ class BoundingInfo
 	    throw new IllegalArgumentException("posFrom may not be negative");
 	if (runTo != null && posTo < 0)
 	    throw new IllegalArgumentException("posTo may not be negative");
+
+	if (runFrom == runTo && posTo < posFrom)
+	    throw new IllegalArgumentException("posTo (" + posTo + ") may not be less than posFrom (" + posFrom + ") with the same runFrom and runTo");
+	
 	this.runFrom = runFrom;
 	this.posFrom = posFrom;
 	this.runTo = runTo;
@@ -50,7 +54,7 @@ class BoundingInfo
     {
 	NullCheck.notNullItems(runs, "runs");
 	NullCheck.notNull(acceptor, "acceptor");
-	boolean accepting = runFrom != null;
+	boolean accepting = runFrom == null;
 	for(Run r: runs)
 	{
 	    if (accepting)
@@ -59,28 +63,25 @@ class BoundingInfo
 		{
 		    acceptor.accept(r, 0, Math.min(r.text().length(), posTo));
 		    return;
-		    		}
-	    } else
-	    {
-		//not accepting
-		if (r == runFrom)
-		{
-		    if (r == runTo)
-		    {
-			//runFrom == runTo, nothing strange
-			acceptor.accept(r, Math.min(r.text().length(), posFrom), Math.min(r.text().length(), posTo));
-			return;
-		    }
-		    acceptor.accept(r, Math.min(r.text().length(), posFrom), r.text().length());
-		    accepting = true;
-		    continue;
 		}
-		if (r == runTo)//runTo met before we accepted anything, as you wish...
-		    return;
-	    }
-	    //r != runFrom and r != runTo
-	    if (accepting)
 		acceptor.accept(r, 0, r.text().length());
+		continue;
+	    }
+	    //not accepting
+	    if (r == runFrom)
+	    {
+		if (r == runTo)
+		{
+		    //runFrom == runTo, nothing strange
+		    acceptor.accept(r, posFrom, Math.min(r.text().length(), posTo));
+		    return;
+		}
+		acceptor.accept(r, posFrom, r.text().length());
+		accepting = true;
+		continue;
+	    } // encountering runFrom
+	    if (r == runTo)//runTo met before we accepted anything, as you wish...
+		return;
 	}
     }
 }
