@@ -22,34 +22,32 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-final class TextExtractorWhole
+public final class TextExtractorWhole extends TextExtractor
 {
     static private final String LOG_COMPONENT = "document";
 
     private final int width;
     private final List<RowPart> parts = new LinkedList();
 
-    TextExtractorWhole(int width)
+    public TextExtractorWhole(int width)
     {
 	if (width < 0)
 	    throw new IllegalArgumentException("width (" + width + ") may not be negative");
 	this.width = width;
     }
 
-    void onNode(Node node)
+    public void onNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof EmptyLine)
 	{
-	    final Paragraph para = (Paragraph)node;
-	    final RowPart part = new RowPart(para.runs[0]);
-	    para.setRowParts(new RowPart[]{part});
-	    parts.add(part);
+	    addEmptyLine();
 	    return;
 	}
    	if (node instanceof Paragraph)
 	{
 	    onParagraph((Paragraph)node);
+	    addEmptyLine();
 	    return;
 	}
 	for(Node n: node.getSubnodes())
@@ -68,7 +66,6 @@ final class TextExtractorWhole
 	}
 	if (splitter.res.isEmpty())
 	    return;
-	for(RowPart p: splitter.res)
-	    parts.add(p);
+	onParagraphLines(splitter.res.toArray(new RowPart[splitter.res.size()]));
     }
 }

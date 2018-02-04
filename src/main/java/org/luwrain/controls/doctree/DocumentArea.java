@@ -342,7 +342,12 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 
     @Override public boolean onClipboardCopyAll()
     {
-	return false;
+	if (isEmpty())
+	    return false;
+	final TextExtractorWhole extractor = new TextExtractorWhole(context.getScreenWidth());
+	extractor.onNode(document.getRoot());
+	context.getClipboard().set(extractor.getLines());
+	return true;
     }
 
 @Override public boolean onClipboardCopy(int fromX, int fromY, int toX, int toY, boolean withDeleting)
