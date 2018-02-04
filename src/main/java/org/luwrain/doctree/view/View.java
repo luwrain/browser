@@ -42,7 +42,7 @@ public class View
 	this.doc = doc;
 	this.root = doc.getRoot();
 	NodeGeom.calcWidth(root, width);
-	final RowPartsBuilder rowPartsBuilder = new RowPartsBuilder();
+	final DefaultRowPartsBuilder rowPartsBuilder = new DefaultRowPartsBuilder();
 	rowPartsBuilder.onNode(root);
 	rowParts = rowPartsBuilder.getRowParts();
 	NullCheck.notNullItems(rowParts, "rowParts");
@@ -208,7 +208,7 @@ public class View
     static public String[] getParagraphLines(Paragraph para, int width)
     {
 	NullCheck.notNull(para, "para");
-	final RowPartsBuilder builder = new RowPartsBuilder();
+	final DefaultRowPartsBuilder builder = new DefaultRowPartsBuilder();
 	builder.onNode(para, width);
 	final RowPart[] parts = builder.getRowParts();
 	for(RowPart r: parts)

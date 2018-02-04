@@ -22,34 +22,22 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-final class RowPartsBuilder
+final class TextExtractorWhole
 {
-    static private final String LOG_COMPONENT = "doctree";
+    static private final String LOG_COMPONENT = "document";
+
+    private final int width;
 
     private final List<RowPart> parts = new LinkedList();
-    private final List<Paragraph> paragraphs = new LinkedList<Paragraph>();
 
-    private final BoundingInfo boundingInfo;
-
-    RowPartsBuilder()
+    TextExtractorWhole(int width)
     {
-	this.boundingInfo = null;
+	if (width < 0)
+	    throw new IllegalArgumentException("width (" + width + ") may not be negative");
+	this.width = width;
     }
 
-    RowPartsBuilder(BoundingInfo boundingInfo)
-    {
-	NullCheck.notNull(boundingInfo, "boundingInfo");
-	this.boundingInfo = boundingInfo;
-    }
-
-    
 void onNode(Node node)
-    {
-	NullCheck.notNull(node, "node"); 
-	onNode(node, 0);
-    }
-
-void onNode(Node node, int width)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof EmptyLine)
@@ -62,46 +50,26 @@ void onNode(Node node, int width)
 	}
    	if (node instanceof Paragraph)
 	{
-	    onParagraph((Paragraph)node, width);
+	    onParagraph((Paragraph)node);
 	    return;
 	}
-	if (NodeGeom.hasTitleRun(node))
-	parts.add(makeTitlePart(node.getTitleRun()));
 	for(Node n: node.getSubnodes())
 		onNode(n);
     }
 
-    private void onParagraph(Paragraph para, int width)
+    private void onParagraph(Paragraph para)
     {
 	NullCheck.notNull(para, "para");
-	final RowPartsSplitter splitter = new RowPartsSplitter();
+			final RowPartsSplitter splitter = new RowPartsSplitter();
 	for(Run r: para.runs())
 	{
 	    final String text = r.text();
 	    NullCheck.notNull(text, "text");
-	    splitter.onRun(r, text, 0, text.length(), width > 0?width:para.width);
+	    splitter.onRun(r, text, 0, text.length(), width);
 	}
-	if (!splitter.res.isEmpty())
-	{
-	    para.setRowParts(splitter.res.toArray(new RowPart[splitter.res.size()]));
-	    paragraphs.add(para);
+	if (splitter.res.isEmpty())
+	    return;
 	    for(RowPart p: splitter.res)
 		parts.add(p);
-	}
-    }
-    static private RowPart makeTitlePart(Run run)
-    {
-	NullCheck.notNull(run, "run");
-return new RowPart(run);
-    }
-
-RowPart[] getRowParts()
-    {
-	return parts.toArray(new RowPart[parts.size()]);
-    }
-
-Paragraph[] getParagraphs()
-    {
-	return paragraphs.toArray(new Paragraph[paragraphs.size()]);
     }
 }
