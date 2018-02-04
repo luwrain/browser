@@ -20,7 +20,7 @@ package org.luwrain.doctree.view;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-class RowPart
+final class RowPart
 {
     /** The run this part is associated with*/
     final Run run;
@@ -32,7 +32,6 @@ class RowPart
     final int relRowNum;
     /** Absolute row index in the document*/
     int absRowNum = 0;
-
 
     //For empty runs
         RowPart(Run run)
@@ -61,7 +60,7 @@ if (posFrom >= posTo)
 	this.relRowNum = relRowNum;
     }
 
-    public boolean isEmpty()
+boolean isEmpty()
     {
 	return posFrom == posTo;
     }
