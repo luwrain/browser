@@ -50,7 +50,7 @@ final class TextExtractorFragment
 	this.posTo = posTo;
     }
 
-void onNode(Node node)
+    void onNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof EmptyLine)
@@ -67,55 +67,48 @@ void onNode(Node node)
 	    return;
 	}
 	for(Node n: node.getSubnodes())
-		onNode(n);
+	    onNode(n);
     }
 
     private void onParagraph(Paragraph para)
     {
 	NullCheck.notNull(para, "para");
 	final Run boundingRun1 = searchForRun(runFrom, para.runs());
-		final Run boundingRun2 = searchForRun(runTo, para.runs());
-		if (!accepting && boundingRun1 == null && boundingRun2 == null)
-		    return;
-			final RowPartsSplitter splitter = new RowPartsSplitter();
-			
-		if (boundingRun1 == null && boundingRun2 == null)
-		{
-	for(Run r: para.runs())
-	{
-	    final String text = r.text();
-	    NullCheck.notNull(text, "text");
-	    splitter.onRun(r, text, 0, text.length(), width);
-	}
-		} else
-		{
-		    final BoundingInfo boundingInfo = prepareBoundingInfo(para, boundingRun1, boundingRun2);
-
-		    boundingInfo.filter(para.runs(), (run, fromChar,toChar)->{
-
-	    final String text = run.text();
-	    NullCheck.notNull(text, "text");
-	    if (fromChar < 0 || fromChar >= text.length())
-		throw new RuntimeException("fromChar (" + fromChar + ") must be non-negative and less than " + text.length());
-
-	    	    if (toChar < 0 || toChar >= text.length())
-		throw new RuntimeException("toChar (" + toChar + ") must be non-negative and less than " + text.length());
-
-		    
-	    splitter.onRun(run, text, fromChar, toChar, width);
-			});
- 		    		}
-
-		if (splitter.res.isEmpty())
+	final Run boundingRun2 = searchForRun(runTo, para.runs());
+	if (!accepting && boundingRun1 == null && boundingRun2 == null)
 	    return;
-	    for(RowPart p: splitter.res)
-		parts.add(p);
+	final RowPartsSplitter splitter = new RowPartsSplitter();
+	if (boundingRun1 == null && boundingRun2 == null)
+	{
+	    for(Run r: para.runs())
+	    {
+		final String text = r.text();
+		NullCheck.notNull(text, "text");
+		splitter.onRun(r, text, 0, text.length(), width);
+	    }
+	} else
+	{
+	    final BoundingInfo boundingInfo = prepareBoundingInfo(para, boundingRun1, boundingRun2);
+	    boundingInfo.filter(para.runs(), (run, fromChar,toChar)->{
+		    final String text = run.text();
+		    NullCheck.notNull(text, "text");
+		    if (fromChar < 0 || fromChar >= text.length())
+			throw new RuntimeException("fromChar (" + fromChar + ") must be non-negative and less than " + text.length());
+	    	    if (toChar < 0 || toChar >= text.length())
+			throw new RuntimeException("toChar (" + toChar + ") must be non-negative and less than " + text.length());
+		    splitter.onRun(run, text, fromChar, toChar, width);
+		});
+	}
+	if (splitter.res.isEmpty())
+	    return;
+	for(RowPart p: splitter.res)
+	    parts.add(p);
     }
 
-private BoundingInfo prepareBoundingInfo(Paragraph para, Run run1, Run run2)
-{
-    return null;
-}
+    private BoundingInfo prepareBoundingInfo(Paragraph para, Run run1, Run run2)
+    {
+	throw new RuntimeException("Not implemented yet");
+    }
 
     //Returns the run, if it is encountered in the runs, null otherwise
     static private Run searchForRun(Run run, Run[] runs)

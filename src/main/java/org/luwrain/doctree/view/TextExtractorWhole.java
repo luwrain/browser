@@ -27,7 +27,6 @@ final class TextExtractorWhole
     static private final String LOG_COMPONENT = "document";
 
     private final int width;
-
     private final List<RowPart> parts = new LinkedList();
 
     TextExtractorWhole(int width)
@@ -37,7 +36,7 @@ final class TextExtractorWhole
 	this.width = width;
     }
 
-void onNode(Node node)
+    void onNode(Node node)
     {
 	NullCheck.notNull(node, "node");
 	if (node instanceof EmptyLine)
@@ -54,13 +53,13 @@ void onNode(Node node)
 	    return;
 	}
 	for(Node n: node.getSubnodes())
-		onNode(n);
+	    onNode(n);
     }
 
     private void onParagraph(Paragraph para)
     {
 	NullCheck.notNull(para, "para");
-			final RowPartsSplitter splitter = new RowPartsSplitter();
+	final RowPartsSplitter splitter = new RowPartsSplitter();
 	for(Run r: para.runs())
 	{
 	    final String text = r.text();
@@ -69,7 +68,7 @@ void onNode(Node node)
 	}
 	if (splitter.res.isEmpty())
 	    return;
-	    for(RowPart p: splitter.res)
-		parts.add(p);
+	for(RowPart p: splitter.res)
+	    parts.add(p);
     }
 }
