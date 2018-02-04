@@ -42,7 +42,6 @@ public class Node extends org.luwrain.doctree.view.NodeBase
     /** The exact meaning of a level depends on the node type*/
     int level = 0;
 
-
     protected boolean empty = false;
 
 	Node(Type type)
@@ -50,17 +49,17 @@ public class Node extends org.luwrain.doctree.view.NodeBase
 	this.type = type;
     }
 
-    public Node[] getSubnodes()
+    public final Node[] getSubnodes()
     {
 	return subnodes != null?subnodes:new Node[0];
     }
 
-    public int getSubnodeCount()
+    public final int getSubnodeCount()
     {
 	return subnodes != null?subnodes.length:0;
     }
 
-    public boolean noSubnodes()
+    public final boolean noSubnodes()
     {
 	return subnodes == null || subnodes.length < 1;
     }
@@ -126,6 +125,31 @@ void setEmptyMark()
 	if (type == null)
 	    return "";
 	return type.toString() + " \"" + getCompleteText() + "\"";
+    }
+
+    public final boolean hasNodeInAllParents(Node toCheck)
+    {
+	NullCheck.notNull(toCheck, "toCheck");
+		Node p = getParentNode();
+	while(p != null)
+	{
+	    if (p == toCheck)
+		return true;
+	    p = p.getParentNode();
+	}
+	return false;
+    }
+
+    public final boolean isInTable()
+    {
+	Node p = getParentNode();
+	while(p != null)
+	{
+	    if (p instanceof Table)
+		return true;
+	    p = p.getParentNode();
+	}
+	return false;
     }
 
     public String getCompleteText()

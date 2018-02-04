@@ -22,10 +22,11 @@ package org.luwrain.doctree.view;
 import org.luwrain.core.*;
 import org.luwrain.doctree.*;
 
-public class Iterator
+public final class Iterator
 {
     public interface Matching
     {
+	//paragraph is null on title rows
 	boolean isRowMatching(Node node, Paragraph paragraph, Row row);
     }
 
@@ -170,6 +171,8 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
 	return search(matching, searchFrom, -1);
 	    }
 
+
+    //do not changes the position of failure
     protected boolean search(Matching matching, int searchFrom, int step)
     {
 	NullCheck.notNull(matching, "matching");
@@ -297,8 +300,6 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
     {
 	if (noContent())
 	    return false;
-	//	if (isEmptyRow())
-	//	    return false;
 	final Row r = getRow();
 	if (r.getRowY() != y)
 	    return false;
@@ -309,12 +310,13 @@ NullCheck.notNullItems(paragraphs, "paragraphs");
 	return true;
     }
 
+    //pos is relative to the roe beginning
     public Run getRunUnderPos(int pos)
     {
 	if (pos < 0)
 	    throw new IllegalArgumentException("pos may not be negative");
 		if (noContent())
-	    throw new RuntimeException("Iterator is without content");
+	    throw new RuntimeException("The iterator is without content");
 	return rows[current].getRunUnderPos(pos);
     }
 

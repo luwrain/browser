@@ -41,7 +41,7 @@ public class Announcement
     public void announce(Iterator it, boolean briefIntroduction)
     {
 	NullCheck.notNull(it, "it");
-	if (it.noContent()/* || it.isEmptyRow()*/)
+	if (it.noContent())
 	{
 	    environment.setEventResponse(DefaultEventResponse.hint(Hint.EMPTY_LINE));
 	    return;
@@ -51,7 +51,6 @@ public class Announcement
 	environment.say(it.getText());
 	return;
 	}
-
 	if (it.isTitleRow())
 	{
 	    onTitle(it);
@@ -63,12 +62,6 @@ public class Announcement
     protected void onTitle(Iterator it)
     {
 	final Node node = it.getNode();
-	if (node.getType() == Node.Type.ORDERED_LIST)
-	    onOrderedList(it); else
-	    if (node.getType() == Node.Type.UNORDERED_LIST)
-		onUnorderedList(it); else
-		if (node instanceof ListItem)
-		    onListItem(it); else
 		    if (node instanceof TableCell)
 			onTableCell(it); else
 		    {
@@ -76,34 +69,23 @@ public class Announcement
 		    }
     }
 
-    private void onOrderedList(Iterator it)
+protected void onTableCell(Iterator it)
     {
-	environment.say("Нумерованный список");
-    }
-
-    private void onUnorderedList(Iterator it)
-    {
-	environment.say("Ненумерованный список");
-    }
-
-    private void onListItem(Iterator it)
-    {
-	//	final Node node = it.getTitleParentNode();
-	environment.say("Элемент списка ", Sounds.LIST_ITEM);
-    }
-
-    private void onTableCell(Iterator it)
-    {
-	//it.getTitleParentNode();
 	final TableCell cell = (TableCell)it.getNode();
+	final TableRow row = (TableRow)cell.getParentNode();
 	final int rowIndex = cell.getRowIndex();
 	final int colIndex = cell.getColIndex();
 	if (rowIndex == 0 && colIndex == 0)
 	{
-	    environment.say("Начало таблицы", Sounds.TABLE_CELL);
+	    environment.say("Начало таблицы, строка 1" + row.getCompleteText(), Sounds.TABLE_CELL);
 	    return;
 }
-	environment.say("Строка " + (rowIndex + 1) + ", столбец " + (colIndex + 1), Sounds.TABLE_CELL);
+	if (colIndex == 0)
+	{
+	    environment.say("строка " + (rowIndex + 1) + row.getCompleteText(), Sounds.TABLE_CELL);
+	    return;
+	}
+	environment.say("столбец " + (colIndex + 1), Sounds.TABLE_CELL);
     }
 
     private void announceText(Iterator it)

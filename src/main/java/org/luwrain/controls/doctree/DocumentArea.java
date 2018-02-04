@@ -350,9 +350,36 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 	return true;
     }
 
-@Override public boolean onClipboardCopy(int fromX, int fromY, int toX, int toY, boolean withDeleting)
+    @Override public boolean onClipboardCopy(int fromX, int fromY, int toX, int toY, boolean withDeleting)
     {
-	return false;
+	if (isEmpty() || withDeleting)
+	    return false;
+	Run run1 = null;
+	Run run2 = null;
+	final Iterator it = new org.luwrain.doctree.view.Iterator(view);
+	if (it.noContent())
+	    return false;
+	do {
+	    if (it.coversPos(fromX, fromY))
+	    {
+		run1 = it.getRunUnderPos(fromX - it.getX());
+		if (run1 == null)
+		    throw new RuntimeException("The iterator is unable to provide a run under the covered point");
+	    }
+	    if (it.coversPos(toX, toY))
+	    {
+		run2 = it.getRunUnderPos(toX - it.getX());
+		if (run1 == null)
+		    throw new RuntimeException("The iterator is unable to provide a run under the covered point");
+	    }
+    	} while(it.moveNext());
+	if (run1 == null || run2 == null)
+	    return false;
+	context.getClipboard().set(new String[]{
+		run1.text(),
+		run2.text(),
+	    });
+	return true;
     }
 
 @Override public boolean onDeleteRegion(int fromX, int fromY, int toX, int toY)
@@ -422,6 +449,35 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
     {
 	if (noContentCheck())
 	    return true;
+	if (iterator.isTitleRow() && iterator.getNode() instanceof TableCell)
+	{
+	    final TableCell cell = (TableCell)iterator.getNode();
+	    final int rowIndex = cell.getRowIndex();
+	    if (cell.getColIndex() == 0)
+	    if (iterator.searchForward((node,para,row)->{
+
+			//Checking if we already left the required table
+if (!node.hasNodeInAllParents(cell.getTable()))
+    return true;
+			if (para != null)
+			    return false;
+			if (!(node instanceof TableCell))
+			    return false;
+			final TableCell cellToCheck = (TableCell)node;
+			//Checking if we found a cell of a inclosed table
+			if (cellToCheck.getTable() != cell.getTable())
+			    return false;
+			return cellToCheck.getRowIndex() == rowIndex + 1 && cellToCheck.getColIndex() == 0;			
+		    }, iterator.getIndex()))
+	    {
+
+			onNewHotPointY( quickNav);
+	return true;
+
+		
+	    }
+		}
+
 	if (!iterator.moveNext())
 	{
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_LINES_BELOW));
