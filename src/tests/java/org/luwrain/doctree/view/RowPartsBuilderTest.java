@@ -27,7 +27,7 @@ public class RowPartsBuilderTest extends Assert
     {
 	final Paragraph para = NodeFactory.newPara("123456789");
 	assertNotNull(para);
-	final RowPartsBuilder builder = new RowPartsBuilder();
+	final DefaultRowPartsBuilder builder = new DefaultRowPartsBuilder();
 	builder.onNode(para, 3);
 	final Paragraph[] paragraphs = builder.getParagraphs();
 	assertTrue(paragraphs.length == 1);

@@ -449,34 +449,32 @@ protected boolean onMoveHotPoint(MoveHotPointEvent event)
     {
 	if (noContentCheck())
 	    return true;
+
+	//If we at a title row in a first column in a table, we must jump on the next row
 	if (iterator.isTitleRow() && iterator.getNode() instanceof TableCell)
 	{
 	    final TableCell cell = (TableCell)iterator.getNode();
 	    final int rowIndex = cell.getRowIndex();
 	    if (cell.getColIndex() == 0)
-	    if (iterator.searchForward((node,para,row)->{
-
-			//Checking if we already left the required table
-if (!node.hasNodeInAllParents(cell.getTable()))
-    return true;
-			if (para != null)
-			    return false;
-			if (!(node instanceof TableCell))
-			    return false;
-			final TableCell cellToCheck = (TableCell)node;
-			//Checking if we found a cell of a inclosed table
-			if (cellToCheck.getTable() != cell.getTable())
-			    return false;
-			return cellToCheck.getRowIndex() == rowIndex + 1 && cellToCheck.getColIndex() == 0;			
-		    }, iterator.getIndex()))
-	    {
-
-			onNewHotPointY( quickNav);
-	return true;
-
-		
-	    }
+		if (iterator.searchForward((node,para,row)->{
+			    //Checking if we already left the required table
+			    if (!node.hasNodeInAllParents(cell.getTable()))
+				return true;
+			    if (para != null)
+				return false;
+			    if (!(node instanceof TableCell))
+				return false;
+			    final TableCell cellToCheck = (TableCell)node;
+			    //Checking if we found a cell of a inclosed table
+			    if (cellToCheck.getTable() != cell.getTable())
+				return false;
+			    return cellToCheck.getRowIndex() == rowIndex + 1 && cellToCheck.getColIndex() == 0;			
+			}, iterator.getIndex()))
+		{
+		    onNewHotPointY( quickNav);
+		    return true;
 		}
+	}
 
 	if (!iterator.moveNext())
 	{

@@ -77,7 +77,7 @@ protected void onTableCell(Iterator it)
 	final int colIndex = cell.getColIndex();
 	if (rowIndex == 0 && colIndex == 0)
 	{
-	    environment.say("Начало таблицы, строка 1" + row.getCompleteText(), Sounds.TABLE_CELL);
+	    environment.say("Начало таблицы " + row.getCompleteText(), Sounds.TABLE_CELL);
 	    return;
 }
 	if (colIndex == 0)
