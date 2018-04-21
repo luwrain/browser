@@ -1,0 +1,209 @@
+/*
+   Copyright 2012-2017 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
+
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
+
+package org.luwrain.browser.weight;
+
+import java.util.*;
+
+import org.luwrain.core.*;
+import org.luwrain.browser.Browser;
+import org.luwrain.browser.selectors.*;
+import org.luwrain.browser.*;
+import org.luwrain.app.browser.*;
+
+class WebDocument
+{
+    // make WebDocument structure for web page, more simple than html document, i.e.  only visible elements and without element with single child
+    // only visible elements
+    private WebElement root = null;
+
+    public WebElement getRoot()
+    {
+	return root;
+    }
+
+    /**
+     * replace WebElement structure for given web page
+     * @param page - web page
+     */
+    public void make(Browser page)
+    {
+	NullCheck.notNull(page, "page");
+	// get all children without parent, there should be only one like this
+	final ChildrenSelector selector = new ChildrenSelector(page,false);//page.rootChildren(false);
+	final BrowserIterator it = page.createIterator();
+	selector.moveFirst(it);
+	root = new WebText(null, it.clone());
+	//Enumerating all children
+	do {
+	    make_(page, root, new ChildrenSelector(it,false));
+	} while(selector.moveNext(it));
+	cleanup(root);
+	/*
+	// calculate weight and mark BIG elements in sorted set
+	elementInit(root,new Weight.ByTextLen());
+	WeightSortedSet result=new WeightSortedSet();
+	new ByFairDistrib().search(this.getRoot(),result);
+	// debug
+	//root.print(1,true);
+	System.out.println("BIG result:");
+	for(WebElement e:result)
+		e.print(0,false);
+	System.out.println("BIG result END");
+	*/
+    }
+
+	private void make_(Browser page, WebElement parent, Selector selector)
+    {
+	NullCheck.notNull(page, "page");
+	NullCheck.notNull(parent, "parent");
+	NullCheck.notNull(selector, "selector");
+	final BrowserIterator nodeIt = page.createIterator();
+	if(!selector.moveFirst(nodeIt))
+	    return;
+	do {
+	    final WebElement element;
+	    //	    Log.debug("browser", "new element:" + nodeIt.getType() + ":" + nodeIt.getText());
+	    if(nodeIt.isEditable())
+	    {
+		switch(""/*nodeIt.getType()*/)
+		{
+		    /*
+		case "input checkbox":
+		    element = new WebCheckbox(parent,nodeIt.clone());
+		    break;
+		case "input radio":
+		    element = new WebRadio(parent,nodeIt.clone());
+		    break;
+		case "input button":
+		    element = new WebButton(parent,nodeIt.clone());
+		    break;
+		case "select":
+		    element = new WebSelect(parent,nodeIt.clone());
+		    break;
+		*/
+		default:
+		    element=new WebEdit(parent,nodeIt.clone());
+		}
+	    } else
+		switch(""/*nodeIt.getType()*/)
+		{
+		    /*
+		case "link":
+		    element=new WebText(parent,nodeIt.clone());
+		    element.setAttribute("href",nodeIt.getLink());
+		    break;
+		case "button":
+		    element = new WebButton(parent,nodeIt.clone());
+		    break;
+		case "list":
+		    element = new WebList(parent,nodeIt.clone());
+		    break;
+		case "li":
+		    element = new WebListItem(parent,nodeIt.clone());
+		    break;
+		case "table":
+		    element = new WebTable(parent,nodeIt.clone());
+		    break;
+		case "tr":
+		    element = new WebTableRow(parent,nodeIt.clone());
+		    break;
+		case "td":
+		case "th":
+		    element = new WebTableCell(parent,nodeIt.clone());
+		break;
+		    */
+		default:
+		    element=new WebText(parent,nodeIt.clone());
+		    break;
+		}
+	    if(!nodeIt.forTEXT())
+		make_(page,element, new ChildrenSelector(nodeIt,false));
+	    parent.getChildren().add(element);
+	} while(selector.moveNext(nodeIt));
+    }
+
+    private void cleanup(WebElement element)
+    {
+	// clean childs
+		int cnt = 0;
+		for(WebElement child:element.getChildren())
+		{
+		    cleanup(child);
+		    if(!child.isDeleted())
+			cnt++;
+		}
+		// remove this if have no child and invisible
+		if(cnt==0&&!element.isVisible())
+		    element.toDelete();
+		// remove marked
+		Iterator<WebElement> i=element.getChildren().iterator();
+		while (i.hasNext())
+		{
+			WebElement child=i.next();
+			if(child.isDeleted())
+				i.remove();
+		}
+		// replace single child with its parent
+		//System.out.println("replace: "+element.getType()+" "+element.getText());
+		if(element.getParent()!=null&&element.getChildren().size()==1)
+		{
+		    switch(""/*element.getNode().getType()*/)
+			{
+				// ignore important tags for this optimization
+				case "li":
+				case "tr":
+				case "td":
+				case "th":
+					break;
+				default:
+					BrowserIterator e=element.getParent().getNode();
+					//System.out.println("REPLACE: "+e.getType()+" "+e.getText());
+					// keep attributes from removed parent in element
+					element.mixAttributes(element.getParent());
+					// replace by idx
+					int idx=element.getParent().getChildren().indexOf(element);
+					if(idx!=-1)
+					{ // idx can't be -1 but we check
+						// replace element in parent childs to first child of element (loose element at all)
+						element.getParent().getChildren().set(idx,element.getChildren().get(0));
+					}
+				break;
+			}
+		}
+	}
+	public void elementInit(WebElement element, Weight.Calculator calculator)
+	{
+		element.init();
+		element.incWeight(-1*element.getWeight()); // TODO: make weight zero at init or add method
+		// calculate weight
+		if(!element.hasChildren())
+		{
+			element.incWeight(calculator.calcWeightFor(element));
+		} else
+		{
+			for(WebElement child:element.getChildren())
+			{
+				// and init elements
+				elementInit(child, calculator);
+				element.incWeight(child.getWeight());
+			}
+		}
+	}
+
+
+}
