@@ -88,6 +88,6 @@ return urlObj.toString();
 
     @Override public void runAsync(Runnable runnable)
     {
-	luwrain.runInMainThread(runnable);
+	luwrain.runUiSafely(runnable);
     }
 }

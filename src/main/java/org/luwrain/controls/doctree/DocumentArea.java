@@ -20,6 +20,7 @@
 package org.luwrain.controls.doctree;
 
 import java.util.LinkedList;
+import java.util.EnumSet;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -35,7 +36,7 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 
     protected final ControlEnvironment context;
     protected final RegionPoint regionPoint = new RegionPoint();
-    protected final ClipboardTranslator clipboardTranslator = new ClipboardTranslator(this, regionPoint);
+    protected final ClipboardTranslator clipboardTranslator = new ClipboardTranslator(this, regionPoint, EnumSet.noneOf(ClipboardTranslator.Flags.class));
     private String areaName = null;//FIXME:No corresponding constructor;
     protected final Announcement announcement;
 
