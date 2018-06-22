@@ -76,7 +76,7 @@ class BrowserApp implements Application
 			       base,
 			       announcement){
 
-		@Override public boolean onKeyboardEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    NullCheck.notNull(event, "event");
@@ -88,7 +88,7 @@ class BrowserApp implements Application
 			default:
 			    break;
 			}
-		    return super.onKeyboardEvent(event);
+		    return super.onInputEvent(event);
 		}
 
 		@Override public boolean onSystemEvent(EnvironmentEvent event)

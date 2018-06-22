@@ -217,7 +217,7 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 	return index < layout.getLineCount()?layout.getLine(index):"";
     }
 
-    @Override public boolean onKeyboardEvent(KeyboardEvent event) 
+    @Override public boolean onInputEvent(KeyboardEvent event) 
     {
 	NullCheck.notNull(event, "event");
 	if (!event.isSpecial() && !event.isModified())
