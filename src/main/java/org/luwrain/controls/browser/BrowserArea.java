@@ -139,7 +139,7 @@ return documentBuilder.build(browser);
 	return title != null?title:"";
     }
 
-    @Override public boolean onEnvironmentEvent(EnvironmentEvent event)
+    @Override public boolean onSystemEvent(EnvironmentEvent event)
     {
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
@@ -148,7 +148,7 @@ return documentBuilder.build(browser);
 	    refresh();
 	    return true;
 	default:
-	    return super.onEnvironmentEvent(event);
+	    return super.onSystemEvent(event);
 	}
     }
 

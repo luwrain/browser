@@ -275,7 +275,7 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 	return false;
     }
 
-    @Override public boolean onEnvironmentEvent(EnvironmentEvent event)
+    @Override public boolean onSystemEvent(EnvironmentEvent event)
     {
 	NullCheck.notNull(event, "event");
 	if (event.getType() != EnvironmentEvent.Type.REGULAR)
@@ -289,7 +289,7 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 		return onMoveHotPoint((MoveHotPointEvent)event);
 	    return false;
 	default:
-	    return clipboardTranslator.onEnvironmentEvent(event, getHotPointX(), getHotPointY());
+	    return clipboardTranslator.onSystemEvent(event, getHotPointX(), getHotPointY());
 	}
     }
 
