@@ -23,7 +23,7 @@ import org.luwrain.controls.browser.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.doctree.*;
 
-class BrowserApp implements Application
+public final class App implements Application
 {
     private Luwrain luwrain = null;
     private Strings strings = null;
@@ -34,12 +34,12 @@ class BrowserApp implements Application
 
     private final String arg;
 
-    BrowserApp()
+    public App()
     {
 	arg = null;
     }
 
-    BrowserApp(String arg)
+    public App(String arg)
     {
 	NullCheck.notNull(arg, "arg");
 	this.arg = arg;

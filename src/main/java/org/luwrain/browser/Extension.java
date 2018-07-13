@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2017 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -15,13 +15,14 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.browser;
+package org.luwrain.browser;
 
 import java.util.*;
+import org.luwrain.base.*;
 
 import org.luwrain.core.*;
 
-public class Extension extends org.luwrain.core.extensions.EmptyExtension
+public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 {
     @Override public Command[] getCommands(Luwrain luwrain)
     {
@@ -38,7 +39,7 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 	    }};
     }
 
-    @Override public Shortcut[] getShortcuts(Luwrain luwrain)
+    @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
 	return new Shortcut[]{
 	    new Shortcut() {
@@ -48,14 +49,15 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		}
 		@Override public Application[] prepareApp(String[] args)
 		{
-		    if (args == null || args.length < 1)
-			return new Application[]{new BrowserApp()};
-		    LinkedList<Application> v = new LinkedList<Application>();
+		    NullCheck.notNullItems(args, "args");
+		    if (args.length == 0)
+			return new Application[]{new org.luwrain.app.browser.App()};
+		    final List<Application> v = new LinkedList();
 		    for(String s: args)
-			if (s != null)
-			    v.add(new BrowserApp(s));
+			if (!s.isEmpty())
+			    v.add(new org.luwrain.app.browser.App(s));
 		    if (v.isEmpty())
-			return new Application[]{new BrowserApp()};
+			return new Application[]{new org.luwrain.app.browser.App()};
 		    return v.toArray(new Application[v.size()]);
 		}
 	    }};
@@ -64,6 +66,7 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
+	//	return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
+	return new org.luwrain.cpanel.Factory[0];
     }
 }
