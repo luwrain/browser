@@ -71,7 +71,8 @@ return urlObj.toString();
 		}
 		catch(Throwable e)
 		{
-		    Log.error(LOG_COMPONENT, "unable to construct a doctree document:" + e.getClass().getName() + ":" + e.getMessage());
+		    Log.error(LOG_COMPONENT, "unable to construct a document:" + e.getClass().getName() + ":" + e.getMessage());
+		    e.printStackTrace();
 		    return null;
 		}
 	    });

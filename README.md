@@ -1,29 +1,22 @@
 
-# Documents preview back-end
+## WebKit-based browser engine for the blind
 
-This repository contains a structure representing a text document 
-prepared for exploring by blind and visually impaired people.
-A set of features includes:
+This repository contains the code responsible of transforming the structures of the [WebKit](https://en.wikipedia.org/wiki/WebKit) engine
+to the the form suitable for reading and navigating by blind people.
+The code itself doesn't deal with low-level information and uses only the things provided
+by the [org.luwrain.browser.Browser](http://luwrain.org/api/org/luwrain/browser/Browser.html) interface,
+which serves as a bridge to the WebKit internals .
+You can find its implementation in [interaction-javafx](https://github.com/luwrain/interaction-javafx/) repository.
 
-* Loading of documents from files in various formats, including 
-TXT,
-HTML,
-DOC,
-DOCX,
-FB2,
-EPUB,
-DAISY, etc
+The general aim is to have an accessible to blind people web-browser with proper support of JavaScript.
+The WebKit implementation is used as it comes in the [JavaFX](https://en.wikipedia.org/wiki/JavaFX) platform.
 
-* Easy navigation over document parts 
+In addition, this repository provides a structure suitable for reading structural text documents.
+Besides the browser, it is very useful for viewing office documents.
 
-* Easy access to the documents content with speech
-
-* Preparing textual view for the screen
-
-A front-end for this structure is a set of applications from [this repository](https://github.com/luwrain/app-reader).
-DocTree is an extension of [LUWRAIN environment](https://github.com/luwrain/luwrain).
 
 See also:
 
 * [Our website](http://luwrain.org/?lang=en)
+* [Our mailing lists](http://luwrain.org/community/mailing-lists/?lang=en)
 * [Our Twitter](http://twitter.com/luwrain)
