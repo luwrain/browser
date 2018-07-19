@@ -73,12 +73,14 @@ public abstract class Selector
 	if (count == 0 || it.getPos() + 1 >= count)
 	    return false;
 	it.setPos(it.getPos()+1);
-	while(it.getPos() < count && !suits(it)) 
-	    it.setPos(it.getPos()+1);
-	if(it.getPos() >= count)
+	while(!suits(it))
 	{
-	    it.setPos(origState);
-	    return false;
+	    if (it.getPos() + 1 >= count)
+	    {
+		it.setPos(origState);
+		return false;
+	    }
+	    it.setPos(it.getPos()+1);
 	}
 	return true;
     }
