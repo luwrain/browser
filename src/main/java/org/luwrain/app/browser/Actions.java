@@ -98,9 +98,9 @@ class Actions implements org.luwrain.controls.browser.Callback
     {
 	NullCheck.notNull(area, "area");
 	NullCheck.notNull(query, "query");
-	if (!(query instanceof ObjectUniRefQuery))
+	if (!(query instanceof UniRefAreaQuery))
 	    return false;
-	final ObjectUniRefQuery q = (ObjectUniRefQuery)query;
+	final UniRefAreaQuery q = (UniRefAreaQuery)query;
 	final String title = area.getBrowserTitle();
 	final String url = area.getBrowserUrl();
 	if (url == null || url.trim().isEmpty())

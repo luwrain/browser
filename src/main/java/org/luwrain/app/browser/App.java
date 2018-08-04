@@ -115,7 +115,7 @@ public final class App implements Application
 		    NullCheck.notNull(query, "query");
 		    switch(query.getQueryCode())
 		    {
-					    case AreaQuery.OBJECT_UNIREF:
+					    case AreaQuery.UNIREF_AREA:
 			return actions.onUniRefQuery(area, query);
 		    default:
 			return super.onAreaQuery(query);

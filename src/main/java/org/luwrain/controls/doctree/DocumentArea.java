@@ -303,11 +303,25 @@ public class DocumentArea implements Area, ClipboardTranslator.Provider
 	NullCheck.notNull(query, "query");
 	switch(query.getQueryCode())
 	{
-	case AreaQuery.OBJECT_UNIREF:
+	case AreaQuery.UNIREF_AREA:
 	    if (isEmpty() || document.getUrl() == null)
 		return false;
-	    ((ObjectUniRefQuery)query).answer("url:" + document.getUrl().toString());
+	    ((UniRefAreaQuery)query).answer("url:" + document.getUrl().toString());
 	    return true;
+
+	    	case AreaQuery.UNIREF_HOT_POINT:
+		    {
+			final Run run = getCurrentRun();
+		    if (isEmpty() || run == null)
+		return false;
+		    final String res = getCurrentRun().href();
+		    if (res == null || res.isEmpty())
+			return false;
+	    ((UniRefHotPointQuery)query).answer("url:" + res);
+	    return true;
+		    }
+
+	    
 	case AreaQuery.BEGIN_LISTENING:
 	    return onBeginListeningQuery((BeginListeningQuery)query);
 	default:
