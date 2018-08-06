@@ -17,7 +17,7 @@
 
 //LWR_API 1.0
 
-package org.luwrain.controls.doctree;
+package org.luwrain.controls.doc;
 
 import java.util.LinkedList;
 import java.util.EnumSet;

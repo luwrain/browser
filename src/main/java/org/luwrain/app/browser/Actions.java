@@ -25,7 +25,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
 import org.luwrain.doctree.*;
 import org.luwrain.controls.browser.*;
-import org.luwrain.controls.doctree.*;
+import org.luwrain.controls.doc.*;
 import org.luwrain.browser.*;
 import org.luwrain.browser.docbuilder.*;
 

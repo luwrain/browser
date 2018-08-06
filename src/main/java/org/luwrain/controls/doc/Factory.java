@@ -17,7 +17,7 @@
 
 //LWR_API 1.0
 
-package org.luwrain.controls.doctree;
+package org.luwrain.controls.doc;
 
 import org.luwrain.core.*;
 import org.luwrain.controls.*;

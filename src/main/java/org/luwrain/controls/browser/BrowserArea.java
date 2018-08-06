@@ -24,7 +24,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.doctree.*;
+import org.luwrain.controls.doc.*;
 import org.luwrain.doctree.*;
 
 public class BrowserArea extends DocumentArea
