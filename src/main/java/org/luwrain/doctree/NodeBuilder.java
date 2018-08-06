@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 
-public final class NodeFactory2
+public final class NodeBuilder
 {
     private final List<Node> nodes = new LinkedList();
 
@@ -31,14 +31,14 @@ public final class NodeFactory2
 	NullCheck.notNull(node, "node");
     }
 
-            public Paragraph addPara()
+    public Paragraph addPara()
     {
 	final Paragraph para = new Paragraph();
 	nodes.add(para);
 	return para;
     }
 
-        public Paragraph addPara(String text)
+    public Paragraph addPara(String text)
     {
 	NullCheck.notNull(text, "text");
 	final Paragraph para = new Paragraph();
@@ -49,16 +49,23 @@ public final class NodeFactory2
 
     public EmptyLine addEmptyLine()
     {
-final EmptyLine emptyLine = new EmptyLine();
-nodes.add(emptyLine);
-return emptyLine;
+	final EmptyLine emptyLine = new EmptyLine();
+	nodes.add(emptyLine);
+	return emptyLine;
     }
 
-	    public Table newTable()
+    public Node newRoot()
+    {
+	final Node  node = new Node(Node.Type.ROOT);
+	node.setSubnodes(nodes.toArray(new Node[nodes.size()]));
+	return node;
+    }
+
+    public Table newTable()
     {
 	final Table table = new Table();
-table.setSubnodes(nodes.toArray(new Node[nodes.size()]));
-return table;
+	table.setSubnodes(nodes.toArray(new Node[nodes.size()]));
+	return table;
     }
 
     public TableRow newTableRow()
@@ -70,9 +77,9 @@ return table;
 
     public ListItem newListItem()
     {
-final ListItem listItem = new ListItem();
-listItem.setSubnodes(nodes.toArray(new Node[nodes.size()]));
-return listItem;
+	final ListItem listItem = new ListItem();
+	listItem.setSubnodes(nodes.toArray(new Node[nodes.size()]));
+	return listItem;
     }
 
     public Node newOrderedList()
@@ -82,7 +89,7 @@ return listItem;
 	return orderedList;
     }
 
-        public Node newUnorderedList()
+    public Node newUnorderedList()
     {
 	final Node unorderedList = new Node(Node.Type.UNORDERED_LIST);
 	unorderedList.setSubnodes(nodes.toArray(new Node[nodes.size()]));
