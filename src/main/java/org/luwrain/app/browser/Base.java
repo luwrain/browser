@@ -25,7 +25,7 @@ import org.luwrain.browser.*;
 import org.luwrain.doctree.*;
 import org.luwrain.controls.browser.*;
 
-class Base implements DocumentBuilder, ClientThread
+class Base implements org.luwrain.controls.browser.DocumentBuilder, ClientThread
 {
     static final String LOG_COMPONENT = "browser";
 
