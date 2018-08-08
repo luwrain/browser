@@ -19,10 +19,11 @@
 package org.luwrain.doctree;
 
 import java.io.*;
+import java.util.*;
 
 public interface DocumentBuilder
 {
-    Document buildDoc(File file);
-    Document buildDoc(String text);
-    DocumentBuilder buildDoc(InputStream is);
+    Document buildDoc(File file, Properties props) throws IOException;
+    Document buildDoc(String text, Properties props);
+    Document buildDoc(InputStream is, Properties props) throws IOException;
 }

@@ -23,15 +23,20 @@ import org.luwrain.util.*;
 
 public final class DocumentBuilderLoader
 {
-    static private String PROP_PREFIX = "luwrain.ext.doc.loader.";
+    static private final String LOG_COMPONENT = "doc";
+    static private String PROP_PREFIX = "luwrain.ext.doc.builder.";
 
-    static public Object newDocumentBuilder(Luwrain luwrain, String contentType)
+    public DocumentBuilder newDocumentBuilder(Luwrain luwrain, String contentType)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notEmpty(contentType, "contentType");
-	final String className = luwrain.getProperty(PROP_PREFIX + prepareContentType(contentType));
-	if (!className.isEmpty())
+	final String propName = PROP_PREFIX + prepareContentType(contentType);
+	final String className = luwrain.getProperty(propName);
+	if (className.isEmpty())
+	{
+	    Log.error(LOG_COMPONENT, "no property \'" + propName + "\'");
 	    return null;
+	}
 	final Object obj = ClassUtils.newInstanceOf(className, DocumentBuilderFactory.class);
 	if (obj == null)
 	    return null;
