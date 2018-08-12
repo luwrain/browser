@@ -29,6 +29,7 @@ public final class NodeBuilder
     public void addSubnode(Node node)
     {
 	NullCheck.notNull(node, "node");
+	nodes.add(node);
     }
 
     public Paragraph addPara()
