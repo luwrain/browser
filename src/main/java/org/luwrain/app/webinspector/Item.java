@@ -24,6 +24,8 @@ import org.luwrain.browser.*;
 final class Item
 {
     final BrowserIterator it;
+    final String className;
+    final String inputType;
     final String tagName;
     final String text;
 
@@ -31,14 +33,26 @@ final class Item
     {
 	NullCheck.notNull(it, "it");
 	this.it = it.clone();
+	this.className = it.getClassName();
+	if (it.isInput())
+	    this.inputType = it.getInputType(); else
+						  this.inputType = "";
 	this.tagName = it.getHtmlTagName();
 	this.text = it.getText();
     }
 
     @Override public String toString()
     {
+	String className = this.className;
+	if (className.startsWith("HTML"))
+	    className = className.substring(4);
+	if (className.endsWith("Impl"))
+	    className = className.substring(0, className.length() - 4);
 	final StringBuilder b = new StringBuilder();
-	b.append(tagName != null?tagName:"null").append(" ").append(text != null?text:"null");
+	b.append(className);
+	if (!inputType.isEmpty())
+	    b.append("(").append(inputType).append(")");
+b.append(" ").append(text != null?text:"null");
 	return new String(b);
 	}
 }

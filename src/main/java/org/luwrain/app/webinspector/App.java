@@ -29,7 +29,7 @@ public final class App implements Application
     private Base base = null;
     private Actions actions = null;
     private ActionLists actionLists = null;
-    private NavigationArea area = null;
+    private ListArea area = null;
 
     private final String arg;
 
@@ -62,26 +62,17 @@ public final class App implements Application
 
     private void createArea()
     {
-    	area = new NavigationArea(new DefaultControlEnvironment(luwrain)) {
-
-		@Override public String getAreaName()
-		{
-		    return strings.appName();
-		}
-
-		@Override public int getLineCount()
-		{
-		    final int count = base.getItems().length;
-		    return count > 0?count:1;
-		}
-
-		@Override public String getLine(int index)
-		{
-		    if (index >= 0 && index < base.getItems().length)
-			return base.getItems()[index].toString();
-		    return "";
-		}
-
+	final ListArea.Params params = new ListArea.Params();
+	params.context = new DefaultControlEnvironment(luwrain);
+	params.name = strings.appName();
+	params.model = base.getModel();
+	params.appearance = new ListUtils.DefaultAppearance(params.context);
+	params.clickHandler = (area,index,obj)->{
+	    if (obj == null || !(obj instanceof Item))
+		return false;
+	    return actions.onClick((Item)obj);
+	};
+    	this.area = new ListArea(params) {
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -89,8 +80,9 @@ public final class App implements Application
 		    if (event.isSpecial())
 			switch(event.getSpecial())
 			{
-			default:
-			    break;
+			case ESCAPE:
+			    closeApp();
+			    return true;
 			}
 		    return super.onInputEvent(event);
 		}
@@ -103,7 +95,11 @@ public final class App implements Application
 		    switch(event.getCode())
 		    {
 		    case ACTION:
-			return onBrowserAction(event);
+				if (ActionEvent.isAction(event, "open-url"))
+	    return actions.onOpenUrl();
+	if (ActionEvent.isAction(event, "show-graphical"))
+	    return actions.onShowGraphical();
+	return false;
 		    case CLOSE:
 			closeApp();
 			return true;
@@ -111,32 +107,11 @@ public final class App implements Application
 			return super.onSystemEvent(event);
 		    }
 		}
-
-		@Override public boolean onAreaQuery(AreaQuery query)
-		{
-		    NullCheck.notNull(query, "query");
-		    switch(query.getQueryCode())
-		    {
-		    default:
-			return super.onAreaQuery(query);
-		    }
-		}
-
 		@Override public Action[] getAreaActions()
 		{
 		    return actionLists.getBrowserActions();
 		}
 	    };
-    }
-
-    private boolean onBrowserAction(EnvironmentEvent event)
-    {
-	NullCheck.notNull(event, "event");
-	if (ActionEvent.isAction(event, "open-url"))
-	    return actions.onOpenUrl();
-	if (ActionEvent.isAction(event, "show-graphical"))
-	    return actions.onShowGraphical();
-	return false;
     }
 
     @Override public void closeApp()

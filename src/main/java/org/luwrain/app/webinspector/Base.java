@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
+import org.luwrain.controls.*;
 import org.luwrain.browser.*;
 import org.luwrain.browser.selectors.*;
 
@@ -103,8 +104,23 @@ final class Base implements BrowserEvents
 	    });
     }
 
-    Item[] getItems()
+    ListArea.Model getModel()
     {
-	return items;
+	return new Model();
     }
+
+    private final class Model implements org.luwrain.controls.ListArea.Model
+    {
+	@Override public int getItemCount()
+	{
+	    return items.length;
+	}
+	@Override public Object getItem(int index)
+	{
+	    return items[index];
+	}
+	@Override public void refresh()
+	{
+	}
     }
+}

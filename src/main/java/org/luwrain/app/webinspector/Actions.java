@@ -63,6 +63,13 @@ Browser browser, Strings strings)
 	return true;
     }
 
+    boolean onClick(Item item)
+    {
+	NullCheck.notNull(item, "item");
+
+	return false;
+    }
+
     boolean onShowGraphical()
     {
 	browser.setVisibility(!browser.getVisibility());
