@@ -20,36 +20,22 @@ import java.net.*;
 import java.util.Date;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
-import org.luwrain.core.queries.*;
-import org.luwrain.doctree.*;
-import org.luwrain.controls.browser.*;
-import org.luwrain.controls.doc.*;
 import org.luwrain.browser.*;
-import org.luwrain.browser.docbuilder.*;
-
-import org.luwrain.popups.*;
 
 final class Actions
 {
-    static private final String UNIREF_TYPE = "url";//FIXME:change to web: in the future
-
     private final Luwrain luwrain;
     private final Base base;
-    private final Browser browser;
     private final Strings strings;
-    private final Conversations conv;
+    final Conversations conv;
 
-    Actions(Luwrain luwrain, Base base,
-Browser browser, Strings strings)
+    Actions(Luwrain luwrain, Base base, Strings strings)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notNull(base, "base");
-	NullCheck.notNull(browser, "browser");
 	NullCheck.notNull(strings, "strings");
 	this.luwrain = luwrain;
 	this.base = base;
-	this.browser = browser;
 	this.conv = new Conversations(luwrain);
 	this.strings = strings;
     }
@@ -87,7 +73,6 @@ Browser browser, Strings strings)
 		    base.updateItems();
 		    return null;
 		});
-
 	    return true;
 	}
 	return false;
@@ -95,7 +80,7 @@ Browser browser, Strings strings)
 
     boolean onShowGraphical()
     {
-	browser.setVisibility(!browser.getVisibility());
+	base.browser.setVisibility(!base.browser.getVisibility());
 	return true;
     }
 }

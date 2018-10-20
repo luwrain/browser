@@ -54,7 +54,7 @@ public final class App implements Application
 	this.luwrain = luwrain;
 	this.base = new Base(luwrain);
 	this.actionLists = new ActionLists(luwrain, strings);
-	this.actions = new Actions(luwrain, base, base.browser, strings);
+	this.actions = new Actions(luwrain, base, strings);
 	createArea();
 	final String startingUrl = "http://luwrain.org";
 	return new InitResult();
