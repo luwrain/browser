@@ -27,7 +27,7 @@ public class AllNodesSelector extends Selector
 
     public AllNodesSelector(boolean visible)
     {
-	this.visible=visible;
+	this.visible = visible;
     }
 
 public boolean isVisible()

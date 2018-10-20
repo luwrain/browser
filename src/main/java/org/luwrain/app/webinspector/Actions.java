@@ -66,7 +66,30 @@ Browser browser, Strings strings)
     boolean onClick(Item item)
     {
 	NullCheck.notNull(item, "item");
+	if (item.className.equals("HTMLButtonElementImpl") ||
+	    item.inputType.equals("submit"))
+	{
+	    base.browser.runSafely(()->{
+		    item.it.emulateSubmit();
+		    return null;
+		});
+	    return true;
+	}
+	if (item.inputType.equals("text") ||
+	    item.inputType.equals("password") ||
+	    item.inputType.equals("email"))
+	{
+	    final String text = conv.formText("");
+	    if (text == null)
+		return true;
+	    base.browser.runSafely(()->{
+		    item.it.setInputText(text);
+		    base.updateItems();
+		    return null;
+		});
 
+	    return true;
+	}
 	return false;
     }
 

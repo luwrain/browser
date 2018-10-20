@@ -99,7 +99,13 @@ public final class App implements Application
 	    return actions.onOpenUrl();
 	if (ActionEvent.isAction(event, "show-graphical"))
 	    return actions.onShowGraphical();
+	if (ActionEvent.isAction(event, "show-graphical"))
+	    return actions.onShowGraphical();
 	return false;
+		    case REFRESH:
+			base.updateItems();
+			super.refresh();
+			return true;
 		    case CLOSE:
 			closeApp();
 			return true;

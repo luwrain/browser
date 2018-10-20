@@ -89,13 +89,14 @@ final class Base implements BrowserEvents
     {
     	final Object obj = browser.runSafely(()->{
 		browser.rescanDom();
-		final AllNodesSelector selector = new AllNodesSelector(false);
 		final BrowserIterator it = browser.createIterator();
 		final List<Item> res = new LinkedList();
-		if (selector.moveFirst(it))
-		do {
+		final int count = browser.numElements();
+		for(int i = 0;i < count;++i)
+		{
+		    it.setPos(i);
 		    res.add(new Item(it));
-		} while(selector.moveNext(it));
+		}
 		luwrain.runUiSafely(()->{
 			this.items = res.toArray(new Item[res.size()]);
 			luwrain.playSound(Sounds.DONE);
