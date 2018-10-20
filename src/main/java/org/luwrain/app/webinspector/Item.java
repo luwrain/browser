@@ -16,14 +16,29 @@
 
 package org.luwrain.app.webinspector;
 
-public interface Strings
-{
-    static final String NAME = "luwrain.webinspector";
+import java.util.*;
 
-    String appName();
-    String actionOpenUrl();
-    String actionRefresh();
-    String actionStop();
-    String actionHistoryPrev();
-    String actionShowGraphical();
+import org.luwrain.core.*;
+import org.luwrain.browser.*;
+
+final class Item
+{
+    final BrowserIterator it;
+    final String tagName;
+    final String text;
+
+    Item(BrowserIterator it)
+    {
+	NullCheck.notNull(it, "it");
+	this.it = it.clone();
+	this.tagName = it.getHtmlTagName();
+	this.text = it.getText();
+    }
+
+    @Override public String toString()
+    {
+	final StringBuilder b = new StringBuilder();
+	b.append(tagName != null?tagName:"null").append(" ").append(text != null?text:"null");
+	return new String(b);
+	}
 }

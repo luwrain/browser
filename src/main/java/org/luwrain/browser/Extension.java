@@ -27,6 +27,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public Command[] getCommands(Luwrain luwrain)
     {
 	return new Command[]{
+
 	    new Command(){
 		@Override public String getName()
 		{
@@ -36,12 +37,26 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 		{
 		    luwrain.launchApp("browser");
 		}
-	    }};
+	    },
+
+	    new Command(){
+		@Override public String getName()
+		{
+		    return "web-inspector";
+		}
+		@Override public void onCommand(Luwrain luwrain)
+		{
+		    luwrain.launchApp("web-inspector");
+		}
+	    },
+
+	};
     }
 
     @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
-	return new Shortcut[]{
+	return new ExtensionObject[]{
+
 	    new Shortcut() {
 		@Override public String getExtObjName()
 		{
@@ -60,7 +75,29 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 			return new Application[]{new org.luwrain.app.browser.App()};
 		    return v.toArray(new Application[v.size()]);
 		}
-	    }};
+	    },
+
+	    new Shortcut() {
+		@Override public String getExtObjName()
+		{
+		    return "web-inspector";
+		}
+		@Override public Application[] prepareApp(String[] args)
+		{
+		    NullCheck.notNullItems(args, "args");
+		    if (args.length == 0)
+			return new Application[]{new org.luwrain.app.webinspector.App()};
+		    final List<Application> v = new LinkedList();
+		    for(String s: args)
+			if (!s.isEmpty())
+			    v.add(new org.luwrain.app.webinspector.App(s));
+		    if (v.isEmpty())
+			return new Application[]{new org.luwrain.app.webinspector.App()};
+		    return v.toArray(new Application[v.size()]);
+		}
+	    },
+
+	};
     }
 
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)

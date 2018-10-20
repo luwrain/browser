@@ -17,35 +17,94 @@
 package org.luwrain.app.webinspector;
 
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
-import org.luwrain.doctree.*;
-import org.luwrain.controls.browser.*;
+import org.luwrain.browser.selectors.*;
 
-final class Base implements ClientThread
+final class Base implements BrowserEvents
 {
-    static final String LOG_COMPONENT = "browser";
+    static final String LOG_COMPONENT = "inspector";
 
     private final Luwrain luwrain;
     final Browser browser;
+    private Item[] items = new Item[0];
 
     Base(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
 	this.browser = luwrain.createBrowser();
+	this.browser.init(this);
     }
 
-    @Override public Object runSync(Callable callable)
+    @Override public void onChangeState(State state)
+    {
+	NullCheck.notNull(state, "state");
+	Log.debug(LOG_COMPONENT, "changing state to " + state.toString());
+	switch(state)
+	{
+	case SUCCEEDED:
+	    updateItems();
+	    return;
+	}
+    }
+
+    @Override public void onProgress(Number progress)
+    {
+    }
+
+    @Override public void onAlert(String message)
+    {
+	luwrain.message(message);
+    }
+
+    @Override public String onPrompt(String message,String value)
+    {
+	return "FIXME";
+    }
+
+    @Override public void onError(String message)
+    {
+	NullCheck.notNull(message, "message");
+	luwrain.message(message, Luwrain.MessageType.ERROR);
+    }
+
+    @Override public boolean onDownloadStart(String url)
     {
 	//FIXME:
-	return null;
+	return true;
     }
 
-    @Override public void runAsync(Runnable runnable)
+    @Override public Boolean onConfirm(String message)
     {
-	luwrain.runUiSafely(runnable);
+	//FIXME:
+	return true;
     }
-}
+
+    void updateItems()
+    {
+    	final Object obj = browser.runSafely(()->{
+		browser.rescanDom();
+		final AllNodesSelector selector = new AllNodesSelector(false);
+		final BrowserIterator it = browser.createIterator();
+		final List<Item> res = new LinkedList();
+		if (selector.moveFirst(it))
+		do {
+		    res.add(new Item(it));
+		} while(selector.moveNext(it));
+		luwrain.runUiSafely(()->{
+			this.items = res.toArray(new Item[res.size()]);
+			luwrain.playSound(Sounds.DONE);
+		    });
+		return null;
+	    });
+    }
+
+    Item[] getItems()
+    {
+	return items;
+    }
+    }

@@ -71,12 +71,15 @@ public final class App implements Application
 
 		@Override public int getLineCount()
 		{
-		    return 1;
+		    final int count = base.getItems().length;
+		    return count > 0?count:1;
 		}
 
 		@Override public String getLine(int index)
 		{
-		    return "FIXME";
+		    if (index >= 0 && index < base.getItems().length)
+			return base.getItems()[index].toString();
+		    return "";
 		}
 
 		@Override public boolean onInputEvent(KeyboardEvent event)
@@ -129,10 +132,8 @@ public final class App implements Application
     private boolean onBrowserAction(EnvironmentEvent event)
     {
 	NullCheck.notNull(event, "event");
-	/*
 	if (ActionEvent.isAction(event, "open-url"))
-	    return actions.onOpenUrl(area);
-	*/
+	    return actions.onOpenUrl();
 	if (ActionEvent.isAction(event, "show-graphical"))
 	    return actions.onShowGraphical();
 	return false;
