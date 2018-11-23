@@ -32,6 +32,7 @@ final class Base implements BrowserEvents
     private final Luwrain luwrain;
     final Browser browser;
     private Item[] items = new Item[0];
+    private String[] attrs = new String[0]; 
 
     Base(Luwrain luwrain)
     {
@@ -39,6 +40,23 @@ final class Base implements BrowserEvents
 	this.luwrain = luwrain;
 	this.browser = luwrain.createBrowser();
 	this.browser.init(this);
+    }
+
+    void fillAttrs(Item item)
+    {
+	NullCheck.notNull(item, "item");
+	this.attrs = (String[])browser.runSafely(()->{
+	final Map<String, String> attrMap = item.it.getAttrs();
+	final List<String> res = new LinkedList();
+	if (!item.it.getTagName().isEmpty())
+	    res.add("<" + item.it.getTagName() + ">");
+	res.add(item.it.getRect().toString());
+	for(Map.Entry<String, String> e: attrMap.entrySet())
+	{
+	    res.add(e.getKey() + ": " + e.getValue());
+	}
+return res.toArray(new String[res.size()]);
+	    });
     }
 
     @Override public void onChangeState(State state)
@@ -105,12 +123,18 @@ final class Base implements BrowserEvents
 	    });
     }
 
-    ListArea.Model getModel()
+    ListArea.Model getItemsModel()
     {
-	return new Model();
+	return new ItemsModel();
     }
 
-    private final class Model implements org.luwrain.controls.ListArea.Model
+        ListArea.Model getAttrsModel()
+    {
+	return new AttrsModel();
+    }
+
+
+    private final class ItemsModel implements org.luwrain.controls.ListArea.Model
     {
 	@Override public int getItemCount()
 	{
@@ -124,4 +148,21 @@ final class Base implements BrowserEvents
 	{
 	}
     }
+
+        private final class AttrsModel implements org.luwrain.controls.ListArea.Model
+    {
+	@Override public int getItemCount()
+	{
+	    return attrs.length;
+	}
+	@Override public Object getItem(int index)
+	{
+	    return attrs[index];
+	}
+	@Override public void refresh()
+	{
+	}
+    }
+
+    
 }

@@ -29,7 +29,8 @@ public final class App implements Application
     private Base base = null;
     private Actions actions = null;
     private ActionLists actionLists = null;
-    private ListArea area = null;
+    private ListArea elementsArea = null;
+    private ListArea attrsArea = null;
 
     private final String arg;
 
@@ -56,23 +57,27 @@ public final class App implements Application
 	this.actionLists = new ActionLists(luwrain, strings);
 	this.actions = new Actions(luwrain, base, strings);
 	createArea();
-	final String startingUrl = "http://luwrain.org";
+	if (arg != null && !arg.trim().isEmpty())
+	    base.browser.loadByUrl(arg);
 	return new InitResult();
     }
 
     private void createArea()
     {
-	final ListArea.Params params = new ListArea.Params();
-	params.context = new DefaultControlEnvironment(luwrain);
-	params.name = strings.appName();
-	params.model = base.getModel();
-	params.appearance = new ListUtils.DefaultAppearance(params.context);
-	params.clickHandler = (area,index,obj)->{
+	final ListArea.Params elementsParams = new ListArea.Params();
+	elementsParams.context = new DefaultControlEnvironment(luwrain);
+	elementsParams.name = strings.appName();
+	elementsParams.model = base.getItemsModel();
+	elementsParams.appearance = new ListUtils.DefaultAppearance(elementsParams.context);
+	elementsParams.clickHandler = (area,index,obj)->{
 	    if (obj == null || !(obj instanceof Item))
 		return false;
-	    return actions.onClick((Item)obj);
+	    base.fillAttrs((Item)obj);
+	    attrsArea.refresh();
+	    luwrain.setActiveArea(attrsArea);
+	    return true;
 	};
-    	this.area = new ListArea(params) {
+    	this.elementsArea = new ListArea(elementsParams) {
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -86,7 +91,6 @@ public final class App implements Application
 			}
 		    return super.onInputEvent(event);
 		}
-
 		@Override public boolean onSystemEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -118,6 +122,58 @@ public final class App implements Application
 		    return actionLists.getBrowserActions();
 		}
 	    };
+
+		final ListArea.Params attrsParams = new ListArea.Params();
+	attrsParams.context = new DefaultControlEnvironment(luwrain);
+	attrsParams.name = strings.appName();
+	attrsParams.model = base.getAttrsModel();
+	attrsParams.appearance = new ListUtils.DefaultAppearance(attrsParams.context);
+	attrsParams.clickHandler = (area,index,obj)->{
+	    if (obj == null || !(obj instanceof Item))
+		return false;
+	    //FIXME:
+	    return false;
+	};
+    	this.attrsArea = new ListArea(attrsParams) {
+		@Override public boolean onInputEvent(KeyboardEvent event)
+		{
+		    NullCheck.notNull(event, "event");
+		    NullCheck.notNull(event, "event");
+		    if (event.isSpecial())
+			switch(event.getSpecial())
+			{
+			case ESCAPE:
+			    closeApp();
+			    return true;
+			case TAB:
+			    luwrain.setActiveArea(elementsArea);
+			    return true;
+			}
+		    return super.onInputEvent(event);
+		}
+		@Override public boolean onSystemEvent(EnvironmentEvent event)
+		{
+		    NullCheck.notNull(event, "event");
+		    if (event.getType() != EnvironmentEvent.Type.REGULAR)
+			return super.onSystemEvent(event);
+		    switch(event.getCode())
+		    {
+		    case ACTION:
+	return false;
+		    case CLOSE:
+			closeApp();
+			return true;
+		    default:
+			return super.onSystemEvent(event);
+		    }
+		}
+		@Override public Action[] getAreaActions()
+		{
+		    return new Action[0];
+		}
+	    };
+
+	
     }
 
     @Override public void closeApp()
@@ -133,6 +189,6 @@ public final class App implements Application
 
     @Override public AreaLayout getAreaLayout()
     {
-	return new AreaLayout(area);
+	return new AreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, attrsArea);
     }
 }

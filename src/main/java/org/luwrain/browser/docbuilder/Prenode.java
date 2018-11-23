@@ -46,7 +46,7 @@ Prenode(Prenode parent, BrowserIterator browserIt)
 	NullCheck.notNull(browserIt, "browserIt");
 	this.parent = parent;
 	this.browserIt = browserIt.clone();
-	final String s = this.browserIt.getHtmlTagName();
+	final String s = this.browserIt.getTagName();
 	if (s != null)
 	    this.tagName = s.toLowerCase().trim(); else
 	    this.tagName = "";

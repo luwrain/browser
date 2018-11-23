@@ -32,7 +32,7 @@ class Cleaning
 	    String text=node.browserIt.getText();
 	    if(text.isEmpty())
 	    { // remove empty text element without child
-		String tagName = node.browserIt.getHtmlTagName().toLowerCase();
+		String tagName = node.browserIt.getTagName().toLowerCase();
 		switch(tagName)
 		{
 		    /*

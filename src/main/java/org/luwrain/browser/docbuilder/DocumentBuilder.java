@@ -114,7 +114,7 @@ return res;
 	{
 	case "a":
 	    {
-		final String href = it.getAttribute("href");
+		final String href = it.getAttr("href");
 		if (href != null && !href.isEmpty())
 		    hrefs.add(href);
 		for(Prenode p: node.children)
@@ -193,7 +193,7 @@ return res;
 	    final LinkedList<Node> row = new LinkedList<Node>();
 	    // detect thead, tbody, tfoot
 Prenode child_ = rowNodeInfo;
-	    final String tagName = rowNodeInfo.browserIt.getHtmlTagName().toLowerCase();
+	    final String tagName = rowNodeInfo.browserIt.getTagName().toLowerCase();
 	    switch(tagName)
 	    {
 	    case "thead":
@@ -209,13 +209,13 @@ Prenode child_ = rowNodeInfo;
 	    for(Prenode cellChild: child_.children)
 	    {
 		//collspan detection
-		final String tagName2 = cellChild.browserIt.getHtmlTagName().toLowerCase();
+		final String tagName2 = cellChild.browserIt.getTagName().toLowerCase();
 		String collSpanStr = null;
 		switch(tagName2)
 		{
 		case "td":
 		case "th":
-		    collSpanStr = cellChild.browserIt.getAttribute("colspan");
+		    collSpanStr = cellChild.browserIt.getAttr("colspan");
 		//break; // no we can skip this check becouse we don't known what to do if we detect errors here
 		default:
 		    Integer collSpan=null;
@@ -325,7 +325,7 @@ return onFormItem(prenode, tagName);
     NullCheck.notNull(it, "it");
     if (tagName.equals("input"))
     {
-	    final String type = it.getAttribute("type");
+	    final String type = it.getAttr("type");
 	    if (type == null || type.trim().isEmpty())
 						return new ItemWrapper(new EditRun(it), prenode);
 	    switch(type)

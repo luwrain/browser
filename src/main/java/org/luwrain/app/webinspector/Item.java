@@ -37,7 +37,7 @@ final class Item
 	if (it.isInput())
 	    this.inputType = it.getInputType(); else
 						  this.inputType = "";
-	this.tagName = it.getHtmlTagName();
+	this.tagName = it.getTagName();
 	this.text = it.getText();
     }
 
