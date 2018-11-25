@@ -42,6 +42,8 @@ Item root = null;
 		    items[parentPos].contentItems.add(i);
 		i.parent = items[parentPos];
 	    }
+	this.containers = createContainers(items, root);
+	printToLog();
     }
 
     private boolean isContentNode(BrowserIterator it)
@@ -50,9 +52,24 @@ Item root = null;
 	final String className = it.getClassName();
 	switch(className)
 	{
+	case "Br":
 	case "Anchor":
 	case "Text":
 	    return true;
+	case "":
+	    {
+		final String tagName = it.getTagName();
+		if (tagName == null)
+		    return false;
+		switch(tagName.toLowerCase())
+		{
+		case "em":
+		case "strong":
+		    return true;
+		default:
+		    return false;
+		}
+	    }
 	}
 	return false;
     }
@@ -65,16 +82,23 @@ Item root = null;
 	return rect.width > 0 && rect.height > 0;
     }
 
+    private Container[] createContainers(Item[] items, Item root)
+    {
+	NullCheck.notNullItems(items, "items");
+	//NullCheck.notNull(root, "root");
+	final List<Container> res = new LinkedList();
+	for(Item i: items)
+	    if (!i.contentItems.isEmpty() && !isContentNode(i.it))
+		res.add(new Container(i.it, i.createContentItem().children));
+	return res.toArray(new Container[res.size()]);
+    }
+
     public void printToLog()
     {
 	for(int i = 0;i < containers.length;++i)
 	    if (containers[i] != null)
 	    {
 		Log.debug(LOG_COMPONENT, containers[i].toString());
-		/*
-	for(BrowserIterator it: containers[i].content)
-	    Log.debug(LOG_COMPONENT, "+ " + it.getClassName() + ": " + it.getText());
-		*/
 	    }
     }
 
@@ -95,6 +119,14 @@ Item root = null;
 	    this.it = it;
 	    this.className = it.getClassName();
 	    this.tagName = it.getTagName();
+	}
+
+	ContentItem createContentItem()
+	{
+	    final List<ContentItem> c = new LinkedList();
+	    for(Item i: contentItems)
+		c.add(i.createContentItem());
+	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]));
 	}
     }
 }

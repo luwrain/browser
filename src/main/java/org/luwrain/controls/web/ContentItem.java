@@ -22,6 +22,7 @@ final class ContentItem
     String getText()
     {
 	final StringBuilder b = new StringBuilder();
+	b.append(it.getText());
 	for(ContentItem i: children)
 	    b.append(i.getText());
 	return new String(b);

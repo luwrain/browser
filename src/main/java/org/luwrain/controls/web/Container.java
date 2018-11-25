@@ -50,6 +50,7 @@ final class Container
 			final StringBuilder b = new StringBuilder();
 			b.append(it.getClassName()).append(" <").append(it.getTagName()).append(">: ");
 	b.append("(").append(String.format("%d,%d,%d,%d", x, y, width, height)).append(")");
+	b.append(": ").append(getText());
 	return new String(b);
     }
 
