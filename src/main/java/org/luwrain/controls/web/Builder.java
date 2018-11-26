@@ -65,6 +65,8 @@ Item root = null;
 		{
 		case "em":
 		case "strong":
+		case "b":
+		case "span":
 		    return true;
 		default:
 		    return false;
