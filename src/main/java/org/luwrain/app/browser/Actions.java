@@ -27,11 +27,10 @@ import org.luwrain.doctree.*;
 import org.luwrain.controls.web.*;
 import org.luwrain.controls.doc.*;
 import org.luwrain.browser.*;
-import org.luwrain.browser.docbuilder.*;
 
 import org.luwrain.popups.*;
 
-class Actions implements org.luwrain.controls.browser.Callback
+class Actions implements org.luwrain.controls.web.WebArea.Callback
 {
     static private final String UNIREF_TYPE = "url";//FIXME:change to web: in the future
 

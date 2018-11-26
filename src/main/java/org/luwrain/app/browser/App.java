@@ -74,7 +74,8 @@ public final class App implements Application
 	    base.browser.init(events);
 	    return base.browser;
 	};
-	//	params.callback = actions;
+		params.callback = actions;
+		params.clientThread = base;
 
     	area = new WebArea(params){
 		@Override public boolean onInputEvent(KeyboardEvent event)

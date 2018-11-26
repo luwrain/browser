@@ -23,9 +23,9 @@ import java.util.concurrent.*;
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.doctree.*;
-import org.luwrain.controls.browser.*;
+import org.luwrain.controls.web.*;
 
-class Base implements org.luwrain.controls.browser.DocumentBuilder, ClientThread
+class Base implements WebArea.ClientThread
 {
     static final String LOG_COMPONENT = "browser";
 
@@ -41,7 +41,7 @@ class Base implements org.luwrain.controls.browser.DocumentBuilder, ClientThread
 	this.browser = luwrain.createBrowser();
     }
 
-    String makeHref(BrowserArea area, String href)
+    String makeHref(WebArea area, String href)
     {
 	NullCheck.notNull(area, "area");
 	NullCheck.notNull(href, "href");
@@ -60,25 +60,6 @@ return urlObj.toString();
 	    {
 		return href;
 	    }
-    }
-
-    @Override public Document build(Browser browser)
-    {
-	NullCheck.notNull(browser, "browser");
-	final Object res = this.browser.runSafely(()->{
-		try {
-		    return new org.luwrain.browser.docbuilder.DocumentBuilder(browser).build();
-		}
-		catch(Throwable e)
-		{
-		    Log.error(LOG_COMPONENT, "unable to construct a document:" + e.getClass().getName() + ":" + e.getMessage());
-		    e.printStackTrace();
-		    return null;
-		}
-	    });
-	if (res == null || !(res instanceof org.luwrain.doctree.Document))
-	    return null;
-	return (Document)res;
     }
 
     @Override public Object runSync(Callable callable)
