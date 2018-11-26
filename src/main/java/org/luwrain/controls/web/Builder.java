@@ -12,9 +12,7 @@ public final class Builder
 {
     static final String LOG_COMPONENT = "web";
 
-    private Container[] containers = new Container[0];
-
-    public void build(Browser browser)
+    public Model build(Browser browser)
     {
 	NullCheck.notNull(browser, "browser");
 	final int count = browser.numElements();
@@ -42,8 +40,7 @@ Item root = null;
 		    items[parentPos].contentItems.add(i);
 		i.parent = items[parentPos];
 	    }
-	this.containers = createContainers(items, root);
-	printToLog();
+	return new Model(createContainers(items, root));
     }
 
     private boolean isContentNode(BrowserIterator it)
@@ -93,15 +90,6 @@ Item root = null;
 	    if (!i.contentItems.isEmpty() && !isContentNode(i.it))
 		res.add(new Container(i.it, i.createContentItem().children));
 	return res.toArray(new Container[res.size()]);
-    }
-
-    public void printToLog()
-    {
-	for(int i = 0;i < containers.length;++i)
-	    if (containers[i] != null)
-	    {
-		Log.debug(LOG_COMPONENT, containers[i].toString());
-	    }
     }
 
     static private final class Item

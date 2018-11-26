@@ -21,7 +21,6 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.web.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.doc.*;
 
 public final class App implements Application
 {
@@ -66,8 +65,6 @@ public final class App implements Application
     private void createArea()
     {
 	final org.luwrain.controls.doc.Strings announcementStrings = (org.luwrain.controls.doc.Strings)luwrain.i18n().getStrings("luwrain.doc");
-	final Announcement announcement = new Announcement(new DefaultControlEnvironment(luwrain), announcementStrings);
-
 	final WebArea.Params params = new WebArea.Params();
 	params.context = new DefaultControlEnvironment(luwrain);
 	params.browserFactory = (events)->{

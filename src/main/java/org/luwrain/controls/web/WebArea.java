@@ -24,89 +24,88 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.doc.*;
-import org.luwrain.doctree.*;
 
 public class WebArea implements Area
 {
-/**
- * An interface to thread manager. A vast majority of work in the browser
- * engine is performed in background thread. So, the engine actually is
- * unable to return anything back to the browser area directly.  In
- * addition, general area functionality doesn't have anything allowing it
- * to manage threads. 
- *
- * This interface gives access to some implementation-dependent class
- * which is able to run some code in the main thread of
- * application. There are two types of the code which could be requested
- * to run: synchronous and asynchronous. The first type implies that
- * there is no need to wait until provided code is executed. The second
- * one means that the corresponding method may not return until the
- * requested code is fully executed. This allows to get the method return
- * value back to the caller.
- *
- * @see BrowserArea
- */
-public interface ClientThread
-{
-    /**
-     * Runs the requested code in asynchronous mode (no need to wait finishing).
-     *
-     * @param runnable The runnable object with the necessary code
-     */
-    void runAsync(Runnable runnable);
-
-    /**
-     * Runs the requested code in synchronous mode (it is necessary to wait finishing).
-     *
-     * @param callable The callable object with the necessary code
-     * @return The return value of the provided code after the execution
-     */
-    Object runSync(java.util.concurrent.Callable callable);
-}
-
+    static final String LOG_COMPONENT = "web";
     
-public interface BrowserFactory
-{
-    Browser newBrowser(BrowserEvents events);
-}
+    /**
+     * An interface to thread manager. A vast majority of work in the browser
+     * engine is performed in background thread. So, the engine actually is
+     * unable to return anything back to the browser area directly.  In
+     * addition, general area functionality doesn't have anything allowing it
+     * to manage threads. 
+     *
+     * This interface gives access to some implementation-dependent class
+     * which is able to run some code in the main thread of
+     * application. There are two types of the code which could be requested
+     * to run: synchronous and asynchronous. The first type implies that
+     * there is no need to wait until provided code is executed. The second
+     * one means that the corresponding method may not return until the
+     * requested code is fully executed. This allows to get the method return
+     * value back to the caller.
+     *
+     * @see BrowserArea
+     */
+    public interface ClientThread
+    {
+	/**
+	 * Runs the requested code in asynchronous mode (no need to wait finishing).
+	 *
+	 * @param runnable The runnable object with the necessary code
+	 */
+	void runAsync(Runnable runnable);
+
+	/**
+	 * Runs the requested code in synchronous mode (it is necessary to wait finishing).
+	 *
+	 * @param callable The callable object with the necessary code
+	 * @return The return value of the provided code after the execution
+	 */
+	Object runSync(java.util.concurrent.Callable callable);
+    }
+
+    public interface BrowserFactory
+    {
+	Browser newBrowser(BrowserEvents events);
+    }
 
     public interface Callback
-{
-    public enum MessageType {PROGRESS, ALERT, ERROR};
+    {
+	public enum MessageType {PROGRESS, ALERT, ERROR};
 
-    void onBrowserRunning();
-    void onBrowserSuccess(String title);
-    void onBrowserFailed();
-    int getAreaVisibleWidth(Area area);
-    boolean confirm(String text);
-    String prompt(String message, String text);
-    void message(String text, MessageType type);
-}
+	void onBrowserRunning();
+	void onBrowserSuccess(String title);
+	void onBrowserFailed();
+	int getAreaVisibleWidth(Area area);
+	boolean confirm(String text);
+	String prompt(String message, String text);
+	void message(String text, MessageType type);
+    }
 
-    
-static public final class Params
-{
-    public ControlEnvironment context = null;
-    public Callback callback = null;
-    public ClientThread clientThread = null;
-    public BrowserFactory browserFactory = null;
-}
+    static public final class Params
+    {
+	public ControlEnvironment context = null;
+	public Callback callback = null;
+	public ClientThread clientThread = null;
+	public BrowserFactory browserFactory = null;
+    }
 
     protected final ControlEnvironment context = null;
     protected final Callback callback;
     protected final Browser browser;
+    protected View view = null;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
 
     public WebArea(Params params)
     {
-		NullCheck.notNull(params, "params");
-		NullCheck.notNull(params.context, "params.context");
-		NullCheck.notNull(params.clientThread, "params.clientThread");
-		NullCheck.notNull(params.callback, "params.callback");
-		NullCheck.notNull(params.browserFactory, "params.browserFactory");
-		this.browser = params.browserFactory.newBrowser(new Events(params.clientThread, this, params.callback));
+	NullCheck.notNull(params, "params");
+	NullCheck.notNull(params.context, "params.context");
+	NullCheck.notNull(params.clientThread, "params.clientThread");
+	NullCheck.notNull(params.callback, "params.callback");
+	NullCheck.notNull(params.browserFactory, "params.browserFactory");
+	this.browser = params.browserFactory.newBrowser(new Events(params.clientThread, this, params.callback));
 	this.callback = params.callback;
     }
 
@@ -117,7 +116,7 @@ static public final class Params
      *
      * @return true if the browser is free and able to do the refreshing, false otherwise
      */
-        boolean refresh()
+    boolean refresh()
     {
 	//Without reloading the page
 	browser.rescanDom();
@@ -131,13 +130,19 @@ static public final class Params
    	final int x = 0;//getHotPointX();
 	final int y = 0;//getHotPointY();
 	final Object obj = browser.runSafely(()->{
-		return null;
-		//FIXME:return documentBuilder.build(browser);
+		try {
+		final Model model = new Builder().build(browser);
+		return model.buildView();
+		}
+		catch(Throwable e)
+		{
+		    Log.error(LOG_COMPONENT, "the construction of web view and model failed:" + e.getClass().getName() + ":" + e.getMessage());
+		    return null;
+		}
 	    });
-	if (obj == null || !(obj instanceof Document))
+	if (obj == null || !(obj instanceof View))
 	    return false;
-	//setDocument((Document)obj, callback.getAreaVisibleWidth(this));
-	//this.onMoveHotPoint(new MoveHotPointEvent(x,y,false));
+	this.view = (View)obj;
 	return true;
     }
 
