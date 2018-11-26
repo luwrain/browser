@@ -24,7 +24,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
 import org.luwrain.doctree.*;
-import org.luwrain.controls.browser.*;
+import org.luwrain.controls.web.*;
 import org.luwrain.controls.doc.*;
 import org.luwrain.browser.*;
 import org.luwrain.browser.docbuilder.*;
@@ -58,7 +58,7 @@ class Actions implements org.luwrain.controls.browser.Callback
 	this.strings = strings;
     }
 
-    boolean onOpenUrl(BrowserArea area)
+    boolean onOpenUrl(WebArea area)
     {
 	NullCheck.notNull(area, "area");
 	final String current = area.getBrowserUrl();
@@ -69,7 +69,7 @@ class Actions implements org.luwrain.controls.browser.Callback
 	return true;
     }
 
-    boolean onCopyUrl(BrowserArea area)
+    boolean onCopyUrl(WebArea area)
     {
 	NullCheck.notNull(area, "area");
 	final String value = area.getBrowserUrl();
@@ -79,8 +79,9 @@ class Actions implements org.luwrain.controls.browser.Callback
 	return true;
     }
 
-    boolean onCopyRef(BrowserArea area)
+    boolean onCopyRef(WebArea area)
     {
+	/*
 	NullCheck.notNull(area, "area");
 	final Run run = area.getCurrentRun();
 	if (run == null || !(run instanceof  WebTextRun))
@@ -92,9 +93,11 @@ class Actions implements org.luwrain.controls.browser.Callback
 	//FIXME:clipboard
 	luwrain.message(res, Luwrain.MessageType.OK);
 	return true;
+	*/
+	return false;
     }
 
-    boolean onUniRefQuery(BrowserArea area, AreaQuery query)
+    boolean onUniRefQuery(WebArea area, AreaQuery query)
     {
 	NullCheck.notNull(area, "area");
 	NullCheck.notNull(query, "query");
@@ -111,8 +114,9 @@ class Actions implements org.luwrain.controls.browser.Callback
 	return true;
     }
 
-    boolean onEnter(BrowserArea area)
+    boolean onEnter(WebArea area)
     {
+	/*
 	NullCheck.notNull(area, "area");
 	final Run run = area.getCurrentRun();
 	if (run == null)
@@ -159,7 +163,7 @@ class Actions implements org.luwrain.controls.browser.Callback
 	    //FIXME:area.refresh();
 	    return true;
 	}
-
+	*/
 	//FIXME:
     /*
 	final String[] items = el.getMultipleText();
@@ -168,9 +172,10 @@ class Actions implements org.luwrain.controls.browser.Callback
 	return false;
     }
 
-    boolean onOk(BrowserArea area)
+    boolean onOk(WebArea area)
     {
 	NullCheck.notNull(area, "area");
+	/*
 	final Run run = area.getCurrentRun();
 	if (run == null || !(run instanceof WebRun))
 	    return false;
@@ -180,9 +185,11 @@ class Actions implements org.luwrain.controls.browser.Callback
 		return null;
 	    });
 	return true;
+	*/
+	return false;
     }
 
-    boolean onHistoryPrev(BrowserArea area)
+    boolean onHistoryPrev(WebArea area)
     {
 	NullCheck.notNull(area, "area");
 	//FIXME:

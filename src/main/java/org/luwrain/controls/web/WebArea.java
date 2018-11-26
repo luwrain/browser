@@ -87,10 +87,10 @@ public interface BrowserFactory
     
 static public final class Params
 {
-    ControlEnvironment context = null;
-    Callback callback = null;
-    ClientThread clientThread = null;
-    BrowserFactory browserFactory = null;
+    public ControlEnvironment context = null;
+    public Callback callback = null;
+    public ClientThread clientThread = null;
+    public BrowserFactory browserFactory = null;
 }
 
     protected final ControlEnvironment context = null;

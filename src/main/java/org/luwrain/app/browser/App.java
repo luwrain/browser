@@ -19,7 +19,7 @@ package org.luwrain.app.browser;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
-import org.luwrain.controls.browser.*;
+import org.luwrain.controls.web.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.doc.*;
 
@@ -30,7 +30,7 @@ public final class App implements Application
     private Base base = null;
     private Actions actions = null;
     private ActionLists actionLists = null;
-    private BrowserArea area = null;
+    private WebArea area = null;
 
     private final String arg;
 
@@ -68,14 +68,15 @@ public final class App implements Application
 	final org.luwrain.controls.doc.Strings announcementStrings = (org.luwrain.controls.doc.Strings)luwrain.i18n().getStrings("luwrain.doc");
 	final Announcement announcement = new Announcement(new DefaultControlEnvironment(luwrain), announcementStrings);
 
-    	area = new BrowserArea(
-			       new DefaultControlEnvironment(luwrain),
-			       base.browser,
-			       actions, 
-			       base,
-			       base,
-			       announcement){
+	final WebArea.Params params = new WebArea.Params();
+	params.context = new DefaultControlEnvironment(luwrain);
+	params.browserFactory = (events)->{
+	    base.browser.init(events);
+	    return base.browser;
+	};
+	//	params.callback = actions;
 
+    	area = new WebArea(params){
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
 		    NullCheck.notNull(event, "event");
