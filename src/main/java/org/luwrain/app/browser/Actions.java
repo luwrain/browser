@@ -208,6 +208,7 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 
     @Override public void onBrowserSuccess(String title)
     {
+	Log.debug("proba", "super");
 	if (title != null)
 	    luwrain.message(title, Sounds.INTRO_REGULAR); else //FIXME:strings
 	    luwrain.message("Готово"); //FIXME:strings

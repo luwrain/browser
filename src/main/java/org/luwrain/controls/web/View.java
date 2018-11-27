@@ -14,4 +14,14 @@ final class View
 	NullCheck.notNull(model, "model");
 	this.model = model;
     }
+
+    String getItem(int index)
+    {
+	return model.containers[index].getText();
+    }
+
+    int getItemCount()
+    {
+	return model.containers.length;
+    }
 }

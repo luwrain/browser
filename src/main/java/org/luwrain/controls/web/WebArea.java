@@ -91,12 +91,14 @@ public class WebArea implements Area
 	public BrowserFactory browserFactory = null;
     }
 
-    protected final ControlEnvironment context = null;
+    protected final ControlEnvironment context;
     protected final Callback callback;
     protected final Browser browser;
     protected View view = null;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
+
+    protected int itemIndex = 0;
 
     public WebArea(Params params)
     {
@@ -105,6 +107,7 @@ public class WebArea implements Area
 	NullCheck.notNull(params.clientThread, "params.clientThread");
 	NullCheck.notNull(params.callback, "params.callback");
 	NullCheck.notNull(params.browserFactory, "params.browserFactory");
+	this.context = params.context;
 	this.browser = params.browserFactory.newBrowser(new Events(params.clientThread, this, params.callback));
 	this.callback = params.callback;
     }
@@ -121,28 +124,31 @@ public class WebArea implements Area
 	//Without reloading the page
 	browser.rescanDom();
 	updateView();
-	context.playSound(Sounds.OK);
 	return true;
     }
 
     protected boolean updateView()
     {
-   	final int x = 0;//getHotPointX();
-	final int y = 0;//getHotPointY();
 	final Object obj = browser.runSafely(()->{
 		try {
 		final Model model = new Builder().build(browser);
+		Log.debug(LOG_COMPONENT, "prepared the model with " + model.containers.length + " containers");
 		return model.buildView();
 		}
 		catch(Throwable e)
 		{
 		    Log.error(LOG_COMPONENT, "the construction of web view and model failed:" + e.getClass().getName() + ":" + e.getMessage());
+		    e.printStackTrace();
 		    return null;
 		}
 	    });
 	if (obj == null || !(obj instanceof View))
+	{
+	    Log.warning(LOG_COMPONENT, "unable to build a view");
 	    return false;
+	}
 	this.view = (View)obj;
+	Log.debug(LOG_COMPONENT, "the view is successfully prepared");
 	return true;
     }
 
@@ -218,6 +224,23 @@ public class WebArea implements Area
 
     @Override public boolean onInputEvent(KeyboardEvent event)
     {
+	NullCheck.notNull(event, "event");
+	if (event.isSpecial() && !event.isModified())
+	    switch(event.getSpecial())
+	    {
+	    case ARROW_DOWN:
+		if (noContent())
+		    return true;
+		if (itemIndex >= view.getItemCount())
+		{
+		    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
+		    return true;
+		}
+		++itemIndex;
+		announceItem();
+		return true;
+	    case ARROW_UP:
+	    }
 	return false;
     }
 
@@ -245,7 +268,6 @@ public class WebArea implements Area
 	return new Action[0];
     }
 
-
     void onPageChangeState(Events.State state)
     {
 	NullCheck.notNull(state, "state");
@@ -256,7 +278,9 @@ public class WebArea implements Area
 	    callback.onBrowserRunning();
 	    return;
 	case SUCCEEDED:
+	    Log.debug("proba", "he");
 	    refresh();
+	    Log.debug("proba", "here2");
 	    callback.onBrowserSuccess(browser.getTitle());
 	    return;
 	case FAILED:
@@ -280,20 +304,27 @@ void onDownloadStart(String url)
 	//FIXME:
     }
 
+        public void announceItem()
+    {
+	if (view == null)
+	    return;
+	context.setEventResponse(DefaultEventResponse.text(view.getItem(itemIndex)));
+    }
+
+
     protected void noContentMsg()
     {
 	context.setEventResponse(DefaultEventResponse.hint(Hint.NO_CONTENT));
     }
 
-    /*
+
     protected boolean noContent()
     {
-	if (isEmpty())
+	if (view == null)
 	{
 	    noContentMsg();
 	    return true;
 	}
 	return false;
     }
-    */
 }

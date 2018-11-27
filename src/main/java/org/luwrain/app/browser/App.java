@@ -56,9 +56,13 @@ public final class App implements Application
 	this.actionLists = new ActionLists(luwrain, strings);
 	this.actions = new Actions(luwrain, base, base.sett, base.browser, strings);
 	createArea();
-	final String startingUrl = base.sett.getHomePage("");
-	if (!startingUrl.trim().isEmpty())
-	    area.open(startingUrl.trim());
+	if (arg != null && !arg.trim().isEmpty())
+	    area.open(arg); else
+	{
+	    	final String startingUrl = base.sett.getHomePage("");
+		if (!startingUrl.trim().isEmpty())
+		    	    area.open(startingUrl);
+	}
 	return new InitResult();
     }
 
