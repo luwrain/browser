@@ -60,7 +60,7 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
     boolean onOpenUrl(WebArea area)
     {
 	NullCheck.notNull(area, "area");
-	final String current = area.getBrowserUrl();
+	final String current = area.getUrl();
 	final String addr = conv.openUrl(current != null?current:"");
 	if (addr == null || addr.isEmpty())
 	    return true;
@@ -71,7 +71,7 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
     boolean onCopyUrl(WebArea area)
     {
 	NullCheck.notNull(area, "area");
-	final String value = area.getBrowserUrl();
+	final String value = area.getUrl();
 	if (value == null || value.trim().isEmpty())
 	    return false;
 	luwrain.message(value, Luwrain.MessageType.OK);
@@ -103,8 +103,8 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	if (!(query instanceof UniRefAreaQuery))
 	    return false;
 	final UniRefAreaQuery q = (UniRefAreaQuery)query;
-	final String title = area.getBrowserTitle();
-	final String url = area.getBrowserUrl();
+	final String title = area.getTitle();
+	final String url = area.getUrl();
 	if (url == null || url.trim().isEmpty())
 	    return false;
 	if (title != null && !title.isEmpty())

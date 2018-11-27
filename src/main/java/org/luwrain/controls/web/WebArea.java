@@ -30,7 +30,7 @@ import org.luwrain.controls.*;
 public class WebArea implements Area
 {
     static final String LOG_COMPONENT = "web";
-    
+
     /**
      * An interface to thread manager. A vast majority of work in the browser
      * engine is performed in background thread. So, the engine actually is
@@ -111,6 +111,8 @@ public class WebArea implements Area
 	NullCheck.notNull(params.browserFactory, "params.browserFactory");
 	this.context = params.context;
 	this.browser = params.browserFactory.newBrowser(new Events(params.clientThread, this, params.callback));
+	if (this.browser == null)
+	    throw new NullPointerException("Browser factory may not return null");
 	this.callback = params.callback;
     }
 
@@ -123,7 +125,10 @@ public class WebArea implements Area
      */
     boolean refresh()
     {
-	//Without reloading the page
+	/*
+	if (browser.isBusy())
+	    return false;
+	*/
 	browser.rescanDom();
 	updateView();
 	return true;
@@ -133,9 +138,9 @@ public class WebArea implements Area
     {
 	final Object obj = browser.runSafely(()->{
 		try {
-		final Model model = new Builder().build(browser);
-		Log.debug(LOG_COMPONENT, "prepared the model with " + model.containers.length + " containers");
-		return model.buildView();
+		    final Model model = new Builder().build(browser);
+		    Log.debug(LOG_COMPONENT, "prepared the model with " + model.containers.length + " containers");
+		    return model.buildView();
 		}
 		catch(Throwable e)
 		{
@@ -179,8 +184,8 @@ public class WebArea implements Area
 	if (url.isEmpty())
 	    return false;
 	if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://"))
-	browser.loadByUrl("http://" + url); else
-		browser.loadByUrl("http://" + url);
+	    browser.loadByUrl("http://" + url); else
+	    browser.loadByUrl("http://" + url);
 	return true;
     }
 
@@ -197,8 +202,8 @@ public class WebArea implements Area
 
     public String getUrl()
     {
-final String res = browser.getUrl();
-return res != null?res:"";
+	final String res = browser.getUrl();
+	return res != null?res:"";
     }
 
     @Override public int getHotPointX()
@@ -243,18 +248,17 @@ return res != null?res:"";
     protected boolean onMoveDown(KeyboardEvent event)
     {
 	NullCheck.notNull(event, "event");
-			if (noContent())
-		    return true;
-		if (itemIndex >= view.getItemCount())
-		{
-		    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
-		    return true;
-		}
-		++itemIndex;
-		announceItem();
-		return true;
+	if (noContent())
+	    return true;
+	if (itemIndex >= view.getItemCount())
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
+	    return true;
+	}
+	++itemIndex;
+	announceItem();
+	return true;
     }
-
 
     @Override public boolean onSystemEvent(EnvironmentEvent event)
     {
@@ -274,7 +278,7 @@ return res != null?res:"";
 	return false;
     }
 
-        @Override public Action[] getAreaActions()
+    @Override public Action[] getAreaActions()
     {
 	return new Action[0];
     }
@@ -285,11 +289,11 @@ return res != null?res:"";
 	this.state = state;
 	switch(state)
 	{
-	    	case SUCCEEDED:
+	case SUCCEEDED:
 	    refresh();
 	    callback.onBrowserSuccess(getTitle());
 	    return;
-	    	case RUNNING:
+	case RUNNING:
 	    callback.onBrowserRunning();
 	    return;
 	case FAILED:
@@ -307,24 +311,22 @@ return res != null?res:"";
 	this.progress = progress;
     }
 
-void onDownloadStart(String url)
+    void onDownloadStart(String url)
     {
 	//FIXME:
     }
 
-        public void announceItem()
+    public void announceItem()
     {
 	if (view == null)
 	    return;
 	context.setEventResponse(DefaultEventResponse.text(view.getItem(itemIndex)));
     }
 
-
     protected void noContentMsg()
     {
 	context.setEventResponse(DefaultEventResponse.hint(Hint.NO_CONTENT));
     }
-
 
     protected boolean noContent()
     {

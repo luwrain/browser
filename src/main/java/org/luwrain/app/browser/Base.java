@@ -47,7 +47,7 @@ class Base implements WebArea.ClientThread
 	NullCheck.notNull(href, "href");
 	if (href.isEmpty())
 	    return "";
-	final String pageUrl = area.getBrowserUrl();
+	final String pageUrl = area.getUrl();
 	if (pageUrl == null || pageUrl.isEmpty())
 	    return href;
 	    try {

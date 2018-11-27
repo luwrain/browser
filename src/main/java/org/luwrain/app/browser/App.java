@@ -59,9 +59,9 @@ public final class App implements Application
 	if (arg != null && !arg.trim().isEmpty())
 	    area.open(arg); else
 	{
-	    	final String startingUrl = base.sett.getHomePage("");
-		if (!startingUrl.trim().isEmpty())
-		    	    area.open(startingUrl);
+	    final String startingUrl = base.sett.getHomePage("");
+	    if (!startingUrl.trim().isEmpty())
+		area.open(startingUrl);
 	}
 	return new InitResult();
     }
@@ -75,8 +75,8 @@ public final class App implements Application
 	    base.browser.init(events);
 	    return base.browser;
 	};
-		params.callback = actions;
-		params.clientThread = base;
+	params.callback = actions;
+	params.clientThread = base;
 
     	area = new WebArea(params){
 		@Override public boolean onInputEvent(KeyboardEvent event)
@@ -93,7 +93,6 @@ public final class App implements Application
 			}
 		    return super.onInputEvent(event);
 		}
-
 		@Override public boolean onSystemEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -112,19 +111,17 @@ public final class App implements Application
 			return super.onSystemEvent(event);
 		    }
 		}
-
 		@Override public boolean onAreaQuery(AreaQuery query)
 		{
 		    NullCheck.notNull(query, "query");
 		    switch(query.getQueryCode())
 		    {
-					    case AreaQuery.UNIREF_AREA:
+		    case AreaQuery.UNIREF_AREA:
 			return actions.onUniRefQuery(area, query);
 		    default:
 			return super.onAreaQuery(query);
 		    }
 		}
-
 		@Override public Action[] getAreaActions()
 		{
 		    return actionLists.getBrowserActions();
@@ -141,9 +138,9 @@ public final class App implements Application
 	    return actions.onShowGraphical();
 	if (ActionEvent.isAction(event, "history-prev"))
 	    return actions.onHistoryPrev(area);
-		if (ActionEvent.isAction(event, "copy-url"))
+	if (ActionEvent.isAction(event, "copy-url"))
 	    return actions.onCopyUrl(area);
-				if (ActionEvent.isAction(event, "copy-ref"))
+	if (ActionEvent.isAction(event, "copy-ref"))
 	    return actions.onCopyRef(area);
 	return false;
     }
