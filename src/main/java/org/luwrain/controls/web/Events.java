@@ -31,7 +31,7 @@ class Events implements org.luwrain.browser.BrowserEvents
     {
 	if (progress == null)
 	    return;
-	clientThread.runAsync(()->area.onProgress(progress));
+	clientThread.runAsync(()->area.onProgress(progress.intValue()));
     }
 
     @Override public void onAlert(String message)

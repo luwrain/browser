@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2017 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -14,6 +14,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
 */
+
+//LWR_API 1.0
 
 package org.luwrain.controls.web;
 
@@ -156,9 +158,9 @@ public class WebArea implements Area
      *
      * @return true if there is any successfully loaded page, false otherwise
      */ 
-    boolean noWebContent()
+    boolean isEmpty()
     {
-	return state != Events.State.SUCCEEDED;
+	return view == null || state != Events.State.SUCCEEDED;
     }
 
     /**
@@ -176,24 +178,27 @@ public class WebArea implements Area
 	NullCheck.notNull(url, "url");
 	if (url.isEmpty())
 	    return false;
-	browser.loadByUrl(url);
+	if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://"))
+	browser.loadByUrl("http://" + url); else
+		browser.loadByUrl("http://" + url);
 	return true;
     }
 
-    boolean stop()
+    public void stop()
     {
 	browser.stop();
-	return true;
     }
 
-    public String getBrowserTitle()
+    public String getTitle()
     {
-	return browser.getTitle();
+	final String res = browser.getTitle();
+	return res != null?res:"";
     }
 
-    public String getBrowserUrl()
+    public String getUrl()
     {
-	return browser.getUrl();
+final String res = browser.getUrl();
+return res != null?res:"";
     }
 
     @Override public int getHotPointX()
@@ -229,7 +234,16 @@ public class WebArea implements Area
 	    switch(event.getSpecial())
 	    {
 	    case ARROW_DOWN:
-		if (noContent())
+		return onMoveDown(event);
+	    case ARROW_UP:
+	    }
+	return false;
+    }
+
+    protected boolean onMoveDown(KeyboardEvent event)
+    {
+	NullCheck.notNull(event, "event");
+			if (noContent())
 		    return true;
 		if (itemIndex >= view.getItemCount())
 		{
@@ -239,9 +253,6 @@ public class WebArea implements Area
 		++itemIndex;
 		announceItem();
 		return true;
-	    case ARROW_UP:
-	    }
-	return false;
     }
 
 
@@ -268,20 +279,18 @@ public class WebArea implements Area
 	return new Action[0];
     }
 
-    void onPageChangeState(Events.State state)
+    void onNewState(Events.State state)
     {
 	NullCheck.notNull(state, "state");
 	this.state = state;
 	switch(state)
 	{
-	case RUNNING:
-	    callback.onBrowserRunning();
-	    return;
-	case SUCCEEDED:
-	    Log.debug("proba", "he");
+	    	case SUCCEEDED:
 	    refresh();
-	    Log.debug("proba", "here2");
-	    callback.onBrowserSuccess(browser.getTitle());
+	    callback.onBrowserSuccess(getTitle());
+	    return;
+	    	case RUNNING:
+	    callback.onBrowserRunning();
 	    return;
 	case FAILED:
 	    callback.onBrowserFailed();
@@ -293,10 +302,9 @@ public class WebArea implements Area
 	}
     }
 
-    void onProgress(Number progress)
+    void onProgress(int progress)
     {
-	NullCheck.notNull(progress, "progress");
-	this.progress = (int)(progress==null?0:Math.floor(progress.doubleValue()*100));
+	this.progress = progress;
     }
 
 void onDownloadStart(String url)
