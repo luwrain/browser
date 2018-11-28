@@ -107,7 +107,6 @@ return res.toArray(new String[res.size()]);
     {
     	final Object obj = browser.runSafely(()->{
 		browser.rescanDom();
-		new org.luwrain.controls.web.Builder().build(browser);
 		final BrowserIterator it = browser.createIterator();
 		final List<Item> res = new LinkedList();
 		final int count = browser.numElements();

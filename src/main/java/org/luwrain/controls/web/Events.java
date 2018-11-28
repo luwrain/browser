@@ -21,7 +21,7 @@ import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
-class Events implements org.luwrain.browser.BrowserEvents
+final class Events implements org.luwrain.browser.BrowserEvents
 {
     private final WebArea.ClientThread clientThread;
     private final WebArea area;

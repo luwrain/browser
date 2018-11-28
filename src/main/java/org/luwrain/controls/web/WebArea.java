@@ -139,6 +139,13 @@ public class WebArea implements Area
 	final Object obj = browser.runSafely(()->{
 		try {
 		    final Model model = new Builder().build(browser);
+		    try {
+			model.dumpToFile(new java.io.File(new java.io.File("/tmp"), Model.makeDumpFileName(browser.getUrl())));
+		    }
+		    catch(Exception e)
+		    {
+			Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage());
+		    }
 		    Log.debug(LOG_COMPONENT, "prepared the model with " + model.containers.length + " containers");
 		    return model.buildView();
 		}

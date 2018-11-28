@@ -23,7 +23,7 @@ import java.awt.Rectangle;
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 
-public final class Builder
+final class Builder
 {
     static final String LOG_COMPONENT = "web";
 
@@ -102,8 +102,17 @@ Item root = null;
 	//NullCheck.notNull(root, "root");
 	final List<Container> res = new LinkedList();
 	for(Item i: items)
-	    if (!i.contentItems.isEmpty() && !isContentNode(i.it))
+	{
+	    if (i.contentItems.isEmpty() || isContentNode(i.it))
+		continue;
+	    switch(i.className.toLowerCase())
+	    {
+	    case "title":
+	    case "script":
+		continue;
+	    }
 		res.add(new Container(i.it, i.createContentItem().children));
+	}
 	return res.toArray(new Container[res.size()]);
     }
 

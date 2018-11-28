@@ -25,7 +25,12 @@ import org.luwrain.browser.*;
 
 final class Container
 {
+    enum Type {LIST_ITEM, PARA};
+    
     final BrowserIterator it;
+    final String className;
+    final String tagName;
+final Type type;
     final int x;
     final int y;
     final int width;
@@ -37,7 +42,10 @@ final class Container
 	NullCheck.notNull(it, "it");
 	NullCheck.notNullItems(content, "content");
 	this.it = it;
+	this.className = it.getClassName();
+	this.tagName = it.getTagName();
 	this.content = content;
+	this.type = getType(className.trim().toLowerCase(), tagName.trim().toLowerCase());
 	final Rectangle rect = it.getRect();
 	if (rect == null)
 	{
@@ -59,6 +67,17 @@ final class Container
 	for(ContentItem i: content)
 	    b.append(i.getText());
 	return new String(b);
+    }
+
+    private Type getType(String className, String tagName)
+    {
+	NullCheck.notNull(className, "className");
+	NullCheck.notNull(tagName, "tagName");
+	if (className.equals("li"))
+	    return Type.LIST_ITEM;
+	if (className.equals("paragraph"))
+	    return Type.PARA;
+	return Type.PARA;
     }
 
     @Override public String toString()

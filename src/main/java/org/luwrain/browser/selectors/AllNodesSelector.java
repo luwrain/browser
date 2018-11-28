@@ -43,7 +43,7 @@ public void setVisible(boolean visible)
     // return true if current element is visible
 public boolean checkVisible(BrowserIterator it)
     {
-	return it.isVisible();
+	return true;
     }
 
     /** return true if current element suits the condition of this selector.*/

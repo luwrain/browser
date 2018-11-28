@@ -31,6 +31,18 @@ final class View
 	this.model = model;
     }
 
+    boolean isEmpty()
+    {
+	return model.containers.length == 0;
+    }
+
+    Iterator createIterator()
+    {
+	if (isEmpty())
+	    return null;
+	return new Iterator(this, 0);
+    }
+
     String getItem(int index)
     {
 	return model.containers[index].getText();
@@ -39,5 +51,46 @@ final class View
     int getItemCount()
     {
 	return model.containers.length;
+    }
+
+    static final class Iterator
+    {
+	private final View view;
+	private int pos = 0;
+	private Container container;
+
+	Iterator(View view, int pos)
+	{
+	    NullCheck.notNull(view, "view");
+	    if (pos < 0)
+		throw new IllegalArgumentException("pos (" + pos + ") may not be negative");
+	    this.view = view;
+	    this.pos = pos;
+	    this.container = view.model.getContainer(this.pos);
+	}
+
+Container.Type getType()
+	{
+	    return container.type;
+	}
+
+	int getLineCount()
+	{
+	    return 1;
+	}
+
+	String getLine(int index)
+	{
+	    return "";
+	}
+
+	boolean moveNext()
+	{
+	    if (pos + 1 >= view.model.getContainerCount())
+		return false;
+	    ++pos;
+container = view.model.getContainer(pos);
+	    return true;
+	}
     }
 }

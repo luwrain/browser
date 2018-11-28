@@ -41,9 +41,14 @@ final class ContentItem
 	this.children = children;
     }
 
+    boolean isText()
+    {
+	return className.equals("Text");
+    }
+
     String getText()
     {
-	if (className.equals("Text"))
+	if (isText())
 	    return text;
 	final StringBuilder b = new StringBuilder();
 	for(ContentItem i: children)
