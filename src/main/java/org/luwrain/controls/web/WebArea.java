@@ -74,7 +74,8 @@ public class WebArea implements Area
 
     public interface Callback
     {
-	public enum MessageType {PROGRESS, ALERT, ERROR};
+	public enum MessageType {PROGRESS, ALERT, ERROR
+	};
 
 	void onBrowserRunning();
 	void onBrowserSuccess(String title);
@@ -97,6 +98,7 @@ public class WebArea implements Area
     protected final Callback callback;
     protected final Browser browser;
     protected View view = null;
+    protected View.Iterator it = null;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
 
@@ -162,7 +164,7 @@ public class WebArea implements Area
 	    return false;
 	}
 	this.view = (View)obj;
-	Log.debug(LOG_COMPONENT, "the view is successfully prepared");
+	this.it = view.createIterator();
 	return true;
     }
 
@@ -172,7 +174,7 @@ public class WebArea implements Area
      */ 
     boolean isEmpty()
     {
-	return view == null || state != Events.State.SUCCEEDED;
+	return view == null || it == null;
     }
 
     /**
@@ -248,21 +250,36 @@ public class WebArea implements Area
 	    case ARROW_DOWN:
 		return onMoveDown(event);
 	    case ARROW_UP:
+		return onMoveUp(event);
 	    }
 	return false;
     }
+
+        protected boolean onMoveUp(KeyboardEvent event)
+    {
+	NullCheck.notNull(event, "event");
+	if (noContent())
+	    return true;
+	if (!it.movePrev())
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
+	    return true;
+	}
+	announceItem();
+	return true;
+    }
+
 
     protected boolean onMoveDown(KeyboardEvent event)
     {
 	NullCheck.notNull(event, "event");
 	if (noContent())
 	    return true;
-	if (itemIndex >= view.getItemCount())
+	if (!it.moveNext())
 	{
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
 	    return true;
 	}
-	++itemIndex;
 	announceItem();
 	return true;
     }
@@ -325,9 +342,26 @@ public class WebArea implements Area
 
     public void announceItem()
     {
-	if (view == null)
+	if (isEmpty())
 	    return;
-	context.setEventResponse(DefaultEventResponse.text(view.getItem(itemIndex)));
+
+		final Sounds sound;
+	switch(it.getType())
+	{
+	case PARA:
+	    sound = Sounds.PARAGRAPH;
+	    break;
+	case LIST_ITEM:
+	    sound = Sounds.LIST_ITEM;
+	    break;
+	case HEADING:
+	    sound = Sounds.DOC_SECTION;
+	    break;
+	default:
+	    sound = null;
+	}
+
+	context.setEventResponse(DefaultEventResponse.text(sound, it.getLine(0)));
     }
 
     protected void noContentMsg()
@@ -337,7 +371,7 @@ public class WebArea implements Area
 
     protected boolean noContent()
     {
-	if (view == null)
+	if (isEmpty())
 	{
 	    noContentMsg();
 	    return true;

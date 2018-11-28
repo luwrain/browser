@@ -43,21 +43,12 @@ final class View
 	return new Iterator(this, 0);
     }
 
-    String getItem(int index)
-    {
-	return model.containers[index].getText();
-    }
-
-    int getItemCount()
-    {
-	return model.containers.length;
-    }
 
     static final class Iterator
     {
 	private final View view;
 	private int pos = 0;
-	private Container container;
+	private Container container = null;
 
 	Iterator(View view, int pos)
 	{
@@ -81,7 +72,16 @@ Container.Type getType()
 
 	String getLine(int index)
 	{
-	    return "";
+	    return container.getText();
+	}
+
+		boolean movePrev()
+	{
+	    if (pos == 0)
+		return false;
+	    --pos;
+container = view.model.getContainer(pos);
+	    return true;
 	}
 
 	boolean moveNext()

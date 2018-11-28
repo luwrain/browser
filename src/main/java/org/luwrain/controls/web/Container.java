@@ -25,8 +25,8 @@ import org.luwrain.browser.*;
 
 final class Container
 {
-    enum Type {LIST_ITEM, PARA};
-    
+    enum Type {LIST_ITEM, PARA, HEADING};
+
     final BrowserIterator it;
     final String className;
     final String tagName;
@@ -73,10 +73,15 @@ final Type type;
     {
 	NullCheck.notNull(className, "className");
 	NullCheck.notNull(tagName, "tagName");
-	if (className.equals("li"))
+	switch(className)
+	{
+	case "li":
 	    return Type.LIST_ITEM;
-	if (className.equals("paragraph"))
+	case "paragraph":
 	    return Type.PARA;
+	case "heading":
+	    return Type.HEADING;
+	}
 	return Type.PARA;
     }
 

@@ -109,6 +109,8 @@ Item root = null;
 	    {
 	    case "title":
 	    case "script":
+			    case "noscript":
+	    case "style":
 		continue;
 	    }
 		res.add(new Container(i.it, i.createContentItem().children));
