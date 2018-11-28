@@ -36,11 +36,6 @@ final class Model
 	this.containers = containers;
     }
 
-    View buildView()
-    {
-	return new View(this);
-    }
-
     Container[] getContainers()
     {
 	return containers.clone();

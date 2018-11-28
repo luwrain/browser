@@ -23,7 +23,7 @@ import java.awt.Rectangle;
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 
-final class Builder
+final class ModelBuilder
 {
     static final String LOG_COMPONENT = "web";
 

@@ -35,19 +35,28 @@ final class ContainerRowsBuilder
     void process(ContentItem contentItem)
     {
 	NullCheck.notNull(contentItem, "contentItem");
+	if (contentItem.isText())
+	    onText(contentItem, 40);//FIXME:
     }
 
     void commitRow()
     {
+	if (res.isEmpty())
+	    return;
+	rows.add(new ContainerRow(res.toArray(new WebObject[res.size()])));
+	res.clear();
+	offset = 0;
     }
 
-    
-
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars
-    void onContentItem(ContentItem item, String text, int boundFrom, int boundTo, int maxRowLen)
+    void onText(ContentItem item, int maxRowLen)
     {
 	NullCheck.notNull(item, "item");
-	NullCheck.notNull(text, "text");
+	if (!item.isText())
+	    throw new IllegalArgumentException("Given content item must be of text type");
+	final String text = item.getText();
+	final int boundFrom = 0;
+	final int boundTo = text.length();
 	if (boundFrom < 0 || boundTo < 0)
 	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") and boundTo (" + boundTo + ") may not be negative");
 	if (boundFrom > text.length() || boundTo > text.length())
@@ -67,7 +76,6 @@ final class ContainerRowsBuilder
 	    {
 		//Try again on the next line
 		commitRow();
-		offset = 0;
 		continue;
 	    }
 	    final int remains = boundTo - stepFrom;
@@ -85,7 +93,6 @@ final class ContainerRowsBuilder
 		if (offset > 0)
 		{
 		    //Trying to do the same once again from the beginning of the next line in hope a whole line will be enough
-		    offset = 0;
 		    commitRow();
 		    continue;
 		}
@@ -98,7 +105,6 @@ final class ContainerRowsBuilder
 			throw new RuntimeException("Exceeding room on line (" + roomOnLine + "), stepFrom=" + stepFrom + ", stepTo=" + stepTo);
 	    res.add(new WebText(item, stepFrom, stepTo));
 	    commitRow();
-	    offset = 0;
 	    nextStepFrom = findNextWord(stepTo, text, boundTo);
 	} //main loop;
     }

@@ -36,6 +36,7 @@ final Type type;
     final int width;
     final int height;
     final ContentItem[] content;
+ContainerRow[] rows = new ContainerRow[0];
 
     public Container(BrowserIterator it, ContentItem[] content)
     {
@@ -59,6 +60,17 @@ final Type type;
 	this.y = rect.y;
 	this.width = rect.width;
 	this.height = rect.height;
+    }
+
+    void setRows(ContainerRow[] rows)
+    {
+	NullCheck.notNullItems(rows, "rows");
+	this.rows = rows.clone();
+    }
+
+    ContainerRow[] getRows()
+    {
+	return rows.clone();
     }
 
     String getText()

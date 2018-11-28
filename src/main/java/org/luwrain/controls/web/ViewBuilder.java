@@ -38,8 +38,9 @@ final class ViewBuilder
 	    final ContainerRowsBuilder b = new ContainerRowsBuilder();
 	    for(ContentItem i: c.getContent())
 		processContentItem(b, i);
+	    c.setRows(b.rows.toArray(new ContainerRow[b.rows.size()]));
 	}
-	return null;
+	return new View(model);
     }
 
     private void processContentItem(ContainerRowsBuilder builder, ContentItem item)
@@ -55,5 +56,4 @@ final class ViewBuilder
 	    processContentItem(builder, i);
     }
 
-    
 }
