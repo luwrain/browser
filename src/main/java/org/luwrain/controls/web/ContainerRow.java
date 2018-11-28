@@ -19,13 +19,13 @@ package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
 
-class WebObject
+final class ContainerRow
 {
-    final ContentItem contentItem;
+    private WebObject[] objs;
 
-    WebObject(ContentItem contentItem)
+    ContainerRow(WebObject[] objs)
     {
-	NullCheck.notNull(contentItem, "contentItem");
-	this.contentItem = contentItem;
+	NullCheck.notNullItems(objs, "objs");
+	this.objs = objs;
     }
 }

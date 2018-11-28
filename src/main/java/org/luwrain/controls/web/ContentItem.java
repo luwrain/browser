@@ -46,6 +46,11 @@ final class ContentItem
 	return className.equals("Text");
     }
 
+    ContentItem[] getChildren()
+    {
+	return children.clone();
+    }
+
     String getText()
     {
 	if (isText())

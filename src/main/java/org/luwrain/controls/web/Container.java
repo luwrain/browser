@@ -85,6 +85,11 @@ final Type type;
 	return Type.PARA;
     }
 
+    ContentItem[] getContent()
+    {
+	return content.clone();
+    }
+
     @Override public String toString()
     {
 			final StringBuilder b = new StringBuilder();
