@@ -32,8 +32,8 @@ public class WebArea implements Area
     static final String LOG_COMPONENT = "web";
 
     /**
-     * An interface to thread manager. A vast majority of work in the browser
-     * engine is performed in background thread. So, the engine actually is
+     * An interface to thread manager. A vast majority of browser work
+     * is performed in background thread. So, the engine actually is
      * unable to return anything back to the browser area directly.  In
      * addition, general area functionality doesn't have anything allowing it
      * to manage threads. 
@@ -99,6 +99,7 @@ public class WebArea implements Area
     protected final Browser browser;
     protected View view = null;
     protected View.Iterator it = null;
+    protected int rowIndex = 0;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
 
@@ -159,6 +160,7 @@ public class WebArea implements Area
 	}
 	this.view = (View)obj;
 	this.it = view.createIterator();
+	this.rowIndex = 0;
 	return true;
     }
 
@@ -259,7 +261,7 @@ public class WebArea implements Area
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
 	    return true;
 	}
-	announceItem();
+	announceRow();
 	return true;
     }
 
@@ -269,12 +271,19 @@ public class WebArea implements Area
 	NullCheck.notNull(event, "event");
 	if (noContent())
 	    return true;
+	if (!it.isLastRow(rowIndex))
+	{
+	    ++rowIndex;
+	    announceRow();
+	    return true;
+	}
 	if (!it.moveNext())
 	{
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
 	    return true;
 	}
-	announceItem();
+	rowIndex = 0;
+	announceRow();
 	return true;
     }
 
@@ -334,12 +343,13 @@ public class WebArea implements Area
 	//FIXME:
     }
 
-    public void announceItem()
+    public void announceRow()
     {
 	if (isEmpty())
 	    return;
 
 		final Sounds sound;
+		if (rowIndex == 0)
 	switch(it.getType())
 	{
 	case PARA:
@@ -353,9 +363,12 @@ public class WebArea implements Area
 	    break;
 	default:
 	    sound = null;
-	}
-
-	context.setEventResponse(DefaultEventResponse.text(sound, it.getLine(0)));
+	} else
+		    sound = null;
+	final StringBuilder b = new StringBuilder();
+	for(WebObject obj: it.getLine(rowIndex))
+	    b.append(obj.getText());
+	context.setEventResponse(DefaultEventResponse.text(sound, new String(b)));
     }
 
     protected void noContentMsg()

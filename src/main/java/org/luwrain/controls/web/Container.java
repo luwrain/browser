@@ -81,6 +81,16 @@ ContainerRow[] rows = new ContainerRow[0];
 	return new String(b);
     }
 
+    int getRowCount()
+    {
+	return rows.length;
+    }
+
+    WebObject[] getRow(int index)
+    {
+	return rows[index].getWebObjs();
+    }
+
     private Type getType(String className, String tagName)
     {
 	NullCheck.notNull(className, "className");

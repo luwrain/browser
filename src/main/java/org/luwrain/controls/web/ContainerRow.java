@@ -28,4 +28,9 @@ final class ContainerRow
 	NullCheck.notNullItems(objs, "objs");
 	this.objs = objs;
     }
+
+    WebObject[] getWebObjs()
+    {
+	return objs.clone();
+    }
 }

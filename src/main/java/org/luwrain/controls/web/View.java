@@ -67,12 +67,17 @@ Container.Type getType()
 
 	int getLineCount()
 	{
-	    return 1;
+	    return container.getRowCount();
 	}
 
-	String getLine(int index)
+	WebObject[] getLine(int index)
 	{
-	    return container.getText();
+	    return container.getRow(index);
+	}
+
+	boolean isLastRow(int index)
+	{
+	    return container.getRowCount() > 0 && index + 1 == container.getRowCount();
 	}
 
 		boolean movePrev()

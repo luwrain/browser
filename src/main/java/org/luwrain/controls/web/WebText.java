@@ -40,7 +40,7 @@ final class WebText extends WebObject
 	    throw new IllegalArgumentException("posTo may not be greater than the lenth of the text (" + text.length() + ")");
     }
 
-    String getText()
+    @Override String getText()
     {
 	return text.substring(posFrom, posTo);
     }

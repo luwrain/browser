@@ -19,7 +19,7 @@ package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
 
-class WebObject
+abstract class WebObject
 {
     final ContentItem contentItem;
 
@@ -28,4 +28,6 @@ class WebObject
 	NullCheck.notNull(contentItem, "contentItem");
 	this.contentItem = contentItem;
     }
+
+    abstract String getText();
 }

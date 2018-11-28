@@ -23,6 +23,8 @@ import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
 final class ViewBuilder
 {
+    static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
+    
     final Model model;
 
     ViewBuilder(Model model)
@@ -38,6 +40,8 @@ final class ViewBuilder
 	    final ContainerRowsBuilder b = new ContainerRowsBuilder();
 	    for(ContentItem i: c.getContent())
 		processContentItem(b, i);
+	    b.commitRow();
+	    //Log.debug(LOG_COMPONENT, "" + b.rows.size() + " rows for the container");
 	    c.setRows(b.rows.toArray(new ContainerRow[b.rows.size()]));
 	}
 	return new View(model);
@@ -49,11 +53,11 @@ final class ViewBuilder
 	NullCheck.notNull(item, "item");
 	if (item.isText())
 	{
+	    //Log.debug(LOG_COMPONENT, "Adding text \'" + item.getText() + "\'");
 	    builder.process(item);
 	    return;
 	}
 	for(ContentItem i: item.getChildren())
 	    processContentItem(builder, i);
     }
-
 }
