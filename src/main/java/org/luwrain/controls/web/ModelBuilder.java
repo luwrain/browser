@@ -64,6 +64,7 @@ Item root = null;
 	final String className = it.getClassName();
 	switch(className)
 	{
+	case "Input":
 	case "Br":
 	case "Anchor":
 	case "Text":

@@ -43,6 +43,13 @@ final class ViewBuilder
 	    b.commitRow();
 	    //Log.debug(LOG_COMPONENT, "" + b.rows.size() + " rows for the container");
 	    c.setRows(b.rows.toArray(new ContainerRow[b.rows.size()]));
+	    if (c.getRowCount() == 0)
+	    {
+		Log.warning(LOG_COMPONENT, "the container <" + c.tagName + "> without rows (has " + c.getContent().length + " content items)");
+		Log.warning(LOG_COMPONENT, "the container content:");
+		for(ContentItem ci: c.getContent())
+		    Log.warning(LOG_COMPONENT, ci.toString());
+	    }
 	}
 	return new View(model);
     }
@@ -51,12 +58,8 @@ final class ViewBuilder
     {
 	NullCheck.notNull(builder, "builder");
 	NullCheck.notNull(item, "item");
-	if (item.isText())
-	{
-	    //Log.debug(LOG_COMPONENT, "Adding text \'" + item.getText() + "\'");
-	    builder.process(item);
+	if (builder.process(item))
 	    return;
-	}
 	for(ContentItem i: item.getChildren())
 	    processContentItem(builder, i);
     }

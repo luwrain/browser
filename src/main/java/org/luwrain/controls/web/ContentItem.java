@@ -28,6 +28,7 @@ final class ContentItem
     final String className;
     final String tagName;
     final String text;
+    private final Map<String, String> attrs;
     final ContentItem[] children;
 
     ContentItem(BrowserIterator it, ContentItem[] children)
@@ -38,6 +39,7 @@ final class ContentItem
 	this.className = it.getClassName();
 	this.tagName = it.getTagName();
 	this.text = prepareText(it.getText());
+	this.attrs = it.getAttrs();
 	this.children = children;
     }
 
@@ -46,18 +48,46 @@ final class ContentItem
 	return className.equals("Text");
     }
 
-    ContentItem[] getChildren()
-    {
-	return children.clone();
-    }
-
-    String getText()
+        String getText()
     {
 	if (isText())
 	    return text;
 	final StringBuilder b = new StringBuilder();
 	for(ContentItem i: children)
 	    b.append(i.getText());
+	return new String(b);
+    }
+
+    boolean isTextInput()
+    {
+	return tagName.toLowerCase().equals("input");
+    }
+
+    boolean isButton()
+    {
+	if (attrs.containsKey("role"))
+	{
+	    final String role = attrs.get("role");
+	    return role.equals("button");
+	}
+	return false;
+    }
+
+
+    ContentItem[] getChildren()
+    {
+	return children.clone();
+    }
+
+    @Override public String toString()
+    {
+	if (isText())
+	    return getText();
+	final StringBuilder b = new StringBuilder();
+	b.append("<" + tagName + ">");
+	for(ContentItem c: children)
+	    b.append(c.toString());
+	b.append("</" + tagName + ">");
 	return new String(b);
     }
 

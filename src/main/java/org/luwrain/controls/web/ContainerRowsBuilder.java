@@ -25,6 +25,9 @@ final class ContainerRowsBuilder
 {
     static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
 
+    static private final int SPECIAL_MIN_WIDTH = 10;
+        static private final int SPECIAL_MAX_WIDTH = 15;
+
     /** Objects of the incomplete row*/
     final List<WebObject> res = new LinkedList();
     /** Number of characters on the current (incomplete) row*/
@@ -32,22 +35,76 @@ final class ContainerRowsBuilder
     /** Complete rows*/
     final List<ContainerRow> rows = new LinkedList();
 
-    void process(ContentItem contentItem)
+    boolean process(ContentItem contentItem)
     {
 	NullCheck.notNull(contentItem, "contentItem");
 	if (contentItem.isText())
-	    onText(contentItem, 40);//FIXME:
+	{
+	    onText(contentItem, 50);//FIXME:
+	    return true;
+	}
+	if (contentItem.isTextInput())
+	{
+	    onTextInput(contentItem, 50);
+	    return true;
+	}
+		if (contentItem.isButton())
+	{
+	    onTextInput(contentItem, 50);
+	    return true;
+	}
+	return false;
     }
 
     void commitRow()
     {
 	if (res.isEmpty())
 	    return;
-	//Log.debug("proba", "commit" + offset);
 	rows.add(new ContainerRow(res.toArray(new WebObject[res.size()])));
 	res.clear();
 	offset = 0;
     }
+
+    private void onTextInput(ContentItem item, int maxRowLen)
+    {
+	NullCheck.notNull(item, "item");
+	if (!item.isTextInput())
+	    throw new IllegalArgumentException("The item must be of text input type");
+	if (maxRowLen < SPECIAL_MAX_WIDTH)
+	    throw new IllegalArgumentException("maxRowLen (" + maxRowLen + ") may not be less than SPECIAL_MAX_WIDTH (" + SPECIAL_MAX_WIDTH);
+	final int room = maxRowLen - offset;
+	final int width;
+	if (room > SPECIAL_MAX_WIDTH)
+	    width = SPECIAL_MAX_WIDTH; else
+	    if (room >= SPECIAL_MIN_WIDTH)
+		width = SPECIAL_MIN_WIDTH; else
+	    {
+		commitRow();
+		width = SPECIAL_MAX_WIDTH;
+	    }
+	res.add(new WebTextInput(item, width));
+    }
+
+        private void onButton(ContentItem item, int maxRowLen)
+    {
+	NullCheck.notNull(item, "item");
+	if (!item.isButton())
+	    throw new IllegalArgumentException("The item must be of button type");
+	if (maxRowLen < SPECIAL_MAX_WIDTH)
+	    throw new IllegalArgumentException("maxRowLen (" + maxRowLen + ") may not be less than SPECIAL_MAX_WIDTH (" + SPECIAL_MAX_WIDTH);
+	final int room = maxRowLen - offset;
+	final int width;
+	if (room > SPECIAL_MAX_WIDTH)
+	    width = SPECIAL_MAX_WIDTH; else
+	    if (room >= SPECIAL_MIN_WIDTH)
+		width = SPECIAL_MIN_WIDTH; else
+	    {
+		commitRow();
+		width = SPECIAL_MAX_WIDTH;
+	    }
+	res.add(new WebButton(item, "FIXME", width));
+    }
+
 
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars
     void onText(ContentItem item, int maxRowLen)

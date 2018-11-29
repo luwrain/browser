@@ -50,18 +50,40 @@ public class DefaultAppearance implements WebArea.Appearance
 	default:
 	    sound = null;
 	}
-	final StringBuilder b = new StringBuilder();
-	for(WebObject obj: objs)
-	    b.append(obj.getText());
-	context.setEventResponse(DefaultEventResponse.text(sound, new String(b)));
+	context.setEventResponse(DefaultEventResponse.text(sound, makeResponseText(objs)));
     }
 
     @Override public void announceRow(WebObject[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
+	context.setEventResponse(DefaultEventResponse.text(makeResponseText(objs)));
+    }
+
+    protected String makeResponseText(WebObject[] objs)
+    {
+	NullCheck.notNullItems(objs, "objs");
 	final StringBuilder b = new StringBuilder();
-	for(WebObject obj: objs)
-	    b.append(obj.getText());
-	context.setEventResponse(DefaultEventResponse.text(new String(b)));
+	for(WebObject o: objs)
+	{
+	    if (o instanceof WebText)
+	    {
+		final WebText webText = (WebText)o;
+		b.append(webText.getText());
+		continue;
+	    }
+	    if (o instanceof WebTextInput)
+	    {
+		final WebTextInput webTextInput = (WebTextInput)o;
+		b.append(" поле для ввода текста ").append(webTextInput.getText()).append(" ");
+		continue;
+	    }
+	    	    if (o instanceof WebButton)
+	    {
+		final WebButton webButton = (WebButton)o;
+		b.append(" кнопка ").append(webButton.getTitle()).append(" ");
+		continue;
+	    }
+		    	}
+	return new String(b);
     }
 }
