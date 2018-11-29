@@ -45,17 +45,32 @@ final class ContentItem
 
     boolean isText()
     {
-	return className.equals("Text");
+	return className.equals(Classes.TEXT);
     }
 
         String getText()
     {
-	if (isText())
 	    return text;
-	final StringBuilder b = new StringBuilder();
-	for(ContentItem i: children)
-	    b.append(i.getText());
-	return new String(b);
+}
+
+    boolean isImage()
+    {
+	if (className.equals(Classes.IMAGE))
+	    return true;
+	if (tagName.toLowerCase().equals("svg"))
+	    return true;
+	return false;
+    }
+
+    String getImageComment()
+    {
+	if (attrs.containsKey("alt"))
+	{
+	    final String value = attrs.get("alt");
+	    if (value != null)
+		return value;
+	}
+	return "";
     }
 
     boolean isTextInput()
@@ -65,12 +80,25 @@ final class ContentItem
 
     boolean isButton()
     {
+	if (className.equals(Classes.BUTTON))
+	    return true;
 	if (attrs.containsKey("role"))
 	{
 	    final String role = attrs.get("role");
 	    return role.equals("button");
 	}
 	return false;
+    }
+
+    String getButtonTitle()
+    {
+	if (attrs.containsKey("aria-label"))
+	{
+	    final String value = attrs.get("aria-label");
+	    if (value != null && !value.isEmpty())
+		return value;
+	}
+	return "FIXME:NO_TITLE";
     }
 
 

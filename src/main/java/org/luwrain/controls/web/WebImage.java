@@ -19,15 +19,15 @@ package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
 
-final class WebButton extends WebObject
+final class WebImage extends WebObject
 {
-    final String title;
+    final String comment;
     final int width;
 
-    WebButton(ContentItem contentItem, int width)
+    WebImage(ContentItem contentItem, int width)
     {
 	super(contentItem);
-	this.title = contentItem.getButtonTitle();
+	this.comment = contentItem.getImageComment();
 	this.width = width;
 	if (width <= 0)
 	    throw new IllegalArgumentException("width (" + width + ") must be greater than zero");
@@ -38,8 +38,8 @@ final class WebButton extends WebObject
 	return width;
     }
 
-public String getTitle()
+public String getComment()
     {
-	return title;
+	return comment;
     }
 }

@@ -64,7 +64,9 @@ Item root = null;
 	final String className = it.getClassName();
 	switch(className)
 	{
+	case "Button":
 	case "Input":
+	case "Image":
 	case "Br":
 	case "Anchor":
 	case "Text":
@@ -80,6 +82,7 @@ Item root = null;
 		case "strong":
 		case "b":
 		case "span":
+		case "svg":
 		    return true;
 		default:
 		    return false;
@@ -135,6 +138,7 @@ Item root = null;
 	    NullCheck.notNull(it, "it");
 	    this.it = it;
 	    this.className = it.getClassName();
+	    Log.debug("checking", className);
 	    this.tagName = it.getTagName();
 	}
 

@@ -17,29 +17,9 @@
 
 package org.luwrain.controls.web;
 
-import org.luwrain.core.*;
-
-final class WebButton extends WebObject
+final class Classes
 {
-    final String title;
-    final int width;
-
-    WebButton(ContentItem contentItem, int width)
-    {
-	super(contentItem);
-	this.title = contentItem.getButtonTitle();
-	this.width = width;
-	if (width <= 0)
-	    throw new IllegalArgumentException("width (" + width + ") must be greater than zero");
-    }
-
-        public int getWidth()
-    {
-	return width;
-    }
-
-public String getTitle()
-    {
-	return title;
-    }
+    static final String BUTTON = "Button";
+        static final String IMAGE = "Image";
+    static final String TEXT = "Text";
 }

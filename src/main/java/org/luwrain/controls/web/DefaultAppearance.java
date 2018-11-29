@@ -83,6 +83,14 @@ public class DefaultAppearance implements WebArea.Appearance
 		b.append(" кнопка ").append(webButton.getTitle()).append(" ");
 		continue;
 	    }
+
+		    	    	    if (o instanceof WebImage)
+	    {
+		final WebImage webImage = (WebImage)o;
+		b.append(" изображение ").append(webImage.getComment()).append(" ");
+		continue;
+	    }
+
 		    	}
 	return new String(b);
     }
