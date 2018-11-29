@@ -37,7 +37,7 @@ final class ContentItem
 	this.it = it;
 	this.className = it.getClassName();
 	this.tagName = it.getTagName();
-	this.text = it.getText();
+	this.text = prepareText(it.getText());
 	this.children = children;
     }
 
@@ -59,5 +59,23 @@ final class ContentItem
 	for(ContentItem i: children)
 	    b.append(i.getText());
 	return new String(b);
+    }
+
+    static private String  prepareText(String text)
+    {
+	NullCheck.notNull(text, "text");
+	String res = "";
+	boolean wasSpace = false;
+	for(int i = 0;i < text.length();++i)
+	{
+char c = text.charAt(i);
+	    if (Character.isISOControl(c))
+		c = ' ';
+	    if (wasSpace && Character.isSpace(c))
+		continue;
+	    		res += c;
+			wasSpace = Character.isSpace(c);
+	}
+	return res;
     }
 }

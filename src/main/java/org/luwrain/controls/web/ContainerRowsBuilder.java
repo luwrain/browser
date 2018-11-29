@@ -43,6 +43,7 @@ final class ContainerRowsBuilder
     {
 	if (res.isEmpty())
 	    return;
+	//Log.debug("proba", "commit" + offset);
 	rows.add(new ContainerRow(res.toArray(new WebObject[res.size()])));
 	res.clear();
 	offset = 0;
@@ -55,39 +56,36 @@ final class ContainerRowsBuilder
 	if (!item.isText())
 	    throw new IllegalArgumentException("Given content item must be of text type");
 	final String text = item.getText();
-	final int boundFrom = 0;
 	final int boundTo = text.length();
-	if (boundFrom < 0 || boundTo < 0)
-	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") and boundTo (" + boundTo + ") may not be negative");
-	if (boundFrom > text.length() || boundTo > text.length())
-	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") and boundTo (" + boundTo + ") may not be greater than length of the text (" + text.length() + ")");
-	if (boundFrom > boundTo)
-	    throw new IllegalArgumentException("boundFrom (" + boundFrom + ") may not be greater than boundTo (" + boundTo + ")");
+	//Log.debug("proba", "" + offset + ":" + text);
 	if (offset > maxRowLen)
 	    throw new RuntimeException("offset (" + offset + ") may not be greater than maxRowLen (" + maxRowLen + ")");
-	if (boundFrom == boundTo)
+	if (text.isEmpty())
 	    return;
-	int nextStepFrom = boundFrom;
+	int nextStepFrom = 0;
 	while (nextStepFrom < boundTo)
 	{
+	    //Log.debug("proba", "step:from " + nextStepFrom + ":" + text.substring(nextStepFrom));
 	    final int stepFrom = nextStepFrom;
-	    final int roomOnLine = maxRowLen - offset;//Available space on current line
+	    final int roomOnLine = maxRowLen - offset;//Available space on the current line
+	    	    final int needed = boundTo - stepFrom;
 	    if (roomOnLine == 0)
 	    {
 		//Try again on the next line
 		commitRow();
 		continue;
 	    }
-	    final int remains = boundTo - stepFrom;
-	    //Both remains and roomOnLine are greater than zero
-	    if (remains <= roomOnLine)
+	    //Both needed and roomOnLine are greater than zero
+	    if (needed <= roomOnLine)
 	    {
 		//Everything fits on the current line
+		//Log.debug("proba", "Adding " + text.substring(stepFrom, boundTo));
 		res.add(new WebText(item, stepFrom, boundTo));
-		offset += remains;
+		offset += needed;
 		return;
 	    }
 	    int stepTo = findWordsFittingOnLIne(text, stepFrom, boundTo, roomOnLine);
+	    //Log.debug("proba", "stepTo=" + stepTo);
 	    if (stepTo == stepFrom)//No word ends before the end of the row
 	    {
 		if (offset > 0)
@@ -103,9 +101,12 @@ final class ContainerRowsBuilder
 			throw new RuntimeException("stepTo (" + stepTo + ") == stepFrom (" + stepFrom + ")");
 	    	    if (stepTo - stepFrom > roomOnLine)
 			throw new RuntimeException("Exceeding room on line (" + roomOnLine + "), stepFrom=" + stepFrom + ", stepTo=" + stepTo);
+		    //Log.debug("proba", "splitting " + text.substring(stepFrom, stepTo));
+
 	    res.add(new WebText(item, stepFrom, stepTo));
+	    offset += (stepTo - stepFrom);
 	    commitRow();
-	    nextStepFrom = findNextWord(stepTo, text, boundTo);
+	    nextStepFrom = findNextWord(stepTo, text);
 	} //main loop;
     }
 
@@ -126,13 +127,13 @@ final class ContainerRowsBuilder
 	    return pos;
     }
 
-    private int findNextWord(int pos, String text, int boundTo)
+    private int findNextWord(int pos, String text)
     {
 	NullCheck.notNull(text, "text");
 	int i = pos;
-	    while (i < boundTo && Character.isSpace(text.charAt(i)))
+	while (i < text.length() && Character.isSpace(text.charAt(i)))
 		++i;
-	    if (i >= boundTo)
+	if (i >= text.length())
 		return pos;
 	    return i;
     }

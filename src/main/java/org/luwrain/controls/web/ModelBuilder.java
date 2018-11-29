@@ -40,7 +40,6 @@ Item root = null;
 	    items[i] = new Item(it.clone());
 	}
 	for(Item i: items)
-	    if (isContentNode(i.it))
 	    {
 		final BrowserIterator parentIt = i.it.getParent();
 		if (parentIt == null)
@@ -48,10 +47,11 @@ Item root = null;
 		    if (root == null)
 			root = i; else
 		    Log.warning(LOG_COMPONENT, "the node without a parent");
+		    continue;
 		}
 		final int parentPos = parentIt.getPos();
 		items[parentPos].children.add(i);
-		if (isContentNode(i.it))
+		if (isContentNode(i.it) && isVisible(i.it))
 		    items[parentPos].contentItems.add(i);
 		i.parent = items[parentPos];
 	    }

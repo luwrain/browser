@@ -266,6 +266,12 @@ public class WebArea implements Area
 	NullCheck.notNull(event, "event");
 	if (noContent())
 	    return true;
+	if (rowIndex > 0)
+	{
+	    --rowIndex;
+	    announceRow();
+	    return true;
+	}
 	if (!it.movePrev())
 	{
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
