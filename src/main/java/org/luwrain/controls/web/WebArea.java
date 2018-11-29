@@ -31,6 +31,12 @@ public class WebArea implements Area
 {
     static final String LOG_COMPONENT = "web";
 
+    interface Appearance
+    {
+	void announceFirstRow(Container.Type type, WebObject[] objs);
+		void announceRow(WebObject[] objs);
+    }
+
     /**
      * An interface to thread manager. A vast majority of browser work
      * is performed in background thread. So, the engine actually is
@@ -89,12 +95,14 @@ public class WebArea implements Area
     static public final class Params
     {
 	public ControlEnvironment context = null;
+	public Appearance appearance;
 	public Callback callback = null;
 	public ClientThread clientThread = null;
 	public BrowserFactory browserFactory = null;
     }
 
     protected final ControlEnvironment context;
+    protected final Appearance appearance;
     protected final Callback callback;
     protected final Browser browser;
     protected View view = null;
@@ -109,10 +117,12 @@ public class WebArea implements Area
     {
 	NullCheck.notNull(params, "params");
 	NullCheck.notNull(params.context, "params.context");
+	NullCheck.notNull(params.appearance, "params.appearance");
 	NullCheck.notNull(params.clientThread, "params.clientThread");
 	NullCheck.notNull(params.callback, "params.callback");
 	NullCheck.notNull(params.browserFactory, "params.browserFactory");
 	this.context = params.context;
+	this.appearance = params.appearance;
 	this.browser = params.browserFactory.newBrowser(new Events(params.clientThread, this, params.callback));
 	if (this.browser == null)
 	    throw new NullPointerException("Browser factory may not return null");
@@ -347,28 +357,9 @@ public class WebArea implements Area
     {
 	if (isEmpty())
 	    return;
-
-		final Sounds sound;
 		if (rowIndex == 0)
-	switch(it.getType())
-	{
-	case PARA:
-	    sound = Sounds.PARAGRAPH;
-	    break;
-	case LIST_ITEM:
-	    sound = Sounds.LIST_ITEM;
-	    break;
-	case HEADING:
-	    sound = Sounds.DOC_SECTION;
-	    break;
-	default:
-	    sound = null;
-	} else
-		    sound = null;
-	final StringBuilder b = new StringBuilder();
-	for(WebObject obj: it.getLine(rowIndex))
-	    b.append(obj.getText());
-	context.setEventResponse(DefaultEventResponse.text(sound, new String(b)));
+		    appearance.announceFirstRow(it.getType(), it.getLine(rowIndex)); else
+		    		    appearance.announceRow(it.getLine(rowIndex));
     }
 
     protected void noContentMsg()
