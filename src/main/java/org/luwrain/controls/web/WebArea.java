@@ -219,6 +219,11 @@ public class WebArea implements Area
 	browser.stop();
     }
 
+    public boolean goHistoryPrev()
+    {
+	return browser.goHistoryPrev();
+    }
+
     public String getTitle()
     {
 	final String res = browser.getTitle();

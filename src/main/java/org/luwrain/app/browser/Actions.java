@@ -125,19 +125,6 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
     }
 
 
-    boolean onHistoryPrev(WebArea area)
-    {
-	NullCheck.notNull(area, "area");
-	//FIXME:
-	return true;
-    }
-
-    boolean onShowGraphical()
-    {
-	browser.setVisibility(!browser.getVisibility());
-	return true;
-    }
-
     @Override public void onBrowserRunning()
     {
 	luwrain.say("Идёт загрузка страницы. Пожалуйста, подождите...");//FIXME:some kind message is better

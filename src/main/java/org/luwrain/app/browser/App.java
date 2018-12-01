@@ -101,7 +101,20 @@ public final class App implements Application
 		    switch(event.getCode())
 		    {
 		    case ACTION:
-			return onBrowserAction(event);
+				if (ActionEvent.isAction(event, "open-url"))
+	    return actions.onOpenUrl(area);
+	if (ActionEvent.isAction(event, "show-graphical"))
+	{
+	    base.browser.setVisibility(true);
+	    return true;
+	}
+	if (ActionEvent.isAction(event, "history-prev"))
+	    return area.goHistoryPrev();
+	if (ActionEvent.isAction(event, "copy-url"))
+	    return actions.onCopyUrl(area);
+	if (ActionEvent.isAction(event, "copy-ref"))
+	    return actions.onCopyRef(area);
+			return false;
 		    case CLOSE:
 			closeApp();
 			return true;
@@ -125,22 +138,6 @@ public final class App implements Application
 		    return actionLists.getBrowserActions();
 		}
 	    };
-    }
-
-    private boolean onBrowserAction(EnvironmentEvent event)
-    {
-	NullCheck.notNull(event, "event");
-	if (ActionEvent.isAction(event, "open-url"))
-	    return actions.onOpenUrl(area);
-	if (ActionEvent.isAction(event, "show-graphical"))
-	    return actions.onShowGraphical();
-	if (ActionEvent.isAction(event, "history-prev"))
-	    return actions.onHistoryPrev(area);
-	if (ActionEvent.isAction(event, "copy-url"))
-	    return actions.onCopyUrl(area);
-	if (ActionEvent.isAction(event, "copy-ref"))
-	    return actions.onCopyRef(area);
-	return false;
     }
 
     @Override public void closeApp()
