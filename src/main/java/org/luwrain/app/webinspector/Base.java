@@ -55,6 +55,15 @@ final class Base implements BrowserEvents
 	{
 	    res.add(e.getKey() + ": " + e.getValue());
 	}
+	final String style = item.it.getComputedStyleAll();
+	if (style != null && !style.trim().isEmpty())
+	{
+	    res.add("Стили:");//FIXME:
+	    final String[] styles = style.split(";", -1);
+	    Arrays.sort(styles);
+	    for(String s: styles)
+		res.add(s.trim());
+	}
 return res.toArray(new String[res.size()]);
 	    });
     }
@@ -62,11 +71,13 @@ return res.toArray(new String[res.size()]);
     @Override public void onChangeState(State state)
     {
 	NullCheck.notNull(state, "state");
-	Log.debug(LOG_COMPONENT, "changing state to " + state.toString());
 	switch(state)
 	{
 	case SUCCEEDED:
 	    updateItems();
+	    return;
+	case FAILED:
+	    luwrain.playSound(Sounds.ERROR);
 	    return;
 	}
     }
@@ -163,6 +174,4 @@ return res.toArray(new String[res.size()]);
 	{
 	}
     }
-
-    
 }

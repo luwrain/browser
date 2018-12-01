@@ -50,14 +50,20 @@ public final class App implements Application
 	final Object o = luwrain.i18n().getStrings(Strings.NAME);
 	if (o == null || !(o instanceof Strings))
 	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
-	strings = (Strings)o;
+	this.strings = (Strings)o;
 	this.luwrain = luwrain;
 	this.base = new Base(luwrain);
 	this.actionLists = new ActionLists(luwrain, strings);
 	this.actions = new Actions(luwrain, base, strings);
 	createArea();
 	if (arg != null && !arg.trim().isEmpty())
-	    base.browser.loadByUrl(arg);
+	{
+	    final String url;
+	    if (!arg.toLowerCase().startsWith("http://") && !arg.toLowerCase().startsWith("https://"))
+		url = "http://" + arg; else
+		url = arg;
+	    base.browser.loadByUrl(url);
+	}
 	return new InitResult();
     }
 
@@ -84,6 +90,9 @@ public final class App implements Application
 		    if (event.isSpecial())
 			switch(event.getSpecial())
 			{
+			case TAB:
+			    luwrain.setActiveArea(attrsArea);
+			    return true;
 			case ESCAPE:
 			    closeApp();
 			    return true;
@@ -98,12 +107,11 @@ public final class App implements Application
 		    switch(event.getCode())
 		    {
 		    case ACTION:
-				if (ActionEvent.isAction(event, "open-url"))
-	    return actions.onOpenUrl();
 	if (ActionEvent.isAction(event, "show-graphical"))
-	    return actions.onShowGraphical();
-	if (ActionEvent.isAction(event, "show-graphical"))
-	    return actions.onShowGraphical();
+	{
+base.browser.setVisibility(true);
+return true;
+	}
 	return false;
 		    case REFRESH:
 			base.updateItems();
@@ -177,7 +185,7 @@ public final class App implements Application
 
     @Override public void closeApp()
     {
-	//FIXME:browser.close();
+	base.browser.close();
 	luwrain.closeApp();
     }
 

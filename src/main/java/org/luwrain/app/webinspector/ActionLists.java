@@ -35,10 +35,6 @@ class ActionLists
     Action[] getBrowserActions()
     {
 	return new Action[]{
-	    new Action("open-url", strings.actionOpenUrl(), new KeyboardEvent(KeyboardEvent.Special.F6)),
-	    new Action("refresh", strings.actionRefresh(), new KeyboardEvent(KeyboardEvent.Special.F5)),
-	    new Action("stop", strings.actionStop(), new KeyboardEvent(KeyboardEvent.Special.ESCAPE)),
-	    new Action("history-prev", strings.actionHistoryPrev(), new KeyboardEvent(KeyboardEvent.Special.BACKSPACE)),
 	    new Action("show-graphical", strings.actionShowGraphical(), new KeyboardEvent(KeyboardEvent.Special.F10)),
 	};
     }

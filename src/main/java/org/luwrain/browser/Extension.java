@@ -39,17 +39,6 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 		}
 	    },
 
-	    new Command(){
-		@Override public String getName()
-		{
-		    return "web-inspector";
-		}
-		@Override public void onCommand(Luwrain luwrain)
-		{
-		    luwrain.launchApp("web-inspector");
-		}
-	    },
-
 	};
     }
 
@@ -80,7 +69,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 	    new Shortcut() {
 		@Override public String getExtObjName()
 		{
-		    return "web-inspector";
+		    return "web-ins";
 		}
 		@Override public Application[] prepareApp(String[] args)
 		{

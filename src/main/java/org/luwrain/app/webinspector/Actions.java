@@ -40,15 +40,6 @@ final class Actions
 	this.strings = strings;
     }
 
-    boolean onOpenUrl()
-    {
-	final String addr = conv.openUrl("http://");
-	if (addr == null || addr.isEmpty())
-	    return true;
-	base.browser.loadByUrl(addr);
-	return true;
-    }
-
     boolean onClick(Item item)
     {
 	NullCheck.notNull(item, "item");
@@ -76,11 +67,5 @@ final class Actions
 	    return true;
 	}
 	return false;
-    }
-
-    boolean onShowGraphical()
-    {
-	base.browser.setVisibility(!base.browser.getVisibility());
-	return true;
     }
 }
