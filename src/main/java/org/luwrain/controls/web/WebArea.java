@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
+import org.luwrain.core.queries.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.*;
 
@@ -117,7 +118,7 @@ public class WebArea implements Area
     protected View.Iterator it = null;
     protected int rowIndex = 0;
     protected int hotPointX = 0;
-    protected Events.State state = Events.State.READY;
+    protected Events.State state = null;
     protected int progress = 0;
 
     protected int itemIndex = 0;
@@ -188,9 +189,14 @@ public class WebArea implements Area
      *
      * @return true if there is any successfully loaded page, false otherwise
      */ 
-    boolean isEmpty()
+    public boolean isEmpty()
     {
 	return view == null || it == null;
+    }
+
+    boolean isBusy()
+    {
+	return state == Events.State.SCHEDULED || state == Events.State.RUNNING;
     }
 
     /**
@@ -409,11 +415,36 @@ public class WebArea implements Area
 	}
     }
 
-    @Override public boolean onAreaQuery(AreaQuery query)
-    {
-	return false;
-    }
-
+    		@Override public boolean onAreaQuery(AreaQuery query)
+		{
+		    NullCheck.notNull(query, "query");
+		    switch(query.getQueryCode())
+		    {
+		    case AreaQuery.UNIREF_AREA:
+			if (isEmpty())
+			    return false;
+			{
+			    final String title = getTitle();
+			    final String url = getUrl();
+			    ((UniRefAreaQuery)query).answer("link:" + title + ":web:" + url);
+			}
+			return true;
+		    case AreaQuery.URL_AREA:
+			if (isEmpty())
+			    return false;
+			((UrlAreaQuery)query).answer(getUrl());
+			return true;
+		    case AreaQuery.BACKGROUND_SOUND:
+			if (isBusy())
+			{
+			    ((BackgroundSoundQuery)query).answer(new BackgroundSoundQuery.Answer(BkgSounds.FETCHING));
+			    return true;
+			}
+			return false;
+		    default:
+			return false;
+		    }
+		}
     @Override public Action[] getAreaActions()
     {
 	return new Action[0];
@@ -423,6 +454,7 @@ public class WebArea implements Area
     {
 	NullCheck.notNull(state, "state");
 	this.state = state;
+	context.onAreaNewBackgroundSound(this);
 	switch(state)
 	{
 	case SUCCEEDED:
@@ -436,8 +468,7 @@ public class WebArea implements Area
 	    callback.onBrowserFailed();
 	    return;
 	case CANCELLED:
-	case READY:
-	case SCHEDULED:
+	    	case SCHEDULED:
 	    return;
 	}
     }
