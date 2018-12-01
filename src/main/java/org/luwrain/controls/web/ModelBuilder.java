@@ -74,7 +74,7 @@ Item root = null;
 	case Classes.BUTTON:
 	case Classes.INPUT:
 	case Classes.IMAGE:
-	case "Br":
+	case Classes.BR:
 	case Classes.ANCHOR:
 	case Classes.TEXT:
 	    return true;
@@ -101,6 +101,8 @@ Item root = null;
 
     static boolean isVisible(BrowserIterator it)
     {
+	if (it.getClassName().equals(Classes.BR))
+	    return true;
 	final Rectangle rect = it.getRect();
 	if (rect == null)
 	    return false;

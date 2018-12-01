@@ -46,6 +46,11 @@ final class ContentItem
 	this.children = children;
     }
 
+    boolean isBr()
+    {
+	return className.equals(Classes.BR);
+    }
+
     boolean isText()
     {
 	return className.equals(Classes.TEXT);

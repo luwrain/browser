@@ -40,22 +40,27 @@ final class ContainerRowsBuilder
 	NullCheck.notNull(contentItem, "contentItem");
 	if (contentItem.isText())
 	{
-	    onText(contentItem, 50);//FIXME:
+	    onText(contentItem, 100);//FIXME:
+	    return true;
+	}
+	if (contentItem.isBr())
+	{
+	    commitRow();
 	    return true;
 	}
 	if (contentItem.isTextInput())
 	{
-	    onTextInput(contentItem, 50);
+	    onTextInput(contentItem, 100);
 	    return true;
 	}
 		if (contentItem.isButton())
 	{
-	    onButton(contentItem, 50);
+	    onButton(contentItem, 100);
 	    return true;
 	}
 				if (contentItem.isImage())
 	{
-	    onImage(contentItem, 50);
+	    onImage(contentItem, 100);
 	    return true;
 	}
 	return false;
