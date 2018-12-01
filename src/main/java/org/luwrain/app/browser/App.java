@@ -109,27 +109,12 @@ public final class App implements Application
 			}
 			if (ActionEvent.isAction(event, "history-prev"))
 			    return area.goHistoryPrev();
-			if (ActionEvent.isAction(event, "copy-url"))
-			    return actions.onCopyUrl(area);
-			if (ActionEvent.isAction(event, "copy-ref"))
-			    return actions.onCopyRef(area);
 			return false;
 		    case CLOSE:
 			closeApp();
 			return true;
 		    default:
 			return super.onSystemEvent(event);
-		    }
-		}
-		@Override public boolean onAreaQuery(AreaQuery query)
-		{
-		    NullCheck.notNull(query, "query");
-		    switch(query.getQueryCode())
-		    {
-		    case AreaQuery.UNIREF_AREA:
-			return actions.onUniRefQuery(area, query);
-		    default:
-			return super.onAreaQuery(query);
 		    }
 		}
 		@Override public Action[] getAreaActions()

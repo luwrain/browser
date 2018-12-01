@@ -79,52 +79,6 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	return true;
     }
 
-    boolean onCopyUrl(WebArea area)
-    {
-	NullCheck.notNull(area, "area");
-	final String value = area.getUrl();
-	if (value == null || value.trim().isEmpty())
-	    return false;
-	luwrain.message(value, Luwrain.MessageType.OK);
-	return true;
-    }
-
-    boolean onCopyRef(WebArea area)
-    {
-	/*
-	NullCheck.notNull(area, "area");
-	final Run run = area.getCurrentRun();
-	if (run == null || !(run instanceof  WebTextRun))
-	    return false;
-	final String value = run.href();
-	if (value == null || value.isEmpty())
-	    return false;
-	final String res = base.makeHref(area, value);
-	//FIXME:clipboard
-	luwrain.message(res, Luwrain.MessageType.OK);
-	return true;
-	*/
-	return false;
-    }
-
-    boolean onUniRefQuery(WebArea area, AreaQuery query)
-    {
-	NullCheck.notNull(area, "area");
-	NullCheck.notNull(query, "query");
-	if (!(query instanceof UniRefAreaQuery))
-	    return false;
-	final UniRefAreaQuery q = (UniRefAreaQuery)query;
-	final String title = area.getTitle();
-	final String url = area.getUrl();
-	if (url == null || url.trim().isEmpty())
-	    return false;
-	if (title != null && !title.isEmpty())
-	    q.answer("link:" + title.trim().replaceAll(":", "\\:") + ":" + UNIREF_TYPE + ":" + url); else
-	    q.answer(UNIREF_TYPE + ":" + url);
-	return true;
-    }
-
-
     @Override public void onBrowserRunning()
     {
 	luwrain.say("Идёт загрузка страницы. Пожалуйста, подождите...");//FIXME:some kind message is better
@@ -169,4 +123,3 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	return false;
     }
 }
-    

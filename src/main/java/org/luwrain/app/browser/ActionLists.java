@@ -41,8 +41,6 @@ class ActionLists
 	    new Action("stop", strings.actionStop(), new KeyboardEvent(KeyboardEvent.Special.ESCAPE)),
 	    new Action("history-prev", strings.actionHistoryPrev(), new KeyboardEvent(KeyboardEvent.Special.BACKSPACE)),
 	    new Action("show-graphical", strings.actionShowGraphical(), new KeyboardEvent(KeyboardEvent.Special.F10)),
-	    	    new Action("copy-url", strings.actionCopyUrl(), new KeyboardEvent(KeyboardEvent.Special.F7)),
-	    new Action("copy-ref", strings.actionCopyRef(), new KeyboardEvent(KeyboardEvent.Special.F8)),
 	};
     }
 }
