@@ -19,14 +19,15 @@ package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
 
-final class WebTextInput extends WebObject
+public final class WebTextInput extends WebObject
 {
-String text = "";
-    final int width;
+private String text = "";
+    private final int width;
 
     WebTextInput(ContentItem contentItem, int width)
     {
 	super(contentItem);
+	this.text = contentItem.getText();
 	this.width = width;
 	if (width <= 0)
 	    throw new IllegalArgumentException("width (" + width + ") must be greater than zero");
@@ -37,7 +38,6 @@ String text = "";
 	return width;
     }
 
-
 public String getText()
     {
 	return text;
@@ -46,6 +46,7 @@ public String getText()
     public void setText(String text)
     {
 	NullCheck.notNull(text, "text");
+	contentItem.it.setText(text);
 	this.text = text;
     }
 }

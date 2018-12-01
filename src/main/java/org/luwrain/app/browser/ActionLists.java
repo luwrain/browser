@@ -20,7 +20,7 @@ package org.luwrain.app.browser;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 
-class ActionLists
+final class ActionLists
 {
     private final Luwrain luwrain;
     private final Strings strings;

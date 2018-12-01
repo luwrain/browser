@@ -158,7 +158,7 @@ public class WebArea implements Area
 	return true;
     }
 
-    protected boolean updateView()
+    public boolean updateView()
     {
 	final Object obj = browser.runSafely(()->{
 		try {

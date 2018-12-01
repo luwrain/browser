@@ -48,6 +48,6 @@ class Conversations
         String formTextEdit(String prevValue)
     {
 	NullCheck.notNull(prevValue, "prevValue");
-	return Popups.simple(luwrain, "Редактирования формы", "Текст в поле формы:", prevValue);
+	return Popups.simple(luwrain, "Редактирования формы", "Текст в поле:", prevValue);
     }
     }

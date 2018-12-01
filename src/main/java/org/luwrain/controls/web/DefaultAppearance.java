@@ -81,8 +81,11 @@ public class DefaultAppearance implements WebArea.Appearance
 	    if (o instanceof WebButton)
 	    {
 		final WebButton webButton = (WebButton)o;
-		//FIXME:width
-		b.append("[").append(webButton.getTitle()).append("]");
+		final String text;
+		if (webButton.getTitle().length() + 2 >= webButton.getWidth())
+		    text = webButton.getTitle() ; else
+		    text = webButton.getTitle().substring(0, webButton.getWidth() - 5) + "...";
+		b.append("[").append(text).append("]");
 		continue;
 	    }
 	    if (o instanceof WebImage)

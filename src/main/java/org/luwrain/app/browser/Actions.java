@@ -30,10 +30,8 @@ import org.luwrain.browser.*;
 
 import org.luwrain.popups.*;
 
-class Actions implements org.luwrain.controls.web.WebArea.Callback
+final class Actions implements org.luwrain.controls.web.WebArea.Callback
 {
-    static private final String UNIREF_TYPE = "url";//FIXME:change to web: in the future
-
     private final Luwrain luwrain;
     private final Base base;
     private final Settings sett;
@@ -57,16 +55,29 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	this.strings = strings;
     }
 
-    boolean onClick(WebObject webObj, int rowIndex)
+    boolean onClick(WebArea area, WebObject webObj, int rowIndex)
     {
+	NullCheck.notNull(area, "area");
 	NullCheck.notNull(webObj, "webObj");
+	if (webObj instanceof WebTextInput)
+	{
+	    final WebTextInput webTextInput = (WebTextInput)webObj;
+	    final String value = conv.formTextEdit(webTextInput.getText());
+	    if (value == null)
+		return true;
 	    browser.runSafely(()->{
-		    webObj.getIterator().emulateClick();
-	    return null;
+		    webTextInput.setText(value);
+		    return null;
 		});
+	    area.updateView();
+	    return true;
+	}
+	browser.runSafely(()->{
+		webObj.getIterator().emulateClick();
+		return null;
+	    });
 	return true;
     }
-
 
     boolean onOpenUrl(WebArea area)
     {

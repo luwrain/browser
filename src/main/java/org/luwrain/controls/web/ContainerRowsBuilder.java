@@ -102,15 +102,16 @@ final class ContainerRowsBuilder
 	    throw new IllegalArgumentException("The item must be of button type");
 	if (maxRowLen < SPECIAL_MAX_WIDTH)
 	    throw new IllegalArgumentException("maxRowLen (" + maxRowLen + ") may not be less than SPECIAL_MAX_WIDTH (" + SPECIAL_MAX_WIDTH);
+		final int width;
 	final int room = maxRowLen - offset;
-	final int width;
-	if (room > SPECIAL_MAX_WIDTH)
-	    width = SPECIAL_MAX_WIDTH; else
-	    if (room >= SPECIAL_MIN_WIDTH)
-		width = SPECIAL_MIN_WIDTH; else
+	final int needed = item.getButtonTitle().length() + 2;
+	if (needed <= room)
+	    width = needed; else
+	if (needed >= SPECIAL_MIN_WIDTH)
+	    width = room; else
 	    {
 		commitRow();
-		width = SPECIAL_MAX_WIDTH;
+		width = Math.min(needed, maxRowLen);
 	    }
 	res.add(new WebButton(item, width));
     }
