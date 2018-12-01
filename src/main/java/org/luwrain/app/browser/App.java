@@ -79,7 +79,6 @@ public final class App implements Application
 	};
 	params.callback = actions;
 	params.clientThread = base;
-
     	area = new WebArea(params){
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
@@ -101,19 +100,19 @@ public final class App implements Application
 		    switch(event.getCode())
 		    {
 		    case ACTION:
-				if (ActionEvent.isAction(event, "open-url"))
-	    return actions.onOpenUrl(area);
-	if (ActionEvent.isAction(event, "show-graphical"))
-	{
-	    base.browser.setVisibility(true);
-	    return true;
-	}
-	if (ActionEvent.isAction(event, "history-prev"))
-	    return area.goHistoryPrev();
-	if (ActionEvent.isAction(event, "copy-url"))
-	    return actions.onCopyUrl(area);
-	if (ActionEvent.isAction(event, "copy-ref"))
-	    return actions.onCopyRef(area);
+			if (ActionEvent.isAction(event, "open-url"))
+			    return actions.onOpenUrl(area);
+			if (ActionEvent.isAction(event, "show-graphical"))
+			{
+			    base.browser.setVisibility(true);
+			    return true;
+			}
+			if (ActionEvent.isAction(event, "history-prev"))
+			    return area.goHistoryPrev();
+			if (ActionEvent.isAction(event, "copy-url"))
+			    return actions.onCopyUrl(area);
+			if (ActionEvent.isAction(event, "copy-ref"))
+			    return actions.onCopyRef(area);
 			return false;
 		    case CLOSE:
 			closeApp();
@@ -152,7 +151,6 @@ public final class App implements Application
 
     @Override public AreaLayout getAreaLayout()
     {
-		return new AreaLayout(area);
-
+	return new AreaLayout(area);
     }
 }
