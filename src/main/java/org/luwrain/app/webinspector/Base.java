@@ -55,7 +55,7 @@ final class Base implements BrowserEvents
 	{
 	    res.add(e.getKey() + ": " + e.getValue());
 	}
-	final String style = item.it.getComputedStyleAll();
+	final String style = item.it.getAllComputedStyles();
 	if (style != null && !style.trim().isEmpty())
 	{
 	    res.add("Стили:");//FIXME:

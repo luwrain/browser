@@ -103,7 +103,7 @@ Item root = null;
     {
 	if (it.getClassName().equals(Classes.BR))
 	    return true;
-	if (it.getComputedStyleProperty("visibility").toLowerCase().equals("hidden"))
+	if (it.getComputedStyle("visibility").toLowerCase().equals("hidden"))
 	    return false;
 	final Rectangle rect = it.getRect();
 	if (rect == null)

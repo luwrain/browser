@@ -55,7 +55,7 @@ public class ChildrenSelector extends AllNodesSelector
 	final AllNodesSelector allNodesSelector = new AllNodesSelector(visible);
 	if (allNodesSelector.moveFirst(it))
 	    do {
-		if(it.isParent(childrenOf))
+		//		if(it.isParent(childrenOf))
 		    res.add(it.getPos());
 	    }
 	    while (allNodesSelector.moveNext(it));
