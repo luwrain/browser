@@ -19,7 +19,10 @@ package org.luwrain.controls.web;
 
 final class Classes
 {
+    static final String ANCHOR = "Anchor";
     static final String BUTTON = "Button";
-        static final String IMAGE = "Image";
+    static final String DOCUMENT_TYPE = "DocumentType";
+    static final String IMAGE = "Image";
+    static final String INPUT = "Input";
     static final String TEXT = "Text";
 }

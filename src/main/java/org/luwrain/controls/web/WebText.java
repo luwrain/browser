@@ -45,6 +45,16 @@ public String getText()
 	return text.substring(posFrom, posTo);
     }
 
+    public boolean hasHref()
+    {
+	return !contentItem.href.isEmpty();
+    }
+
+    public String getHref()
+    {
+	return contentItem.href;
+    }
+
     @Override public int getWidth()
     {
 	return posTo -posFrom;

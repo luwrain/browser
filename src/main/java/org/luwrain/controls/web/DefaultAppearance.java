@@ -105,6 +105,8 @@ public class DefaultAppearance implements WebArea.Appearance
 	    if (o instanceof WebText)
 	    {
 		final WebText webText = (WebText)o;
+		if (webText.hasHref())
+		    b.append (" ссылка ");
 		b.append(webText.getText());
 		continue;
 	    }

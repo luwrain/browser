@@ -25,19 +25,22 @@ import org.luwrain.browser.*;
 final class ContentItem
 {
     final BrowserIterator it;
+    final String href;
     final String className;
     final String tagName;
     final String text;
     private final Map<String, String> attrs;
     final ContentItem[] children;
 
-    ContentItem(BrowserIterator it, ContentItem[] children)
+    ContentItem(BrowserIterator it, ContentItem[] children, String href)
     {
 	NullCheck.notNull(it, "it");
 	NullCheck.notNullItems(children, "children");
+	NullCheck.notNull(href, "href");
 	this.it = it;
 	this.className = it.getClassName();
 	this.tagName = it.getTagName();
+	this.href = href.trim();
 	this.text = prepareText(it.getText());
 	this.attrs = it.getAttrs();
 	this.children = children;

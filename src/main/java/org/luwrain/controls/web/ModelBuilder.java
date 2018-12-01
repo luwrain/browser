@@ -41,6 +41,8 @@ Item root = null;
 	}
 	for(Item i: items)
 	    {
+		if (i.className.equals(Classes.DOCUMENT_TYPE))
+		continue;
 		final BrowserIterator parentIt = i.it.getParent();
 		if (parentIt == null)
 		{
@@ -55,6 +57,11 @@ Item root = null;
 		    items[parentPos].contentItems.add(i);
 		i.parent = items[parentPos];
 	    }
+	if (root != null)
+	    Log.debug(LOG_COMPONENT, "root tag <" + root.tagName + ">"); else
+	    Log.warning(LOG_COMPONENT, "no root item");
+	if (root != null)
+	    setHrefs(root, "");
 	return new Model(createContainers(items, root));
     }
 
@@ -64,12 +71,12 @@ Item root = null;
 	final String className = it.getClassName();
 	switch(className)
 	{
-	case "Button":
-	case "Input":
-	case "Image":
+	case Classes.BUTTON:
+	case Classes.INPUT:
+	case Classes.IMAGE:
 	case "Br":
-	case "Anchor":
-	case "Text":
+	case Classes.ANCHOR:
+	case Classes.TEXT:
 	    return true;
 	case "":
 	    {
@@ -100,6 +107,24 @@ Item root = null;
 	return rect.width > 0 && rect.height > 0;
     }
 
+    private void setHrefs(Item item, String href)
+    {
+	NullCheck.notNull(item, "item");
+	NullCheck.notNull(href, "href");
+	final String current;
+	if (item.className.equals(Classes.ANCHOR))
+	{
+	final String hrefAttr = item.it.getAttr("href");
+	if (hrefAttr != null)
+	    current = hrefAttr; else
+	    current = "";
+	} else
+	    current = href;
+	item.href = current;
+	for(Item i: item.children)
+	    setHrefs(i, current);
+    }
+
     private Container[] createContainers(Item[] items, Item root)
     {
 	NullCheck.notNullItems(items, "items");
@@ -127,6 +152,7 @@ Item root = null;
 	final BrowserIterator it;
 	final String tagName;
 	final String className;
+	String href = "";
 
 	Item parent = null;
 	final List<Item> children = new LinkedList();
@@ -147,7 +173,7 @@ Item root = null;
 	    final List<ContentItem> c = new LinkedList();
 	    for(Item i: contentItems)
 		c.add(i.createContentItem());
-	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]));
+	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]), href);
 	}
     }
 }
