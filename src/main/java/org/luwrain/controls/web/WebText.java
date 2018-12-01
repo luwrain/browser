@@ -44,4 +44,9 @@ public String getText()
     {
 	return text.substring(posFrom, posTo);
     }
+
+    @Override public int getWidth()
+    {
+	return posTo -posFrom;
+    }
 }

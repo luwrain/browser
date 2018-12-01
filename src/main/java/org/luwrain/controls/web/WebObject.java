@@ -18,8 +18,9 @@
 package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
+import org.luwrain.browser.*;
 
-public class WebObject
+abstract public class WebObject
 {
     final ContentItem contentItem;
 
@@ -27,5 +28,12 @@ public class WebObject
     {
 	NullCheck.notNull(contentItem, "contentItem");
 	this.contentItem = contentItem;
+    }
+
+    abstract public int getWidth();
+
+    public BrowserIterator getIterator()
+    {
+	return contentItem.it;
     }
 }

@@ -32,7 +32,7 @@ String text = "";
 	    throw new IllegalArgumentException("width (" + width + ") must be greater than zero");
     }
 
-        public int getWidth()
+        @Override public int getWidth()
     {
 	return width;
     }

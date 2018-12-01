@@ -70,7 +70,7 @@ Container.Type getType()
 	    return container.getRowCount();
 	}
 
-	WebObject[] getLine(int index)
+	WebObject[] getRow(int index)
 	{
 	    return container.getRow(index);
 	}

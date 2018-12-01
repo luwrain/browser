@@ -72,6 +72,7 @@ public final class App implements Application
 	final WebArea.Params params = new WebArea.Params();
 	params.context = new DefaultControlEnvironment(luwrain);
 	params.appearance = new DefaultAppearance(params.context);
+	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(webObj, rowIndex);
 	params.browserFactory = (events)->{
 	    base.browser.init(events);
 	    return base.browser;
@@ -87,8 +88,6 @@ public final class App implements Application
 		    if (event.isSpecial())
 			switch(event.getSpecial())
 			{
-			case ENTER:
-			    return actions.onEnter(this);
 			default:
 			    break;
 			}
@@ -106,8 +105,6 @@ public final class App implements Application
 		    case CLOSE:
 			closeApp();
 			return true;
-		    case OK:
-			return actions.onOk(area);
 		    default:
 			return super.onSystemEvent(event);
 		    }
@@ -148,8 +145,7 @@ public final class App implements Application
 
     @Override public void closeApp()
     {
-	//FIXME:browser.close();
-	luwrain.closeApp();
+	base.closeApp();
     }
 
     @Override public String getAppName()
@@ -159,6 +155,7 @@ public final class App implements Application
 
     @Override public AreaLayout getAreaLayout()
     {
-	return new AreaLayout(area);
+		return new AreaLayout(area);
+
     }
 }

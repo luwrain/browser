@@ -59,6 +59,43 @@ public class DefaultAppearance implements WebArea.Appearance
 	context.setEventResponse(DefaultEventResponse.text(makeResponseText(objs)));
     }
 
+    @Override public String getRowTextAppearance(WebObject[] objs)
+    {
+	NullCheck.notNullItems(objs, "objs");
+	final StringBuilder b = new StringBuilder();
+	for(WebObject o: objs)
+	{
+	    if (o instanceof WebText)
+	    {
+		final WebText webText = (WebText)o;
+		b.append(webText.getText());
+		continue;
+	    }
+	    if (o instanceof WebTextInput)
+	    {
+		final WebTextInput webTextInput = (WebTextInput)o;
+		//FIXME:width
+		b.append("[").append(webTextInput.getText()).append("]");
+		continue;
+	    }
+	    if (o instanceof WebButton)
+	    {
+		final WebButton webButton = (WebButton)o;
+		//FIXME:width
+		b.append("[").append(webButton.getTitle()).append("]");
+		continue;
+	    }
+	    if (o instanceof WebImage)
+	    {
+		final WebImage webImage = (WebImage)o;
+		//FIXME:
+		b.append("[").append(webImage.getComment()).append("]");
+		continue;
+	    }
+	}
+	return new String(b);
+    }
+
     protected String makeResponseText(WebObject[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
@@ -77,21 +114,19 @@ public class DefaultAppearance implements WebArea.Appearance
 		b.append(" поле для ввода текста ").append(webTextInput.getText()).append(" ");
 		continue;
 	    }
-	    	    if (o instanceof WebButton)
+	    if (o instanceof WebButton)
 	    {
 		final WebButton webButton = (WebButton)o;
 		b.append(" кнопка ").append(webButton.getTitle()).append(" ");
 		continue;
 	    }
-
-		    	    	    if (o instanceof WebImage)
+	    if (o instanceof WebImage)
 	    {
 		final WebImage webImage = (WebImage)o;
 		b.append(" изображение ").append(webImage.getComment()).append(" ");
 		continue;
 	    }
-
-		    	}
+	}
 	return new String(b);
     }
 }

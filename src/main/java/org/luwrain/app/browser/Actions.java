@@ -57,6 +57,17 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	this.strings = strings;
     }
 
+    boolean onClick(WebObject webObj, int rowIndex)
+    {
+	NullCheck.notNull(webObj, "webObj");
+	    browser.runSafely(()->{
+		    webObj.getIterator().emulateClick();
+	    return null;
+		});
+	return true;
+    }
+
+
     boolean onOpenUrl(WebArea area)
     {
 	NullCheck.notNull(area, "area");
@@ -113,80 +124,6 @@ class Actions implements org.luwrain.controls.web.WebArea.Callback
 	return true;
     }
 
-    boolean onEnter(WebArea area)
-    {
-	/*
-	NullCheck.notNull(area, "area");
-	final Run run = area.getCurrentRun();
-	if (run == null)
-	    return false;
-	if (run instanceof WebTextRun)
-	    //	    run instanceof ButtonRun)
-	{
-	    final WebRun webTextRun = (WebRun)run;
-	    browser.runSafely(()->{
-	    webTextRun.click();
-	    return null;
-		});
-	    luwrain.playSound(Sounds.INTRO_REGULAR);
-	    return true;
-	}
-
-	//button
-		if (run instanceof ButtonRun)
-	{
-	    final ButtonRun buttonRun = (ButtonRun)run;
-	    browser.runSafely(()->{
-		    buttonRun.submit();
-	    return null;
-		});
-	    luwrain.playSound(Sounds.INTRO_REGULAR);
-	    return true;
-	}
-
-
-	//edits
-	if (run instanceof EditRun)
-	{
-	    final EditRun editRun = (EditRun)run;
-	    final Object oldValue = browser.runSafely(()->{
-		    return editRun.getText();
-		});
-	    final String newValue = conv.formTextEdit(oldValue != null?oldValue.toString():"");
-	    if (newValue == null)
-		return false;
-	    browser.runSafely(()->{
-		    editRun.setText(newValue);
-		    return null;
-		});
-	    //FIXME:area.refresh();
-	    return true;
-	}
-	*/
-	//FIXME:
-    /*
-	final String[] items = el.getMultipleText();
-	el.setText(res);
-    */
-	return false;
-    }
-
-    boolean onOk(WebArea area)
-    {
-	NullCheck.notNull(area, "area");
-	/*
-	final Run run = area.getCurrentRun();
-	if (run == null || !(run instanceof WebRun))
-	    return false;
-	final WebRun webRun = (WebRun)run;
-	browser.runSafely(()->{
-		webRun.click();
-		return null;
-	    });
-	return true;
-	*/
-	return false;
-    }
 
     boolean onHistoryPrev(WebArea area)
     {

@@ -27,7 +27,7 @@ import org.luwrain.controls.web.*;
 
 class Base implements WebArea.ClientThread
 {
-    static final String LOG_COMPONENT = "browser";
+    static final String LOG_COMPONENT = "web";
 
     private final Luwrain luwrain;
     final Settings sett;
@@ -60,6 +60,12 @@ return urlObj.toString();
 	    {
 		return href;
 	    }
+    }
+
+    void closeApp()
+    {
+	browser.close();
+	luwrain.closeApp();
     }
 
     @Override public Object runSync(Callable callable)

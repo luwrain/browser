@@ -34,7 +34,13 @@ public class WebArea implements Area
     interface Appearance
     {
 	void announceFirstRow(Container.Type type, WebObject[] objs);
-		void announceRow(WebObject[] objs);
+	void announceRow(WebObject[] objs);
+	String getRowTextAppearance(WebObject[] objs);
+    }
+
+    public interface ClickHandler
+    {
+	boolean onWebClick(WebArea area, int rowIndex, WebObject webObj);
     }
 
     /**
@@ -96,6 +102,7 @@ public class WebArea implements Area
     {
 	public ControlEnvironment context = null;
 	public Appearance appearance;
+	public ClickHandler clickHandler = null;
 	public Callback callback = null;
 	public ClientThread clientThread = null;
 	public BrowserFactory browserFactory = null;
@@ -104,10 +111,12 @@ public class WebArea implements Area
     protected final ControlEnvironment context;
     protected final Appearance appearance;
     protected final Callback callback;
+    protected ClickHandler clickHandler = null;
     protected final Browser browser;
     protected View view = null;
     protected View.Iterator it = null;
     protected int rowIndex = 0;
+    protected int hotPointX = 0;
     protected Events.State state = Events.State.READY;
     protected int progress = 0;
 
@@ -127,6 +136,7 @@ public class WebArea implements Area
 	if (this.browser == null)
 	    throw new NullPointerException("Browser factory may not return null");
 	this.callback = params.callback;
+	this.clickHandler = params.clickHandler;
     }
 
     /**
@@ -221,6 +231,21 @@ public class WebArea implements Area
 	return res != null?res:"";
     }
 
+    public WebObject getSelectedObj()
+    {
+	if (isEmpty())
+	    return null;
+		final WebObject[] row = it.getRow(rowIndex);
+		int offset = 0;
+		for(int i = 0;i < row.length;++i)
+		{
+		    if (hotPointX >= offset && hotPointX < offset + row[i].getWidth())
+			return row[i];
+		    offset += row[i].getWidth();
+		}
+		return null;
+    }
+
     @Override public int getHotPointX()
     {
 	return 0;
@@ -253,12 +278,72 @@ public class WebArea implements Area
 	if (event.isSpecial() && !event.isModified())
 	    switch(event.getSpecial())
 	    {
+	    case ENTER:
+		return onClick();
+	    case ARROW_RIGHT:
+		return onMoveRight(event);
+	    case ARROW_LEFT:
+		return onMoveLeft(event);
 	    case ARROW_DOWN:
 		return onMoveDown(event);
 	    case ARROW_UP:
 		return onMoveUp(event);
 	    }
 	return false;
+    }
+
+    protected boolean onClick()
+    {
+	if (noContent())
+	    return true;
+	if (clickHandler == null)
+	    return false;
+	final WebObject webObj = getSelectedObj();
+	if (webObj == null)
+	    return false;
+	return clickHandler.onWebClick(this, rowIndex, webObj);
+    }
+
+    protected boolean onMoveRight(KeyboardEvent event)
+    {
+	NullCheck.notNull(event, "event");
+	if (noContent())
+	    return true;
+	final String text = appearance.getRowTextAppearance(it.getRow(rowIndex));
+	if (hotPointX >= text.length())
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    return true;
+	    }
+	++hotPointX;
+		if (hotPointX >= text.length())
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    return true;
+	    }
+		context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
+		return true;
+    }
+
+		    protected boolean onMoveLeft(KeyboardEvent event)
+    {
+	NullCheck.notNull(event, "event");
+	if (noContent())
+	    return true;
+	final String text = appearance.getRowTextAppearance(it.getRow(rowIndex));
+	if (hotPointX == 0)
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.BEGIN_OF_LINE));
+	    return true;
+	    }
+	--hotPointX;
+		if (hotPointX >= text.length())
+	{
+	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    return true;
+	    }
+		context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
+		return true;
     }
 
         protected boolean onMoveUp(KeyboardEvent event)
@@ -269,6 +354,7 @@ public class WebArea implements Area
 	if (rowIndex > 0)
 	{
 	    --rowIndex;
+	    hotPointX = 0;
 	    announceRow();
 	    return true;
 	}
@@ -277,10 +363,10 @@ public class WebArea implements Area
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
 	    return true;
 	}
+	hotPointX = 0;
 	announceRow();
 	return true;
     }
-
 
     protected boolean onMoveDown(KeyboardEvent event)
     {
@@ -290,6 +376,7 @@ public class WebArea implements Area
 	if (!it.isLastRow(rowIndex))
 	{
 	    ++rowIndex;
+	    hotPointX = 0;
 	    announceRow();
 	    return true;
 	}
@@ -299,6 +386,7 @@ public class WebArea implements Area
 	    return true;
 	}
 	rowIndex = 0;
+	hotPointX = 0;
 	announceRow();
 	return true;
     }
@@ -364,8 +452,8 @@ public class WebArea implements Area
 	if (isEmpty())
 	    return;
 		if (rowIndex == 0)
-		    appearance.announceFirstRow(it.getType(), it.getLine(rowIndex)); else
-		    		    appearance.announceRow(it.getLine(rowIndex));
+		    appearance.announceFirstRow(it.getType(), it.getRow(rowIndex)); else
+		    		    appearance.announceRow(it.getRow(rowIndex));
     }
 
     protected void noContentMsg()
