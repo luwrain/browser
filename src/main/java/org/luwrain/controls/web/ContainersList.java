@@ -24,13 +24,13 @@ import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
-final class Model
+final class ContainersList
 {
     static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
-    
-    final Container[] containers;
 
-    Model(Container[] containers)
+    private final Container[] containers;
+
+    ContainersList(Container[] containers)
     {
 	NullCheck.notNullItems(containers, "containers");
 	this.containers = containers;
@@ -51,7 +51,7 @@ final class Model
 	return containers[index];
     }
 
-    public void dumpToFile(File file) throws IOException
+    void dumpToFile(File file) throws IOException
     {
 	NullCheck.notNull(file, "file");
 	final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
@@ -106,5 +106,4 @@ final class Model
 	NullCheck.notNull(url, "url");
 	return url.replaceAll("/", ".").replaceAll(":", ".");
     }
-
 }

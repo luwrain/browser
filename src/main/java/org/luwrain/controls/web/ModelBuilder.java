@@ -27,7 +27,7 @@ final class ModelBuilder
 {
     static final String LOG_COMPONENT = "web";
 
-    public Model build(Browser browser)
+    ContainersList build(Browser browser)
     {
 	NullCheck.notNull(browser, "browser");
 	final int count = browser.numElements();
@@ -62,7 +62,7 @@ final class ModelBuilder
 	    Log.warning(LOG_COMPONENT, "no root item");
 	if (root != null)
 	    setHrefs(root, "");
-	return new Model(createContainers(items, root));
+	return new ContainersList(createContainers(items, root));
     }
 
     private void setHrefs(Item item, String href)

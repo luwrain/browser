@@ -162,10 +162,10 @@ public class WebArea implements Area
     {
 	final Object obj = browser.runSafely(()->{
 		try {
-		    final Model model = new ModelBuilder().build(browser);
-		    try { model.dumpToFile(new java.io.File(new java.io.File("/tmp"), Model.makeDumpFileName(browser.getUrl()))); } catch(Exception e) { Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage()); }
-		    Log.debug(LOG_COMPONENT, "prepared the model with " + model.containers.length + " containers");
-		    return new ViewBuilder(model).build();
+		    final ContainersList containers = new ModelBuilder().build(browser);
+		    try { containers.dumpToFile(new java.io.File(new java.io.File("/tmp"), ContainersList.makeDumpFileName(browser.getUrl()))); } catch(Exception e) { Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage()); }
+		    Log.debug(LOG_COMPONENT, "containers prepared: " + containers.getContainerCount());
+		    return new ViewBuilder(containers.getContainers()).build();
 		}
 		catch(Throwable e)
 		{

@@ -27,18 +27,18 @@ final class ViewBuilder
 {
     static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
     
-    final Model model;
+    private final Container[] containers;
 
-    ViewBuilder(Model model)
+    ViewBuilder(Container[] containers)
     {
-	NullCheck.notNull(model, "model");
-	this.model = model;
+	NullCheck.notNullItems(containers, "containers");
+	this.containers = containers;
     }
 
     View build()
     {
 	final List<Container> viewContainers = new LinkedList();
-	for(Container c: model.getContainers())
+	for(Container c: containers)
 	{
 	    final ContainerRowsBuilder b = new ContainerRowsBuilder();
 	    for(ContentItem i: c.getContent())
