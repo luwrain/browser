@@ -17,6 +17,8 @@
 
 package org.luwrain.controls.web;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.WebArea.Callback.MessageType;
@@ -35,21 +37,19 @@ final class ViewBuilder
 
     View build()
     {
+	final List<Container> viewContainers = new LinkedList();
 	for(Container c: model.getContainers())
 	{
 	    final ContainerRowsBuilder b = new ContainerRowsBuilder();
 	    for(ContentItem i: c.getContent())
 		processContentItem(b, i);
 	    b.commitRow();
-	    //Log.debug(LOG_COMPONENT, "" + b.rows.size() + " rows for the container");
 	    c.setRows(b.rows.toArray(new ContainerRow[b.rows.size()]));
-	    if (c.getRowCount() == 0)
-	    {
-		Log.warning(LOG_COMPONENT, "the container <" + c.tagName + "> without rows (has " + c.getContent().length + " content items)");
-		Log.warning(LOG_COMPONENT, c.treeItem.toString());
-	    }
+	    if (c.getRowCount() > 0)
+		viewContainers.add(c); else
+		Log.warning(LOG_COMPONENT, "the container <" + c.tagName + "> without rows (has " + c.getContent().length + " content items)" + System.lineSeparator() + c.treeItem.toString());
 	}
-	return new View(model);
+	return new View(viewContainers.toArray(new Container[viewContainers.size()]));
     }
 
     private void processContentItem(ContainerRowsBuilder builder, ContentItem item)

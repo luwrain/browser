@@ -23,17 +23,27 @@ import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
 final class View
 {
-    final Model model;
+    private final Container[] containers;
 
-	View(Model model)
+	View(Container[] containers)
     {
-	NullCheck.notNull(model, "model");
-	this.model = model;
+	NullCheck.notNullItems(containers, "containers");
+	this.containers = containers;
     }
 
     boolean isEmpty()
     {
-	return model.containers.length == 0;
+	return containers.length == 0;
+    }
+
+    Container getContainer(int index)
+    {
+	return containers[index];
+    }
+
+    int getContainerCount()
+    {
+	return containers.length;
     }
 
     Iterator createIterator()
@@ -57,7 +67,7 @@ final class View
 		throw new IllegalArgumentException("pos (" + pos + ") may not be negative");
 	    this.view = view;
 	    this.pos = pos;
-	    this.container = view.model.getContainer(this.pos);
+	    this.container = view.getContainer(this.pos);
 	}
 
 Container.Type getType()
@@ -85,16 +95,16 @@ Container.Type getType()
 	    if (pos == 0)
 		return false;
 	    --pos;
-container = view.model.getContainer(pos);
+container = view.getContainer(pos);
 	    return true;
 	}
 
 	boolean moveNext()
 	{
-	    if (pos + 1 >= view.model.getContainerCount())
+	    if (pos + 1 >= view.getContainerCount())
 		return false;
 	    ++pos;
-container = view.model.getContainer(pos);
+container = view.getContainer(pos);
 	    return true;
 	}
     }

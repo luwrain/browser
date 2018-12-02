@@ -29,6 +29,8 @@ final class ContentItem
     final String className;
     final String tagName;
     final String text;
+    final String role;
+    final String ariaLabel;
     private final Map<String, String> attrs;
     final ContentItem[] children;
 
@@ -38,12 +40,14 @@ final class ContentItem
 	NullCheck.notNullItems(children, "children");
 	NullCheck.notNull(href, "href");
 	this.it = it;
+		this.children = children;
 	this.className = it.getClassName();
 	this.tagName = it.getTagName();
 	this.href = href.trim();
 	this.text = prepareText(it.getText());
 	this.attrs = it.getAttrs();
-	this.children = children;
+	this.role = attrs.containsKey("role")?attrs.get("role"):"";
+		this.ariaLabel = attrs.containsKey("aria-label")?attrs.get("aria-label"):"";
     }
 
     boolean isBr()
@@ -67,11 +71,15 @@ final class ContentItem
 	    return true;
 	if (tagName.toLowerCase().equals("svg"))
 	    return true;
+	if (role.toLowerCase().equals("img"))
+	    return true;
 	return false;
     }
 
     String getImageComment()
     {
+	if (ariaLabel.isEmpty())
+	    return ariaLabel;
 	if (attrs.containsKey("alt"))
 	{
 	    final String value = attrs.get("alt");

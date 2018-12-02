@@ -68,6 +68,9 @@ Item root = null;
     private boolean isContentNode(BrowserIterator it)
     {
 	NullCheck.notNull(it, "it");
+	final String role = it.getAttr("role");
+	if (role != null && role.toLowerCase().equals("img"))
+	    return true;
 	final String className = it.getClassName();
 	switch(className)
 	{
@@ -138,7 +141,7 @@ Item root = null;
 	{
 	    if (i.contentItems.isEmpty() || isContentNode(i.it))
 		continue;
-	    switch(i.className.toLowerCase())
+	    switch(i.className.toLowerCase())//FIXME:
 	    {
 	    case "title":
 	    case "script":
