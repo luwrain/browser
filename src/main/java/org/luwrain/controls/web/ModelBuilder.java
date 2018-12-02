@@ -146,12 +146,12 @@ Item root = null;
 	    case "style":
 		continue;
 	    }
-		res.add(new Container(i.it, i.createContentItem().children));
+	    res.add(new Container(i.it, i, i.createContentItem().children));
 	}
 	return res.toArray(new Container[res.size()]);
     }
 
-    static private final class Item
+    static private final class Item implements TreeItem
     {
 	final BrowserIterator it;
 	final String tagName;
@@ -160,16 +160,28 @@ Item root = null;
 
 	Item parent = null;
 	final List<Item> children = new LinkedList();
-	
 	final List<Item> contentItems = new LinkedList();
-
 	Item(BrowserIterator it)
 	{
 	    NullCheck.notNull(it, "it");
 	    this.it = it;
 	    this.className = it.getClassName();
-	    Log.debug("checking", className);
 	    this.tagName = it.getTagName();
+	}
+
+	@Override public TreeItem getParentItem()
+	{
+	    return parent;
+	}
+
+	@Override public TreeItem[] getChildren()
+	{
+	    return children.toArray(new TreeItem[children.size()]);
+	}
+
+	@Override public Map<String, String> getItemAttrs()
+	{
+	    return it.getAttrs();
 	}
 
 	ContentItem createContentItem()
@@ -178,6 +190,22 @@ Item root = null;
 	    for(Item i: contentItems)
 		c.add(i.createContentItem());
 	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]), href);
+	}
+
+	@Override public String toString()
+	{
+	    if (className.equals(Classes.TEXT))
+		return it.getText();
+	    final Map<String, String> attrs = it.getAttrs();
+	    final StringBuilder b = new StringBuilder();
+		b.append("<").append(tagName);
+		for(Map.Entry<String, String> e: attrs.entrySet())
+		    b.append (System.lineSeparator()).append("  ").append(e.getKey()).append("=").append(e.getValue());
+		b.append(">").append(System.lineSeparator());
+		for(Item c: children)
+		    b.append(c.toString()).append(System.lineSeparator());
+		b.append("</").append(tagName).append(">");
+		return new String(b);
 	}
     }
 }

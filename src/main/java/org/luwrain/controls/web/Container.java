@@ -28,21 +28,24 @@ final class Container
     enum Type {LIST_ITEM, PARA, HEADING};
 
     final BrowserIterator it;
+    final TreeItem treeItem;
     final String className;
     final String tagName;
-final Type type;
+    final Type type;
     final int x;
     final int y;
     final int width;
     final int height;
     final ContentItem[] content;
-ContainerRow[] rows = new ContainerRow[0];
+    ContainerRow[] rows = new ContainerRow[0];
 
-    public Container(BrowserIterator it, ContentItem[] content)
+    public Container(BrowserIterator it, TreeItem treeItem, ContentItem[] content)
     {
 	NullCheck.notNull(it, "it");
+	NullCheck.notNull(treeItem, "treeItem");
 	NullCheck.notNullItems(content, "content");
 	this.it = it;
+	this.treeItem = treeItem;
 	this.className = it.getClassName();
 	this.tagName = it.getTagName();
 	this.content = content;

@@ -46,9 +46,7 @@ final class ViewBuilder
 	    if (c.getRowCount() == 0)
 	    {
 		Log.warning(LOG_COMPONENT, "the container <" + c.tagName + "> without rows (has " + c.getContent().length + " content items)");
-		Log.warning(LOG_COMPONENT, "the container content:");
-		for(ContentItem ci: c.getContent())
-		    Log.warning(LOG_COMPONENT, ci.toString());
+		Log.warning(LOG_COMPONENT, c.treeItem.toString());
 	    }
 	}
 	return new View(model);
