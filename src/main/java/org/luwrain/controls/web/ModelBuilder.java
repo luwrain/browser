@@ -32,7 +32,7 @@ final class ModelBuilder
 	NullCheck.notNull(browser, "browser");
 	final int count = browser.numElements();
 	final Item[] items = new Item[count];
-Item root = null;
+	Item root = null;
 	final BrowserIterator it = browser.createIterator();
 	for(int i = 0;i < count;++i)
 	{
@@ -40,23 +40,23 @@ Item root = null;
 	    items[i] = new Item(it.clone());
 	}
 	for(Item i: items)
-	    {
-		if (i.className.equals(Classes.DOCUMENT_TYPE))
+	{
+	    if (i.className.equals(Classes.DOCUMENT_TYPE))
 		continue;
-		final BrowserIterator parentIt = i.it.getParent();
-		if (parentIt == null)
-		{
-		    if (root == null)
-			root = i; else
+	    final BrowserIterator parentIt = i.it.getParent();
+	    if (parentIt == null)
+	    {
+		if (root == null)
+		    root = i; else
 		    Log.warning(LOG_COMPONENT, "the node without a parent");
-		    continue;
-		}
-		final int parentPos = parentIt.getPos();
-		items[parentPos].children.add(i);
-		if (i.content && i.visible)
-		    items[parentPos].contentItems.add(i);
-		i.parent = items[parentPos];
+		continue;
 	    }
+	    final int parentPos = parentIt.getPos();
+	    items[parentPos].children.add(i);
+	    if (i.content && i.visible)
+		items[parentPos].contentItems.add(i);
+	    i.parent = items[parentPos];
+	}
 	if (root != null)
 	    Log.debug(LOG_COMPONENT, "root tag <" + root.tagName + ">"); else
 	    Log.warning(LOG_COMPONENT, "no root item");
@@ -72,10 +72,10 @@ Item root = null;
 	final String current;
 	if (item.className.equals(Classes.ANCHOR))
 	{
-	final String hrefAttr = item.it.getAttr("href");
-	if (hrefAttr != null)
-	    current = hrefAttr; else
-	    current = "";
+	    final String hrefAttr = item.it.getAttr("href");
+	    if (hrefAttr != null)
+		current = hrefAttr; else
+		current = "";
 	} else
 	    current = href;
 	item.href = current;
@@ -96,7 +96,7 @@ Item root = null;
 	    {
 	    case "title":
 	    case "script":
-			    case "noscript":
+	    case "noscript":
 	    case "style":
 		continue;
 	    }
@@ -124,7 +124,7 @@ Item root = null;
 	    this.it = it;
 	    this.content = isContentNode(it);
 	    if (content)
-	    this.visible = isVisible(it); else
+		this.visible = isVisible(it); else
 		this.visible = true;
 	    this.className = it.getClassName();
 	    this.tagName = it.getTagName();
@@ -153,55 +153,54 @@ Item root = null;
 	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]), href);
 	}
 
-	    static private boolean isContentNode(BrowserIterator it)
-    {
-	NullCheck.notNull(it, "it");
-	final String role = it.getAttr("role");
-	if (role != null && role.toLowerCase().equals("img"))
-	    return true;
-	final String className = it.getClassName();
-	switch(className)
+	static private boolean isContentNode(BrowserIterator it)
 	{
-	case Classes.BUTTON:
-	case Classes.INPUT:
-	case Classes.IMAGE:
-	case Classes.BR:
-	case Classes.ANCHOR:
-	case Classes.TEXT:
-	    return true;
-	case "":
+	    NullCheck.notNull(it, "it");
+	    final String role = it.getAttr("role");
+	    if (role != null && role.toLowerCase().equals("img"))
+		return true;
+	    final String className = it.getClassName();
+	    switch(className)
 	    {
-		final String tagName = it.getTagName();
-		if (tagName == null)
-		    return false;
-		switch(tagName.toLowerCase())
+	    case Classes.BUTTON:
+	    case Classes.INPUT:
+	    case Classes.IMAGE:
+	    case Classes.BR:
+	    case Classes.ANCHOR:
+	    case Classes.TEXT:
+		return true;
+	    case "":
 		{
-		case "em":
-		case "strong":
-		case "b":
-		case "span":
-		case "svg":
-		    return true;
-		default:
-		    return false;
+		    final String tagName = it.getTagName();
+		    if (tagName == null)
+			return false;
+		    switch(tagName.toLowerCase())
+		    {
+		    case "em":
+		    case "strong":
+		    case "b":
+		    case "span":
+		    case "svg":
+			return true;
+		    default:
+			return false;
+		    }
 		}
 	    }
+	    return false;
 	}
-	return false;
-    }
 
-	    static private boolean isVisible(BrowserIterator it)
-    {
-	if (it.getClassName().equals(Classes.BR))
-	    return true;
-	if (it.getComputedStyle("visibility").toLowerCase().equals("hidden"))
-	    return false;
-	final Rectangle rect = it.getRect();
-	if (rect == null)
-	    return false;
-	return rect.width > 0 && rect.height > 0;
-    }
-
+	static private boolean isVisible(BrowserIterator it)
+	{
+	    if (it.getClassName().equals(Classes.BR))
+		return true;
+	    if (it.getComputedStyle("visibility").toLowerCase().equals("hidden"))
+		return false;
+	    final Rectangle rect = it.getRect();
+	    if (rect == null)
+		return false;
+	    return rect.width > 0 && rect.height > 0;
+	}
 
 	@Override public String toString()
 	{
@@ -209,14 +208,14 @@ Item root = null;
 		return it.getText();
 	    final Map<String, String> attrs = it.getAttrs();
 	    final StringBuilder b = new StringBuilder();
-		b.append("<").append(tagName);
-		for(Map.Entry<String, String> e: attrs.entrySet())
-		    b.append (System.lineSeparator()).append("  ").append(e.getKey()).append("=").append(e.getValue());
-		b.append(">").append(System.lineSeparator());
-		for(Item c: children)
-		    b.append(c.toString()).append(System.lineSeparator());
-		b.append("</").append(tagName).append(">");
-		return new String(b);
+	    b.append("<").append(tagName);
+	    for(Map.Entry<String, String> e: attrs.entrySet())
+		b.append (System.lineSeparator()).append("  ").append(e.getKey()).append("=").append(e.getValue());
+	    b.append(">").append(System.lineSeparator());
+	    for(Item c: children)
+		b.append(c.toString()).append(System.lineSeparator());
+	    b.append("</").append(tagName).append(">");
+	    return new String(b);
 	}
     }
 }
