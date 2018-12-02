@@ -24,10 +24,10 @@ import org.luwrain.core.events.*;
 import org.luwrain.popups.Popups;
 import org.luwrain.cpanel.*;
 
-class SettingsFactory implements org.luwrain.cpanel.Factory
+final class SettingsFactory implements org.luwrain.cpanel.Factory
 {
     private final Luwrain luwrain;
-    private SimpleElement browserElement = new SimpleElement(StandardElements.APPLICATIONS, this.getClass().getName());
+    private final SimpleElement browserElement = new SimpleElement(StandardElements.APPLICATIONS, this.getClass().getName());
 
     SettingsFactory(Luwrain luwrain)
     {
@@ -49,8 +49,12 @@ class SettingsFactory implements org.luwrain.cpanel.Factory
     @Override public Section createSection(Element el)
     {
 	NullCheck.notNull(el, "el");
+	final Object o = luwrain.i18n().getStrings(Strings.NAME);
+	if (o == null || !(o instanceof Strings))
+	    return null;
+	final Strings strings = (Strings)o;
 	if (el.equals(browserElement))
-	    return new SimpleSection(el, "Интернет", (controlPanel)->{return new SettingsForm(controlPanel);});
+	    return new SimpleSection(el, strings.settSectionName(), (controlPanel)->{return new SettingsForm(controlPanel, strings);});
 	return null;
     }
 }

@@ -21,12 +21,15 @@ public interface Strings
 {
 	static final String NAME = "luwrain.browser";
 
-    String appName();
-    String actionOpenUrl();
-    String actionRefresh();
-    String actionStop();
-    String actionHistoryPrev();
-    String actionShowGraphical();
-    String actionCopyRef();
-    String actionCopyUrl();
+        String appName();
+        String actionOpenUrl();
+        String actionRefresh();
+        String actionStop();
+        String actionHistoryPrev();
+        String actionShowGraphical();
+    String loading();
+    String settHomePage();
+    String settUserAgent();
+    String settRunJavaScript();
+    String settSectionName();
 }

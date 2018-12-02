@@ -15,11 +15,11 @@
    General Public License for more details.
 */
 
-package org.luwrain.browser;
+package org.luwrain.app.browser;
 
 import java.util.*;
-import org.luwrain.base.*;
 
+import org.luwrain.base.*;
 import org.luwrain.core.*;
 
 public final class Extension extends org.luwrain.core.extensions.EmptyExtension
@@ -92,7 +92,6 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	//	return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
-	return new org.luwrain.cpanel.Factory[0];
+		return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
     }
 }

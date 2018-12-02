@@ -22,7 +22,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.web.*;
 import org.luwrain.controls.*;
 
-public final class App implements Application
+final class App implements Application
 {
     private Luwrain luwrain = null;
     private Strings strings = null;

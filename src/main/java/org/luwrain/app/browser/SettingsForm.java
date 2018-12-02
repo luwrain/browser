@@ -22,33 +22,39 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.cpanel.*;
 
-class SettingsForm extends FormArea implements SectionArea
+final class SettingsForm extends FormArea implements SectionArea
 {
     private final ControlPanel controlPanel;
     private final Luwrain luwrain;
     private final Registry registry;
     private final Settings sett;
+    private final Strings strings;
 
-    SettingsForm(ControlPanel controlPanel)
+    SettingsForm(ControlPanel controlPanel, Strings strings)
     {
-	super(new DefaultControlEnvironment(controlPanel.getCoreInterface()), "Интернет");
+	super(new DefaultControlEnvironment(controlPanel.getCoreInterface()), strings.settSectionName());
 	NullCheck.notNull(controlPanel, "controlPanel");
+	NullCheck.notNull(strings, "strings");
 	this.controlPanel = controlPanel;
 	this.luwrain = controlPanel.getCoreInterface();
 	this.registry = luwrain.getRegistry();
 	this.sett = Settings.create(registry);
+	this.strings = strings;
 	fillForm();
     }
 
     private void fillForm()
     {
-	addEdit("home-page", "Домашняя страница:", sett.getHomePage(""));
-	addCheckbox("run-java-script", "Исполнять JavaScript:", true);
+	addEdit("home-page", strings.settHomePage(), sett.getHomePage(""));
+		addEdit("user-agent", strings.settUserAgent(), sett.getUserAgent(""));
+	addCheckbox("run-java-script", strings.settRunJavaScript(), sett.getRunJavaScript(true));
     }
 
     @Override public boolean saveSectionData()
     {
 	sett.setHomePage(getEnteredText("home-page"));
+		sett.setUserAgent(getEnteredText("user-agent"));
+		//		sett.setRunJavaScript(is);
 	return true;
     }
 

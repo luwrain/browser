@@ -92,7 +92,7 @@ final class Actions implements org.luwrain.controls.web.WebArea.Callback
 
     @Override public void onBrowserRunning()
     {
-	luwrain.say("Идёт загрузка страницы. Пожалуйста, подождите...");//FIXME:some kind message is better
+	luwrain.say(strings.loading());
     }
 
     @Override public void onBrowserSuccess(String title)

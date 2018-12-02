@@ -21,10 +21,14 @@ import org.luwrain.core.*;
 
 interface Settings
 {
-	static final String PATH = "/org/luwrain/app/browser";
+    static final String PATH = "/org/luwrain/app/browser";
 
     String getHomePage(String defValue);
     void setHomePage(String value);
+    String getUserAgent(String defValue);
+    void setUserAgent(String value);
+    boolean getRunJavaScript(boolean defValue);
+    void setRunJavaScript(boolean value);
 
     static Settings create(Registry registry)
     {
