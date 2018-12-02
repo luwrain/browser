@@ -54,7 +54,7 @@ final class SettingsForm extends FormArea implements SectionArea
     {
 	sett.setHomePage(getEnteredText("home-page"));
 	sett.setUserAgent(getEnteredText("user-agent"));
-	//		sett.setRunJavaScript(is);
+	sett.setRunJavaScript(true);
 	return true;
     }
 
