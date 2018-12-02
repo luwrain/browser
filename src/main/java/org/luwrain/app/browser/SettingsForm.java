@@ -46,15 +46,15 @@ final class SettingsForm extends FormArea implements SectionArea
     private void fillForm()
     {
 	addEdit("home-page", strings.settHomePage(), sett.getHomePage(""));
-		addEdit("user-agent", strings.settUserAgent(), sett.getUserAgent(""));
+	addEdit("user-agent", strings.settUserAgent(), sett.getUserAgent(""));
 	addCheckbox("run-java-script", strings.settRunJavaScript(), sett.getRunJavaScript(true));
     }
 
     @Override public boolean saveSectionData()
     {
 	sett.setHomePage(getEnteredText("home-page"));
-		sett.setUserAgent(getEnteredText("user-agent"));
-		//		sett.setRunJavaScript(is);
+	sett.setUserAgent(getEnteredText("user-agent"));
+	//		sett.setRunJavaScript(is);
 	return true;
     }
 

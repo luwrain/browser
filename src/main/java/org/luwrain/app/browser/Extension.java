@@ -92,6 +92,6 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-		return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
+	return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
     }
 }

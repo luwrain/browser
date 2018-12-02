@@ -1,7 +1,7 @@
 /*
    Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
-
+o
    This file is part of LUWRAIN.
 
    LUWRAIN is free software; you can redistribute it and/or
@@ -216,7 +216,7 @@ public class WebArea implements Area
 	    return false;
 	if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://"))
 	    browser.loadByUrl("http://" + url); else
-	    browser.loadByUrl("http://" + url);
+	    browser.loadByUrl(url);
 	return true;
     }
 

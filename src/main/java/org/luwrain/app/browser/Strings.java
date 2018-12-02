@@ -19,17 +19,17 @@ package org.luwrain.app.browser;
 
 public interface Strings
 {
-	static final String NAME = "luwrain.browser";
+    static final String NAME = "luwrain.browser";
 
-        String appName();
-        String actionOpenUrl();
-        String actionRefresh();
-        String actionStop();
-        String actionHistoryPrev();
-        String actionShowGraphical();
+    String actionHistoryPrev();
+    String actionOpenUrl();
+    String actionRefresh();
+    String actionShowGraphical();
+    String actionStop();
+    String appName();
     String loading();
     String settHomePage();
-    String settUserAgent();
     String settRunJavaScript();
     String settSectionName();
+    String settUserAgent();
 }
