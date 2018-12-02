@@ -53,7 +53,7 @@ Item root = null;
 		}
 		final int parentPos = parentIt.getPos();
 		items[parentPos].children.add(i);
-		if (isContentNode(i.it) && isVisible(i.it))
+		if (i.content && i.visible)
 		    items[parentPos].contentItems.add(i);
 		i.parent = items[parentPos];
 	    }
@@ -65,7 +65,95 @@ Item root = null;
 	return new Model(createContainers(items, root));
     }
 
-    private boolean isContentNode(BrowserIterator it)
+    private void setHrefs(Item item, String href)
+    {
+	NullCheck.notNull(item, "item");
+	NullCheck.notNull(href, "href");
+	final String current;
+	if (item.className.equals(Classes.ANCHOR))
+	{
+	final String hrefAttr = item.it.getAttr("href");
+	if (hrefAttr != null)
+	    current = hrefAttr; else
+	    current = "";
+	} else
+	    current = href;
+	item.href = current;
+	for(Item i: item.children)
+	    setHrefs(i, current);
+    }
+
+    private Container[] createContainers(Item[] items, Item root)
+    {
+	NullCheck.notNullItems(items, "items");
+	//NullCheck.notNull(root, "root");
+	final List<Container> res = new LinkedList();
+	for(Item i: items)
+	{
+	    if (i.contentItems.isEmpty() || i.content)
+		continue;
+	    switch(i.className.toLowerCase())//FIXME:
+	    {
+	    case "title":
+	    case "script":
+			    case "noscript":
+	    case "style":
+		continue;
+	    }
+	    res.add(new Container(i.it, i, i.createContentItem().children));
+	}
+	return res.toArray(new Container[res.size()]);
+    }
+
+    static private final class Item implements TreeItem
+    {
+	final BrowserIterator it;
+	final boolean content;
+	final boolean visible;
+	final String tagName;
+	final String className;
+
+	String href = "";
+	Item parent = null;
+	final List<Item> children = new LinkedList();
+	final List<Item> contentItems = new LinkedList();
+
+	Item(BrowserIterator it)
+	{
+	    NullCheck.notNull(it, "it");
+	    this.it = it;
+	    this.content = isContentNode(it);
+	    if (content)
+	    this.visible = isVisible(it); else
+		this.visible = true;
+	    this.className = it.getClassName();
+	    this.tagName = it.getTagName();
+	}
+
+	@Override public TreeItem getParentItem()
+	{
+	    return parent;
+	}
+
+	@Override public TreeItem[] getChildren()
+	{
+	    return children.toArray(new TreeItem[children.size()]);
+	}
+
+	@Override public Map<String, String> getItemAttrs()
+	{
+	    return it.getAttrs();
+	}
+
+	ContentItem createContentItem()
+	{
+	    final List<ContentItem> c = new LinkedList();
+	    for(Item i: contentItems)
+		c.add(i.createContentItem());
+	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]), href);
+	}
+
+	    static private boolean isContentNode(BrowserIterator it)
     {
 	NullCheck.notNull(it, "it");
 	final String role = it.getAttr("role");
@@ -102,7 +190,7 @@ Item root = null;
 	return false;
     }
 
-    static boolean isVisible(BrowserIterator it)
+	    static private boolean isVisible(BrowserIterator it)
     {
 	if (it.getClassName().equals(Classes.BR))
 	    return true;
@@ -114,86 +202,6 @@ Item root = null;
 	return rect.width > 0 && rect.height > 0;
     }
 
-    private void setHrefs(Item item, String href)
-    {
-	NullCheck.notNull(item, "item");
-	NullCheck.notNull(href, "href");
-	final String current;
-	if (item.className.equals(Classes.ANCHOR))
-	{
-	final String hrefAttr = item.it.getAttr("href");
-	if (hrefAttr != null)
-	    current = hrefAttr; else
-	    current = "";
-	} else
-	    current = href;
-	item.href = current;
-	for(Item i: item.children)
-	    setHrefs(i, current);
-    }
-
-    private Container[] createContainers(Item[] items, Item root)
-    {
-	NullCheck.notNullItems(items, "items");
-	//NullCheck.notNull(root, "root");
-	final List<Container> res = new LinkedList();
-	for(Item i: items)
-	{
-	    if (i.contentItems.isEmpty() || isContentNode(i.it))
-		continue;
-	    switch(i.className.toLowerCase())//FIXME:
-	    {
-	    case "title":
-	    case "script":
-			    case "noscript":
-	    case "style":
-		continue;
-	    }
-	    res.add(new Container(i.it, i, i.createContentItem().children));
-	}
-	return res.toArray(new Container[res.size()]);
-    }
-
-    static private final class Item implements TreeItem
-    {
-	final BrowserIterator it;
-	final String tagName;
-	final String className;
-	String href = "";
-
-	Item parent = null;
-	final List<Item> children = new LinkedList();
-	final List<Item> contentItems = new LinkedList();
-	Item(BrowserIterator it)
-	{
-	    NullCheck.notNull(it, "it");
-	    this.it = it;
-	    this.className = it.getClassName();
-	    this.tagName = it.getTagName();
-	}
-
-	@Override public TreeItem getParentItem()
-	{
-	    return parent;
-	}
-
-	@Override public TreeItem[] getChildren()
-	{
-	    return children.toArray(new TreeItem[children.size()]);
-	}
-
-	@Override public Map<String, String> getItemAttrs()
-	{
-	    return it.getAttrs();
-	}
-
-	ContentItem createContentItem()
-	{
-	    final List<ContentItem> c = new LinkedList();
-	    for(Item i: contentItems)
-		c.add(i.createContentItem());
-	    return new ContentItem(it, c.toArray(new ContentItem[c.size()]), href);
-	}
 
 	@Override public String toString()
 	{
