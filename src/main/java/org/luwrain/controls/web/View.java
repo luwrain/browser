@@ -59,20 +59,33 @@ final class View
         void dumpToFile(File file) throws IOException
     {
 	NullCheck.notNull(file, "file");
+	int rightBound = 0;
+	for(Container c: containers)
+	{
+	    final int value = c.x + c.width;
+	    if (value > rightBound)
+		rightBound = value;
+	}
 	final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
 	try {
 	    w.write(String.format("%d", containers.length) + " containers");
+	    w.newLine();
+	    w.write("Right bound: " + String.format("%d", rightBound));
 	    w.newLine();
 	for(int i = 0;i < containers.length;++i)
 	{
 	    final Container c = containers[i];
 	    StringBuilder b = new StringBuilder();
-	    	    b.append("#").append(String.format("%d", i));
-		    b.append("<").append(c.tagName).append("> (").append(c.className).append(")");
+	    b.append("#<").append(c.tagName).append(">");;
 	    w.write(new String(b));
 	    w.newLine();
 	    b = new StringBuilder();
-	    b.append("Rect: ").append(String.format("%d,%d,%d,%d", c.x, c.y, c.width, c.height));
+	    b.append("Graphical rect: ").append(String.format("%d,%d,%d,%d", c.x, c.y, c.x + c.width, c.y + c.height));
+	    	    w.write(new String(b));
+	    w.newLine();
+	    b = new StringBuilder();
+	    
+	    	    b.append("Text rect: ").append(String.format("%d,%d,%d,%d", c.textX, c.textY, c.textX + c.textWidth, c.textY + c.textHeight));
 	    w.write(new String(b));
 	    w.newLine();
 	    final List<String> content = new LinkedList();

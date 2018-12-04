@@ -26,7 +26,7 @@ import org.luwrain.controls.web.WebArea.Callback.MessageType;
 final class ViewBuilder
 {
     static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
-    
+
     private final Container[] containers;
 
     ViewBuilder(Container[] containers)
@@ -37,6 +37,7 @@ final class ViewBuilder
 
     View build()
     {
+	calcGeom(100);
 	final List<Container> viewContainers = new LinkedList();
 	for(Container c: containers)
 	{
@@ -60,5 +61,62 @@ final class ViewBuilder
 	    return;
 	for(ContentItem i: item.getChildren())
 	    processContentItem(builder, i);
+    }
+
+    private void calcGeom(int width)
+    {
+	if (width < 10)
+	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
+	calcTextXAndWidth(width);
+	calcTextY();
+	
+    }
+
+    private void calcTextXAndWidth(int width)
+    {
+	int graphicalWidth = 0;
+	for(Container c: containers)
+	    graphicalWidth = Math.max(graphicalWidth, c.x + c.width);
+	Log.debug(LOG_COMPONENT, "graphical width is " + graphicalWidth);
+	final float ratio = (float)graphicalWidth / width;
+	Log.debug(LOG_COMPONENT, "ratio is " + String.format("%.2f", ratio));
+	for(Container c: containers)
+	{
+	     final float textX = (float)c.x / ratio;
+	     c.textX = new Float(textX).intValue();
+	     	     final float textWidth = (float)c.width / ratio;
+	     c.textWidth = new Float(textWidth).intValue();
+	}
+    }
+
+    private void calcTextY()
+    {
+	int topLevel = 0;
+	int nextTextY = 0;
+	while(true)
+	{
+	int baseContIndex = -1;
+	for(int i = 0;i < containers.length;++i)
+	{
+	    final Container c = containers[i];
+	    //Checking if the container already has the text Y
+	    if (c.textY >= 0)
+		continue;
+	    if (c.y < topLevel)
+		continue;
+	    if (baseContIndex < 0)
+		baseContIndex = i;
+	    if (c.y < containers[baseContIndex].y)
+	    {
+		baseContIndex = i;
+		continue;
+	    }
+	}
+	//Checking if all containers were processed
+	if (baseContIndex < 0)
+	    return;
+	containers[baseContIndex].textY = nextTextY;
+	nextTextY++;
+	}
     }
 }

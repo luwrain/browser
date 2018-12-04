@@ -36,6 +36,12 @@ final class Container
     final int y;
     final int width;
     final int height;
+
+    int textX = -1;
+    int textY = -1;
+    int textWidth = -1;
+    int textHeight = -1;
+
     final ContentItem[] content;
     ContainerRow[] rows = new ContainerRow[0];
 
