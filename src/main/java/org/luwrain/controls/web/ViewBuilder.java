@@ -69,7 +69,6 @@ final class ViewBuilder
 	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
 	calcTextXAndWidth(width);
 	calcTextY();
-	
     }
 
     private void calcTextXAndWidth(int width)
@@ -82,10 +81,10 @@ final class ViewBuilder
 	Log.debug(LOG_COMPONENT, "ratio is " + String.format("%.2f", ratio));
 	for(Container c: containers)
 	{
-	     final float textX = (float)c.x / ratio;
-	     c.textX = new Float(textX).intValue();
-	     	     final float textWidth = (float)c.width / ratio;
-	     c.textWidth = new Float(textWidth).intValue();
+	    final float textX = (float)c.x / ratio;
+	    c.textX = new Float(textX).intValue();
+	    final float textWidth = (float)c.width / ratio;
+	    c.textWidth = new Float(textWidth).intValue();
 	}
     }
 
@@ -95,28 +94,28 @@ final class ViewBuilder
 	int nextTextY = 0;
 	while(true)
 	{
-	int baseContIndex = -1;
-	for(int i = 0;i < containers.length;++i)
-	{
-	    final Container c = containers[i];
-	    //Checking if the container already has the text Y
-	    if (c.textY >= 0)
-		continue;
-	    if (c.y < topLevel)
-		continue;
-	    if (baseContIndex < 0)
-		baseContIndex = i;
-	    if (c.y < containers[baseContIndex].y)
+	    int baseContIndex = -1;
+	    for(int i = 0;i < containers.length;++i)
 	    {
-		baseContIndex = i;
-		continue;
+		final Container c = containers[i];
+		//Checking if the container already has the text Y
+		if (c.textY >= 0)
+		    continue;
+		if (c.y < topLevel)
+		    continue;
+		if (baseContIndex < 0)
+		    baseContIndex = i;
+		if (c.y < containers[baseContIndex].y)
+		{
+		    baseContIndex = i;
+		    continue;
+		}
 	    }
-	}
-	//Checking if all containers were processed
-	if (baseContIndex < 0)
-	    return;
-	containers[baseContIndex].textY = nextTextY;
-	nextTextY++;
+	    //Checking if all containers were processed
+	    if (baseContIndex < 0)
+		return;
+	    containers[baseContIndex].textY = nextTextY;
+	    nextTextY++;
 	}
     }
 }
