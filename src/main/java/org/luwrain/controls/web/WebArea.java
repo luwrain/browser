@@ -163,7 +163,6 @@ public class WebArea implements Area
 	final Object obj = browser.runSafely(()->{
 		try {
 		    final ContainersList containers = new ModelBuilder().build(browser);
-		    try { containers.dumpToFile(new java.io.File(new java.io.File("/tmp"), ContainersList.makeDumpFileName(browser.getUrl()))); } catch(Exception e) { Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage()); }
 		    Log.debug(LOG_COMPONENT, "containers prepared: " + containers.getContainerCount());
 		    return new ViewBuilder(containers.getContainers()).build();
 		}
@@ -180,6 +179,7 @@ public class WebArea implements Area
 	    return false;
 	}
 	this.view = (View)obj;
+			    try { view.dumpToFile(new java.io.File(new java.io.File("/tmp"), View.makeDumpFileName(browser.getUrl()))); } catch(Exception e) { Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage()); }
 	this.it = view.createIterator();
 	this.rowIndex = 0;
 	return true;

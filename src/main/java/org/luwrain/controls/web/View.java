@@ -17,6 +17,9 @@
 
 package org.luwrain.controls.web;
 
+import java.util.*;
+import java.io.*;
+
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.WebArea.Callback.MessageType;
@@ -51,6 +54,62 @@ final class View
 	if (isEmpty())
 	    return null;
 	return new Iterator(this, 0);
+    }
+
+        void dumpToFile(File file) throws IOException
+    {
+	NullCheck.notNull(file, "file");
+	final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+	try {
+	    w.write(String.format("%d", containers.length) + " containers");
+	    w.newLine();
+	for(int i = 0;i < containers.length;++i)
+	{
+	    final Container c = containers[i];
+	    StringBuilder b = new StringBuilder();
+	    	    b.append("#").append(String.format("%d", i));
+		    b.append("<").append(c.tagName).append("> (").append(c.className).append(")");
+	    w.write(new String(b));
+	    w.newLine();
+	    b = new StringBuilder();
+	    b.append("Rect: ").append(String.format("%d,%d,%d,%d", c.x, c.y, c.width, c.height));
+	    w.write(new String(b));
+	    w.newLine();
+	    final List<String> content = new LinkedList();
+	    for(ContentItem item: c.content)
+		dumpContentItem(item, " ", content);
+	    for(String l: content)
+	    {
+		w.write(l);
+		w.newLine();
+	    }
+	    }
+	w.flush();
+	}
+	finally {
+	    w.close();
+	}
+    }
+
+    private void dumpContentItem(ContentItem item, String prefix, List<String> res)
+    {
+	NullCheck.notNull(item, "item");
+	NullCheck.notNull(prefix, "prefix");
+	NullCheck.notNull(res, "res");
+	if (item.isText())
+	{
+	    res.add(prefix + item.getText());
+	    return;
+	}
+	res.add(prefix + "<" + item.tagName + ">");
+	for(ContentItem i: item.children)
+	    dumpContentItem(i, prefix + " ", res);
+    }
+
+            static String makeDumpFileName(String url)
+    {
+	NullCheck.notNull(url, "url");
+	return url.replaceAll("/", ".").replaceAll(":", ".");
     }
 
 
