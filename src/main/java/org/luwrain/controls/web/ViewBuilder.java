@@ -116,6 +116,7 @@ final class ViewBuilder
 		return;
 	    containers[baseContIndex].textY = nextTextY;
 	    final Container chosenContainer = containers[baseContIndex];
+	    Log.debug("building", "chosen for " + nextTextY + " is " + chosenContainer.toString());
 	    nextTextY++;
 	    //Checking if there are some more non-overlapping containers located vertically closely
 	    final List<Container> closeContList = new LinkedList();
@@ -151,14 +152,20 @@ final class ViewBuilder
 				    return 0;
 		});
 	    closeCont[0].textY = chosenContainer.textY;
+	    for(Container cc: closeCont)
+		Log.debug("building", "near " + cc.toString());
 	    for(int k = 1;k < closeCont.length;++k)
 	    {
 		if (closeCont[k].textY >= 0)
 		    throw new RuntimeException("Considering the previously used container");
 		int kk = 0;
 		for(kk = 0;kk < k;++kk)
+		{
+		    //Log.debug("building", "" + closeCont[kk].textY);
 		    if (closeCont[kk].textY >= 0 && closeCont[k].intersectsGraphically(closeCont[kk]))
 			break;
+		}
+		Log.debug("building", "k=" + k + ",kk=" + kk);
 		if (kk < k)//We have an intersection with one of the previously use container
 		    continue;
 		closeCont[k].textY = chosenContainer.textY;

@@ -82,14 +82,6 @@ final class Container
 	return rows.clone();
     }
 
-    String getText()
-    {
-	final StringBuilder b = new StringBuilder();
-	for(ContentItem i: content)
-	    b.append(i.getText());
-	return new String(b);
-    }
-
     int getRowCount()
     {
 	return rows.length;
@@ -125,7 +117,8 @@ final class Container
     {
 	NullCheck.notNull(c, "c");
 	final int sq1 = getGraphicalSquare();
-		final int sq2 = getGraphicalSquare();
+			final int sq2 = c.getGraphicalSquare();
+			//		Log.debug("building", "sq1=" + sq1 + ",sq2=" + sq2);
 		if (sq1 == 0 && sq2 == 0)
 		    return x == c.x && y == c.y;
 		if (sq1 == 0)
@@ -157,9 +150,8 @@ final class Container
     @Override public String toString()
     {
 			final StringBuilder b = new StringBuilder();
-			b.append(it.getClassName()).append(" <").append(it.getTagName()).append(">: ");
-	b.append("(").append(String.format("%d,%d,%d,%d", x, y, width, height)).append(")");
-	b.append(": ").append(getText());
+			b.append(" <").append(it.getTagName()).append("> ");
+	b.append("(gr:").append(String.format("%d,%d,%d,%d", x, y, x + width, y + height)).append(")");
 	return new String(b);
     }
 }
