@@ -84,7 +84,6 @@ final class View
 	    	    w.write(new String(b));
 	    w.newLine();
 	    b = new StringBuilder();
-	    
 	    	    b.append("Text rect: ").append(String.format("%d,%d,%d,%d", c.textX, c.textY, c.textX + c.textWidth, c.textY + c.textHeight));
 	    w.write(new String(b));
 	    w.newLine();

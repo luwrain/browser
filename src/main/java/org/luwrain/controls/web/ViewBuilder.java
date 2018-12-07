@@ -115,7 +115,54 @@ final class ViewBuilder
 	    if (baseContIndex < 0)
 		return;
 	    containers[baseContIndex].textY = nextTextY;
+	    final Container chosenContainer = containers[baseContIndex];
 	    nextTextY++;
-	}
+	    //Checking if there are some more non-overlapping containers located vertically closely
+	    final List<Container> closeContList = new LinkedList();
+	    for(int k = 0;k < containers.length;++k)
+	    {
+		if (k == baseContIndex)
+		    continue;
+		final Container c2 = containers[k];
+		if (c2.textY >= 0)//already has textY
+		    continue;
+		if (chosenContainer.intersectsGraphically(c2))
+		    continue;
+		final int diff = chosenContainer.y - c2.y;
+		if (diff > -16 && diff < 16)
+		    closeContList.add(c2);
+	    }
+	    if (closeContList.isEmpty())
+		continue;
+	    final Container[] closeCont = closeContList.toArray(new Container[closeContList.size()]);
+	    Arrays.sort(closeCont, (o1, o2)->{
+		    final Container c1 = (Container)o1;
+		    		    final Container c2 = (Container)o2;
+				    if (c1.y < c2.y)
+					return -1;
+				    if (c1.y < c2.y)
+					return 1;
+				    final int sq1 = c1.getGraphicalSquare();
+				    				    final int sq2 = c2.getGraphicalSquare();
+				    if (sq1 == 0 && sq2 != 0)
+					return -1;
+				    if (sq1 != 0 && sq2 == 0)
+					return 1;
+				    return 0;
+		});
+	    closeCont[0].textY = chosenContainer.textY;
+	    for(int k = 1;k < closeCont.length;++k)
+	    {
+		if (closeCont[k].textY >= 0)
+		    throw new RuntimeException("Considering the previously used container");
+		int kk = 0;
+		for(kk = 0;kk < k;++kk)
+		    if (closeCont[kk].textY >= 0 && closeCont[k].intersectsGraphically(closeCont[kk]))
+			break;
+		if (kk < k)//We have an intersection with one of the previously use container
+		    continue;
+		closeCont[k].textY = chosenContainer.textY;
+	    }
+	} //for(containers)
     }
 }

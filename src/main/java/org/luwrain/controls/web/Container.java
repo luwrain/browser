@@ -121,6 +121,39 @@ final class Container
 	return content.clone();
     }
 
+    boolean intersectsGraphically(Container c)
+    {
+	NullCheck.notNull(c, "c");
+	final int sq1 = getGraphicalSquare();
+		final int sq2 = getGraphicalSquare();
+		if (sq1 == 0 && sq2 == 0)
+		    return x == c.x && y == c.y;
+		if (sq1 == 0)
+		    return between(x, c.x, c.x + c.width) && between(y, c.y, c.y + c.height);
+		if (sq2 == 0)
+		    return between(c.x, x, x + width) && between(c.y, y, y + height);
+	return intersects(x, width, c.x, c.width) &&
+	intersects(y, height, c.y, c.height);
+    }
+
+    static private boolean between(int pos, int from, int to)
+    {
+	return pos >= from && pos < to;
+    }
+
+    static private boolean intersects(int start1, int len1, int start2, int len2)
+    {
+	if (start1 < start2)
+	    return start2 >= start1 && start2 < start1 + len1; else
+	    return start1 >= start2 && start1 < start2 + len2;
+	    
+    }
+
+    int getGraphicalSquare()
+    {
+	return width * height;
+    }
+
     @Override public String toString()
     {
 			final StringBuilder b = new StringBuilder();
@@ -129,6 +162,4 @@ final class Container
 	b.append(": ").append(getText());
 	return new String(b);
     }
-
-    
 }
