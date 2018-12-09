@@ -19,7 +19,6 @@ package org.luwrain.app.webinspector;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.doc.*;
 
 public final class App implements Application
 {

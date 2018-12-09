@@ -68,7 +68,7 @@ final class App implements Application
 
     private void createArea()
     {
-	final org.luwrain.controls.doc.Strings announcementStrings = (org.luwrain.controls.doc.Strings)luwrain.i18n().getStrings("luwrain.doc");
+	//final org.luwrain.controls.doc.Strings announcementStrings = (org.luwrain.controls.doc.Strings)luwrain.i18n().getStrings("luwrain.doc");
 	final WebArea.Params params = new WebArea.Params();
 	params.context = new DefaultControlEnvironment(luwrain);
 	params.appearance = new DefaultAppearance(params.context);

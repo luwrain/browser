@@ -117,16 +117,30 @@ final class Container
     {
 	NullCheck.notNull(c, "c");
 	final int sq1 = getGraphicalSquare();
-			final int sq2 = c.getGraphicalSquare();
-			//		Log.debug("building", "sq1=" + sq1 + ",sq2=" + sq2);
-		if (sq1 == 0 && sq2 == 0)
-		    return x == c.x && y == c.y;
-		if (sq1 == 0)
-		    return between(x, c.x, c.x + c.width) && between(y, c.y, c.y + c.height);
-		if (sq2 == 0)
-		    return between(c.x, x, x + width) && between(c.y, y, y + height);
+	final int sq2 = c.getGraphicalSquare();
+	if (sq1 == 0 && sq2 == 0)
+	    return x == c.x && y == c.y;
+	if (sq1 == 0)
+	    return between(x, c.x, c.x + c.width) && between(y, c.y, c.y + c.height);
+	if (sq2 == 0)
+	    return between(c.x, x, x + width) && between(c.y, y, y + height);
 	return intersects(x, width, c.x, c.width) &&
 	intersects(y, height, c.y, c.height);
+    }
+
+        boolean intersectsText(Container c)
+    {
+	NullCheck.notNull(c, "c");
+	final int sq1 = getTextSquare();
+	final int sq2 = c.getTextSquare();
+	if (sq1 == 0 && sq2 == 0)
+	    return textX == c.textX && textY == c.textY;
+	if (sq1 == 0)
+	    return between(textX, c.textX, c.textX + c.textWidth) && between(textY, c.textY, c.textY + c.textHeight);
+	if (sq2 == 0)
+	    return between(c.textX, textX, textX + textWidth) && between(c.textY, textY, textY + textHeight);
+	return intersects(textX, textWidth, c.textX, c.textWidth) &&
+	intersects(textY, textHeight, c.textY, c.textHeight);
     }
 
     static private boolean between(int pos, int from, int to)
@@ -146,6 +160,12 @@ final class Container
     {
 	return width * height;
     }
+
+        int getTextSquare()
+    {
+	return textWidth * textHeight;
+    }
+
 
     @Override public String toString()
     {

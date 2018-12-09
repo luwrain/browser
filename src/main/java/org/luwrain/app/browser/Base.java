@@ -22,7 +22,6 @@ import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
-import org.luwrain.doctree.*;
 import org.luwrain.controls.web.*;
 
 class Base implements WebArea.ClientThread

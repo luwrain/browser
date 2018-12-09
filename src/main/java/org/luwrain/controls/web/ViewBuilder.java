@@ -69,6 +69,16 @@ final class ViewBuilder
 	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
 	calcTextXAndWidth(width);
 	calcTextY();
+
+	for(int i = 0;i < containers.length;++i)
+	    for(int j = 0;j < containers.length;++j)
+		if (i != j)
+		    if (containers[i].intersectsText(containers[j]))
+		{
+		    Log.warning(LOG_COMPONENT, "intersecting containers with numbers " + i + " and " + j);
+		    Log.warning(LOG_COMPONENT, "container #" + i + ":" + containers[i].toString());
+		    		    Log.warning(LOG_COMPONENT, "container #" + j + ":" + containers[j].toString());
+		}
     }
 
     private void calcTextXAndWidth(int width)
@@ -152,8 +162,10 @@ final class ViewBuilder
 				    return 0;
 		});
 	    closeCont[0].textY = chosenContainer.textY;
+	    /*
 	    for(Container cc: closeCont)
 		Log.debug("building", "near " + cc.toString());
+	    */
 	    for(int k = 1;k < closeCont.length;++k)
 	    {
 		if (closeCont[k].textY >= 0)
@@ -165,7 +177,7 @@ final class ViewBuilder
 		    if (closeCont[kk].textY >= 0 && closeCont[k].intersectsGraphically(closeCont[kk]))
 			break;
 		}
-		Log.debug("building", "k=" + k + ",kk=" + kk);
+		//Log.debug("building", "k=" + k + ",kk=" + kk);
 		if (kk < k)//We have an intersection with one of the previously use container
 		    continue;
 		closeCont[k].textY = chosenContainer.textY;

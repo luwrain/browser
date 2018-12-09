@@ -23,9 +23,7 @@ import java.util.Date;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
-import org.luwrain.doctree.*;
 import org.luwrain.controls.web.*;
-import org.luwrain.controls.doc.*;
 import org.luwrain.browser.*;
 
 import org.luwrain.popups.*;
