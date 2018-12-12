@@ -23,7 +23,6 @@ import java.util.concurrent.*;
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.browser.*;
-import org.luwrain.browser.selectors.*;
 
 final class Base implements BrowserEvents
 {
