@@ -269,12 +269,18 @@ public class WebArea implements Area
 
     @Override public int getLineCount()
     {
+	if (isEmpty())
 	return 1;
+	return view.getLineCount();
     }
 
     @Override public String getLine(int index)
     {
-	return "";
+	if (index < 0)
+	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
+	if (isEmpty())
+	    return (index == 0)?noContentStr():"";
+	return view.getLine(index);
     }
 
     @Override public String getAreaName()
@@ -490,6 +496,11 @@ public class WebArea implements Area
 		if (rowIndex == 0)
 		    appearance.announceFirstRow(it.getType(), it.getRow(rowIndex)); else
 		    		    appearance.announceRow(it.getRow(rowIndex));
+    }
+
+    protected String noContentStr()
+    {
+	return "Содержимое веб-страницы отсутствует";
     }
 
     protected void noContentMsg()

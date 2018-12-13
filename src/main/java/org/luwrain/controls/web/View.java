@@ -24,10 +24,10 @@ import org.luwrain.core.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
-final class View
+final class View implements Lines
 {
     static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
-    
+
     private final Container[] containers;
     private final String[] lines;
 
@@ -42,6 +42,20 @@ final class View
     boolean isEmpty()
     {
 	return containers.length == 0;
+    }
+
+    @Override public int getLineCount()
+    {
+	return lines.length > 0?lines.length:1;
+    }
+
+    @Override public String getLine(int index)
+    {
+	if (index < 0)
+	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
+	if (index > lines.length)
+	    return "";
+	return lines[index];
     }
 
     Container getContainer(int index)
