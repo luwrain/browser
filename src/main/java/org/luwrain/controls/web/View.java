@@ -26,12 +26,17 @@ import org.luwrain.controls.web.WebArea.Callback.MessageType;
 
 final class View
 {
+    static private final String LOG_COMPONENT = WebArea.LOG_COMPONENT;
+    
     private final Container[] containers;
+    private final String[] lines;
 
-	View(Container[] containers)
+    View(WebArea.Appearance appearance, Container[] containers)
     {
+	NullCheck.notNull(appearance, "appearance");
 	NullCheck.notNullItems(containers, "containers");
 	this.containers = containers;
+	this.lines = buildLines(containers, appearance);
     }
 
     boolean isEmpty()
@@ -56,6 +61,48 @@ final class View
 	return new Iterator(this, 0);
     }
 
+    static private String[] buildLines(Container[] containers, WebArea.Appearance appearance)
+    {
+	NullCheck.notNullItems(containers, "containers");
+	NullCheck.notNull(appearance, "appearance");
+	int lineCount = 0;
+	for(Container c: containers)
+	    lineCount = Math.max(lineCount, c.textY + c.textHeight);
+	Log.debug(LOG_COMPONENT, "preparing " + lineCount + " lines");
+	final String[] lines = new String[lineCount];
+	for(Container c: containers)
+	{
+	    for(int i = 0;i < c.rows.length;++i)
+	    {
+		final ContainerRow row = c.rows[i];
+		final String text = appearance.getRowTextAppearance(row.getWebObjs());
+		if (text.length() > c.textWidth)
+		    Log.warning(LOG_COMPONENT, "row text \'" + text + "\' is longer than the width of the container (" + c.textWidth + ")");
+		final int lineIndex = c.textY + i;
+		lines[lineIndex] = putString(lines[lineIndex], text, c.textX);	
+	    }
+	}
+	return lines;
+    }
+
+	static private String putString(String s, String fragment, int pos)
+	{
+	    NullCheck.notNull(s, "s");
+	    NullCheck.notNull(fragment, "fragment");
+	    final StringBuilder b = new StringBuilder();
+	    if (pos > s.length())
+	    {
+		b.append(s);
+		for(int i = s.length();i < pos;++i)
+		    b.append(" ");
+	    } else
+		b.append(s.substring(0, pos));
+	    b.append(fragment);
+	    if (pos + fragment.length() < s.length())
+		b.append(s.substring(pos + fragment.length()));
+	    return new String(b);
+	}
+	
         void dumpToFile(File file) throws IOException
     {
 	NullCheck.notNull(file, "file");

@@ -45,6 +45,9 @@ final class Container
     final ContentItem[] content;
     ContainerRow[] rows = new ContainerRow[0];
 
+        final List<Container> vertDepOn = new LinkedList();
+    boolean actualTextY = false;
+
     public Container(BrowserIterator it, TreeItem treeItem, ContentItem[] content)
     {
 	NullCheck.notNull(it, "it");
@@ -148,12 +151,11 @@ final class Container
 	return pos >= from && pos < to;
     }
 
-    static private boolean intersects(int start1, int len1, int start2, int len2)
+    static boolean intersects(int start1, int len1, int start2, int len2)
     {
 	if (start1 < start2)
 	    return start2 >= start1 && start2 < start1 + len1; else
 	    return start1 >= start2 && start1 < start2 + len2;
-	    
     }
 
     int getGraphicalSquare()
@@ -166,11 +168,23 @@ final class Container
 	return textWidth * textHeight;
     }
 
+    void calcActualTextY()
+    {
+	if (actualTextY)
+	    return;
+	for(Container c: vertDepOn)
+	    c.calcActualTextY();
+	int maxPos = 0;
+	for(Container c: vertDepOn)
+	    maxPos = Math.max(maxPos, c.textY + c.textHeight);
+	this.textY = maxPos;
+	actualTextY = true;
+    }
 
     @Override public String toString()
     {
-			final StringBuilder b = new StringBuilder();
-			b.append(" <").append(it.getTagName()).append("> ");
+	final StringBuilder b = new StringBuilder();
+	b.append(" <").append(it.getTagName()).append("> ");
 	b.append("(gr:").append(String.format("%d,%d,%d,%d", x, y, x + width, y + height)).append(")");
 	return new String(b);
     }

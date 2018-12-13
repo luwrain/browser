@@ -35,8 +35,9 @@ final class ViewBuilder
 	this.containers = containers;
     }
 
-    View build()
+    View build(WebArea.Appearance appearance)
     {
+	NullCheck.notNull(appearance, "appearance");
 	calcGeom(100);
 	final List<Container> viewContainers = new LinkedList();
 	for(Container c: containers)
@@ -50,7 +51,11 @@ final class ViewBuilder
 		viewContainers.add(c); else
 		Log.warning(LOG_COMPONENT, "the container <" + c.tagName + "> without rows (has " + c.getContent().length + " content items)" + System.lineSeparator() + c.treeItem.toString());
 	}
-	return new View(viewContainers.toArray(new Container[viewContainers.size()]));
+	for(Container c: containers)
+	    c.actualTextY = false;
+		for(Container c: containers)
+		    c.calcActualTextY();
+		return new View(appearance, viewContainers.toArray(new Container[viewContainers.size()]));
     }
 
     private void processContentItem(ContainerRowsBuilder builder, ContentItem item)
@@ -69,7 +74,6 @@ final class ViewBuilder
 	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
 	calcTextXAndWidth(width);
 	calcTextY();
-
 	for(int i = 0;i < containers.length;++i)
 	    for(int j = 0;j < containers.length;++j)
 		if (i != j)
@@ -79,6 +83,17 @@ final class ViewBuilder
 		    Log.warning(LOG_COMPONENT, "container #" + i + ":" + containers[i].toString());
 		    		    Log.warning(LOG_COMPONENT, "container #" + j + ":" + containers[j].toString());
 		}
+		for(int i = 0;i < containers.length;++i)
+	    for(int j = 0;j < containers.length;++j)
+		if (i != j)
+	    {
+		final Container ci = containers[i];
+		final Container cj = containers[j];
+		if (cj.textY <= ci.textY)
+		    continue;
+		if (Container.intersects(ci.textX, ci.textWidth, cj.textX, cj.textWidth))
+		    cj.vertDepOn.add(ci);
+	    }
     }
 
     private void calcTextXAndWidth(int width)
