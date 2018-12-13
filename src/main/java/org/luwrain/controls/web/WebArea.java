@@ -19,6 +19,7 @@ o
 
 package org.luwrain.controls.web;
 
+import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -179,7 +180,27 @@ public class WebArea implements Area
 	    return false;
 	}
 	this.view = (View)obj;
-			    try { view.dumpToFile(new java.io.File(new java.io.File("/tmp"), View.makeDumpFileName(browser.getUrl()))); } catch(Exception e) { Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage()); }
+	try {
+	    final String fileName = View.makeDumpFileName(browser.getUrl());
+	    final File structFile = new File(new File("/tmp"), fileName);
+	    final File textFile = new File(new File("/tmp"), fileName + ".txt");
+	    view.dumpToFile(structFile);
+	    final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textFile)));
+	    try {
+		for(int i = 0;i < view.getLineCount();++i)
+		{
+		    w.write(view.getLine(i));
+		    w.newLine();
+		}
+	    }
+	    finally {
+		w.close();
+	    }
+	}
+	catch(Exception e)
+	{
+	    Log.error(LOG_COMPONENT, "unable to make a dump file:" + e.getClass().getName() + ":" + e.getMessage());
+	}
 	this.it = view.createIterator();
 	this.rowIndex = 0;
 	return true;

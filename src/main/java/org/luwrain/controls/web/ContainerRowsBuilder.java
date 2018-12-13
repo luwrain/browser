@@ -28,6 +28,8 @@ final class ContainerRowsBuilder
     static private final int SPECIAL_MIN_WIDTH = 10;
         static private final int SPECIAL_MAX_WIDTH = 15;
 
+    private final int rowLen;
+
     /** Objects of the incomplete row*/
     final List<WebObject> res = new LinkedList();
     /** Number of characters on the current (incomplete) row*/
@@ -35,12 +37,19 @@ final class ContainerRowsBuilder
     /** Complete rows*/
     final List<ContainerRow> rows = new LinkedList();
 
+    ContainerRowsBuilder(int rowLen)
+    {
+	if (rowLen < 5)
+	    Log.warning(LOG_COMPONENT, "too short row:" + rowLen);
+	this.rowLen = rowLen;
+    }
+
     boolean process(ContentItem contentItem)
     {
 	NullCheck.notNull(contentItem, "contentItem");
 	if (contentItem.isText())
 	{
-	    onText(contentItem, 100);//FIXME:
+	    onText(contentItem, rowLen);
 	    return true;
 	}
 	if (contentItem.isBr())
@@ -50,17 +59,17 @@ final class ContainerRowsBuilder
 	}
 	if (contentItem.isTextInput())
 	{
-	    onTextInput(contentItem, 100);
+	    onTextInput(contentItem, rowLen);
 	    return true;
 	}
 		if (contentItem.isButton())
 	{
-	    onButton(contentItem, 100);
+	    onButton(contentItem, rowLen);
 	    return true;
 	}
 				if (contentItem.isImage())
 	{
-	    onImage(contentItem, 100);
+	    onImage(contentItem, rowLen);
 	    return true;
 	}
 	return false;

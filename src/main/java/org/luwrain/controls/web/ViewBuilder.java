@@ -55,7 +55,7 @@ final class ViewBuilder
 	final List<Container> viewContainers = new LinkedList();
 	for(Container c: containers)
 	{
-	    final ContainerRowsBuilder b = new ContainerRowsBuilder();
+	    final ContainerRowsBuilder b = new ContainerRowsBuilder(c.textWidth);
 	    for(ContentItem i: c.getContent())
 		processContentItem(b, i);
 	    b.commitRow();
@@ -82,6 +82,7 @@ final class ViewBuilder
 		    c.calcActualTextY();
 		return new View(appearance, res);
     }
+
 
     private void processContentItem(ContainerRowsBuilder builder, ContentItem item)
     {
