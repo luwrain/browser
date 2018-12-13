@@ -203,6 +203,9 @@ public class WebArea implements Area
 	}
 	this.it = view.createIterator();
 	this.rowIndex = 0;
+	context.onAreaNewContent(this);
+	context.onAreaNewHotPoint(this);
+	context.onAreaNewName(this);
 	return true;
     }
 
@@ -280,12 +283,16 @@ public class WebArea implements Area
 
     @Override public int getHotPointX()
     {
+	if (isEmpty())
 	return 0;
+	return it.getX() + hotPointX;
     }
 
     @Override public int getHotPointY()
     {
+	if (isEmpty())
 	return 0;
+	return it.getY() + rowIndex;
     }
 
     @Override public int getLineCount()
@@ -359,6 +366,7 @@ public class WebArea implements Area
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	    return true;
 	    }
+		context.onAreaNewHotPoint(this);
 		context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
 		return true;
     }
@@ -380,6 +388,7 @@ public class WebArea implements Area
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
 	    return true;
 	    }
+		context.onAreaNewHotPoint(this);
 		context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
 		return true;
     }
@@ -393,6 +402,7 @@ public class WebArea implements Area
 	{
 	    --rowIndex;
 	    hotPointX = 0;
+	    context.onAreaNewHotPoint(this);
 	    announceRow();
 	    return true;
 	}
@@ -401,7 +411,10 @@ public class WebArea implements Area
 	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
 	    return true;
 	}
+	final int count = it.getRowCount();
+	rowIndex = count > 0?count - 1:0;
 	hotPointX = 0;
+	context.onAreaNewHotPoint(this);
 	announceRow();
 	return true;
     }
@@ -415,6 +428,7 @@ public class WebArea implements Area
 	{
 	    ++rowIndex;
 	    hotPointX = 0;
+	    context.onAreaNewHotPoint(this);
 	    announceRow();
 	    return true;
 	}
@@ -425,6 +439,7 @@ public class WebArea implements Area
 	}
 	rowIndex = 0;
 	hotPointX = 0;
+	context.onAreaNewHotPoint(this);
 	announceRow();
 	return true;
     }

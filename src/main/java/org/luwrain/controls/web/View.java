@@ -204,12 +204,22 @@ final class View implements Lines
 	    this.container = view.getContainer(this.pos);
 	}
 
+	int getX()
+	{
+	    return container.textX;
+	}
+
+	int getY()
+	{
+	    return container.textY;
+	}
+
 Container.Type getType()
 	{
 	    return container.type;
 	}
 
-	int getLineCount()
+	int getRowCount()
 	{
 	    return container.getRowCount();
 	}
