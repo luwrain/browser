@@ -84,6 +84,8 @@ final class View implements Lines
 	    lineCount = Math.max(lineCount, c.textY + c.textHeight);
 	Log.debug(LOG_COMPONENT, "preparing " + lineCount + " lines");
 	final String[] lines = new String[lineCount];
+	for(int i = 0;i < lineCount;++i)
+	    lines[i] = "";
 	for(Container c: containers)
 	{
 	    for(int i = 0;i < c.rows.length;++i)

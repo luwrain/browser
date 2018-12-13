@@ -164,7 +164,7 @@ public class WebArea implements Area
 		try {
 		    final ContainersList containers = new ModelBuilder().build(browser);
 		    Log.debug(LOG_COMPONENT, "containers prepared: " + containers.getContainerCount());
-		    return new ViewBuilder(containers.getContainers()).build(appearance);
+		    return new ViewBuilder(containers.getContainers()).build(appearance, 100);
 		}
 		catch(Throwable e)
 		{

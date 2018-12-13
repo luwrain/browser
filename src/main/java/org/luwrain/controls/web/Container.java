@@ -78,6 +78,7 @@ final class Container
     {
 	NullCheck.notNullItems(rows, "rows");
 	this.rows = rows.clone();
+	this.textHeight = rows.length;
     }
 
     ContainerRow[] getRows()
