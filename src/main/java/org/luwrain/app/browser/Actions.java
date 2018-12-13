@@ -113,12 +113,6 @@ final class Actions implements org.luwrain.controls.web.WebArea.Callback
 	luwrain.message(text);
     }
 
-    @Override public int getAreaVisibleWidth(Area area)
-    {
-	NullCheck.notNull(area, "area");
-	return luwrain.getAreaVisibleWidth(area);
-    }
-
     @Override public String prompt(String message, String value)
     {
 	NullCheck.notNull(message, "message");

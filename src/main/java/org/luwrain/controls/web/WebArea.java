@@ -94,7 +94,6 @@ public class WebArea implements Area
 	void onBrowserRunning();
 	void onBrowserSuccess(String title);
 	void onBrowserFailed();
-	int getAreaVisibleWidth(Area area);
 	boolean confirm(String text);
 	String prompt(String message, String text);
 	void message(String text, MessageType type);
@@ -165,7 +164,7 @@ public class WebArea implements Area
 		try {
 		    final ContainersList containers = new ModelBuilder().build(browser);
 		    Log.debug(LOG_COMPONENT, "containers prepared: " + containers.getContainerCount());
-		    return new ViewBuilder(containers.getContainers()).build(appearance, 100);
+		    return new ViewBuilder(containers.getContainers()).build(appearance, context.getAreaVisibleWidth(this));
 		}
 		catch(Throwable e)
 		{
