@@ -69,7 +69,7 @@ final class ContainerRowsBuilder
 	}
 				if (contentItem.isImage())
 	{
-	    onImage(contentItem, rowLen);
+	    onImage(contentItem);
 	    return true;
 	}
 	return false;
@@ -125,25 +125,19 @@ final class ContainerRowsBuilder
 	res.add(new WebButton(item, width));
     }
 
-            private void onImage(ContentItem item, int maxRowLen)
+            private void onImage(ContentItem item)
     {
 	NullCheck.notNull(item, "item");
 	if (!item.isImage())
 	    throw new IllegalArgumentException("The item must be of an image type");
-	if (maxRowLen < SPECIAL_MAX_WIDTH)
-	    throw new IllegalArgumentException("maxRowLen (" + maxRowLen + ") may not be less than SPECIAL_MAX_WIDTH (" + SPECIAL_MAX_WIDTH);
-	final int room = maxRowLen - offset;
-	final int width;
-	if (room > SPECIAL_MAX_WIDTH)
-	    width = SPECIAL_MAX_WIDTH; else
-	    if (room >= SPECIAL_MIN_WIDTH)
-		width = SPECIAL_MIN_WIDTH; else
-	    {
-		commitRow();
-		width = SPECIAL_MAX_WIDTH;
-	    }
-	res.add(new WebImage(item, width));
-    }
+	if (rowLen - offset < 8)
+	    commitRow();
+	final String comment = item.getImageComment();
+	final int room = rowLen - offset;
+	if (comment.length() + 2 <= room)
+	    res.add(new WebImage(item, Math.min(comment.length() + 2, 10))); else
+	    	    res.add(new WebImage(item, Math.min(room, 10)));
+	}
 
 
     //Removes spaces only on row breaks and only if after the break there are non-spacing chars
