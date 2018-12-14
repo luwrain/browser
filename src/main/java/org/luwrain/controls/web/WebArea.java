@@ -32,6 +32,7 @@ import org.luwrain.controls.*;
 public class WebArea implements Area
 {
     static final String LOG_COMPONENT = "web";
+    static private final int MIN_VISIBLE_WIDTH = 20;
 
     interface Appearance
     {
@@ -149,22 +150,20 @@ public class WebArea implements Area
      */
     boolean refresh()
     {
-	/*
-	if (browser.isBusy())
-	    return false;
-	*/
+	//FIXME:if busy
+	final int areaWidth = context.getAreaVisibleWidth(this);
 	browser.rescanDom();
-	updateView();
+	updateView(areaWidth);
 	return true;
     }
 
-    public boolean updateView()
+    public boolean updateView(int areaWidth)
     {
 	final Object obj = browser.runSafely(()->{
 		try {
 		    final ContainersList containers = new ModelBuilder().build(browser);
 		    Log.debug(LOG_COMPONENT, "containers prepared: " + containers.getContainerCount());
-		    return new ViewBuilder(containers.getContainers()).build(appearance, context.getAreaVisibleWidth(this));
+		    return new ViewBuilder(containers.getContainers()).build(appearance, Math.max(areaWidth, MIN_VISIBLE_WIDTH));
 		}
 		catch(Throwable e)
 		{

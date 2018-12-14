@@ -178,8 +178,8 @@ final class Container
 	int maxPos = 0;
 	for(Container c: vertDepOn)
 	    maxPos = Math.max(maxPos, c.textY + c.textHeight);
-	this.textY = maxPos;
-	actualTextY = true;
+	this.textY = maxPos + 1;
+		actualTextY = true;
     }
 
     @Override public String toString()

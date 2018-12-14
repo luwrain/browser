@@ -38,11 +38,12 @@ final class ViewBuilder
     View build(WebArea.Appearance appearance, int width)
     {
 	NullCheck.notNull(appearance, "appearance");
-
 		if (width < 10)
 	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
 	calcTextXAndWidth(width);
 	calcTextY();
+	for(Container c: containers)
+	    c.textY *= 2;
 	for(int i = 0;i < containers.length;++i)
 	    for(int j = 0;j < containers.length;++j)
 		if (i != j)

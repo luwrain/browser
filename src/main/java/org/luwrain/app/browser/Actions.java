@@ -67,7 +67,7 @@ final class Actions implements org.luwrain.controls.web.WebArea.Callback
 		    webTextInput.setText(value);
 		    return null;
 		});
-	    area.updateView();
+	    area.updateView(luwrain.getAreaVisibleWidth(area));
 	    return true;
 	}
 	browser.runSafely(()->{
