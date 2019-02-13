@@ -18,7 +18,11 @@
 package org.luwrain.controls.web;
 
 import java.util.*;
+import java.io.*;
 import java.awt.Rectangle;
+
+import com.google.gson.*;
+import com.google.gson.stream.*;
 
 import org.luwrain.core.*;
 import org.luwrain.browser.*;
@@ -39,6 +43,53 @@ final class ModelBuilder
 	    it.setPos(i);
 	    items[i] = new Item(it.clone());
 	}
+
+	try {
+	Gson gson = new Gson();
+	JsonWriter writer = new JsonWriter(new FileWriter("/tmp/json"));
+			    writer.beginArray();
+			    for(int i = 0;i < items.length;++i)
+		{
+		    final Item item = items[i];
+		    writer.beginObject();
+		    writer.name("id").value(i);
+		    writer.name("tag").value(item.tagName);
+		    writer.name("class").value(item.className);
+
+		    	    final Rectangle rect = item.it.getRect();
+	    if (rect != null)
+	    {
+		writer.name("x").value(rect.x);
+				writer.name("y").value(rect.y);
+								writer.name("width").value(rect.width);
+																writer.name("height").value(rect.height);
+	    }
+	    if (item.it.getParent() != null)
+		writer.name("parent").value(item.it.getParent().getPos());
+
+	    if (item.className.toLowerCase().equals("text"))
+		writer.name("text").value(item.it.getText());
+	    	    System.out.println("" + i);
+	    if (!item.tagName.equals("html"))
+	    writer.name("style").value(item.it.getAllComputedStyles());
+	    
+	    
+	    writer.name("attrs");
+	    writer.beginObject();
+	    	    for(Map.Entry<String, String> e: item.it.getAttrs().entrySet())
+	    		writer.name(e.getKey()).value(e.getValue());
+	    writer.endObject();
+		    writer.endObject();
+		}
+		writer.endArray();
+		writer.close();
+	
+	}
+	catch(Exception e)
+	{
+	    e.printStackTrace();
+	}
+	
 	for(Item i: items)
 	{
 	    if (i.className.equals(Classes.DOCUMENT_TYPE))
