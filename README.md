@@ -1,5 +1,5 @@
 
-## WebKit-based browser engine for the blind
+# WebKit-based browser engine for the blind
 
 This repository contains the code responsible of transforming the structures of the [WebKit](https://en.wikipedia.org/wiki/WebKit) engine
 to the the form suitable for reading and navigating by blind people.
@@ -14,9 +14,7 @@ The WebKit implementation is used as it comes in the [JavaFX](https://en.wikiped
 In addition, this repository provides a structure suitable for reading structural text documents.
 Besides the browser, it is very useful for viewing office documents.
 
+This repository is a part of the LUWRAIN project.
+LUWRAIN is a platform for the creation of apps for the blind and partially-sighted.
+Please visit [luwrain.org](http://luwrain.org/?lang=en) for further information.
 
-See also:
-
-* [Our website](http://luwrain.org/?lang=en)
-* [Our mailing lists](http://luwrain.org/community/mailing-lists/?lang=en)
-* [Our Twitter](http://twitter.com/luwrain)
