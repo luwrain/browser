@@ -1,24 +1,9 @@
-/*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.controls.web;
 
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
+import org.luwrain.controls.block.*;
 import org.luwrain.browser.*;
 
 public class DefaultAppearance implements WebArea.Appearance
@@ -31,8 +16,9 @@ public class DefaultAppearance implements WebArea.Appearance
 	this.context = context;
     }
 
-    @Override public void announceFirstRow(Container.Type type, WebObject[] objs)
+    @Override public void announceFirstRow(Block block, BlockRowFragment[] objs)
     {
+	/*
 	NullCheck.notNull(type, "type");
 	NullCheck.notNullItems(objs, "objs");
 	final Sounds sound;
@@ -51,20 +37,23 @@ public class DefaultAppearance implements WebArea.Appearance
 	    sound = null;
 	}
 	context.setEventResponse(DefaultEventResponse.text(sound, makeResponseText(objs)));
+	*/
     }
 
-    @Override public void announceRow(WebObject[] objs)
+    @Override public void announceRow(Block block, BlockRowFragment[] objs)
     {
+	NullCheck.notNull(block, "block");
 	NullCheck.notNullItems(objs, "objs");
 	context.setEventResponse(DefaultEventResponse.text(makeResponseText(objs)));
     }
 
-    @Override public String getRowTextAppearance(WebObject[] objs)
+    @Override public String getRowTextAppearance(BlockRowFragment[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
 	final StringBuilder b = new StringBuilder();
-	for(WebObject o: objs)
+	for(BlockRowFragment o: objs)
 	{
+	    /*
 	    if (o instanceof WebText)
 	    {
 		final WebText webText = (WebText)o;
@@ -95,14 +84,16 @@ public class DefaultAppearance implements WebArea.Appearance
 		b.append("[").append(webImage.getComment()).append("]");
 		continue;
 	    }
+	    */
 	}
 	return new String(b);
     }
 
-    protected String makeResponseText(WebObject[] objs)
+    protected String makeResponseText(BlockRowFragment[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
 	final StringBuilder b = new StringBuilder();
+	/*
 	for(WebObject o: objs)
 	{
 	    if (o instanceof WebText)
@@ -133,5 +124,8 @@ public class DefaultAppearance implements WebArea.Appearance
 	    }
 	}
 	return new String(b);
+    }
+	*/
+	return "";
     }
 }

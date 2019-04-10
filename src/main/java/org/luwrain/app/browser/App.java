@@ -72,7 +72,7 @@ final class App implements Application
 	final WebArea.Params params = new WebArea.Params();
 	params.context = new DefaultControlEnvironment(luwrain);
 	params.appearance = new DefaultAppearance(params.context);
-	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
+	//FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
 	params.browserFactory = (events)->{
 	    base.browser.init(events);
 	    return base.browser;
