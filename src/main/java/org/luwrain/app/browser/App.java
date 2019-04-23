@@ -70,7 +70,7 @@ final class App implements Application
     {
 	//final org.luwrain.controls.doc.Strings announcementStrings = (org.luwrain.controls.doc.Strings)luwrain.i18n().getStrings("luwrain.doc");
 	final WebArea.Params params = new WebArea.Params();
-	params.context = new DefaultControlEnvironment(luwrain);
+	params.context = new DefaultControlContext(luwrain);
 	params.appearance = new DefaultAppearance(params.context);
 	//FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
 	params.browserFactory = (events)->{

@@ -69,7 +69,7 @@ public final class App implements Application
     private void createArea()
     {
 	final ListArea.Params elementsParams = new ListArea.Params();
-	elementsParams.context = new DefaultControlEnvironment(luwrain);
+	elementsParams.context = new DefaultControlContext(luwrain);
 	elementsParams.name = strings.appName();
 	elementsParams.model = base.getItemsModel();
 	elementsParams.appearance = new ListUtils.DefaultAppearance(elementsParams.context);
@@ -130,7 +130,7 @@ return true;
 	    };
 
 		final ListArea.Params attrsParams = new ListArea.Params();
-	attrsParams.context = new DefaultControlEnvironment(luwrain);
+	attrsParams.context = new DefaultControlContext(luwrain);
 	attrsParams.name = strings.appName();
 	attrsParams.model = base.getAttrsModel();
 	attrsParams.appearance = new ListUtils.DefaultAppearance(attrsParams.context);
