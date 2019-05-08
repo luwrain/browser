@@ -8,9 +8,9 @@ import org.luwrain.browser.*;
 
 public class DefaultAppearance implements WebArea.Appearance
 {
-    protected ControlEnvironment context;
+    protected ControlContext context;
 
-    public DefaultAppearance(ControlEnvironment context)
+    public DefaultAppearance(ControlContext context)
     {
 	NullCheck.notNull(context, "context");
 	this.context = context;

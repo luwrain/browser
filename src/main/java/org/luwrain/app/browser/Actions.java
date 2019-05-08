@@ -90,7 +90,7 @@ final class Actions implements org.luwrain.controls.web.WebArea.Callback
 
     @Override public void onBrowserRunning()
     {
-	luwrain.say(strings.loading());
+	luwrain.speak(strings.loading());
     }
 
     @Override public void onBrowserSuccess(String title)
