@@ -82,7 +82,7 @@ public final class App implements Application
 	    return true;
 	};
     	this.elementsArea = new ListArea(elementsParams) {
-		@Override public boolean onInputEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    NullCheck.notNull(event, "event");
@@ -141,7 +141,7 @@ return true;
 	    return false;
 	};
     	this.attrsArea = new ListArea(attrsParams) {
-		@Override public boolean onInputEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    NullCheck.notNull(event, "event");

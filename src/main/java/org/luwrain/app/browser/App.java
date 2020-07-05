@@ -80,7 +80,7 @@ final class App implements Application
 	params.callback = actions;
 	params.clientThread = base;
     	area = new WebArea(params){
-		@Override public boolean onInputEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    NullCheck.notNull(event, "event");

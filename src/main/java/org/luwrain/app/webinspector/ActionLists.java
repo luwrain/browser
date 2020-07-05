@@ -35,7 +35,7 @@ class ActionLists
     Action[] getBrowserActions()
     {
 	return new Action[]{
-	    new Action("show-graphical", strings.actionShowGraphical(), new KeyboardEvent(KeyboardEvent.Special.F10)),
+	    new Action("show-graphical", strings.actionShowGraphical(), new InputEvent(InputEvent.Special.F10)),
 	};
     }
 }
