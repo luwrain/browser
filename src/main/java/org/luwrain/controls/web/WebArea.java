@@ -204,7 +204,7 @@ protected ClientThread clientThread = null;
 	return title != null?title:"";
     }
 
-    @Override public boolean onSystemEvent(EnvironmentEvent event)
+    @Override public boolean onSystemEvent(SystemEvent event)
     {
 	NullCheck.notNull(event, "event");
 	switch(event.getCode())
