@@ -21,6 +21,7 @@ import java.net.*;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
+import org.luwrain.base.*;
 import org.luwrain.browser.*;
 import org.luwrain.controls.web.*;
 
@@ -37,7 +38,7 @@ class Base implements WebArea.ClientThread
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
 	this.sett = Settings.create(luwrain.getRegistry());
-	this.browser = luwrain.createBrowser();
+	this.browser = (Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
     }
 
     String makeHref(WebArea area, String href)

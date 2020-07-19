@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
+import org.luwrain.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.browser.*;
 
@@ -37,7 +38,7 @@ final class Base implements BrowserEvents
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
-	this.browser = luwrain.createBrowser();
+	this.browser = (Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
 	this.browser.init(this);
     }
 
