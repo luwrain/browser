@@ -18,6 +18,7 @@
 package org.luwrain.app.browser;
 
 import org.luwrain.core.*;
+import org.luwrain.browser.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.web.*;
 import org.luwrain.controls.*;
@@ -74,8 +75,8 @@ final class App implements Application
 	params.appearance = new DefaultAppearance(params.context);
 	//FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
 	params.browserFactory = (events)->{
-	    base.browser.init(events);
-	    return base.browser;
+	    NullCheck.notNull(events, "events");
+	    return Browser.create(luwrain, events);
 	};
 	params.callback = actions;
 	params.clientThread = base;

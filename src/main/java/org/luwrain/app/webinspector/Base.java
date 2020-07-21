@@ -38,8 +38,7 @@ final class Base implements BrowserEvents
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
-	this.browser = (Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
-	this.browser.init(this);
+	this.browser = Browser.create(luwrain, this);
     }
 
     void fillAttrs(Item item)

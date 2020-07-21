@@ -22,6 +22,8 @@ package org.luwrain.browser;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 
+import org.luwrain.core.*;
+
 /**
  * An interface to web-browser engine. This interface provides
  * web-browser functionality with JavaScript support. The corresponding
@@ -37,7 +39,8 @@ import java.util.concurrent.Callable;
  */
 public interface Browser extends org.luwrain.base.GraphicalMode
 {
-        void init(BrowserEvents events);
+    static public final String GRAPHICAL_MODE_NAME = "browser";
+
         void close();
     void loadByUrl(String url);
     void loadByText(String text);
@@ -53,4 +56,11 @@ public interface Browser extends org.luwrain.base.GraphicalMode
     void stop();
     boolean goHistoryPrev();
 
+    static public Browser create(Luwrain luwrain, BrowserEvents events)
+    {
+	NullCheck.notNull(events, "events");
+	final BrowserParams params = new BrowserParams();
+	params.events = events;
+	return (Browser)luwrain.openGraphicalMode(GRAPHICAL_MODE_NAME, params);
+    }
 }
