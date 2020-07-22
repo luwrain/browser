@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -27,18 +27,8 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public Command[] getCommands(Luwrain luwrain)
     {
 	return new Command[]{
-
-	    new Command(){
-		@Override public String getName()
-		{
-		    return "browser";
-		}
-		@Override public void onCommand(Luwrain luwrain)
-		{
-		    luwrain.launchApp("browser");
-		}
-	    },
-
+	    new SimpleShortcutCommand("browser"),
+	    new SimpleShortcutCommand("web-ins"),
 	};
     }
 
