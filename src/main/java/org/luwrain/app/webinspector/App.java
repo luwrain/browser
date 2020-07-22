@@ -17,15 +17,24 @@
 
 package org.luwrain.app.webinspector;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
-import org.luwrain.controls.*;
-
+import org.luwrain.browser.*;
 import org.luwrain.template.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
+        static final String LOG_COMPONENT = "inspector";
+
     private final String arg;
+
+    Item[] items = new Item[0];
+    String[] attrs = new String[0];
+    private MainLayout mainLayout = null;
+    private Browser browser = null;
+    private Conversations conv = null;
 
     public App(String arg)
     {
@@ -40,12 +49,115 @@ public final class App extends AppBase <Strings>implements Application
 
     @Override public boolean onAppInit()
     {
+	this.conv = new Conversations(this);
+	this.browser = Browser.create(getLuwrain(), null);
+	this.mainLayout = new MainLayout(this);
 	return true;
     }
+
+    void fillAttrs(Item item)
+    {
+	NullCheck.notNull(item, "item");
+	this.attrs = (String[])browser.runSafely(()->{
+	final Map<String, String> attrMap = item.it.getAttrs();
+	final List<String> res = new LinkedList();
+	if (!item.it.getTagName().isEmpty())
+	    res.add("<" + item.it.getTagName() + ">");
+	res.add(item.it.getRect().toString());
+	for(Map.Entry<String, String> e: attrMap.entrySet())
+	{
+	    res.add(e.getKey() + ": " + e.getValue());
+	}
+	final String style = item.it.getAllComputedStyles();
+	if (style != null && !style.trim().isEmpty())
+	{
+	    res.add("Стили:");//FIXME:
+	    final String[] styles = style.split(";", -1);
+	    Arrays.sort(styles);
+	    for(String s: styles)
+		res.add(s.trim());
+	}
+return res.toArray(new String[res.size()]);
+	    });
+    }
+
+        void updateItems()
+    {
+    	final Object obj = browser.runSafely(()->{
+		browser.rescanDom();
+		final BrowserIterator it = browser.createIterator();
+		final List<Item> res = new LinkedList();
+		final int count = browser.numElements();
+		for(int i = 0;i < count;++i)
+		{
+		    it.setPos(i);
+		    res.add(new Item(it));
+		}
+		getLuwrain().runUiSafely(()->{
+			this.items = res.toArray(new Item[res.size()]);
+			getLuwrain().playSound(Sounds.DONE);
+		    });
+		return null;
+	    });
+    }
+
+
 
     @Override public AreaLayout getDefaultAreaLayout()
     {
 	return null;
     }
 
+    Browser getBrowser()
+    {
+	return this.browser;
+    }
+
+    Conversations getConv()
+    {
+	return this.conv;
+    }
+
+private final class Events implements BrowserEvents
+{
+    @Override public void onChangeState(State state)
+    {
+	NullCheck.notNull(state, "state");
+	switch(state)
+	{
+	case SUCCEEDED:
+	    updateItems();
+	    return;
+	case FAILED:
+	    getLuwrain().playSound(Sounds.ERROR);
+	    return;
+	}
+    }
+    @Override public void onProgress(Number progress)
+    {
+    }
+    @Override public void onAlert(String message)
+    {
+	getLuwrain().message(message);
+    }
+    @Override public String onPrompt(String message,String value)
+    {
+	return "FIXME";
+    }
+    @Override public void onError(String message)
+    {
+	NullCheck.notNull(message, "message");
+	getLuwrain().message(message, Luwrain.MessageType.ERROR);
+    }
+    @Override public boolean onDownloadStart(String url)
+    {
+	//FIXME:
+	return true;
+    }
+    @Override public Boolean onConfirm(String message)
+    {
+	//FIXME:
+	return true;
+    }
+    }
 }

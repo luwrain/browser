@@ -27,10 +27,10 @@ final class Conversations
     private final Luwrain luwrain;
     private final Set<String> openUrlHistory = new HashSet<String>();
 
-    Conversations(Luwrain luwrain)
+    Conversations(App app)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	this.luwrain = luwrain;
+	NullCheck.notNull(app, "app");
+	this.luwrain = app.getLuwrain();
     }
 
         String formText(String prevValue)

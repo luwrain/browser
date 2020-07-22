@@ -75,6 +75,36 @@ final class MainLayout extends LayoutBase
 	    };
     }
 
+        boolean onClick(Item item)
+    {
+	NullCheck.notNull(item, "item");
+	if (item.className.equals("HTMLButtonElementImpl") ||
+	    item.inputType.equals("submit"))
+	{
+	    app.getBrowser().runSafely(()->{
+		    item.it.emulateSubmit();
+		    return null;
+		});
+	    return true;
+	}
+	if (item.inputType.equals("text") ||
+	    item.inputType.equals("password") ||
+	    item.inputType.equals("email"))
+	{
+	    final String text = app.getConv().formText("");
+	    if (text == null)
+		return true;
+	    app.getBrowser().runSafely(()->{
+		    item.it.setInputText(text);
+		    app.updateItems();
+		    return null;
+		});
+	    return true;
+	}
+	return false;
+    }
+
+
     private ListArea.Params createElementsParams()
     {
 		final ListArea.Params elementsParams = new ListArea.Params();
@@ -108,4 +138,35 @@ final class MainLayout extends LayoutBase
 	};
 	return attrsParams;
     }
+
+        private final class ItemsModel implements org.luwrain.controls.ListArea.Model
+    {
+	@Override public int getItemCount()
+	{
+	    return app.items.length;
+	}
+	@Override public Object getItem(int index)
+	{
+	    return app.items[index];
+	}
+	@Override public void refresh()
+	{
+	}
+    }
+
+        private final class AttrsModel implements org.luwrain.controls.ListArea.Model
+    {
+	@Override public int getItemCount()
+	{
+	    return app.attrs.length;
+	}
+	@Override public Object getItem(int index)
+	{
+	    return app.attrs[index];
+	}
+	@Override public void refresh()
+	{
+	}
+    }
+
 }
