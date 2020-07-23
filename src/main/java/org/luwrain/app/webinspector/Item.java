@@ -37,7 +37,7 @@ final class Item
 	this.className = it.getClassName();
 	if (it.isInput())
 	    this.inputType = it.getInputType(); else
-						  this.inputType = "";
+	    this.inputType = "";
 	this.tagName = it.getTagName();
 	this.text = it.getText();
     }
@@ -53,7 +53,7 @@ final class Item
 	b.append(className);
 	if (!inputType.isEmpty())
 	    b.append("(").append(inputType).append(")");
-b.append(" ").append(text != null?text:"null");
+	b.append(" ").append(text != null?text:"null");
 	return new String(b);
-	}
+    }
 }

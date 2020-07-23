@@ -26,10 +26,9 @@ import org.luwrain.template.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
-        static final String LOG_COMPONENT = "inspector";
+    static final String LOG_COMPONENT = "inspector";
 
     private final String arg;
-
     Item[] items = new Item[0];
     String[] attrs = new String[0];
     private MainLayout mainLayout = null;
@@ -50,8 +49,9 @@ public final class App extends AppBase <Strings>implements Application
     @Override public boolean onAppInit()
     {
 	this.conv = new Conversations(this);
-	this.browser = Browser.create(getLuwrain(), null);
+	this.browser = Browser.create(getLuwrain(), new Events());
 	this.mainLayout = new MainLayout(this);
+	setAppName(getStrings().appName());
 	return true;
     }
 
@@ -59,29 +59,29 @@ public final class App extends AppBase <Strings>implements Application
     {
 	NullCheck.notNull(item, "item");
 	this.attrs = (String[])browser.runSafely(()->{
-	final Map<String, String> attrMap = item.it.getAttrs();
-	final List<String> res = new LinkedList();
-	if (!item.it.getTagName().isEmpty())
-	    res.add("<" + item.it.getTagName() + ">");
-	res.add(item.it.getRect().toString());
-	for(Map.Entry<String, String> e: attrMap.entrySet())
-	{
-	    res.add(e.getKey() + ": " + e.getValue());
-	}
-	final String style = item.it.getAllComputedStyles();
-	if (style != null && !style.trim().isEmpty())
-	{
-	    res.add("Стили:");//FIXME:
-	    final String[] styles = style.split(";", -1);
-	    Arrays.sort(styles);
-	    for(String s: styles)
-		res.add(s.trim());
-	}
-return res.toArray(new String[res.size()]);
+		final Map<String, String> attrMap = item.it.getAttrs();
+		final List<String> res = new LinkedList();
+		if (!item.it.getTagName().isEmpty())
+		    res.add("<" + item.it.getTagName() + ">");
+		res.add(item.it.getRect().toString());
+		for(Map.Entry<String, String> e: attrMap.entrySet())
+		{
+		    res.add(e.getKey() + ": " + e.getValue());
+		}
+		final String style = item.it.getAllComputedStyles();
+		if (style != null && !style.trim().isEmpty())
+		{
+		    res.add("Стили:");//FIXME:
+		    final String[] styles = style.split(";", -1);
+		    Arrays.sort(styles);
+		    for(String s: styles)
+			res.add(s.trim());
+		}
+		return res.toArray(new String[res.size()]);
 	    });
     }
 
-        void updateItems()
+    void updateItems()
     {
     	final Object obj = browser.runSafely(()->{
 		browser.rescanDom();
@@ -101,11 +101,15 @@ return res.toArray(new String[res.size()]);
 	    });
     }
 
-
-
     @Override public AreaLayout getDefaultAreaLayout()
     {
-	return null;
+	return mainLayout.getLayout();
+    }
+
+    @Override public void closeApp()
+    {
+	this.browser.close();
+	super.closeApp();
     }
 
     Browser getBrowser()
@@ -118,46 +122,46 @@ return res.toArray(new String[res.size()]);
 	return this.conv;
     }
 
-private final class Events implements BrowserEvents
-{
-    @Override public void onChangeState(State state)
+    private final class Events implements BrowserEvents
     {
-	NullCheck.notNull(state, "state");
-	switch(state)
+	@Override public void onChangeState(State state)
 	{
-	case SUCCEEDED:
-	    updateItems();
-	    return;
-	case FAILED:
-	    getLuwrain().playSound(Sounds.ERROR);
-	    return;
+	    NullCheck.notNull(state, "state");
+	    switch(state)
+	    {
+	    case SUCCEEDED:
+		updateItems();
+		return;
+	    case FAILED:
+		getLuwrain().playSound(Sounds.ERROR);
+		return;
+	    }
 	}
-    }
-    @Override public void onProgress(Number progress)
-    {
-    }
-    @Override public void onAlert(String message)
-    {
-	getLuwrain().message(message);
-    }
-    @Override public String onPrompt(String message,String value)
-    {
-	return "FIXME";
-    }
-    @Override public void onError(String message)
-    {
-	NullCheck.notNull(message, "message");
-	getLuwrain().message(message, Luwrain.MessageType.ERROR);
-    }
-    @Override public boolean onDownloadStart(String url)
-    {
-	//FIXME:
-	return true;
-    }
-    @Override public Boolean onConfirm(String message)
-    {
-	//FIXME:
-	return true;
-    }
+	@Override public void onProgress(Number progress)
+	{
+	}
+	@Override public void onAlert(String message)
+	{
+	    getLuwrain().message(message);
+	}
+	@Override public String onPrompt(String message,String value)
+	{
+	    return "FIXME";
+	}
+	@Override public void onError(String message)
+	{
+	    NullCheck.notNull(message, "message");
+	    getLuwrain().message(message, Luwrain.MessageType.ERROR);
+	}
+	@Override public boolean onDownloadStart(String url)
+	{
+	    //FIXME:
+	    return true;
+	}
+	@Override public Boolean onConfirm(String message)
+	{
+	    //FIXME:
+	    return true;
+	}
     }
 }

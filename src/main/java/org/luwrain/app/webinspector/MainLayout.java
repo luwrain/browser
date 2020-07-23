@@ -23,25 +23,30 @@ import org.luwrain.controls.*;
 
 import org.luwrain.template.*;
 
-final class MainLayout extends LayoutBase
+final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 {
     private final App app;
-    private ListArea elementsArea;
+    private ConsoleArea elementsArea;
     private ListArea attrsArea;
 
     MainLayout(App app)
     {
 	NullCheck.notNull(app, "app");
 	this.app = app;
-	this.elementsArea = new ListArea(createElementsParams()) {
+	this.elementsArea = new ConsoleArea(createElementsParams()) {
+		private final Actions actions = actions();
 		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
+		    if (app.onInputEvent(this, event))
+			return true;
 		    return super.onInputEvent(event);
 		}
 		@Override public boolean onSystemEvent(SystemEvent event)
 		{
 		    NullCheck.notNull(event, "event");
+		    if (app.onSystemEvent(this, event))
+			return true;
 		    if (event.getType() != SystemEvent.Type.REGULAR)
 			return super.onSystemEvent(event);
 		    switch(event.getCode())
@@ -50,23 +55,40 @@ final class MainLayout extends LayoutBase
 			return super.onSystemEvent(event);
 		    }
 		}
+		@Override public boolean onAreaQuery(AreaQuery query)
+		{
+		    NullCheck.notNull(query, "query");
+		    if (app.onAreaQuery(this, query))
+			return true;
+		    return super.onAreaQuery(query);
+		}
 		@Override public Action[] getAreaActions()
 		{
-		    return new Action[0];
+		    return actions.getAreaActions();
 		}
 	    };
-
     	this.attrsArea = new ListArea(createAttrsParams()) {
+		private final Actions actions = actions();
 		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
-		    NullCheck.notNull(event, "event");
+		    if (app.onInputEvent(this, event))
+			return true;
 		    return super.onInputEvent(event);
 		}
 		@Override public boolean onSystemEvent(SystemEvent event)
 		{
 		    NullCheck.notNull(event, "event");
-			return super.onSystemEvent(event);
+		    if (app.onSystemEvent(this, event))
+			return true;
+		    return super.onSystemEvent(event);
+		}
+		@Override public boolean onAreaQuery(AreaQuery query)
+		{
+		    NullCheck.notNull(query, "query");
+		    if (app.onAreaQuery(this, query))
+			return true;
+		    return super.onAreaQuery(query);
 		}
 		@Override public Action[] getAreaActions()
 		{
@@ -75,7 +97,12 @@ final class MainLayout extends LayoutBase
 	    };
     }
 
-        boolean onClick(Item item)
+    @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
+    {
+	return null;
+    }
+
+    private boolean onClick(Item item)
     {
 	NullCheck.notNull(item, "item");
 	if (item.className.equals("HTMLButtonElementImpl") ||
@@ -104,31 +131,32 @@ final class MainLayout extends LayoutBase
 	return false;
     }
 
-
-    private ListArea.Params createElementsParams()
+    private ConsoleArea.Params createElementsParams()
     {
-		final ListArea.Params elementsParams = new ListArea.Params();
-		elementsParams.context = new DefaultControlContext(app.getLuwrain());
-		elementsParams.name = app.getStrings().appName();
-	//	elementsParams.model = base.getItemsModel();
-	elementsParams.appearance = new ListUtils.DefaultAppearance(elementsParams.context);
-	elementsParams.clickHandler = (area,index,obj)->{
+	final ConsoleArea.Params params = new ConsoleArea.Params();
+	params.context = new DefaultControlContext(app.getLuwrain());
+	params.name = app.getStrings().appName();
+	params.model = new ConsoleModel();
+	params.appearance = new ElementsAppearance();
+	params.inputHandler = this;
+	params.inputPrefix = "WebKit>";
+	params.clickHandler = (area,index,obj)->{
 	    if (obj == null || !(obj instanceof Item))
 		return false;
-	    //	    base.fillAttrs((Item)obj);
+	    	    app.fillAttrs((Item)obj);
 	    attrsArea.refresh();
 	    app.getLuwrain().setActiveArea(attrsArea);
 	    return true;
 	};
-	return elementsParams;
+	return params;
     }
 
     private ListArea.Params createAttrsParams()
     {
-			final ListArea.Params attrsParams = new ListArea.Params();
-			attrsParams.context = new DefaultControlContext(app.getLuwrain());
-			attrsParams.name = app.getStrings().appName();
-	//	attrsParams.model = base.getAttrsModel();
+	final ListArea.Params attrsParams = new ListArea.Params();
+	attrsParams.context = new DefaultControlContext(app.getLuwrain());
+	attrsParams.name = app.getStrings().appName();
+	attrsParams.model = new AttrsModel();
 	attrsParams.appearance = new ListUtils.DefaultAppearance(attrsParams.context);
 	attrsParams.clickHandler = (area,index,obj)->{
 	    if (obj == null || !(obj instanceof Item))
@@ -139,7 +167,12 @@ final class MainLayout extends LayoutBase
 	return attrsParams;
     }
 
-        private final class ItemsModel implements org.luwrain.controls.ListArea.Model
+    AreaLayout getLayout()
+    {
+	return new AreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, attrsArea);
+    }
+
+    private final class ConsoleModel implements org.luwrain.controls.ConsoleArea.Model
     {
 	@Override public int getItemCount()
 	{
@@ -149,12 +182,24 @@ final class MainLayout extends LayoutBase
 	{
 	    return app.items[index];
 	}
-	@Override public void refresh()
+    }
+
+        private final class ElementsAppearance implements ConsoleArea.Appearance
+    {
+	@Override public void announceItem(Object item)
 	{
+	    NullCheck.notNull(item, "item");
+	    app.getLuwrain().setEventResponse(DefaultEventResponse.text(item.toString()));
+	    return;
+	}
+	@Override public String getTextAppearance(Object item)
+	{
+	    NullCheck.notNull(item, "item");
+	    return item.toString();
 	}
     }
 
-        private final class AttrsModel implements org.luwrain.controls.ListArea.Model
+    private final class AttrsModel implements org.luwrain.controls.ListArea.Model
     {
 	@Override public int getItemCount()
 	{
@@ -168,5 +213,4 @@ final class MainLayout extends LayoutBase
 	{
 	}
     }
-
 }
