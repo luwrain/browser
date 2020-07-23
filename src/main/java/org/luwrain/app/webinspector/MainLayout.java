@@ -34,7 +34,9 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	NullCheck.notNull(app, "app");
 	this.app = app;
 	this.elementsArea = new ConsoleArea(createElementsParams()) {
-		private final Actions actions = actions();
+		private final Actions actions = actions(
+							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+							);
 		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -45,7 +47,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		@Override public boolean onSystemEvent(SystemEvent event)
 		{
 		    NullCheck.notNull(event, "event");
-		    if (app.onSystemEvent(this, event))
+		    if (app.onSystemEvent(this, event, actions))
 			return true;
 		    if (event.getType() != SystemEvent.Type.REGULAR)
 			return super.onSystemEvent(event);
@@ -68,7 +70,9 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		}
 	    };
     	this.attrsArea = new ListArea(createAttrsParams()) {
-		private final Actions actions = actions();
+		private final Actions actions = actions(
+							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+							);
 		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -79,7 +83,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		@Override public boolean onSystemEvent(SystemEvent event)
 		{
 		    NullCheck.notNull(event, "event");
-		    if (app.onSystemEvent(this, event))
+		    if (app.onSystemEvent(this, event, actions))
 			return true;
 		    return super.onSystemEvent(event);
 		}
@@ -92,14 +96,29 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		}
 		@Override public Action[] getAreaActions()
 		{
-		    return new Action[0];
+		    return actions.getAreaActions();
 		}
 	    };
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
-	return null;
+	NullCheck.notNull(area, "area");
+	NullCheck.notNull(text, "text");
+	if (text.trim().isEmpty())
+	    return ConsoleArea.InputHandler.Result.REJECTED;
+	/*
+	  if (app.getBrowser().isBusy())
+	  return ConsoleArea.InputHandler.Result.REJECTED;
+	*/
+	app.getBrowser().loadByUrl(text.trim());
+	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
+    }
+
+    private boolean actShowGraphical()
+    {
+	app.getBrowser().setVisibility(true);
+	return true;
     }
 
     private boolean onClick(Item item)
@@ -143,7 +162,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	params.clickHandler = (area,index,obj)->{
 	    if (obj == null || !(obj instanceof Item))
 		return false;
-	    	    app.fillAttrs((Item)obj);
+	    app.fillAttrs((Item)obj);
 	    attrsArea.refresh();
 	    app.getLuwrain().setActiveArea(attrsArea);
 	    return true;
@@ -184,7 +203,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	}
     }
 
-        private final class ElementsAppearance implements ConsoleArea.Appearance
+    private final class ElementsAppearance implements ConsoleArea.Appearance
     {
 	@Override public void announceItem(Object item)
 	{
