@@ -111,7 +111,7 @@ protected ClientThread clientThread = null;
     {
 	//FIXME:if busy
 	final int areaWidth = context.getAreaVisibleWidth(this);
-	browser.rescanDom();
+	browser.update();
 	updateView(areaWidth);
 	return true;
     }

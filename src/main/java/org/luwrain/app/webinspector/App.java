@@ -84,10 +84,10 @@ public final class App extends AppBase <Strings>implements Application
     void updateItems()
     {
     	final Object obj = browser.runSafely(()->{
-		browser.rescanDom();
+		browser.update();
 		final BrowserIterator it = browser.createIterator();
 		final List<Item> res = new LinkedList();
-		final int count = browser.numElements();
+		final int count = browser.getElementCount();
 		for(int i = 0;i < count;++i)
 		{
 		    it.setPos(i);

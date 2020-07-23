@@ -34,7 +34,7 @@ final class ModelBuilder
     Container[] build(Browser browser)
     {
 	NullCheck.notNull(browser, "browser");
-	final int count = browser.numElements();
+	final int count = browser.getElementCount();
 	final Item[] items = new Item[count];
 	Item root = null;
 	final BrowserIterator it = browser.createIterator();

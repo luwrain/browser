@@ -41,18 +41,18 @@ public interface Browser extends org.luwrain.base.GraphicalMode
 {
     static public final String GRAPHICAL_MODE_NAME = "browser";
 
-        void close();
+    void close();
     void loadByUrl(String url);
     void loadByText(String text);
-        Object executeScript(String script);
+    Object executeScript(String script);
     BrowserIterator createIterator();
     String getTitle();
     String getUrl();
     boolean getVisibility();
-    int numElements();
-    void rescanDom();
+    void setVisibility(boolean visible);
+    int getElementCount();
+    void update();
     Object runSafely(Callable callable);
-    void setVisibility(boolean enable);
     void stop();
     boolean goHistoryPrev();
 
