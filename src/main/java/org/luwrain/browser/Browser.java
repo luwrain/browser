@@ -19,8 +19,9 @@
 
 package org.luwrain.browser;
 
-import java.util.Vector;
-import java.util.concurrent.Callable;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 
@@ -60,6 +61,13 @@ public interface Browser extends org.luwrain.base.GraphicalMode
     {
 	NullCheck.notNull(events, "events");
 	final BrowserParams params = new BrowserParams();
+	final org.luwrain.settings.browser.Settings sett = org.luwrain.settings.browser.Settings.create(luwrain.getRegistry());
+	params.userAgent = sett.getUserAgent(params.userAgent);
+	params.javaScriptEnabled = sett.getJavaScriptEnabled(true);
+	final File baseDir = luwrain.getAppDataDir("luwrain.browser").toFile();
+	final UUID uuid = UUID.randomUUID();
+	params.userDataDir = new File(baseDir, uuid.toString().replaceAll("-", ""));
+	params.userDataDir.mkdir();
 	params.events = events;
 	return (Browser)luwrain.openGraphicalMode(GRAPHICAL_MODE_NAME, params);
     }

@@ -15,12 +15,13 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.browser;
+package org.luwrain.settings.browser;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.cpanel.*;
+import org.luwrain.browser.*;
 
 final class SettingsForm extends FormArea implements SectionArea
 {
@@ -32,7 +33,7 @@ final class SettingsForm extends FormArea implements SectionArea
 
     SettingsForm(ControlPanel controlPanel, Strings strings)
     {
-	super(new DefaultControlContext(controlPanel.getCoreInterface()), strings.settSectionName());
+	super(new DefaultControlContext(controlPanel.getCoreInterface()), strings.sectionName());
 	NullCheck.notNull(controlPanel, "controlPanel");
 	NullCheck.notNull(strings, "strings");
 	this.controlPanel = controlPanel;
@@ -45,16 +46,16 @@ final class SettingsForm extends FormArea implements SectionArea
 
     private void fillForm()
     {
-	addEdit("home-page", strings.settHomePage(), sett.getHomePage(""));
-	addEdit("user-agent", strings.settUserAgent(), sett.getUserAgent(""));
-	addCheckbox("run-java-script", strings.settRunJavaScript(), sett.getRunJavaScript(true));
+	addEdit("home-page", strings.homePage(), sett.getHomePage(""));
+	addEdit("user-agent", strings.userAgent(), sett.getUserAgent(new BrowserParams().userAgent));
+	addCheckbox("java-script-enabled", strings.javaScriptEnabled(), sett.getJavaScriptEnabled(true));
     }
 
     @Override public boolean saveSectionData()
     {
 	sett.setHomePage(getEnteredText("home-page"));
 	sett.setUserAgent(getEnteredText("user-agent"));
-	sett.setRunJavaScript(true);
+	sett.setJavaScriptEnabled(getCheckboxState("java-script-enabled"));
 	return true;
     }
 

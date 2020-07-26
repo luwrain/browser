@@ -21,6 +21,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
+import org.luwrain.settings.browser.Settings;
 
 class Conversations
 {

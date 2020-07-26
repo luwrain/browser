@@ -27,6 +27,7 @@ import org.luwrain.controls.web.*;
 import org.luwrain.browser.*;
 
 import org.luwrain.popups.*;
+import org.luwrain.settings.browser.Settings;
 
 final class Actions implements org.luwrain.controls.web.WebArea.Callback
 {

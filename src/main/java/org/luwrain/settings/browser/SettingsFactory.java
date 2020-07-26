@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.browser;
+package org.luwrain.settings.browser;
 
 import java.util.*;
 
@@ -24,12 +24,12 @@ import org.luwrain.core.events.*;
 import org.luwrain.popups.Popups;
 import org.luwrain.cpanel.*;
 
-final class SettingsFactory implements org.luwrain.cpanel.Factory
+public final class SettingsFactory implements org.luwrain.cpanel.Factory
 {
     private final Luwrain luwrain;
     private final SimpleElement browserElement = new SimpleElement(StandardElements.APPLICATIONS, this.getClass().getName());
 
-    SettingsFactory(Luwrain luwrain)
+    public SettingsFactory(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
@@ -54,7 +54,7 @@ final class SettingsFactory implements org.luwrain.cpanel.Factory
 	    return null;
 	final Strings strings = (Strings)o;
 	if (el.equals(browserElement))
-	    return new SimpleSection(el, strings.settSectionName(), (controlPanel)->{return new SettingsForm(controlPanel, strings);});
+	    return new SimpleSection(el, strings.sectionName(), (controlPanel)->{return new SettingsForm(controlPanel, strings);});
 	return null;
     }
 }

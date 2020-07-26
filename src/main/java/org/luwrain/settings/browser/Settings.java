@@ -15,24 +15,25 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.browser;
+package org.luwrain.settings.browser;
 
 import org.luwrain.core.*;
 
-interface Settings
+public interface Settings
 {
-    static final String PATH = "/org/luwrain/app/browser";
+    static final String PATH = "/org/luwrain/browser";
 
     String getHomePage(String defValue);
     void setHomePage(String value);
     String getUserAgent(String defValue);
     void setUserAgent(String value);
-    boolean getRunJavaScript(boolean defValue);
-    void setRunJavaScript(boolean value);
+    boolean getJavaScriptEnabled(boolean defValue);
+    void setJavaScriptEnabled(boolean value);
 
-    static Settings create(Registry registry)
+    static public Settings create(Registry registry)
     {
 	NullCheck.notNull(registry, "registry");
+	registry.addDirectory(PATH);
 	return RegistryProxy.create(registry, PATH, Settings.class);
     }
 }

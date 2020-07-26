@@ -15,18 +15,14 @@
    General Public License for more details.
 */
 
-//LWR_API 1.0
+package org.luwrain.settings.browser;
 
-package org.luwrain.browser;
-
-import java.io.*;
-
-import org.luwrain.base.*;
-
-public final class BrowserParams extends GraphicalMode.Params
+public interface Strings
 {
-    public BrowserEvents events = null;
-    public String userAgent = "LUWRAIN";
-    public File userDataDir = null;
-    public boolean javaScriptEnabled = true;
+    static final String NAME = "luwrain.settings.browser";
+
+    String homePage();
+    String javaScriptEnabled();
+    String sectionName();
+    String userAgent();
 }

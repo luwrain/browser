@@ -30,14 +30,14 @@ class Base implements WebArea.ClientThread
     static final String LOG_COMPONENT = "web";
 
     private final Luwrain luwrain;
-    final Settings sett;
+    final org.luwrain.settings.browser.Settings sett;
     final Browser browser;
 
     Base(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
-	this.sett = Settings.create(luwrain.getRegistry());
+	this.sett = org.luwrain.settings.browser.Settings.create(luwrain.getRegistry());
 	this.browser = (Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
     }
 

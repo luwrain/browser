@@ -21,6 +21,7 @@ import java.util.*;
 
 import org.luwrain.base.*;
 import org.luwrain.core.*;
+import org.luwrain.settings.browser.SettingsFactory;
 
 public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 {

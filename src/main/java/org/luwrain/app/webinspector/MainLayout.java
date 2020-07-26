@@ -107,12 +107,14 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	NullCheck.notNull(text, "text");
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
-	/*
-	  if (app.getBrowser().isBusy())
-	  return ConsoleArea.InputHandler.Result.REJECTED;
-	*/
-	app.getBrowser().loadByUrl(text.trim());
-	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
+	try {
+	    app.getBrowser().loadByUrl(text.trim());
+	}
+	catch(Exception e)
+	{
+	    app.getLuwrain().crash(e);
+	}
+	return ConsoleArea.InputHandler.Result.OK;
     }
 
     private boolean actShowGraphical()

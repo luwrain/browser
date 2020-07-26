@@ -83,7 +83,7 @@ public final class App extends AppBase <Strings>implements Application
 
     void updateItems()
     {
-    	final Object obj = browser.runSafely(()->{
+    	browser.runSafely(()->{
 		browser.update();
 		final BrowserIterator it = browser.createIterator();
 		final List<Item> res = new LinkedList();
@@ -155,6 +155,7 @@ public final class App extends AppBase <Strings>implements Application
 	    switch(state)
 	    {
 	    case SUCCEEDED:
+		Log.debug(LOG_COMPONENT, "browser succeeded: callback in thread " + Thread.currentThread().getName());
 		updateItems();
 		return;
 	    case FAILED:
@@ -176,6 +177,7 @@ public final class App extends AppBase <Strings>implements Application
 	@Override public void onError(String message)
 	{
 	    NullCheck.notNull(message, "message");
+	    Log.error(LOG_COMPONENT, message);
 	    getLuwrain().message(message, Luwrain.MessageType.ERROR);
 	}
 	@Override public boolean onDownloadStart(String url)
