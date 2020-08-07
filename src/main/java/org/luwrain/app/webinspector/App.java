@@ -22,7 +22,7 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.browser.*;
-import org.luwrain.template.*;
+import org.luwrain.app.base.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
@@ -37,7 +37,7 @@ public final class App extends AppBase <Strings>implements Application
 
     public App(String arg)
     {
-	super(Strings.NAME, Strings.class);
+	super(Strings.NAME, Strings.class, "luwrain.webinspector");
 	this.arg = arg;
     }
 
