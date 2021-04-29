@@ -46,13 +46,13 @@ public final class App extends AppBase <Strings>implements Application
 	this(null);
     }
 
-    @Override public boolean onAppInit()
+    @Override public AreaLayout onAppInit()
     {
 	this.conv = new Conversations(this);
 	this.browser = Browser.create(getLuwrain(), new Events());
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
-	return true;
+	return mainLayout.getLayout();
     }
 
     void fillAttrs(Item item)
@@ -99,11 +99,6 @@ public final class App extends AppBase <Strings>implements Application
 		    });
 		return null;
 	    });
-    }
-
-    @Override public AreaLayout getDefaultAreaLayout()
-    {
-	return mainLayout.getLayout();
     }
 
         @Override public void closeApp()
