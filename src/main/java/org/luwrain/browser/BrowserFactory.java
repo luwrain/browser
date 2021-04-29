@@ -25,39 +25,11 @@ import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 
-/**
- * An interface to web-browser engine. This interface provides
- * web-browser functionality with JavaScript support. The corresponding
- * back-end is based on WebKit implementation included in JavaFX.
- *
- * The methods of this interface don't cover any features related to the
- * view of the loaded page in any form. However, the client application
- * can request showing traditional graphical view of the loaded page.
- * The content of the loaded page is represented by a set of elements
- * which can be enumerated with {@link BrowserIterator} class.
- *
- * @see BrowserIterator Events
- */
-public interface BrowserInterface extends org.luwrain.base.GraphicalMode
+public final class BrowserFactory
 {
     static public final String GRAPHICAL_MODE_NAME = "browser";
 
-    void close();
-    void loadByUrl(String url);
-    void loadByText(String text);
-    Object executeScript(String script);
-    BrowserIterator createIterator();
-    String getTitle();
-    String getUrl();
-    boolean getVisibility();
-    void setVisibility(boolean visible);
-    int getElementCount();
-    void update();
-    Object runSafely(Callable callable);
-    void stop();
-    boolean goHistoryPrev();
-
-    static public Browser create(Luwrain luwrain, BrowserEvents events)
+    static public Browser newFactory(Luwrain luwrain, BrowserEvents events)
     {
 	NullCheck.notNull(events, "events");
 	final BrowserParams params = new BrowserParams();

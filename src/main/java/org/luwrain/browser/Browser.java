@@ -130,7 +130,7 @@ public final class Browser extends Base
     public org.luwrain.browser.BrowserIterator createIterator()
     {
 	FxThread.ensure();
-	return new IteratorImpl(this);
+	return new BrowserIterator(this);
     }
 
     public int getElementCount()
