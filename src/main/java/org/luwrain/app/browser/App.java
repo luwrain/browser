@@ -76,7 +76,7 @@ final class App implements Application
 	//FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
 	params.browserFactory = (events)->{
 	    NullCheck.notNull(events, "events");
-	    return Browser.create(luwrain, events);
+	    return null;//Browser.create(luwrain, events);
 	};
 	params.callback = actions;
 	params.clientThread = base;

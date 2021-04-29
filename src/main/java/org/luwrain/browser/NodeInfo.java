@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.graphical.browser;
+package org.luwrain.browser;
 
 import org.w3c.dom.Node;
 import java.awt.Rectangle;

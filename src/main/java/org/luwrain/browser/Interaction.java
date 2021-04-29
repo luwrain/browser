@@ -1,6 +1,6 @@
 
 
-package org.luwrain.graphical.browser;
+package org.luwrain.browser;
 
 interface Interaction
 {

@@ -1,5 +1,5 @@
 
-package org.luwrain.graphical.browser;
+package org.luwrain.browser;
 
 import java.util.*;
 

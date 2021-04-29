@@ -38,7 +38,7 @@ class Base implements WebArea.ClientThread
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
 	this.sett = org.luwrain.settings.browser.Settings.create(luwrain.getRegistry());
-	this.browser = (Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
+	this.browser = null;//(Browser)luwrain.openGraphicalMode("browser", new GraphicalMode.Params());
     }
 
     String makeHref(WebArea area, String href)

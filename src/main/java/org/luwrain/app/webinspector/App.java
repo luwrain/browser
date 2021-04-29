@@ -49,7 +49,7 @@ public final class App extends AppBase <Strings>implements Application
     @Override public AreaLayout onAppInit()
     {
 	this.conv = new Conversations(this);
-	this.browser = Browser.create(getLuwrain(), new Events());
+	this.browser = null;//Browser.create(getLuwrain(), new Events());
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getLayout();
