@@ -40,7 +40,6 @@ import org.luwrain.graphical.*;
 
 abstract class Base
 {
-    static private final String RESCAN_RESOURCE_PATH = "org/luwrain/interaction/javafx/injection.js";
     static final String LOG_COMPONENT = "web";
 
     /*
@@ -58,7 +57,7 @@ abstract class Base
     }
     */
 
-    protected final String injectedScript;
+    protected final String injection;
     public final WebView webView;
     protected final WebEngine webEngine;
     protected DomScanResult domScanRes = null;
@@ -66,7 +65,7 @@ abstract class Base
     protected JSObject injectionRes = null;
     protected JSObject jsWindow = null;
 
-    protected Base(BrowserParams params) throws IOException
+    protected Base(BrowserParams params)
     {
 	NullCheck.notNull(params, "params");
 	NullCheck.notNull(params.events, "params.events");
@@ -74,7 +73,7 @@ abstract class Base
 	NullCheck.notNull(params.userDataDir, "params.userDataDir");
 	FxThread.ensure();
 	final BrowserEvents events = params.events;
-	this.injectedScript = readInjectedScript();
+	this.injection = readInjection();
 	this.webView = new WebView();
 	this.webEngine = webView.getEngine();
 	this.webEngine.setUserDataDirectory(params.userDataDir);
@@ -86,8 +85,9 @@ abstract class Base
 	this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
 	this.webEngine.setConfirmHandler((param)->events.onConfirm(param));
 	this.webEngine.setOnError((event)->events.onError(event.getMessage()));
-		this.webView.setOnKeyReleased((event)->onKeyReleased(event));
+	this.webView.setOnKeyReleased((event)->onKeyReleased(event));
 	this.webView.setVisible(false);
+	Log.debug(LOG_COMPONENT, "browser instance created");
     }
 
     abstract void setVisibility(boolean enabled);
@@ -112,7 +112,7 @@ Object executeScript(String script)
 	try {
 	    final JSObject window = (JSObject)webEngine.executeScript("window");
 	    window.setMember("console",new MyConsole());
-	    this.injectionRes = (JSObject)webEngine.executeScript(injectedScript);
+	    this.injectionRes = (JSObject)webEngine.executeScript(injection);
 	    if (injectionRes == null)
 		Log.warning(LOG_COMPONENT, "the injection result is null after running the injection script");
 	}
@@ -225,24 +225,6 @@ this.domScanRes = new DomScanResult(window);
 	}
     }
 
-        private String readInjectedScript() throws IOException
-    {
-	final InputStream is = getClass().getClassLoader().getResourceAsStream(RESCAN_RESOURCE_PATH);
-	if (is == null)
-	    throw new IOException("No resource with the path 'RESCAN_RESOURCE_PATH'");
-	final BufferedReader r = new BufferedReader(new InputStreamReader(is));
-	try {
-	    final StringBuilder b = new StringBuilder();
-	    String line = null;
-	    while((line = r.readLine()) != null)
-		b.append(line + "\n");
-	    return new String(b);
-    	}
-	finally {
-	    r.close();
-	    is.close();
-	}
-    }
 
 	static long jsLong(Object o)
 	{
@@ -260,5 +242,25 @@ return (long)(int)o;
         DomScanResult getDomScanResult()
     {
 	return this.domScanRes;
+    }
+
+    private String readInjection()
+    {
+	try {
+	    final StringBuilder b = new StringBuilder();
+	    try (final BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("injection.js"), "UTF-8"))) {
+		String line = r.readLine();
+		while(line != null)
+		{
+		    b.append(line).append(System.lineSeparator());
+		    line = r.readLine();
+		}
+		return new String(b);
+	    }
+	}
+	catch(IOException e)
+	{
+	    throw new RuntimeException(e);
+	}
     }
 }

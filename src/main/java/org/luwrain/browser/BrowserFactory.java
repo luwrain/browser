@@ -25,6 +25,8 @@ import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 
+import org.luwrain.graphical.*;
+
 public final class BrowserFactory
 {
     static public final String GRAPHICAL_MODE_NAME = "browser";
@@ -33,6 +35,7 @@ public final class BrowserFactory
     {
 	NullCheck.notNull(events, "events");
 	final BrowserParams params = new BrowserParams();
+	params.luwrain = luwrain;
 	final org.luwrain.settings.browser.Settings sett = org.luwrain.settings.browser.Settings.create(luwrain.getRegistry());
 	params.userAgent = sett.getUserAgent(params.userAgent);
 	params.javaScriptEnabled = sett.getJavaScriptEnabled(true);
@@ -41,6 +44,6 @@ public final class BrowserFactory
 	params.userDataDir = new File(baseDir, uuid.toString().replaceAll("-", ""));
 	params.userDataDir.mkdir();
 	params.events = events;
-	return new Browser(params);
-    }
+	return (Browser)FxThread.call (()->{ return new Browser(params); });
+	    }
 }

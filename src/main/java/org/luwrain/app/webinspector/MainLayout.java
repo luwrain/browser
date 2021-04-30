@@ -72,7 +72,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	}
 	catch(Exception e)
 	{
-	    app.getLuwrain().crash(e);
+	    app.crash(e);
 	}
 	return ConsoleArea.InputHandler.Result.OK;
     }
@@ -91,7 +91,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     private boolean actShowGraphical()
     {
-	app.getBrowser().setVisibility(true);
+	app.getBrowser().showGraphical();
 	return true;
     }
 

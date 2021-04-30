@@ -103,6 +103,12 @@ public final class App extends AppBase <Strings>implements Application
 	    });
     }
 
+    @Override public boolean onEscape(InputEvent event)
+    {
+	closeApp();
+	return true;
+    }
+
         @Override public void closeApp()
     {
 	this.browser.close();

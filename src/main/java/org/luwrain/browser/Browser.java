@@ -30,18 +30,19 @@ public final class Browser extends Base
     static final int LAST_MODIFIED_SCAN_INTERVAL = 100; // lastModifiedTime rescan interval in milliseconds
     static final String LUWRAIN_NODE_TEXT="luwrain_node_text"; // javascript window's property names for using in executeScrypt
 
-    private final Interaction interaction;
+    private final Luwrain luwrain;
+    private final Interaction interaction = null;
 
-    public Browser(Interaction interaction, BrowserParams params)
+    public Browser(BrowserParams params)
     {
 	super(params);
-	NullCheck.notNull(interaction, "interaction");
-	this.interaction = interaction;
+	NullCheck.notNull(params.luwrain, "params.luwrain");
+	this.luwrain = params.luwrain;
     }
 
     @Override public void update()
     {
-	FxThread.runInFxThreadSync(()->super.update());
+	FxThread.runSync(()->super.update());
     }
 
     public void close()
@@ -49,19 +50,28 @@ public final class Browser extends Base
 	interaction.closeBrowser(this);
     }
 
+    public void showGraphical()
+    {
+	luwrain.showGraphical(()->{
+		    webView.setVisible(true);
+		    webView.requestFocus();
+		    return webView;
+	    });
+	    }
+
     @Override public void setVisibility(boolean visible)
     {
 	if(visible)
 	{
 	    interaction.enableGraphicalMode();
-	    FxThread.runInFxThreadSync(()->{
+	    FxThread.runSync(()->{
 		    webView.setVisible(true);
 		    webView.requestFocus();
 		});
 	    return;
 	}
 	interaction.disableGraphicalMode();
-	FxThread.runInFxThreadSync(()->webView.setVisible(false));
+	FxThread.runSync(()->webView.setVisible(false));
     }
 
     public boolean getVisibility()
@@ -72,18 +82,18 @@ public final class Browser extends Base
     public void loadByUrl(String url)
     {
 	NullCheck.notNull(url, "url");
-	    FxThread.runInFxThreadSync(()->webEngine.load(url));
+	    FxThread.runSync(()->webEngine.load(url));
     }
 
     public void loadByText(String text)
     {
 	NullCheck.notNull(text, "text");
-	    FxThread.runInFxThreadSync(()->webEngine.loadContent(text));
+	    FxThread.runSync(()->webEngine.loadContent(text));
     }
 
     public boolean goHistoryPrev()
     {
-	final Object res = FxThread.callInFxThreadSync(()->{
+	final Object res = FxThread.call(()->{
 		if (webEngine.getHistory().getCurrentIndex() <= 0)
 		    return new Boolean(false);
 		webEngine.getHistory().go(-1);
@@ -96,7 +106,7 @@ public final class Browser extends Base
 
     public void stop()
     {
-	FxThread.runInFxThreadSync(()->webEngine.getLoadWorker().cancel());
+	FxThread.runSync(()->webEngine.getLoadWorker().cancel());
     }
 
     public String getTitle()
@@ -116,7 +126,7 @@ public final class Browser extends Base
     public Object runSafely(Callable callable)
     {
 	NullCheck.notNull(callable, "callable");
-	return FxThread.callInFxThreadSync(callable);
+	return FxThread.call(callable);
     }
 
     @Override public synchronized Object executeScript(String script)
@@ -124,7 +134,7 @@ public final class Browser extends Base
 	NullCheck.notNull(script, "script");
 	if(script.trim().isEmpty() || webEngine == null)
 	    return null;
-	return FxThread.callInFxThreadSync(()->super.executeScript(script));
+	return FxThread.call(()->super.executeScript(script));
     }
 
     public org.luwrain.browser.BrowserIterator createIterator()

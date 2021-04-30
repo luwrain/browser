@@ -21,10 +21,11 @@ package org.luwrain.browser;
 
 import java.io.*;
 
-import org.luwrain.base.*;
+import org.luwrain.core.*;
 
-public final class BrowserParams extends GraphicalMode.Params
+public final class BrowserParams
 {
+    public Luwrain luwrain = null;
     public BrowserEvents events = null;
     public String userAgent = "LUWRAIN";
     public File userDataDir = null;
