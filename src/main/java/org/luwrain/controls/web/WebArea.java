@@ -183,7 +183,7 @@ protected ClientThread clientThread = null;
 
     public boolean goHistoryPrev()
     {
-	return browser.goHistoryPrev();
+	return browser.goPrev();
     }
 
     public String getTitle()

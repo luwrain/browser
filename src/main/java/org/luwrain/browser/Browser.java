@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -17,20 +17,15 @@
 
 package org.luwrain.browser;
 
-import java.io.*;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-import org.luwrain.browser.BrowserEvents;
-import org.luwrain.browser.BrowserParams;
 import org.luwrain.graphical.*;
 
 public final class Browser extends Base
 {
-    static final int LAST_MODIFIED_SCAN_INTERVAL = 100; // lastModifiedTime rescan interval in milliseconds
-    static final String LUWRAIN_NODE_TEXT="luwrain_node_text"; // javascript window's property names for using in executeScrypt
-
     private final Luwrain luwrain;
+    private org.luwrain.base.Interaction.GraphicalModeControl graphicalModeControl = null;
 
     public Browser(BrowserParams params)
     {
@@ -46,54 +41,35 @@ public final class Browser extends Base
 
     public void close()
     {
-	//	interaction.closeBrowser(this);
+	hideGraphical();
     }
 
     public void showGraphical()
     {
-	luwrain.showGraphical(()->{
-		    webView.setVisible(true);
-		    webView.requestFocus();
-		    return webView;
+	luwrain.showGraphical((control)->{
+		webView.setVisible(true);
+		webView.requestFocus();
+		this.graphicalModeControl = control;
+		return webView;
 	    });
-	    }
-
-    @Override public void setVisibility(boolean visible)
-    {
-	/*
-	interaction.disableGraphicalMode();
-	FxThread.runSync(()->webView.setVisible(false));
-	*/
     }
 
-    public boolean getVisibility()
+    @Override protected void hideGraphical()
     {
-	return webView.isVisible();//FIXME:
+	if (graphicalModeControl != null)
+	    graphicalModeControl.close();
     }
 
     public void loadByUrl(String url)
     {
-	NullCheck.notNull(url, "url");
-	    FxThread.runSync(()->webEngine.load(url));
+	NullCheck.notEmpty(url, "url");
+	FxThread.runSync(()->webEngine.load(url));
     }
 
     public void loadByText(String text)
     {
 	NullCheck.notNull(text, "text");
-	    FxThread.runSync(()->webEngine.loadContent(text));
-    }
-
-    public boolean goHistoryPrev()
-    {
-	final Object res = FxThread.call(()->{
-		if (webEngine.getHistory().getCurrentIndex() <= 0)
-		    return new Boolean(false);
-		webEngine.getHistory().go(-1);
-		return new Boolean(true);
-	    });
-	    if (res == null || !(res instanceof Boolean))
-		return false;
-	    return ((Boolean)res).booleanValue();
+	FxThread.runSync(()->webEngine.loadContent(text));
     }
 
     public void stop()
@@ -101,18 +77,27 @@ public final class Browser extends Base
 	FxThread.runSync(()->webEngine.getLoadWorker().cancel());
     }
 
-    public String getTitle()
+    public boolean goPrev()
     {
-	if(webEngine == null)
-	    return "";
-	return webEngine.titleProperty().get();
+	final Object res = FxThread.call(()->{
+		if (webEngine.getHistory().getCurrentIndex() <= 0)
+		    return new Boolean(false);
+		webEngine.getHistory().go(-1);
+		return new Boolean(true);
+	    });
+	return ((Boolean)res).booleanValue();
     }
 
-    public synchronized String getUrl()
+    public String getTitle()
     {
-	if(webEngine == null)
-	    return "";
-	return webEngine.getLocation();
+	final Object res = FxThread.call(()->{ return webEngine.titleProperty().get(); });
+	return res != null?res.toString():"";
+    }
+
+    public String getUrl()
+    {
+	final Object res = FxThread.call(()->{ return webEngine.getLocation(); });
+	return res != null?res.toString():"";
     }
 
     public Object runSafely(Callable callable)
@@ -121,7 +106,7 @@ public final class Browser extends Base
 	return FxThread.call(callable);
     }
 
-    @Override public synchronized Object executeScript(String script)
+    @Override public Object executeScript(String script)
     {
 	NullCheck.notNull(script, "script");
 	if(script.trim().isEmpty() || webEngine == null)

@@ -105,7 +105,7 @@ final class App implements Application
 			    return actions.onOpenUrl(area);
 			if (ActionEvent.isAction(event, "show-graphical"))
 			{
-			    base.browser.setVisibility(true);
+			    base.browser.showGraphical();
 			    return true;
 			}
 			if (ActionEvent.isAction(event, "history-prev"))

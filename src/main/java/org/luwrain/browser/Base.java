@@ -90,7 +90,7 @@ abstract class Base
 	Log.debug(LOG_COMPONENT, "browser instance created");
     }
 
-    abstract void setVisibility(boolean enabled);
+    abstract protected void hideGraphical();
 
 
 Object executeScript(String script)
@@ -219,7 +219,7 @@ this.domScanRes = new DomScanResult(window);
 	switch(event.getCode())
 	{
 	case ESCAPE:
-	    setVisibility(false);
+	    hideGraphical();
 	    break;
 	default:break;
 	}
