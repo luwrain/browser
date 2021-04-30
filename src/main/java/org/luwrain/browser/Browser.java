@@ -31,7 +31,6 @@ public final class Browser extends Base
     static final String LUWRAIN_NODE_TEXT="luwrain_node_text"; // javascript window's property names for using in executeScrypt
 
     private final Luwrain luwrain;
-    private final Interaction interaction = null;
 
     public Browser(BrowserParams params)
     {
@@ -47,7 +46,7 @@ public final class Browser extends Base
 
     public void close()
     {
-	interaction.closeBrowser(this);
+	//	interaction.closeBrowser(this);
     }
 
     public void showGraphical()
@@ -61,17 +60,10 @@ public final class Browser extends Base
 
     @Override public void setVisibility(boolean visible)
     {
-	if(visible)
-	{
-	    interaction.enableGraphicalMode();
-	    FxThread.runSync(()->{
-		    webView.setVisible(true);
-		    webView.requestFocus();
-		});
-	    return;
-	}
+	/*
 	interaction.disableGraphicalMode();
 	FxThread.runSync(()->webView.setVisible(false));
+	*/
     }
 
     public boolean getVisibility()
