@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -26,7 +26,7 @@ import org.luwrain.app.base.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
-    static final String LOG_COMPONENT = "inspector";
+    static final String LOG_COMPONENT = "webins";
 
     private final String arg;
     Item[] items = new Item[0];
@@ -49,10 +49,12 @@ public final class App extends AppBase <Strings>implements Application
     @Override public AreaLayout onAppInit()
     {
 	this.conv = new Conversations(this);
-	this.browser = null;//Browser.create(getLuwrain(), new Events());
+	this.browser = BrowserFactory.newBrowser(getLuwrain(), new Events());
+	if (browser == null)
+	    return null;
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
-	return mainLayout.getLayout();
+	return mainLayout.getAreaLayout();
     }
 
     void fillAttrs(Item item)

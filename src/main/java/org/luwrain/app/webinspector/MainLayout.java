@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -23,82 +23,42 @@ import org.luwrain.controls.*;
 
 import org.luwrain.app.base.*;
 
-final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
+final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler
 {
     private final App app;
-    private ConsoleArea elementsArea;
-    private ListArea attrsArea;
+    private final ConsoleArea elementsArea;
+    private final ListArea attrsArea;
 
     MainLayout(App app)
     {
-	NullCheck.notNull(app, "app");
+	super(app);
 	this.app = app;
-	this.elementsArea = new ConsoleArea(createElementsParams()) {
-		private final Actions actions = actions(
-							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
-							);
-		@Override public boolean onInputEvent(InputEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (app.onInputEvent(this, event))
-			return true;
-		    return super.onInputEvent(event);
-		}
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (app.onSystemEvent(this, event, actions))
-			return true;
-		    if (event.getType() != SystemEvent.Type.REGULAR)
-			return super.onSystemEvent(event);
-		    switch(event.getCode())
-		    {
-		    default:
-			return super.onSystemEvent(event);
-		    }
-		}
-		@Override public boolean onAreaQuery(AreaQuery query)
-		{
-		    NullCheck.notNull(query, "query");
-		    if (app.onAreaQuery(this, query))
-			return true;
-		    return super.onAreaQuery(query);
-		}
-		@Override public Action[] getAreaActions()
-		{
-		    return actions.getAreaActions();
-		}
-	    };
-    	this.attrsArea = new ListArea(createAttrsParams()) {
-		private final Actions actions = actions(
-							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
-							);
-		@Override public boolean onInputEvent(InputEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (app.onInputEvent(this, event))
-			return true;
-		    return super.onInputEvent(event);
-		}
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (app.onSystemEvent(this, event, actions))
-			return true;
-		    return super.onSystemEvent(event);
-		}
-		@Override public boolean onAreaQuery(AreaQuery query)
-		{
-		    NullCheck.notNull(query, "query");
-		    if (app.onAreaQuery(this, query))
-			return true;
-		    return super.onAreaQuery(query);
-		}
-		@Override public Action[] getAreaActions()
-		{
-		    return actions.getAreaActions();
-		}
-	    };
+	{
+	    final ConsoleArea.Params params = new ConsoleArea.Params();
+	    params.context = getControlContext();
+	    params.name = app.getStrings().appName();
+	    params.model = new ConsoleUtils.ArrayModel(()->{ return app.items; });
+	    params.appearance = new ElementsAppearance();
+	    params.inputHandler = this;
+	    params.clickHandler = this;
+	    params.inputPrefix = "WebKit>";
+	    this.elementsArea = new ConsoleArea(params);
+	}
+	final Actions elementsActions = actions(
+						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+						);
+	{
+	    final ListArea.Params params = new ListArea.Params();
+	    params.context = getControlContext();
+	    params.name = app.getStrings().appName();
+	    params.model = new ListUtils.ArrayModel(()->{ return app.attrs; });
+	    params.appearance = new ListUtils.DefaultAppearance(getControlContext());
+	    this.attrsArea = new ListArea(params);
+	}
+	final Actions attrsActions = actions(
+					     action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+					     );
+	setAreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, elementsActions, attrsArea, attrsActions);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
@@ -116,6 +76,18 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	}
 	return ConsoleArea.InputHandler.Result.OK;
     }
+
+    @Override public boolean onConsoleClick(ConsoleArea area,int index,Object obj)
+    {
+	NullCheck.notNull(obj, "obj");
+		if (!(obj instanceof Item))
+		    return false;
+		app.fillAttrs((Item)obj);
+			    attrsArea.refresh();
+			    setActiveArea(attrsArea);
+		return true;
+	    };
+
 
     private boolean actShowGraphical()
     {
@@ -152,58 +124,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	return false;
     }
 
-    private ConsoleArea.Params createElementsParams()
-    {
-	final ConsoleArea.Params params = new ConsoleArea.Params();
-	params.context = new DefaultControlContext(app.getLuwrain());
-	params.name = app.getStrings().appName();
-	params.model = new ConsoleModel();
-	params.appearance = new ElementsAppearance();
-	params.inputHandler = this;
-	params.inputPrefix = "WebKit>";
-	params.clickHandler = (area,index,obj)->{
-	    if (obj == null || !(obj instanceof Item))
-		return false;
-	    app.fillAttrs((Item)obj);
-	    attrsArea.refresh();
-	    app.getLuwrain().setActiveArea(attrsArea);
-	    return true;
-	};
-	return params;
-    }
 
-    private ListArea.Params createAttrsParams()
-    {
-	final ListArea.Params attrsParams = new ListArea.Params();
-	attrsParams.context = new DefaultControlContext(app.getLuwrain());
-	attrsParams.name = app.getStrings().appName();
-	attrsParams.model = new AttrsModel();
-	attrsParams.appearance = new ListUtils.DefaultAppearance(attrsParams.context);
-	attrsParams.clickHandler = (area,index,obj)->{
-	    if (obj == null || !(obj instanceof Item))
-		return false;
-	    //FIXME:
-	    return false;
-	};
-	return attrsParams;
-    }
-
-    AreaLayout getLayout()
-    {
-	return new AreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, attrsArea);
-    }
-
-    private final class ConsoleModel implements org.luwrain.controls.ConsoleArea.Model
-    {
-	@Override public int getItemCount()
-	{
-	    return app.items.length;
-	}
-	@Override public Object getItem(int index)
-	{
-	    return app.items[index];
-	}
-    }
 
     private final class ElementsAppearance implements ConsoleArea.Appearance
     {
@@ -217,21 +138,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	{
 	    NullCheck.notNull(item, "item");
 	    return item.toString();
-	}
-    }
-
-    private final class AttrsModel implements org.luwrain.controls.ListArea.Model
-    {
-	@Override public int getItemCount()
-	{
-	    return app.attrs.length;
-	}
-	@Override public Object getItem(int index)
-	{
-	    return app.attrs[index];
-	}
-	@Override public void refresh()
-	{
 	}
     }
 }

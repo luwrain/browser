@@ -32,7 +32,7 @@ public final class Browser extends Base
 
     private final Interaction interaction;
 
-    public Browser(Interaction interaction, BrowserParams params) throws IOException
+    public Browser(Interaction interaction, BrowserParams params)
     {
 	super(params);
 	NullCheck.notNull(interaction, "interaction");

@@ -29,7 +29,7 @@ public final class BrowserFactory
 {
     static public final String GRAPHICAL_MODE_NAME = "browser";
 
-    static public Browser newFactory(Luwrain luwrain, BrowserEvents events)
+    static public Browser newBrowser(Luwrain luwrain, BrowserEvents events)
     {
 	NullCheck.notNull(events, "events");
 	final BrowserParams params = new BrowserParams();
@@ -41,6 +41,6 @@ public final class BrowserFactory
 	params.userDataDir = new File(baseDir, uuid.toString().replaceAll("-", ""));
 	params.userDataDir.mkdir();
 	params.events = events;
-	return null;//(Browser)luwrain.openGraphicalMode(GRAPHICAL_MODE_NAME, params);
+	return new Browser(params);
     }
 }
