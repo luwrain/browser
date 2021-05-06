@@ -29,12 +29,11 @@ class Conversations
     private final Settings sett;
     private final Set<String> openUrlHistory = new HashSet<String>();
 
-    Conversations(Luwrain luwrain, Settings sett)
+    Conversations(App app)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(sett, "sett");
-	this.luwrain = luwrain;
-	this.sett = sett;
+	NullCheck.notNull(app, "app");
+	this.luwrain = app.getLuwrain();
+	this.sett = Settings.create(luwrain.getRegistry());
     }
 
     String openUrl(String initialValue)

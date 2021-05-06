@@ -17,12 +17,16 @@
 
 package org.luwrain.app.browser;
 
+import java.util.concurrent.*;
+
 import org.luwrain.core.*;
+import org.luwrain.controls.web.*;
 import org.luwrain.app.base.*;
 
-final class App extends AppBase<Strings>
+final class App extends AppBase<Strings> implements WebArea.ClientThread
 {
     private final String arg;
+    private Conversations conv = null;
     private MainLayout mainLayout = null;
 
     public App(String arg)
@@ -38,7 +42,31 @@ final class App extends AppBase<Strings>
 
     @Override protected AreaLayout onAppInit()
     {
+	this.conv = new Conversations(this);
 	this.mainLayout = new MainLayout(this);
 	return mainLayout.getAreaLayout();
+    }
+
+    @Override public boolean onEscape(org.luwrain.core.events.InputEvent event)
+    {
+	closeApp();
+	return true;
+    }
+
+    @Override public Object runSync(Callable callable)
+    {
+	NullCheck.notNull(callable, "callable");
+	return getLuwrain().callUiSafely(callable);
+    }
+
+    @Override public void runAsync(Runnable runnable)
+    {
+	NullCheck.notNull(runnable, "runnable");
+	getLuwrain().runUiSafely(runnable);
+    }
+
+    Conversations getConv()
+    {
+	return this.conv;
     }
 }
