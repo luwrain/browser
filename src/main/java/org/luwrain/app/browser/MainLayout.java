@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -26,42 +26,24 @@ import org.luwrain.app.base.*;
 
 final class MainLayout extends LayoutBase
 {
-        private final WebArea area;
+    private final WebArea webArea;
 
     MainLayout(AppBase app)
     {
 	super(app);
-    	area = new WebArea(createWebAreaParams()){
-		@Override public boolean onInputEvent(InputEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    return super.onInputEvent(event);
-		}
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-			return super.onSystemEvent(event);
-		}
-		@Override public Action[] getAreaActions()
-		{
-		    return new Action[0];
-		}
+	{
+	    final WebArea.Params params = new WebArea.Params();
+	    params.context = getControlContext();
+	    params.appearance = new DefaultAppearance(params.context);
+	    //FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
+	    params.browserFactory = (events)->{
+		NullCheck.notNull(events, "events");
+		return BrowserFactory.newBrowser(getLuwrain(), events);
 	    };
-    }
-
-
-    WebArea.Params createWebAreaParams()
-    {
-		final WebArea.Params params = new WebArea.Params();
-		params.context = getControlContext();
-	params.appearance = new DefaultAppearance(params.context);
-	//FIXME:	params.clickHandler = (area,rowIndex,webObj)->actions.onClick(area, webObj, rowIndex);
-	params.browserFactory = (events)->{
-	    NullCheck.notNull(events, "events");
-	    return BrowserFactory.newBrowser(app.getLuwrain(), events);
-	};
-	//	params.callback = actions;
-	//	params.clientThread = base;
-	return params;
+	    //	params.callback = actions;
+	    //	params.clientThread = base;
+	    webArea = new WebArea(params);
+	}
+	setAreaLayout(webArea, actions());
     }
 }

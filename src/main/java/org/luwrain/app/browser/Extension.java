@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -47,7 +47,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 0)
 			return new Application[]{new org.luwrain.app.browser.App()};
-		    final List<Application> v = new LinkedList();
+		    final List<Application> v = new ArrayList();
 		    for(String s: args)
 			if (!s.isEmpty())
 			    v.add(new org.luwrain.app.browser.App(s));
@@ -67,7 +67,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 0)
 			return new Application[]{new org.luwrain.app.webinspector.App()};
-		    final List<Application> v = new LinkedList();
+		    final List<Application> v = new ArrayList();
 		    for(String s: args)
 			if (!s.isEmpty())
 			    v.add(new org.luwrain.app.webinspector.App(s));
