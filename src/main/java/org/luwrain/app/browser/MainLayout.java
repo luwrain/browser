@@ -76,7 +76,6 @@ final class Callback implements org.luwrain.controls.web.WebArea.Callback
 {
     private final Conversations conv = null;
     private final Browser browser = null;
-    private final Luwrain luwrain = null;
     private final Strings strings = null;
 
     boolean onClick(WebArea area, WebObject webObj, int rowIndex)
@@ -93,7 +92,7 @@ final class Callback implements org.luwrain.controls.web.WebArea.Callback
 		    webTextInput.setText(value);
 		    return null;
 		});
-	    area.updateView(luwrain.getAreaVisibleWidth(area));
+	    area.updateView(getLuwrain().getAreaVisibleWidth(area));
 	    return true;
 	}
 	browser.runSafely(()->{
@@ -116,27 +115,27 @@ final class Callback implements org.luwrain.controls.web.WebArea.Callback
 
     @Override public void onBrowserRunning()
     {
-	luwrain.speak(strings.loading());
+	getLuwrain().speak(strings.loading());
     }
 
     @Override public void onBrowserSuccess(String title)
     {
 	NullCheck.notNull(title, "title");
 	if (!title.trim().isEmpty())
-	    luwrain.message(title, Sounds.CLICK); else
-	    luwrain.playSound(Sounds.CLICK);
+	    app.message(title, Luwrain.MessageType.DONE); else
+	    getLuwrain().playSound(Sounds.CLICK);
     }
 
     @Override public void onBrowserFailed()
     {
-	luwrain.message("Страница не может быть загружена", Luwrain.MessageType.ERROR);
+	app.getLuwrain().message("Страница не может быть загружена", Luwrain.MessageType.ERROR);
     }
 
     @Override public void message(String text, MessageType type)
     {
 	NullCheck.notNull(text, "text");
 	NullCheck.notNull(type, "type");
-	luwrain.message(text);
+	app.getLuwrain().message(text);
     }
 
     @Override public String prompt(String message, String value)
