@@ -47,7 +47,7 @@ final class App extends AppBase<Strings> implements WebArea.ClientThread
 	return mainLayout.getAreaLayout();
     }
 
-    @Override public boolean onEscape(org.luwrain.core.events.InputEvent event)
+    @Override public boolean onEscape()
     {
 	closeApp();
 	return true;

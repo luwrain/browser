@@ -25,7 +25,7 @@ import org.luwrain.graphical.*;
 public final class Browser extends Base
 {
     private final Luwrain luwrain;
-    private org.luwrain.base.Interaction.GraphicalModeControl graphicalModeControl = null;
+    private Interaction.GraphicalModeControl graphicalModeControl = null;
 
     public Browser(BrowserParams params)
     {
