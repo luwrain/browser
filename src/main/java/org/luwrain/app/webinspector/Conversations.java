@@ -36,6 +36,6 @@ final class Conversations
         String formText(String prevValue)
     {
 	NullCheck.notNull(prevValue, "prevValue");
-	return Popups.simple(luwrain, "Редактирования формы", "Текст в поле:", prevValue);
+	return Popups.text(luwrain, "Редактирования формы", "Текст в поле:", prevValue);
     }
     }
