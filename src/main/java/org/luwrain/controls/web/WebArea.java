@@ -35,7 +35,6 @@ public class WebArea extends BlockArea
      * requested code is fully executed. This allows to get the method return
      * value back to the caller.
      *
-     * @see BrowserArea
      */
     public interface ClientThread
     {

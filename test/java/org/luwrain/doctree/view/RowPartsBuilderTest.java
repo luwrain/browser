@@ -23,6 +23,7 @@ import org.luwrain.doctree.*;
 
 public class RowPartsBuilderTest extends Assert
 {
+    /*
     @Test public void shortRowInsideWordsSplitting()
     {
 	final Paragraph para = NodeFactory.newPara("123456789");
@@ -38,4 +39,5 @@ public class RowPartsBuilderTest extends Assert
 		assertTrue(parts[1].getText().equals("456"));
 			assertTrue(parts[2].getText().equals("789"));
     }
+    */
 	}

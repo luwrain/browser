@@ -23,6 +23,7 @@ import org.luwrain.doctree.*;
 
 public class BoundingInfoTest extends Assert
 {
+    /*
     @Test public void everything()
     {
 	final Run[] runs = new Run[3];
@@ -110,4 +111,5 @@ public class BoundingInfoTest extends Assert
 	    });
 	assertTrue("23456789".equals(new String(b)));
     }
+    */
 }
