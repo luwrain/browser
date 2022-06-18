@@ -1,6 +1,5 @@
 /*
    Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -15,27 +14,30 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.webinspector;
+package org.luwrain.app.chromite;
 
 import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 
-final class Conversations
+final class Conv
 {
     private final Luwrain luwrain;
-    private final Set<String> openUrlHistory = new HashSet<String>();
+    private final Strings strings;
+    private final Set<String> openUrlHistory = new HashSet<>();
 
-    Conversations(App app)
+    Conv(App app)
     {
-	NullCheck.notNull(app, "app");
 	this.luwrain = app.getLuwrain();
+	this.strings = app.getStrings();
     }
 
-        String formText(String prevValue)
+    String openUrl(String initialValue)
     {
-	NullCheck.notNull(prevValue, "prevValue");
-	return Popups.text(luwrain, "Редактирования формы", "Текст в поле:", prevValue);
+	final String res = Popups.editWithHistory(luwrain, "Открытие страницы", "Адрес:", initialValue, openUrlHistory, Popups.DEFAULT_POPUP_FLAGS);
+	if (res == null || res.trim().isEmpty())
+	    return null;
+	return res;
     }
-    }
+}

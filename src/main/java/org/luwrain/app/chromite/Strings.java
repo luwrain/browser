@@ -1,6 +1,5 @@
 /*
    Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -15,16 +14,11 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.webinspector;
+package org.luwrain.app.chromite;
 
 public interface Strings
 {
-    static final String NAME = "luwrain.webinspector";
+    static final String NAME = "luwrain.chromite";
 
     String appName();
-    String actionOpenUrl();
-    String actionRefresh();
-    String actionStop();
-    String actionHistoryPrev();
-    String actionShowGraphical();
-}
+    }

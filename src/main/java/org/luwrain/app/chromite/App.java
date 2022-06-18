@@ -1,6 +1,5 @@
 /*
    Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -15,34 +14,26 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.browser;
+package org.luwrain.app.chromite;
 
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-import org.luwrain.controls.web.*;
 import org.luwrain.app.base.*;
 
-final class App extends AppBase<Strings> implements WebArea.ClientThread
+public final class App extends AppBase<Strings>
 {
-    private final String arg;
-    private Conversations conv = null;
+    private Conv conv = null;
     private MainLayout mainLayout = null;
-
-    public App(String arg)
-    {
-	super(Strings.NAME, Strings.class);
-	this.arg = arg != null?arg:"";
-    }
 
     public App()
     {
-	this(null);
+	super(Strings.NAME, Strings.class);
     }
 
     @Override protected AreaLayout onAppInit()
     {
-	this.conv = new Conversations(this);
+	this.conv = new Conv(this);
 	this.mainLayout = new MainLayout(this);
 	return mainLayout.getAreaLayout();
     }
@@ -53,20 +44,5 @@ final class App extends AppBase<Strings> implements WebArea.ClientThread
 	return true;
     }
 
-    @Override public Object runSync(Callable callable)
-    {
-	NullCheck.notNull(callable, "callable");
-	return getLuwrain().callUiSafely(callable);
-    }
-
-    @Override public void runAsync(Runnable runnable)
-    {
-	NullCheck.notNull(runnable, "runnable");
-	getLuwrain().runUiSafely(runnable);
-    }
-
-    Conversations getConv()
-    {
-	return this.conv;
-    }
+    Conv getConv() { return this.conv; }
 }
