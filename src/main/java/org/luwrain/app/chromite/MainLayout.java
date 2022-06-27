@@ -21,6 +21,7 @@ import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.types.ChromeTab;
+import com.github.kklisura.cdt.services.impl.*;
 
 
 import org.luwrain.core.*;
@@ -45,9 +46,10 @@ final class MainLayout extends LayoutBase
     {
 
 	    // Create chrome launcher.
-    try (final ChromeLauncher launcher = new ChromeLauncher()) {
+	//    try (final ChromeLauncher launcher = new ChromeLauncher()) {
       // Launch chrome either as headless (true) or regular (false).
-      final ChromeService chromeService = launcher.launch(false);
+	//      final ChromeService chromeService = launcher.launch(false);
+	final ChromeService chromeService = new ChromeServiceImpl("192.168.1.145", 9222);
 
       // Create empty tab ie about:blank.
       final ChromeTab tab = chromeService.createTab();
@@ -73,8 +75,46 @@ final class MainLayout extends LayoutBase
       chromeService.closeTab(tab);
 
 	
-    }
+      //    }
     return true;
     }
+
+    static public void main(String[] args)
+    {
+
+	    // Create chrome launcher.
+	//    try (final ChromeLauncher launcher = new ChromeLauncher()) {
+      // Launch chrome either as headless (true) or regular (false).
+	//      final ChromeService chromeService = launcher.launch(false);
+	final ChromeService chromeService = new ChromeServiceImpl(9222);
+
+      // Create empty tab ie about:blank.
+      final ChromeTab tab = chromeService.createTab();
+
+      // Get DevTools service to this tab
+      try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
+        final Page page = devToolsService.getPage();
+
+        // Navigate to github.com.
+        page.navigate("http://github.com");
+
+        // Wait a while...
+	//        Thread.sleep(2000);
+
+        // Navigate to twitter.com.
+	//        page.navigate("http://twitter.com");
+
+        // Wait a while...
+	//        Thread.sleep(2000);
+      }
+
+      // Close the tab.
+      chromeService.closeTab(tab);
+
+	
+      //    }
+    }
+
+
 
 }
