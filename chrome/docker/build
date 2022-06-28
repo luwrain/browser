@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+docker rmi chromium ||:
+docker build -t chromium --no-cache .

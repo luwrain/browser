@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+SQUASHFS_SRC="/mnt/ub64/casper/filesystem.squashfs"
+
+umount tmp-env/image/proc ||:
+umount tmp-env ||:
+rmdir tmp-env ||:
+mkdir tmp-env
+mount -t tmpfs -o size=10g tmpfs tmp-env
+echo Unpacking
+unsquashfs -d tmp-env/image $SQUASHFS_SRC > /dev/null
+mkdir -p tmp-env/image/proc
+mount --bind /proc tmp-env/image/proc
+echo 'nameserver 8.8.8.8' > tmp-env/image/etc/resolv.conf
+
+#cat <<EOF > tmp-env/image/etc/apt/sources.list
+#deb http://security.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+#deb http://ru.archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+#deb http://ru.archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+#EOF
+#chroot tmp-env/image apt-get update
+#chroot tmp-env/image apt-get install chromium-browser
+#chroot tmp-env/image snap install chromium
+
+cp start tmp-env/image
+chroot tmp-env/image /start
+
+umount tmp-env/image/proc
+umount tmp-env
+rmdir tmp-env

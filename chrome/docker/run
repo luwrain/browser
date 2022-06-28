@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --name chromium -p 9222:9222 --rm chromium 

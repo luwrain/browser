@@ -1,0 +1,9 @@
+#!/bin/bash -evx
+
+
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
+echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+apt-get update -qqy > /dev/null
+apt-get -qqy install google-chrome-unstable > /dev/null
+
+/usr/bin/google-chrome --headless --remote-debugging-port=9222 --no-sandbox -- disable-webgl https://luwrain.org

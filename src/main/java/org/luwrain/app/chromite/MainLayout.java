@@ -44,38 +44,13 @@ final class MainLayout extends LayoutBase
 
     private boolean actTest()
     {
-
-	    // Create chrome launcher.
-	//    try (final ChromeLauncher launcher = new ChromeLauncher()) {
-      // Launch chrome either as headless (true) or regular (false).
-	//      final ChromeService chromeService = launcher.launch(false);
-	final ChromeService chromeService = new ChromeServiceImpl("192.168.1.145", 9222);
-
-      // Create empty tab ie about:blank.
+	final ChromeService chromeService = new ChromeServiceImpl("localhost", 9222);
       final ChromeTab tab = chromeService.createTab();
-
-      // Get DevTools service to this tab
       try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
         final Page page = devToolsService.getPage();
-
-        // Navigate to github.com.
         page.navigate("http://github.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
-
-        // Navigate to twitter.com.
-	//        page.navigate("http://twitter.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
       }
-
-      // Close the tab.
       chromeService.closeTab(tab);
-
-	
-      //    }
     return true;
     }
 
