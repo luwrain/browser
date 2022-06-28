@@ -30,35 +30,41 @@ import org.luwrain.core.*;
 
 public class Chromite
 {
-        private boolean actTest()
-    {
-	final ChromeService chromeService = new ChromeServiceImpl("localhost", 9222);
-      final ChromeTab tab = chromeService.createTab();
-      try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
-        final Page page = devToolsService.getPage();
-    final Runtime runtime = devToolsService.getRuntime();
-    page.onLoadEventFired((event)->{
-	    			  Log.debug("proba", "on load");
-				  /*
-          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
-          Log.debug("proba", evaluation.getResult().getValue().toString());
-	  //	            devToolsService.close();
-	  */
-        });
-    page.enable();
-    Log.debug("proba", "navigating");
-        page.navigate("https://luwrain.org");
-	try {
-	Thread.sleep(10000);
-	}
-	catch(Exception e)
-	{
-	}
-	          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
-          Log.debug("proba", evaluation.getResult().getValue().toString());
+    final ChromeService chromeService;
+          final ChromeTab tab;
+    final ChromeDevToolsService devToolsService;
+            final Page page;
+        final Runtime runtime;
 
-      }
-      chromeService.closeTab(tab);
-    return true;
+    public Chromite()
+    {
+this.chromeService = new ChromeServiceImpl("localhost", 9222);
+this.tab = this.chromeService.createTab();
+this.devToolsService = this.chromeService.createDevToolsService(tab);
+this.page = devToolsService.getPage();
+this.runtime = this.devToolsService.getRuntime();
+    }
+
+    public void close()
+    {
+	this.devToolsService.close();
+	      this.chromeService.closeTab(tab);
+    }
+
+    public void navigate(String url)
+    {
+	        this.page.navigate(url);
+    }
+
+    public String getHtml()
+    {
+		          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
+			  return evaluation.getResult().getValue().toString();
+    }
+
+        private void setOnLoadEvent()
+    {
+	    page.onLoadEventFired((event)->{
+        });
     }
     }
