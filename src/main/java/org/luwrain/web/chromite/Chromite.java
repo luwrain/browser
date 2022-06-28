@@ -14,7 +14,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.chromite;
+package org.luwrain.web.chromite;
 
 import com.github.kklisura.cdt.launch.ChromeLauncher;
 import com.github.kklisura.cdt.protocol.commands.Page;
@@ -26,25 +26,11 @@ import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
-import org.luwrain.controls.*;
-import org.luwrain.app.base.*;
 
 
-final class MainLayout extends LayoutBase
+public class Chromite
 {
-    private final SimpleArea webArea;
-
-    MainLayout(App app)
-    {
-	super(app);
-	webArea = new SimpleArea(getControlContext(), "Chromite");
-		setAreaLayout(webArea, actions(
-					       action("Тест", "test", this::actTest)
-));
-    }
-
-    private boolean actTest()
+        private boolean actTest()
     {
 	final ChromeService chromeService = new ChromeServiceImpl("localhost", 9222);
       final ChromeTab tab = chromeService.createTab();
@@ -75,43 +61,4 @@ final class MainLayout extends LayoutBase
       chromeService.closeTab(tab);
     return true;
     }
-
-    static public void main(String[] args)
-    {
-
-	    // Create chrome launcher.
-	//    try (final ChromeLauncher launcher = new ChromeLauncher()) {
-      // Launch chrome either as headless (true) or regular (false).
-	//      final ChromeService chromeService = launcher.launch(false);
-	final ChromeService chromeService = new ChromeServiceImpl(9222);
-
-      // Create empty tab ie about:blank.
-      final ChromeTab tab = chromeService.createTab();
-
-      // Get DevTools service to this tab
-      try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
-        final Page page = devToolsService.getPage();
-
-        // Navigate to github.com.
-        page.navigate("http://github.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
-
-        // Navigate to twitter.com.
-	//        page.navigate("http://twitter.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
-      }
-
-      // Close the tab.
-      chromeService.closeTab(tab);
-
-	
-      //    }
     }
-
-
-
-}

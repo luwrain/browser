@@ -5,5 +5,9 @@ wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
 echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
 apt-get update -qqy > /dev/null
 apt-get -qqy install google-chrome-unstable > /dev/null
-
-/usr/bin/google-chrome --headless --remote-debugging-port=9222 --no-sandbox -- disable-webgl https://luwrain.org
+useradd chrome
+mkdir /home/chrome
+chown -R chrome:chrome /home/chrome
+chmod 1777 /dev/shm
+su chrome -c '/usr/bin/google-chrome --headless --remote-debugging-port=9222 -- disable-webgl https://luwrain.org'
+#/usr/bin/google-chrome --headless --remote-debugging-port=9222 --no-sandbox -- disable-webgl https://luwrain.org
