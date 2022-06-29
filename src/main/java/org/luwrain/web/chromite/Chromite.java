@@ -27,44 +27,43 @@ import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
 
 import org.luwrain.core.*;
 
-
-public class Chromite
+public class Chromite implements AutoCloseable
 {
     final ChromeService chromeService;
-          final ChromeTab tab;
+    final ChromeTab tab;
     final ChromeDevToolsService devToolsService;
-            final Page page;
-        final Runtime runtime;
+    final Page page;
+    final Runtime runtime;
 
     public Chromite()
     {
-this.chromeService = new ChromeServiceImpl("localhost", 9222);
-this.tab = this.chromeService.createTab();
-this.devToolsService = this.chromeService.createDevToolsService(tab);
-this.page = devToolsService.getPage();
-this.runtime = this.devToolsService.getRuntime();
+	this.chromeService = new ChromeServiceImpl("localhost", 9222);
+	this.tab = this.chromeService.createTab();
+	this.devToolsService = this.chromeService.createDevToolsService(tab);
+	this.page = devToolsService.getPage();
+	this.runtime = this.devToolsService.getRuntime();
     }
 
-    public void close()
+    @Override public void close()
     {
 	this.devToolsService.close();
-	      this.chromeService.closeTab(tab);
+	this.chromeService.closeTab(tab);
     }
 
     public void navigate(String url)
     {
-	        this.page.navigate(url);
+	this.page.navigate(url);
     }
 
     public String getHtml()
     {
-		          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
-			  return evaluation.getResult().getValue().toString();
+	final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
+	return evaluation.getResult().getValue().toString();
     }
 
-        private void setOnLoadEvent()
+    private void setOnLoadEvent()
     {
-	    page.onLoadEventFired((event)->{
-        });
+	page.onLoadEventFired((event)->{
+	    });
     }
-    }
+}

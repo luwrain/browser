@@ -16,102 +16,42 @@
 
 package org.luwrain.app.chromite;
 
-import com.github.kklisura.cdt.launch.ChromeLauncher;
-import com.github.kklisura.cdt.protocol.commands.Page;
-import com.github.kklisura.cdt.services.ChromeDevToolsService;
-import com.github.kklisura.cdt.services.ChromeService;
-import com.github.kklisura.cdt.services.types.ChromeTab;
-import com.github.kklisura.cdt.services.impl.*;
-import com.github.kklisura.cdt.protocol.commands.Runtime;
-import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
-
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 
+import static org.luwrain.util.TextUtils.*;
 
 final class MainLayout extends LayoutBase
 {
+    private final App app;
     private final SimpleArea webArea;
 
     MainLayout(App app)
     {
 	super(app);
+	this.app = app;
 	webArea = new SimpleArea(getControlContext(), "Chromite");
-		setAreaLayout(webArea, actions(
-					       action("Тест", "test", this::actTest)
-));
+	setAreaLayout(webArea, actions(
+				       action("test", "Открыть", new InputEvent(InputEvent.Special.F6), this::actOpen),
+				       action("refresh", "Обновить", new InputEvent(InputEvent.Special.F5), this::actRefresh)
+				       ));
     }
 
-    private boolean actTest()
+    private boolean actOpen()
     {
-	final ChromeService chromeService = new ChromeServiceImpl("localhost", 9222);
-      final ChromeTab tab = chromeService.createTab();
-      try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
-        final Page page = devToolsService.getPage();
-    final Runtime runtime = devToolsService.getRuntime();
-    page.onLoadEventFired((event)->{
-	    			  Log.debug("proba", "on load");
-				  /*
-          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
-          Log.debug("proba", evaluation.getResult().getValue().toString());
-	  //	            devToolsService.close();
-	  */
-        });
-    page.enable();
-    Log.debug("proba", "navigating");
-        page.navigate("https://luwrain.org");
-	try {
-	Thread.sleep(10000);
-	}
-	catch(Exception e)
-	{
-	}
-	          final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
-          Log.debug("proba", evaluation.getResult().getValue().toString());
-
-      }
-      chromeService.closeTab(tab);
-    return true;
+	final String url = app.getConv().openUrl("https://");
+	if (url == null || url.trim().isEmpty())
+	    return true;
+	app.getChromite().navigate(url.trim());
+	return true;
     }
 
-    static public void main(String[] args)
+    private boolean actRefresh()
     {
-
-	    // Create chrome launcher.
-	//    try (final ChromeLauncher launcher = new ChromeLauncher()) {
-      // Launch chrome either as headless (true) or regular (false).
-	//      final ChromeService chromeService = launcher.launch(false);
-	final ChromeService chromeService = new ChromeServiceImpl(9222);
-
-      // Create empty tab ie about:blank.
-      final ChromeTab tab = chromeService.createTab();
-
-      // Get DevTools service to this tab
-      try (final ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab)) {
-        final Page page = devToolsService.getPage();
-
-        // Navigate to github.com.
-        page.navigate("http://github.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
-
-        // Navigate to twitter.com.
-	//        page.navigate("http://twitter.com");
-
-        // Wait a while...
-	//        Thread.sleep(2000);
-      }
-
-      // Close the tab.
-      chromeService.closeTab(tab);
-
-	
-      //    }
+	final String html = app.getChromite().getHtml();
+	webArea.update(lines->lines.setLines(splitLinesAnySeparator(html)));
+	return true;
     }
-
-
-
 }

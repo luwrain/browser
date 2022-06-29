@@ -20,10 +20,12 @@ import java.util.concurrent.*;
 
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
+import org.luwrain.web.chromite.*;
 
 public final class App extends AppBase<Strings>
 {
     private Conv conv = null;
+    private final Chromite chromite = new Chromite();
     private MainLayout mainLayout = null;
 
     public App()
@@ -44,5 +46,12 @@ public final class App extends AppBase<Strings>
 	return true;
     }
 
+    @Override public void closeApp()
+    {
+	this.chromite.close();
+	super.closeApp();
+    }
+
     Conv getConv() { return this.conv; }
+    Chromite getChromite(){ return this.chromite; }
 }
