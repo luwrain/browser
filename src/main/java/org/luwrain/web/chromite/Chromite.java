@@ -16,6 +16,10 @@
 
 package org.luwrain.web.chromite;
 
+import java.util.*;
+import java.io.*;
+import com.google.gson.*;
+
 import com.github.kklisura.cdt.launch.ChromeLauncher;
 import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
@@ -34,6 +38,7 @@ public class Chromite implements AutoCloseable
     final ChromeDevToolsService devToolsService;
     final Page page;
     final Runtime runtime;
+    final Gson gson = new Gson();
 
     public Chromite()
     {
@@ -57,13 +62,52 @@ public class Chromite implements AutoCloseable
 
     public String getHtml()
     {
-	final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
+		final Evaluate evaluation = runtime.evaluate("document.documentElement.outerHTML");
 	return evaluation.getResult().getValue().toString();
     }
+
+        public Elements getPage()
+    {
+final String script = concatLines(readResource("page.js"));
+	final Evaluate evaluation = runtime.evaluate(script);
+	return gson.fromJson(evaluation.getResult().getValue().toString(), Elements.class);
+    }
+
+
+
+
 
     private void setOnLoadEvent()
     {
 	page.onLoadEventFired((event)->{
 	    });
+    }
+
+        String[] readResource(String resName)
+    {
+	try {
+	final List<String> res = new ArrayList<>();
+	try (final BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resName), "UTF-8"))) {
+	    String line = r.readLine();
+	    while(line != null)
+	    {
+		res.add(line);
+		line = r.readLine();
+	    }
+	}
+	return res.toArray(new String[res.size()]);
+	}
+	catch(IOException e)
+	{
+	    throw new RuntimeException(e);
+	}
+    }
+
+    static String concatLines(String[] lines)
+    {
+	final StringBuilder b = new StringBuilder();
+	for(String l: lines)
+	    b.append(l).append(" ");
+	return new String(b);
     }
 }
