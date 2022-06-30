@@ -152,7 +152,7 @@ public final class View implements Lines
 	    return block.getRowCount();
 	}
 
-	BlockRowFragment[] getRow(int index)
+	BlockObjFragment[] getRow(int index)
 	{
 	    return block.getRow(index);
 	}

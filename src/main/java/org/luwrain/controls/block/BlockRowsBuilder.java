@@ -32,7 +32,7 @@ final class BlockRowsBuilder
     private final int rowLen;
 
     /** Objects of the incomplete row*/
-    final List<BlockRowFragment> res = new ArrayList<>();
+    final List<BlockObjFragment> res = new ArrayList<>();
     /** Number of characters on the current (incomplete) row*/
     private int offset = 0;
     /** Complete rows*/
@@ -82,7 +82,7 @@ final class BlockRowsBuilder
     {
 	if (res.isEmpty())
 	    return;
-	rows.add(new BlockRow(res.toArray(new BlockRowFragment[res.size()])));
+	rows.add(new BlockRow(res));
 	res.clear();
 	offset = 0;
     }

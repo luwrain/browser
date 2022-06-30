@@ -33,9 +33,9 @@ public class BlockArea implements Area
 
     public interface Appearance
     {
-	void announceFirstRow(Block block, BlockRowFragment[] fragments);
-	void announceRow(Block block, BlockRowFragment[] fragments);
-	String getRowTextAppearance(BlockRowFragment[] fragments);
+	void announceFirstRow(Block block, BlockObjFragment[] fragments);
+	void announceRow(Block block, BlockObjFragment[] fragments);
+	String getRowTextAppearance(BlockObjFragment[] fragments);
     }
 
     public interface ClickHandler
@@ -105,7 +105,7 @@ public class BlockArea implements Area
     {
 	if (isEmpty())
 	    return null;
-	final BlockRowFragment[] row = it.getRow(rowIndex);
+	final BlockObjFragment[] row = it.getRow(rowIndex);
 	int offset = 0;
 	for(int i = 0;i < row.length;++i)
 	{

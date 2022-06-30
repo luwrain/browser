@@ -16,7 +16,7 @@ public class DefaultAppearance implements WebArea.Appearance
 	this.context = context;
     }
 
-    @Override public void announceFirstRow(Block block, BlockRowFragment[] objs)
+    @Override public void announceFirstRow(Block block, BlockObjFragment[] objs)
     {
 	/*
 	NullCheck.notNull(type, "type");
@@ -40,18 +40,18 @@ public class DefaultAppearance implements WebArea.Appearance
 	*/
     }
 
-    @Override public void announceRow(Block block, BlockRowFragment[] objs)
+    @Override public void announceRow(Block block, BlockObjFragment[] objs)
     {
 	NullCheck.notNull(block, "block");
 	NullCheck.notNullItems(objs, "objs");
 	context.setEventResponse(DefaultEventResponse.text(makeResponseText(objs)));
     }
 
-    @Override public String getRowTextAppearance(BlockRowFragment[] objs)
+    @Override public String getRowTextAppearance(BlockObjFragment[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
 	final StringBuilder b = new StringBuilder();
-	for(BlockRowFragment o: objs)
+	for(BlockObjFragment o: objs)
 	{
 	    /*
 	    if (o instanceof WebText)
@@ -89,7 +89,7 @@ public class DefaultAppearance implements WebArea.Appearance
 	return new String(b);
     }
 
-    protected String makeResponseText(BlockRowFragment[] objs)
+    protected String makeResponseText(BlockObjFragment[] objs)
     {
 	NullCheck.notNullItems(objs, "objs");
 	final StringBuilder b = new StringBuilder();

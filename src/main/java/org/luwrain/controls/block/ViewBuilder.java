@@ -36,7 +36,6 @@ final class ViewBuilder
 
     View build(BlockArea.Appearance appearance, int width)
     {
-	NullCheck.notNull(appearance, "appearance");
 		if (width < 10)
 	    throw new IllegalArgumentException("width (" + width + ") may not be less than 10");
 		//calcTextXAndWidth(width);

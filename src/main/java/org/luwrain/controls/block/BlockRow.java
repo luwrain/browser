@@ -18,19 +18,27 @@
 
 package org.luwrain.controls.block;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 
 public final class BlockRow
 {
-    private BlockRowFragment[] fragments;
+    private BlockObjFragment[] fragments;
 
-    BlockRow(BlockRowFragment[] fragments)
+    BlockRow(BlockObjFragment[] fragments)
     {
 	NullCheck.notNullItems(fragments, "fragments");
 	this.fragments = fragments;
     }
 
-    public BlockRowFragment[] getFragments()
+    BlockRow(List<BlockObjFragment> fragments)
+    {
+	NullCheck.notNull(fragments, "fragments");
+	this.fragments = fragments.toArray(new BlockObjFragment[fragments.size()]);
+    }
+
+    public BlockObjFragment[] getFragments()
     {
 	return fragments.clone();
     }

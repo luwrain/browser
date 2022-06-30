@@ -67,10 +67,10 @@ public class Block
 	this.textHeight = rows.length;
     }
 
-    public final BlockRowFragment[] getRow(int index)
+    public final BlockObjFragment[] getRow(int index)
     {
 	if (rows == null)
-	    throw new RuntimeException("The block still does not have any rows");
+	    throw new IllegalStateException("The block still does not have any rows");
 	return rows[index].getFragments();
     }
 

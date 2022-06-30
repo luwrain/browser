@@ -20,13 +20,12 @@ package org.luwrain.controls.block;
 
 import org.luwrain.core.*;
 
-public final class BlockRowFragment
+public final class BlockObjFragment
 {
-    private final BlockObject blockObj;
-    private final int posFrom;
-    private final int posTo;
+    final BlockObject blockObj;
+    final int posFrom, posTo;
 
-    BlockRowFragment(BlockObject blockObj, int posFrom, int posTo)
+    BlockObjFragment(BlockObject blockObj, int posFrom, int posTo)
     {
 	NullCheck.notNull(blockObj, "blockObj");
 	this.blockObj = blockObj;
@@ -34,23 +33,8 @@ public final class BlockRowFragment
 	this.posTo = posTo;
     }
 
-    public BlockObject getBlockObj()
-    {
-	return blockObj;
-    }
-
-    public int getPosFrom()
-    {
-	return posFrom;
-    }
-    
-    public int getPosTo()
-    {
-	return posTo;
-    }
-
-    public int getWidth()
-    {
-	return posTo - posFrom;
-    }
+    public BlockObject getBlockObj() { return blockObj; }
+    public int getPosFrom() { return posFrom; }
+    public int getPosTo() { return posTo; }
+    public int getWidth() { return posTo - posFrom; }
 }
