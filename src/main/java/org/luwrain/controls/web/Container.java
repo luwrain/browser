@@ -8,6 +8,8 @@ import org.luwrain.core.*;
 import org.luwrain.controls.block.*;
 import org.luwrain.browser.*;
 
+import static org.luwrain.util.RangeUtils.*;
+
 final class Container extends Block
 {
     enum Type {LIST_ITEM, PARA, HEADING};

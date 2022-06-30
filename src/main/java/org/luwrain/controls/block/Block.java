@@ -23,12 +23,13 @@ import java.awt.Rectangle;
 
 import org.luwrain.core.*;
 
+import static org.luwrain.util.RangeUtils.*;
+
 public class Block
 {
-    protected int textX = -1;
-    protected int textY = -1;
-    protected int textWidth = -1;
-protected int textHeight = -1;
+    protected int
+	textX = -1,textY = -1,
+	textWidth = -1, textHeight = -1;
 
     protected final BlockObject[] objs;
     protected BlockRow[] rows = new BlockRow[0];
@@ -86,18 +87,6 @@ protected int textHeight = -1;
 	    return between(c.textX, textX, textX + textWidth) && between(c.textY, textY, textY + textHeight);
 	return intersects(textX, textWidth, c.textX, c.textWidth) &&
 	intersects(textY, textHeight, c.textY, c.textHeight);
-    }
-
-    static public boolean between(int pos, int from, int to)
-    {
-	return pos >= from && pos < to;
-    }
-
-    static public boolean intersects(int start1, int len1, int start2, int len2)
-    {
-	if (start1 < start2)
-	    return start2 >= start1 && start2 < start1 + len1; else
-	    return start1 >= start2 && start1 < start2 + len2;
     }
 
         public final int getTextSquare()

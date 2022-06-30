@@ -22,6 +22,8 @@ import java.util.*;
 
 import org.luwrain.core.*;
 
+import static org.luwrain.util.RangeUtils.*;
+
 final class ViewBuilder
 {
     private final Block[] blocks;
@@ -73,7 +75,7 @@ final class ViewBuilder
 		final Block cj = res[j];
 		if (cj.textY <= ci.textY)
 		    continue;
-		if (Block.intersects(ci.textX, ci.textWidth, cj.textX, cj.textWidth))
+		if (intersects(ci.textX, ci.textWidth, cj.textX, cj.textWidth))
 		    cj.vertDepOn.add(ci);
 	    }
 	for(Block c: res)
