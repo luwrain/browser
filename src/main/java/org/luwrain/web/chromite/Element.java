@@ -20,12 +20,20 @@ import java.util.*;
 
 public final class Element
 {
-private String
+    private String
 	tagName = null;
 
-private List<Element> children = null;
+    private Integer
+	x = null, y = null,
+	width = null, height = null;
 
-public String getTagName() { return tagName != null?tagName:""; }
+    private List<Element> children = null;
+
+    public String getTagName() { return tagName != null?tagName:""; }
+    public int getX() { return x != null?x.intValue():0; }
+    public int getY() { return y != null?y.intValue():0; }
+    public int getWidth() { return width != null?width.intValue():0; }
+    public int getHeight() { return height != null?height.intValue():0; }
     public Element[] getChildren() { return children != null?children.toArray(new Element[children.size()]):new Element[0]; }
     @Override public String toString() { return getTagName(); }
 }

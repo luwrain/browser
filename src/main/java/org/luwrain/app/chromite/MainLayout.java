@@ -24,10 +24,11 @@ import org.luwrain.web.chromite.*;
 
 //import static org.luwrain.util.TextUtils.*;
 
-final class MainLayout extends LayoutBase
+final class MainLayout extends LayoutBase implements TreeArea.ClickHandler
 {
     private final App app;
-    private final TreeArea treeArea;
+final TreeArea treeArea;
+    final SimpleArea attrArea;
 
     private Elements elements = null;
 
@@ -38,11 +39,33 @@ final class MainLayout extends LayoutBase
 	treeArea = new TreeArea(treeParams((params)->{
 		    params.name = "Страница";
 		    params.model = new CachedTreeModel(new Model());
+		    params.clickHandler = this;
 		}));
-	setAreaLayout(treeArea, actions(
+	attrArea = new SimpleArea(getControlContext(), "Атрибуты");
+	setAreaLayout(AreaLayout.LEFT_RIGHT, treeArea, actions(
 				       action("test", "Открыть", new InputEvent(InputEvent.Special.F6), this::actOpen),
 				       action("refresh", "Обновить", new InputEvent(InputEvent.Special.F5), this::actRefresh)
-				       ));
+					),
+		      attrArea, actions());
+    }
+
+    @Override public boolean onTreeClick(TreeArea treeArea, Object obj)
+    {
+	if (obj instanceof Element)
+	{
+	    final Element el = (Element)obj;
+	    attrArea.update(lines->{
+		    lines.clear();
+		    lines.addLine("X: " + String.valueOf(el.getX()));
+		    		    lines.addLine("Y: " + String.valueOf(el.getY()));
+				    		    		    lines.addLine("Width: " + String.valueOf(el.getWidth()));
+								    				    		    		    lines.addLine("Height: " + String.valueOf(el.getHeight()));
+																    lines.addLine("");
+		});
+	    setActiveArea(attrArea);
+	    return true;
+	}
+	return false;
     }
 
     private boolean actOpen()
