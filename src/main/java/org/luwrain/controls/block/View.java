@@ -36,33 +36,17 @@ public final class View implements Lines
 	this.lines = buildLines(blocks, appearance);
     }
 
-    boolean isEmpty()
-    {
-	return blocks.length == 0;
-    }
+    Block getBlock(int index) { return blocks[index]; }
+    public int getBlockCount() { return blocks.length; }
+    boolean isEmpty()  { return blocks.length == 0; }
+    @Override public int getLineCount() { return lines.length > 0?lines.length:1; }
 
-    @Override public int getLineCount()
-    {
-	return lines.length > 0?lines.length:1;
-    }
-
-    @Override public String getLine(int index)
-    {
+    @Override public String getLine(int index) { 
 	if (index < 0)
 	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
 	if (index > lines.length)
 	    return "";
 	return lines[index];
-    }
-
-    Block getBlock(int index)
-    {
-	return blocks[index];
-    }
-
-    public int getBlockCount()
-    {
-	return blocks.length;
     }
 
     Iterator createIterator()
@@ -74,8 +58,6 @@ public final class View implements Lines
 
     static private String[] buildLines(Block[] blocks, BlockArea.Appearance appearance)
     {
-	NullCheck.notNullItems(blocks, "blocks");
-	NullCheck.notNull(appearance, "appearance");
 	int lineCount = 0;
 	for(Block c: blocks)
 	    lineCount = Math.max(lineCount, c.textY + c.textHeight);
@@ -90,7 +72,7 @@ public final class View implements Lines
 		final BlockRow row = c.rows[i];
 		final String text = appearance.getRowTextAppearance(row.getFragments());
 		//if (text.length() > c.textWidth)
-		    //Log.warning(LOG_COMPONENT, "row text \'" + text + "\' is longer than the width of the container (" + c.textWidth + ")");
+		//Log.warning(LOG_COMPONENT, "row text \'" + text + "\' is longer than the width of the container (" + c.textWidth + ")");
 		final int lineIndex = c.textY + i;
 		lines[lineIndex] = putString(lines[lineIndex], text, c.textX);	
 	    }
@@ -98,30 +80,27 @@ public final class View implements Lines
 	return lines;
     }
 
-	static private String putString(String s, String fragment, int pos)
+    static private String putString(String s, String fragment, int pos)
+    {
+	final StringBuilder b = new StringBuilder();
+	if (pos > s.length())
 	{
-	    NullCheck.notNull(s, "s");
-	    NullCheck.notNull(fragment, "fragment");
-	    final StringBuilder b = new StringBuilder();
-	    if (pos > s.length())
-	    {
-		b.append(s);
-		for(int i = s.length();i < pos;++i)
-		    b.append(" ");
-	    } else
-		b.append(s.substring(0, pos));
-	    b.append(fragment);
-	    if (pos + fragment.length() < s.length())
-		b.append(s.substring(pos + fragment.length()));
-	    return new String(b);
-	}
+	    b.append(s);
+	    for(int i = s.length();i < pos;++i)
+		b.append(" ");
+	} else
+	    b.append(s.substring(0, pos));
+	b.append(fragment);
+	if (pos + fragment.length() < s.length())
+	    b.append(s.substring(pos + fragment.length()));
+	return new String(b);
+    }
 
     static final class Iterator
     {
 	private final View view;
 	private int pos = 0;
 	private Block block = null;
-
 	Iterator(View view, int pos)
 	{
 	    NullCheck.notNull(view, "view");
@@ -132,42 +111,12 @@ public final class View implements Lines
 	    this.block = view.getBlock(this.pos);
 	}
 
-	public Block getBlock()
-	{
-	    return block;
-	}
-
-	int getX()
-	{
-	    return block.textX;
-	}
-
-	int getY()
-	{
-	    return block.textY;
-	}
-
-	int getRowCount()
-	{
-	    return block.getRowCount();
-	}
-
-	BlockObjFragment[] getRow(int index)
-	{
-	    return block.getRow(index);
-	}
-
-	boolean isLastRow(int index)
-	{
-	    return block.getRowCount() > 0 && index + 1 == block.getRowCount();
-	}
-
-		boolean movePrev()
+	boolean movePrev()
 	{
 	    if (pos == 0)
 		return false;
 	    --pos;
-block = view.getBlock(pos);
+	    block = view.getBlock(pos);
 	    return true;
 	}
 
@@ -176,8 +125,16 @@ block = view.getBlock(pos);
 	    if (pos + 1 >= view.getBlockCount())
 		return false;
 	    ++pos;
-block = view.getBlock(pos);
+	    block = view.getBlock(pos);
 	    return true;
 	}
+
+	public Block getBlock() { return block; }
+	    int getX() { return block.textX; }
+	    int getY() { return block.textY; }
+	    int getRowCount() { return block.getRowCount(); }
+	    BlockObjFragment[] getRow(int index) { return block.getRow(index); }
+	    boolean isLastRow(int index) { return block.getRowCount() > 0 && index + 1 == block.getRowCount(); }
+	}
     }
-}
+    

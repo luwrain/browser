@@ -29,7 +29,8 @@ import org.luwrain.controls.*;
 
 public class BlockArea implements Area
 {
-    static private final int MIN_VISIBLE_WIDTH = 20;
+    static private final int
+	MIN_VISIBLE_WIDTH = 20;
 
     public interface Appearance
     {
@@ -55,10 +56,11 @@ public class BlockArea implements Area
     protected ClickHandler clickHandler = null;
     protected View view = null;
     protected View.Iterator it = null;
-    protected int rowIndex = 0;
-    protected int hotPointX = 0;
 
-    protected int itemIndex = 0;
+    protected int
+	rowIndex = 0,
+	hotPointX = 0,
+	itemIndex = 0;
 
     public BlockArea(Params params)
     {
