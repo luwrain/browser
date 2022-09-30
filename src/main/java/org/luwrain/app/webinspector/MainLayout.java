@@ -20,34 +20,31 @@ package org.luwrain.app.webinspector;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
-
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 
-final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler
+final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Item>
 {
     private final App app;
-    private final ConsoleArea elementsArea;
-    private final ListArea attrsArea;
+    final ConsoleArea<Item> elementsArea;
+    //final ListArea attrsArea;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	{
-	    final ConsoleArea.Params params = new ConsoleArea.Params();
-	    params.context = getControlContext();
+	    this.elementsArea = new ConsoleArea<Item>(consoleParams((params)->{
 	    params.name = app.getStrings().appName();
 	    params.model = new ConsoleUtils.ArrayModel(()->{ return app.items; });
 	    params.appearance = new ElementsAppearance();
 	    params.inputHandler = this;
 	    params.clickHandler = this;
 	    params.inputPrefix = "WebKit>";
-	    this.elementsArea = new ConsoleArea(params);
-	}
+		    }));
 	final Actions elementsActions = actions(
 						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 						);
+	/*
 	{
 	    final ListArea.Params params = new ListArea.Params();
 	    params.context = getControlContext();
@@ -60,35 +57,22 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 					     action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 					     );
 	setAreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, elementsActions, attrsArea, attrsActions);
+	*/
+	setAreaLayout(elementsArea, elementsActions);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
-		FxThread.runSync(()->app.getWebEngine().load(text));
-		/*
-	try {
-	    app.getBrowser().loadByUrl(text.trim());
-	}
-	catch(Exception e)
-	{
-	    app.crash(e);
-	}
-	//	return ConsoleArea.InputHandler.Result.OK;
-	*/
-
-		return ConsoleArea.InputHandler.Result.OK;
+	FxThread.runSync(()->app.getWebEngine().load(text));
+	return ConsoleArea.InputHandler.Result.OK;
     }
 
-    @Override public boolean onConsoleClick(ConsoleArea area,int index,Object obj)
+    @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)
     {
-		if (!(obj instanceof Item))
-		    return false;
-		app.fillAttrs((Item)obj);
-			    attrsArea.refresh();
-			    setActiveArea(attrsArea);
-		return true;
+	//			    setActiveArea(attrsArea);
+		return false;
 	    };
 
     private boolean actShowGraphical()
@@ -111,30 +95,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     private boolean onClick(Item item)
     {
-	NullCheck.notNull(item, "item");
-	if (item.className.equals("HTMLButtonElementImpl") ||
-	    item.inputType.equals("submit"))
-	{
-	    app.getBrowser().runSafely(()->{
-		    item.it.emulateSubmit();
-		    return null;
-		});
-	    return true;
-	}
-	if (item.inputType.equals("text") ||
-	    item.inputType.equals("password") ||
-	    item.inputType.equals("email"))
-	{
-	    final String text = app.getConv().formText("");
-	    if (text == null)
-		return true;
-	    app.getBrowser().runSafely(()->{
-		    item.it.setInputText(text);
-		    app.updateItems();
-		    return null;
-		});
-	    return true;
-	}
 	return false;
     }
 
