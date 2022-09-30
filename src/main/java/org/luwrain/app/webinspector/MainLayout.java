@@ -17,25 +17,32 @@
 
 package org.luwrain.app.webinspector;
 
+import netscape.javascript.JSObject;
+
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 
+
+
 final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Item>
 {
     private final App app;
-    final ConsoleArea<Item> elementsArea;
+    final ConsoleArea<Item> consoleArea;
     //final ListArea attrsArea;
+
+    private JSObject jsRes = null;
+    private ScanResult scanResult = null;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	    this.elementsArea = new ConsoleArea<Item>(consoleParams((params)->{
+	    this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
 	    params.name = app.getStrings().appName();
-	    params.model = new ConsoleUtils.ArrayModel(()->{ return app.items; });
+	    params.model = new ConsoleUtils.ListModel(app.messages);
 	    params.appearance = new ElementsAppearance();
 	    params.inputHandler = this;
 	    params.clickHandler = this;
@@ -58,15 +65,40 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 					     );
 	setAreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, elementsActions, attrsArea, attrsActions);
 	*/
-	setAreaLayout(elementsArea, elementsActions);
+	setAreaLayout(consoleArea, elementsActions);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
+	if (text.trim().equals("dump"))
+	    return dump()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;
 	FxThread.runSync(()->app.getWebEngine().load(text));
-	return ConsoleArea.InputHandler.Result.OK;
+	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
+    }
+
+    private boolean dump()
+    {
+	FxThread.runSync(()->{
+		final Object res = app.getWebEngine().executeScript(app.injection);
+		if (res == null)
+		{
+		    app.print("null");
+		    return;
+		}
+		if (!(res instanceof JSObject))
+		{
+		    app.print("Instance of " + res.getClass().getName());
+		    return;
+		}
+		this.jsRes = (JSObject)res;
+		this.scanResult = new ScanResult(app.getWebEngine(), jsRes);
+		app.print("Finished, " + scanResult.count + " items");
+	    });
+	getLuwrain().playSound(Sounds.OK);
+	consoleArea.refresh();
+	return true;
     }
 
     @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)

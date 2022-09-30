@@ -38,7 +38,8 @@ public final class App extends AppBase <Strings>implements Application
 	LOG_COMPONENT = "webins";
 
     private final String arg;
-    private final String injection;
+    final String injection;
+    final List<String> messages = new ArrayList<>();
     Item[] items = new Item[0];
     String[] attrs = new String[0];
     private MainLayout mainLayout = null;
@@ -100,23 +101,22 @@ public final class App extends AppBase <Strings>implements Application
     {
 	if (newState == null)
 	    return;
-
+	print(newState.toString());
 	switch(newState)
 	{
 	case SUCCEEDED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    break;
-
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
 	    break;
-
-	    
-	default:
-	    	getLuwrain().runUiSafely(()->getLuwrain().message(newState.toString()));
 	}
     }
 
+    void print(String message)
+    {
+	messages.add(0, message);
+    }
 
     Conversations getConv() { return this.conv; }
     WebView getWebView() { return webView; }
