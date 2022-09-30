@@ -17,6 +17,7 @@
 
 package org.luwrain.app.webinspector;
 
+import java.io.*;
 import java.util.*;
 
 import javafx.scene.web.WebEngine;
@@ -29,12 +30,15 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 
+import static org.luwrain.util.ResourceUtils.*;
+
 public final class App extends AppBase <Strings>implements Application
 {
     static final String
 	LOG_COMPONENT = "webins";
 
     private final String arg;
+    private final String injection;
     Item[] items = new Item[0];
     String[] attrs = new String[0];
     private MainLayout mainLayout = null;
@@ -43,23 +47,29 @@ public final class App extends AppBase <Strings>implements Application
     private     WebEngine webEngine = null;
     private WebView webView = null;
 
+    public App() { this(null); }
     public App(String arg)
     {
 	super(Strings.NAME, Strings.class, "luwrain.webinspector");
 	this.arg = arg;
+	try {
+	    this.injection = getStringResource(getClass(), "injection.js");
+	}
+	catch(IOException e)
+	{
+	    throw new RuntimeException(e);
+	}
     }
-    public App() { this(null); }
 
     @Override public AreaLayout onAppInit()
     {
 	this.conv = new Conversations(this);
 	FxThread.runSync(()->{
 		this.webView = new WebView();
-	this.webEngine = webView.getEngine();
+		this.webEngine = webView.getEngine();
 		this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
-			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
+		this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
 	/*
-
 	this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
 	this.webEngine.setOnAlert((event)->events.onAlert(event.getData()));
 	this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
@@ -67,10 +77,8 @@ public final class App extends AppBase <Strings>implements Application
 	this.webEngine.setOnError((event)->events.onError(event.getMessage()));
 	this.webView.setOnKeyReleased((event)->onKeyReleased(event));
 	*/
-	this.webView.setVisible(false);
-
+		this.webView.setVisible(false);
 	    });
-
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
