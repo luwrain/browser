@@ -22,6 +22,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 
 import org.luwrain.app.base.*;
+import org.luwrain.graphical.*;
 
 final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler
 {
@@ -63,10 +64,10 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
-	NullCheck.notNull(area, "area");
-	NullCheck.notNull(text, "text");
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
+		FxThread.runSync(()->app.getWebEngine().load(text));
+		/*
 	try {
 	    app.getBrowser().loadByUrl(text.trim());
 	}
@@ -74,12 +75,14 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	{
 	    app.crash(e);
 	}
-	return ConsoleArea.InputHandler.Result.OK;
+	//	return ConsoleArea.InputHandler.Result.OK;
+	*/
+
+		return ConsoleArea.InputHandler.Result.OK;
     }
 
     @Override public boolean onConsoleClick(ConsoleArea area,int index,Object obj)
     {
-	NullCheck.notNull(obj, "obj");
 		if (!(obj instanceof Item))
 		    return false;
 		app.fillAttrs((Item)obj);
@@ -88,10 +91,21 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		return true;
 	    };
 
-
     private boolean actShowGraphical()
     {
-	app.getBrowser().showGraphical();
+	app.getLuwrain().showGraphical((graphicalModeControl)->{
+		app.getWebView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			    app.getLuwrain().runUiSafely(()->app.getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}
+		    });
+		app.getWebView().setVisible(true);
+		return app.getWebView();
+	    });
 	return true;
     }
 

@@ -19,14 +19,21 @@ package org.luwrain.app.webinspector;
 
 import java.util.*;
 
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.concurrent.Worker.State;
+import javafx.beans.value.ObservableValue;
+
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.browser.*;
 import org.luwrain.app.base.*;
+import org.luwrain.graphical.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
-    static final String LOG_COMPONENT = "webins";
+    static final String
+	LOG_COMPONENT = "webins";
 
     private final String arg;
     Item[] items = new Item[0];
@@ -35,16 +42,15 @@ public final class App extends AppBase <Strings>implements Application
     private Browser browser = null;
     private Conversations conv = null;
 
+    private     WebEngine webEngine = null;
+    private WebView webView = null;
+
     public App(String arg)
     {
 	super(Strings.NAME, Strings.class, "luwrain.webinspector");
 	this.arg = arg;
     }
-
-    public App()
-    {
-	this(null);
-    }
+    public App() { this(null); }
 
     @Override public AreaLayout onAppInit()
     {
@@ -52,6 +58,25 @@ public final class App extends AppBase <Strings>implements Application
 	this.browser = BrowserFactory.newBrowser(getLuwrain(), new Events());
 	if (browser == null)
 	    return null;
+
+	FxThread.runSync(()->{
+		this.webView = new WebView();
+	this.webEngine = webView.getEngine();
+		this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
+			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
+	/*
+
+	this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
+	this.webEngine.setOnAlert((event)->events.onAlert(event.getData()));
+	this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
+	this.webEngine.setConfirmHandler((param)->events.onConfirm(param));
+	this.webEngine.setOnError((event)->events.onError(event.getMessage()));
+	this.webView.setOnKeyReleased((event)->onKeyReleased(event));
+	*/
+	this.webView.setVisible(false);
+
+	    });
+
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
@@ -109,21 +134,39 @@ public final class App extends AppBase <Strings>implements Application
 	return true;
     }
 
-        @Override public void closeApp()
+    @Override public void closeApp()
     {
 	this.browser.close();
 	super.closeApp();
     }
 
-    Browser getBrowser()
+
+    private void onStateChanged(ObservableValue<? extends State> ov, State oldState, State newState)
     {
-	return this.browser;
+	if (newState == null)
+	    return;
+
+	switch(newState)
+	{
+	case SUCCEEDED:
+	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+	    break;
+
+	    	case FAILED:
+	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
+	    break;
+
+	    
+	default:
+	    	getLuwrain().runUiSafely(()->getLuwrain().message(newState.toString()));
+	}
     }
 
-    Conversations getConv()
-    {
-	return this.conv;
-    }
+
+    Browser getBrowser() { return this.browser; }
+    Conversations getConv() { return this.conv; }
+    WebView getWebView() { return webView; }
+    WebEngine getWebEngine() { return webEngine; }
 
     private final class Events implements BrowserEvents
     {
