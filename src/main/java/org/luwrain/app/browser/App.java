@@ -20,10 +20,9 @@ package org.luwrain.app.browser;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-import org.luwrain.controls.web.*;
 import org.luwrain.app.base.*;
 
-final class App extends AppBase<Strings> implements WebArea.ClientThread
+final class App extends AppBase<Strings>
 {
     private final String arg;
     private Conversations conv = null;
@@ -51,18 +50,6 @@ final class App extends AppBase<Strings> implements WebArea.ClientThread
     {
 	closeApp();
 	return true;
-    }
-
-    @Override public Object runSync(Callable callable)
-    {
-	NullCheck.notNull(callable, "callable");
-	return getLuwrain().callUiSafely(callable);
-    }
-
-    @Override public void runAsync(Runnable runnable)
-    {
-	NullCheck.notNull(runnable, "runnable");
-	getLuwrain().runUiSafely(runnable);
     }
 
     Conversations getConv()

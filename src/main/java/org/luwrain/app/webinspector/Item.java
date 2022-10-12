@@ -20,26 +20,27 @@ package org.luwrain.app.webinspector;
 import java.util.*;
 
 import org.luwrain.core.*;
-import org.luwrain.browser.*;
 
 final class Item
 {
-    final BrowserIterator it;
+    final Object it;
     final String className;
     final String inputType;
     final String tagName;
     final String text;
 
-    Item(BrowserIterator it)
+    Item(Object it)
     {
 	NullCheck.notNull(it, "it");
-	this.it = it.clone();
-	this.className = it.getClassName();
+	this.it = null;//it.clone();
+	this.className = "it.getClassName()";
+	/*
 	if (it.isInput())
-	    this.inputType = it.getInputType(); else
+	    this.inputType = null;//it.getInputType(); else
+	*/
 	    this.inputType = "";
-	this.tagName = it.getTagName();
-	this.text = it.getText();
+	this.tagName = "it.getTagName()";
+	this.text = "it.getText()";
     }
 
     @Override public String toString()

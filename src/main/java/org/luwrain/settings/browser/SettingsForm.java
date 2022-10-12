@@ -21,7 +21,6 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.cpanel.*;
-import org.luwrain.browser.*;
 
 final class SettingsForm extends FormArea implements SectionArea
 {
@@ -47,7 +46,7 @@ final class SettingsForm extends FormArea implements SectionArea
     private void fillForm()
     {
 	addEdit("home-page", strings.homePage(), sett.getHomePage(""));
-	addEdit("user-agent", strings.userAgent(), sett.getUserAgent(new BrowserParams().userAgent));
+	addEdit("user-agent", strings.userAgent(), sett.getUserAgent(""));
 	addCheckbox("java-script-enabled", strings.javaScriptEnabled(), sett.getJavaScriptEnabled(true));
     }
 
