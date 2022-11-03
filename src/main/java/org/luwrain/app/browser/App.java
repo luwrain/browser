@@ -17,7 +17,9 @@
 
 package org.luwrain.app.browser;
 
-import java.util.concurrent.*;
+import java.util.*;
+import java.io.*;
+
 
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -27,6 +29,8 @@ import javafx.beans.value.ObservableValue;
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
+
+import static org.luwrain.util.ResourceUtils.*;
 
 final class App extends AppBase<Strings>
 {
