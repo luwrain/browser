@@ -35,7 +35,7 @@ import static org.luwrain.util.ResourceUtils.*;
 final class App extends AppBase<Strings>
 {
     private final String arg;
-    private Conversations conv = null;
+    private Conv conv = null;
     private MainLayout mainLayout = null;
         final String injection;
 
@@ -58,7 +58,7 @@ final class App extends AppBase<Strings>
 
     @Override protected AreaLayout onAppInit()
     {
-	this.conv = new Conversations(this);
+	this.conv = new Conv(this);
 
 		FxThread.runSync(()->{
 		this.webView = new WebView();
@@ -105,5 +105,5 @@ final class App extends AppBase<Strings>
     }
 
 
-    Conversations getConv() { return this.conv; }
+    Conv getConv() { return this.conv; }
 }

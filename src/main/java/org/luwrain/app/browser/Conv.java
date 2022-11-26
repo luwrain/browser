@@ -23,23 +23,23 @@ import org.luwrain.core.*;
 import org.luwrain.popups.*;
 import org.luwrain.settings.browser.Settings;
 
-class Conversations
+import static org.luwrain.popups.Popups.*;
+
+final class Conv
 {
     private final Luwrain luwrain;
     private final Settings sett;
     private final Set<String> openUrlHistory = new HashSet<String>();
 
-    Conversations(App app)
+    Conv(App app)
     {
-	NullCheck.notNull(app, "app");
 	this.luwrain = app.getLuwrain();
 	this.sett = Settings.create(luwrain.getRegistry());
     }
 
     String openUrl(String initialValue)
     {
-	NullCheck.notNull(initialValue, "initialValue");
-	final String res = Popups.editWithHistory(luwrain, "Открытие страницы", "Адрес:", initialValue, openUrlHistory, Popups.DEFAULT_POPUP_FLAGS);
+	final String res = editWithHistory(luwrain, "Открытие страницы", "Адрес:", initialValue, openUrlHistory, Popups.DEFAULT_POPUP_FLAGS);
 	if (res == null || res.trim().isEmpty())
 	    return null;
 	return res;
