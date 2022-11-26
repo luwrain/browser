@@ -21,6 +21,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.settings.browser.SettingsFactory;
+import org.luwrain.i18n.*;
 
 public final class Extension extends EmptyExtension
 {
@@ -29,7 +30,7 @@ public final class Extension extends EmptyExtension
 	return new Command[]{
 	    new SimpleShortcutCommand("browser"),
 	    new SimpleShortcutCommand("web-ins"),
-	    	    new SimpleShortcutCommand("chromite"),
+	    new SimpleShortcutCommand("chromite"),
 	};
     }
 
@@ -37,18 +38,13 @@ public final class Extension extends EmptyExtension
     {
 	return new ExtensionObject[]{
 	    new SimpleShortcut("chromite", org.luwrain.app.chromite.App.class),
-
 	    new Shortcut() {
-		@Override public String getExtObjName()
-		{
-		    return "browser";
-		}
+		@Override public String getExtObjName() { return "browser"; }
 		@Override public Application[] prepareApp(String[] args)
 		{
-		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 0)
 			return new Application[]{new org.luwrain.app.browser.App()};
-		    final List<Application> v = new ArrayList();
+		    final List<Application> v = new ArrayList<>();
 		    for(String s: args)
 			if (!s.isEmpty())
 			    v.add(new org.luwrain.app.browser.App(s));
@@ -57,18 +53,13 @@ public final class Extension extends EmptyExtension
 		    return v.toArray(new Application[v.size()]);
 		}
 	    },
-
 	    new Shortcut() {
-		@Override public String getExtObjName()
-		{
-		    return "web-ins";
-		}
+		@Override public String getExtObjName() { return "web-ins"; }
 		@Override public Application[] prepareApp(String[] args)
 		{
-		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 0)
 			return new Application[]{new org.luwrain.app.webinspector.App()};
-		    final List<Application> v = new ArrayList();
+		    final List<Application> v = new ArrayList<>();
 		    for(String s: args)
 			if (!s.isEmpty())
 			    v.add(new org.luwrain.app.webinspector.App(s));
@@ -77,13 +68,27 @@ public final class Extension extends EmptyExtension
 		    return v.toArray(new Application[v.size()]);
 		}
 	    },
-
 	};
+    }
+
+    @Override public void i18nExtension(Luwrain luwrain, org.luwrain.i18n.I18nExtension i18nExt)
+    {
+	i18nExt.addCommandTitle(Lang.EN, "browser", "Internet");
+	i18nExt.addCommandTitle(Lang.RU, "browser", "Интернет");
+	i18nExt.addCommandTitle(Lang.EN, "web-ins", "Web inspector");
+	i18nExt.addCommandTitle(Lang.RU, "web-ins", "Веб-инспектор");
+	try {
+	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings-main.properties").create(Lang.EN, Strings.class));
+	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings-main.properties").create(Lang.RU, Strings.class));
+	}
+	catch(java.io.IOException e)
+	{
+	    throw new RuntimeException(e);
+	}
     }
 
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)
     {
-	NullCheck.notNull(luwrain, "luwrain");
 	return new org.luwrain.cpanel.Factory[]{new SettingsFactory(luwrain)};
     }
 }

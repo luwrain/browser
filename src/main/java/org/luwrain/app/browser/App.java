@@ -78,6 +78,7 @@ final class App extends AppBase<Strings>
 
 		
 	this.mainLayout = new MainLayout(this);
+	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
     }
 

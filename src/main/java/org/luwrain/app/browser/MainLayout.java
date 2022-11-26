@@ -26,12 +26,25 @@ import org.luwrain.app.base.*;
 
 final class MainLayout extends LayoutBase
 {
-    private final SimpleArea webArea;
+    private final NavigationArea webArea;
 
     MainLayout(App app)
     {
 	super(app);
-	    //	setAreaLayout(webArea, actions());
-	    webArea = null;
+	this.webArea = new NavigationArea(getControlContext()){
+		@Override public String getLine(int index)
+		{
+		    return "";
+		}
+		@Override public int getLineCount()
+		{
+		    return 1;
+		}
+		@Override public String getAreaName()
+		{
+		    return "web";
+		}
+	    };
+	setAreaLayout(webArea, null);
     }
 }
