@@ -23,14 +23,17 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
+import org.luwrain.graphical.*;
 
 final class MainLayout extends LayoutBase
 {
-    private final NavigationArea webArea;
+    final App app;
+    final NavigationArea webArea;
 
     MainLayout(App app)
     {
 	super(app);
+	this.app = app;
 	this.webArea = new NavigationArea(getControlContext()){
 		@Override public String getLine(int index)
 		{
@@ -45,6 +48,17 @@ final class MainLayout extends LayoutBase
 		    return "web";
 		}
 	    };
-	setAreaLayout(webArea, null);
+	setAreaLayout(webArea, actions(
+				       action("open-url", app.getStrings().actionOpenUrl(), new InputEvent(InputEvent.Special.F6), this::actOpenUrl)
+));
+    }
+
+    private boolean actOpenUrl()
+    {
+	final String url = app.getConv().openUrl("https://");
+	if (url == null)
+	    return false;
+	FxThread.runSync(()->app.getEngine().load(url));
+	return true;
     }
 }

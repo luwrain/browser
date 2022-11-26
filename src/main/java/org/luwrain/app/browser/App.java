@@ -106,4 +106,5 @@ final class App extends AppBase<Strings>
 
 
     Conv getConv() { return this.conv; }
+    WebEngine getEngine() { return webEngine; }
 }
