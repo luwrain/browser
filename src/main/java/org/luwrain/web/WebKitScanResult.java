@@ -26,7 +26,10 @@ import org.w3c.dom.views.DocumentView;
 import com.sun.webkit.dom.DOMWindowImpl;
 import netscape.javascript.*;
 
-final class WebKitScanResult
+import org.luwrain.core.*;
+import static org.luwrain.web.WebKitScan.*;
+
+public final class WebKitScanResult
 {
     final WebEngine engine;
     final JSObject src, root;
@@ -58,6 +61,7 @@ final class WebKitScanResult
 		height = intValue(rect.getMember("height"));
 	    }
 	}
+	Log.debug(LOG_COMPONENT, "scanning completed: " + count + " items");
     }
 
     static int intValue(Object o)

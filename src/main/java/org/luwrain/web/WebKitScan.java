@@ -22,14 +22,17 @@ import java.io.*;
 import javafx.scene.web.WebEngine;
 import netscape.javascript.*;
 
+import org.luwrain.core.*;
+
 import static org.luwrain.util.ResourceUtils.*;
 
 public final class WebKitScan
 {
-    static private final String
+    static final String
+	LOG_COMPONENT = "web",
 	INJECTION_NAME = "injection.js";
 
-    static private String injection = "";
+    static private String injection = null;
     final WebEngine engine;
 
     public WebKitScan(WebEngine engine)
@@ -37,7 +40,10 @@ public final class WebKitScan
 	this.engine = engine;
 	try {
 	    if (injection == null)
+	    {
 		injection = getStringResource(getClass(), INJECTION_NAME);
+		Log.debug(LOG_COMPONENT, "the web injection loaded");
+	    }
 	}
 	catch(IOException e)
 	{
@@ -52,6 +58,7 @@ public final class WebKitScan
 	    throw new RuntimeException("The result of web scanning is null");
 	if (!(res instanceof JSObject))
 	    throw new RuntimeException("The result of web scanning is not an instance of JSObject");
+	Log.debug(LOG_COMPONENT, "Performing scanning of the web page");
 	final JSObject jsRes = (JSObject)res;
 	return new WebKitScanResult(engine, jsRes);
     }

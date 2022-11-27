@@ -29,32 +29,28 @@ import javafx.beans.value.ObservableValue;
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
-
-import static org.luwrain.util.ResourceUtils.*;
+import org.luwrain.web.*;
 
 final class App extends AppBase<Strings>
 {
+static final String
+    LOG_COMPONENT = "browser";
+
     private final String arg;
     private Conv conv = null;
     private MainLayout mainLayout = null;
-        final String injection;
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
+    private WebKitScanResult scanRes = null;
 
+    public App() { this(null); }
     public App(String arg)
     {
 	super(Strings.NAME, Strings.class);
 	this.arg = arg != null?arg:"";
-		try {
-	    this.injection = getStringResource(getClass(), "injection.js");
-	}
-	catch(IOException e)
-	{
-	    throw new RuntimeException(e);
-	}
     }
-    public App() { this(null); }
+
 
     @Override protected AreaLayout onAppInit()
     {
@@ -89,10 +85,20 @@ final class App extends AppBase<Strings>
     {
 	if (newState == null)
 	    return;
+	Log .debug(LOG_COMPONENT, "browser state changed to " + newState.toString());
 	switch(newState)
 	{
 	case SUCCEEDED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+	    FxThread.runSync(()->{
+		    try {
+			new WebKitScan(webEngine).scan();
+		    }
+		    catch(Throwable e)
+		    {
+			crash(e);
+		    }
+		});
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
