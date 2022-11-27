@@ -59,11 +59,10 @@ final class App extends AppBase<Strings>
     @Override protected AreaLayout onAppInit()
     {
 	this.conv = new Conv(this);
-
 		FxThread.runSync(()->{
 		this.webView = new WebView();
 		this.webEngine = webView.getEngine();
-		this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
+		this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.browser").toFile());
 		this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
 	/*
 	this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
@@ -75,8 +74,6 @@ final class App extends AppBase<Strings>
 	*/
 		this.webView.setVisible(false);
 	    });
-
-		
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
@@ -92,7 +89,6 @@ final class App extends AppBase<Strings>
     {
 	if (newState == null)
 	    return;
-	//	print(newState.toString());
 	switch(newState)
 	{
 	case SUCCEEDED:
@@ -103,7 +99,6 @@ final class App extends AppBase<Strings>
 	    break;
 	}
     }
-
 
     Conv getConv() { return this.conv; }
     WebEngine getEngine() { return webEngine; }
