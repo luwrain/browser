@@ -39,10 +39,10 @@ import static org.luwrain.web.WebKitGeom.*;
 
 public final class WebKitTree
 {
-    final WebEngine engine;
-    final HTMLDocument doc;
-    final DOMWindowImpl window;
-    final HTMLBodyElement body;
+    private final WebEngine engine;
+    private final HTMLDocument doc;
+    private final DOMWindowImpl window;
+    private final HTMLBodyElement body;
     final WebKitGeomInfo geom;
 
     public WebKitTree(WebEngine engine)
@@ -56,7 +56,7 @@ public final class WebKitTree
 	this.geom = new WebKitGeom(engine).scan();
     }
 
-        public WebObject getBody()
+    public WebObject getBody()
     {
 	final AtomicReference<WebObject> res = new AtomicReference<>();
 	runSync(()->res.set(new WebObject(this, body)));
@@ -67,6 +67,6 @@ public final class WebKitTree
     {
 	final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
 	runSync(()->res.set(window.getComputedStyle(el, "")));
-		return res.get();
+	return res.get();
     }
 }
