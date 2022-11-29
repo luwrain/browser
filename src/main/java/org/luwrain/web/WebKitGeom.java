@@ -24,6 +24,7 @@ import netscape.javascript.*;
 
 import org.luwrain.core.*;
 
+import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.util.ResourceUtils.*;
 
 public final class WebKitGeom
@@ -53,6 +54,7 @@ public final class WebKitGeom
 
     public WebKitGeomInfo scan()
     {
+	ensure();
 	final Object res = engine.executeScript(injection);
 	if (res == null)
 	    throw new RuntimeException("The result of web scanning is null");

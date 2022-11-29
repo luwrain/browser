@@ -29,19 +29,22 @@ import com.sun.webkit.dom.DOMWindowImpl;
 import netscape.javascript.*;
 
 import org.luwrain.core.*;
+
+import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeom.*;
 
 public final class WebKitGeomInfo
 {
-    final WebEngine engine;
-    final JSObject src, root;
-    final HTMLDocument doc;
-    final DOMWindowImpl window;
+    private final WebEngine engine;
+    private final JSObject src, root;
+    private final HTMLDocument doc;
+    private final DOMWindowImpl window;
 
-    int count = 0;
+    final Map<Node, Item> nodes = new HashMap<>();
 
     WebKitGeomInfo(WebEngine engine, JSObject src)
     {
+	ensure();
 	this.engine = engine;
 	this.src = src;
 	this.doc = (HTMLDocument)engine.getDocument();
@@ -51,7 +54,6 @@ public final class WebKitGeomInfo
 	for(int i = 0;!(o = root.getSlot(i)).getClass().equals(String.class);i++)
 	{
 	    final JSObject jsObj = (JSObject)o;
-	    count++;
 	    final JSObject rect = (JSObject)jsObj.getMember("r");
 	    final Node node = (Node)jsObj.getMember("n");
 	    int x = -1, y = -1, width = -1, height = -1;
@@ -62,8 +64,9 @@ public final class WebKitGeomInfo
 		width = intValue(rect.getMember("width"));
 		height = intValue(rect.getMember("height"));
 	    }
+	    nodes.put(node, new Item(x, y, width, height));
 	}
-	Log.debug(LOG_COMPONENT, "scanning completed: " + count + " items");
+	Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
     }
 
     static int intValue(Object o)
@@ -73,5 +76,17 @@ public final class WebKitGeomInfo
 	if(o instanceof Number)
 	    return ((Number)o).intValue();
 	return Double.valueOf(Double.parseDouble(o.toString())).intValue();
+    }
+
+    static public final class Item
+    {
+	public final int x, y, width, height;
+	Item(int x, int y, int width, int height)
+	{
+	    this.x = x;
+	    this.y = y;
+	    this.width = width;
+	    this.height = height;
+	}
     }
 }

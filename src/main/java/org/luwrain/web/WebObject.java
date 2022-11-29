@@ -18,6 +18,7 @@
 package org.luwrain.web;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import javafx.scene.web.WebEngine;
 
@@ -25,20 +26,25 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
+import com.sun.webkit.dom.TextImpl;
 
 import org.luwrain.core.*;
+
+import static org.luwrain.graphical.FxThread.*;
 
 public final class WebObject
 {
     final WebKitTree tree;
-final Node node;
+    final Node node;
     final Element el;
     public String tagName;
+    public String text;
 
     WebObject(WebKitTree tree, Node node)
     {
 	NullCheck.notNull(tree, "tree");
 	NullCheck.notNull(node, "node");
+	ensure();
 	this.tree = tree;
 	this.node = node;
 	if (node instanceof Element)
@@ -51,16 +57,25 @@ final Node node;
 	    this.el = null;
 	    this.tagName = null;
 	}
+	this.text = node.toString();
     }
 
     public WebObject[] getChildren()
     {
-	final NodeList items = node.getChildNodes();
-	if (items == null)
-	    return null;
+	final AtomicBoolean isNull = new AtomicBoolean(false);	
 	final List<WebObject> res = new ArrayList<>();
+	runSync(()->{
+	    	final NodeList items =node.getChildNodes();
+	if (items == null)
+	{
+	    isNull.set(true);
+	    return;
+	}
 	for(int i = 0;i < items.getLength();i++)
 	    res.add(new WebObject(tree, items.item(i)));
+	});
+    if (isNull.get())
+	return null;
 	return res.toArray(new WebObject[res.size()]);
     }
 
@@ -81,13 +96,26 @@ final Node node;
 	final CSSStyleDeclaration style = getStyle();
 	if (style == null)
 	    return null;
-	return style.getCssText();
+	final WebKitGeomInfo.Item geom = tree.geom.nodes.get(node);
+	final StringBuilder b = new StringBuilder();
+	if (geom != null)
+	{
+	    b.append("lwr-geom: true;");
+	    b.append("lwr-x: ").append(String.valueOf(geom.x)).append("px;");
+	    b.append("lwr-y: ").append(String.valueOf(geom.y)).append("px;");
+	    b.append("lwr-width: ").append(String.valueOf(geom.width)).append("px;");
+	    b.append("lwr-height: ").append(String.valueOf(geom.height)).append("px;");
+	} else
+	{
+	    b.append("lwr-geom: false;");
+	}
+	return new String(b) + style.getCssText();
     }
 
     @Override public String toString()
     {
 	if (tagName != null)
 	    return tagName;
-	return "";
+	return text;
     }
 }

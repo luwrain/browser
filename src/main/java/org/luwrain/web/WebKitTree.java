@@ -18,6 +18,7 @@
 package org.luwrain.web;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import javafx.scene.web.WebEngine;
 
@@ -32,6 +33,8 @@ import com.sun.webkit.dom.DOMWindowImpl;
 import netscape.javascript.*;
 
 import org.luwrain.core.*;
+
+import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeom.*;
 
 public final class WebKitTree
@@ -44,6 +47,7 @@ public final class WebKitTree
 
     public WebKitTree(WebEngine engine)
     {
+	ensure();
 	this.engine = engine;
 	//	this.doc = (HTMLDocument)engine.getDocument();
 	this.doc = (HTMLDocument)engine.documentProperty().getValue();
@@ -54,12 +58,15 @@ public final class WebKitTree
 
         public WebObject getBody()
     {
-	return new WebObject(this, body);
+	final AtomicReference<WebObject> res = new AtomicReference<>();
+	runSync(()->res.set(new WebObject(this, body)));
+	return res.get();
     }
-
 
     public 	CSSStyleDeclaration getStyle(Element el)
     {
-return window.getComputedStyle(el, "");
+	final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
+	runSync(()->res.set(window.getComputedStyle(el, "")));
+		return res.get();
     }
 }

@@ -103,7 +103,9 @@ public final class App extends AppBase <Strings>implements Application
 
     void updateTree()
     {
+	FxThread.runSync(()->{
 	this.tree = new WebKitTree(webEngine);
+	    });
 	mainLayout.elementsArea.clear();
 	mainLayout.elementsArea.requery();
     }
