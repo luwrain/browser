@@ -44,14 +44,15 @@ public final class WebKitTree
     public WebKitTree(WebEngine engine)
     {
 	this.engine = engine;
-	this.doc = (HTMLDocument)engine.getDocument();
+	//	this.doc = (HTMLDocument)engine.getDocument();
+	this.doc = (HTMLDocument)engine.documentProperty().getValue();
 	this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
 	this.body = (HTMLBodyElement)doc.getBody();
     }
 
         public WebObject getBody()
     {
-	return new WebObject(body);
+	return new WebObject(this, body);
     }
 
 

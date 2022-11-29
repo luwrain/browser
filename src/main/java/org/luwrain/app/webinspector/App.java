@@ -101,6 +101,13 @@ public final class App extends AppBase <Strings>implements Application
 	super.closeApp();
     }
 
+    void updateTree()
+    {
+	this.tree = new WebKitTree(webEngine);
+	mainLayout.elementsArea.clear();
+	mainLayout.elementsArea.requery();
+    }
+
 
     private void onStateChanged(ObservableValue<? extends State> ov, State oldState, State newState)
     {

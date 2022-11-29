@@ -24,18 +24,22 @@ import javafx.scene.web.WebEngine;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.w3c.dom.css.CSSStyleDeclaration;
 
 import org.luwrain.core.*;
 
 public final class WebObject
 {
+    final WebKitTree tree;
 final Node node;
     final Element el;
     public String tagName;
 
-    WebObject(Node node)
+    WebObject(WebKitTree tree, Node node)
     {
+	NullCheck.notNull(tree, "tree");
 	NullCheck.notNull(node, "node");
+	this.tree = tree;
 	this.node = node;
 	if (node instanceof Element)
 	{
@@ -56,13 +60,28 @@ final Node node;
 	    return null;
 	final List<WebObject> res = new ArrayList<>();
 	for(int i = 0;i < items.getLength();i++)
-	    res.add(new WebObject(items.item(i)));
+	    res.add(new WebObject(tree, items.item(i)));
 	return res.toArray(new WebObject[res.size()]);
     }
 
     public boolean hasChildren()
     {
 	return node.hasChildNodes();
+    }
+
+    public CSSStyleDeclaration getStyle()
+    {
+	if (el == null)
+	    return null;
+	return tree.getStyle(el);
+    }
+
+    public String getStyleAsText()
+    {
+	final CSSStyleDeclaration style = getStyle();
+	if (style == null)
+	    return null;
+	return style.getCssText();
     }
 
     @Override public String toString()

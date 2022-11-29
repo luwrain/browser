@@ -33,7 +33,8 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 {
     private final App app;
     final ConsoleArea<Item> consoleArea;
-    final TreeListArea elementsArea;
+    final TreeListArea<WebObject> elementsArea;
+    final SimpleArea stylesArea;
 
     private JSObject jsRes = null;
     private ScanResult scanResult = null;
@@ -50,32 +51,33 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	    params.clickHandler = this;
 	    params.inputPrefix = "WebKit>";
 		    }));
-	final Actions elementsActions = actions(
-						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
-						);
-
 		final TreeListArea.Params<WebObject> treeParams = new TreeListArea.Params<>();
         treeParams.context = getControlContext();
 	treeParams.name = "fixme";
 	treeParams.model = new ElementsModel(app);
 	//	treeParams.leafClickHandler = this;
-	this.elementsArea = new TreeListArea<>(treeParams);
-
-		
-	/*
-	{
-	    final ListArea.Params params = new ListArea.Params();
-	    params.context = getControlContext();
-	    params.name = app.getStrings().appName();
-	    params.model = new ListUtils.ArrayModel(()->{ return app.attrs; });
-	    params.appearance = new ListUtils.DefaultAppearance(getControlContext());
-	    this.attrsArea = new ListArea(params);
-	}
-	final Actions attrsActions = actions(
-					     action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
-					     );
-	*/
-	setAreaLayout(AreaLayout.LEFT_RIGHT, consoleArea, elementsActions, elementsArea, null);
+	this.elementsArea = new TreeListArea<WebObject>(treeParams){
+		@Override public boolean onSystemEvent(SystemEvent event)
+		{
+		    if (event.getType() == SystemEvent.Type.REGULAR)
+			switch(event.getCode())
+			{
+			case REFRESH:
+			app.updateTree();
+			app.getLuwrain().playSound(Sounds.OK);
+			return true;
+			case OK:
+			return onShowStyles();
+			}
+		    return super.onSystemEvent(event);
+		}
+	    };
+	this.stylesArea = new SimpleArea(getControlContext(), "fixme");
+	setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, consoleArea, actions(
+						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+								  ),
+		      elementsArea, null,
+		      stylesArea, null);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
@@ -135,9 +137,22 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	return true;
     }
 
-    private boolean onClick(Item item)
+    private boolean onShowStyles()
     {
-	return false;
+	final WebObject obj = elementsArea.selected();
+	if (obj == null)
+	    return false;
+	final String text = obj.getStyleAsText();
+	if (text == null)
+	    return false;
+	stylesArea.update((lines)->{
+		lines.clear();
+		final String[] ll = text.split(";", -1);
+		for(String l: ll)
+		    lines.addLine(l);
+	    });
+	setActiveArea(stylesArea);
+	return true;
     }
 
     private final class ConsoleAppearance implements ConsoleArea.Appearance
@@ -152,5 +167,4 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	    return item.toString();
 	}
     }
-
 }
