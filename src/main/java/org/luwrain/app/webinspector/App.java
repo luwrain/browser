@@ -20,6 +20,9 @@ package org.luwrain.app.webinspector;
 import java.io.*;
 import java.util.*;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.css.DocumentCSS;
+
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.concurrent.Worker.State;
@@ -29,6 +32,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
+import org.luwrain.web.*;
 
 import static org.luwrain.util.ResourceUtils.*;
 
@@ -47,6 +51,7 @@ public final class App extends AppBase <Strings>implements Application
 
     private     WebEngine webEngine = null;
     private WebView webView = null;
+    private Document doc = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -106,6 +111,10 @@ public final class App extends AppBase <Strings>implements Application
 	{
 	case SUCCEEDED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+	    this.doc = webEngine.getDocument();
+	    Log.debug("proba", "" + (doc instanceof DocumentCSS));
+	    Log.debug("proba", "" + doc.getImplementation().hasFeature("Views", "2.0"));
+	    new WebKitTree(webEngine);
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
