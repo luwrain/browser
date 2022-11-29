@@ -20,7 +20,7 @@ package org.luwrain.app.webinspector;
 import java.io.*;
 import java.util.*;
 
-import org.w3c.dom.Document;
+//import org.w3c.dom.Document;
 import org.w3c.dom.css.DocumentCSS;
 
 import javafx.scene.web.WebEngine;
@@ -51,7 +51,7 @@ public final class App extends AppBase <Strings>implements Application
 
     private     WebEngine webEngine = null;
     private WebView webView = null;
-    private Document doc = null;
+    private WebKitTree tree = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -110,11 +110,9 @@ public final class App extends AppBase <Strings>implements Application
 	switch(newState)
 	{
 	case SUCCEEDED:
-	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
-	    this.doc = webEngine.getDocument();
-	    Log.debug("proba", "" + (doc instanceof DocumentCSS));
-	    Log.debug("proba", "" + doc.getImplementation().hasFeature("Views", "2.0"));
-	    new WebKitTree(webEngine);
+	    	    this.tree = new WebKitTree(webEngine);
+		    print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
+	    	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
@@ -130,4 +128,5 @@ public final class App extends AppBase <Strings>implements Application
     Conversations getConv() { return this.conv; }
     WebView getWebView() { return webView; }
     WebEngine getWebEngine() { return webEngine; }
+    WebKitTree getTree() { return tree; } 
 }

@@ -17,9 +17,12 @@
 
 package org.luwrain.web;
 
+import java.util.*;
+
 import javafx.scene.web.WebEngine;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
 import org.luwrain.core.*;
@@ -27,11 +30,10 @@ import org.luwrain.core.*;
 public final class WebObject
 {
 final Node node;
-    public final int x, y, width, height;
     final Element el;
     public String tagName;
 
-    WebObject(Node node, int x, int y, int width, int height)
+    WebObject(Node node)
     {
 	NullCheck.notNull(node, "node");
 	this.node = node;
@@ -45,9 +47,16 @@ final Node node;
 	    this.el = null;
 	    this.tagName = null;
 	}
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
+    }
+
+    public WebObject[] getChildren()
+    {
+	final NodeList items = node.getChildNodes();
+	if (items == null)
+	    return null;
+	final List<WebObject> res = new ArrayList<>();
+	for(int i = 0;i < items.getLength();i++)
+	    res.add(new WebObject(items.item(i)));
+	return res.toArray(new WebObject[res.size()]);
     }
 }

@@ -39,8 +39,6 @@ public final class WebKitScanResult
     final DOMWindowImpl window;
 
     int count = 0;
-    final List<WebObject> objs = new ArrayList<>();
-
     WebKitScanResult(WebEngine engine, JSObject src)
     {
 	this.engine = engine;
@@ -63,7 +61,6 @@ public final class WebKitScanResult
 		width = intValue(rect.getMember("width"));
 		height = intValue(rect.getMember("height"));
 	    }
-	    objs.add(new WebObject(node, x, y, width, height));
 	}
 	Log.debug(LOG_COMPONENT, "scanning completed: " + count + " items");
     }

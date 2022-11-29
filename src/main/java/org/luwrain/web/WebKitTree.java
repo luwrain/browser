@@ -22,6 +22,7 @@ import java.util.*;
 import javafx.scene.web.WebEngine;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.html.HTMLBodyElement;
 import org.w3c.dom.css.CSSStyleDeclaration;
@@ -36,39 +37,26 @@ import static org.luwrain.web.WebKitScan.*;
 public final class WebKitTree
 {
     final WebEngine engine;
-    //    final JSObject src, root;
     final HTMLDocument doc;
     final DOMWindowImpl window;
-
-    int count = 0;
-    final List<WebObject> objs = new ArrayList<>();
+    final HTMLBodyElement body;
 
     public WebKitTree(WebEngine engine)
     {
 	this.engine = engine;
-	//	this.src = src;
 	this.doc = (HTMLDocument)engine.getDocument();
 	this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
-	//	this.root = (JSObject)src.getMember("dom");
-
-		final HTMLBodyElement body = (HTMLBodyElement)doc.getBody();
-
-//DOMWindowImpl wnd = (DOMWindowImpl)((DocumentView)htmlDoc).getDefaultView();
-
-	CSSStyleDeclaration style = window.getComputedStyle(body, "");
-	Log.debug("proba", "" + style.getLength());
-	Log.debug("proba", "" + style.getPropertyValue("height"));
-
+	this.body = (HTMLBodyElement)doc.getBody();
     }
 
-    /*
-    static int intValue(Object o)
+        public WebObject getBody()
     {
-	if(o == null) 
-	    return 0;
-	if(o instanceof Number)
-	    return ((Number)o).intValue();
-	return Double.valueOf(Double.parseDouble(o.toString())).intValue();
+	return new WebObject(body);
     }
-    */
+
+
+    public 	CSSStyleDeclaration getStyle(Element el)
+    {
+return window.getComputedStyle(el, "");
+    }
 }

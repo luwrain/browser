@@ -24,14 +24,14 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
-
+import org.luwrain.web.*;
 
 
 final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Item>
 {
     private final App app;
     final ConsoleArea<Item> consoleArea;
-    //final ListArea attrsArea;
+    final TreeListArea elementsArea;
 
     private JSObject jsRes = null;
     private ScanResult scanResult = null;
@@ -51,6 +51,15 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	final Actions elementsActions = actions(
 						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 						);
+
+		final TreeListArea.Params<WebObject> treeParams = new TreeListArea.Params<>();
+        treeParams.context = getControlContext();
+	treeParams.name = "fixme";
+	treeParams.model = new ElementsModel(app);
+	//	treeParams.leafClickHandler = this;
+	this.elementsArea = new TreeListArea<>(treeParams);
+
+		
 	/*
 	{
 	    final ListArea.Params params = new ListArea.Params();
@@ -63,9 +72,8 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	final Actions attrsActions = actions(
 					     action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 					     );
-	setAreaLayout(AreaLayout.TOP_BOTTOM, elementsArea, elementsActions, attrsArea, attrsActions);
 	*/
-	setAreaLayout(consoleArea, elementsActions);
+	setAreaLayout(AreaLayout.LEFT_RIGHT, consoleArea, elementsActions, elementsArea, null);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
@@ -128,22 +136,5 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     private boolean onClick(Item item)
     {
 	return false;
-    }
-
-
-
-    private final class ElementsAppearance implements ConsoleArea.Appearance
-    {
-	@Override public void announceItem(Object item)
-	{
-	    NullCheck.notNull(item, "item");
-	    app.getLuwrain().setEventResponse(DefaultEventResponse.text(item.toString()));
-	    return;
-	}
-	@Override public String getTextAppearance(Object item)
-	{
-	    NullCheck.notNull(item, "item");
-	    return item.toString();
-	}
     }
 }
