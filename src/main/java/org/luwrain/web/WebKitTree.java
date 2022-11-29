@@ -32,7 +32,7 @@ import com.sun.webkit.dom.DOMWindowImpl;
 import netscape.javascript.*;
 
 import org.luwrain.core.*;
-import static org.luwrain.web.WebKitScan.*;
+import static org.luwrain.web.WebKitGeom.*;
 
 public final class WebKitTree
 {
@@ -40,6 +40,7 @@ public final class WebKitTree
     final HTMLDocument doc;
     final DOMWindowImpl window;
     final HTMLBodyElement body;
+    final WebKitGeomInfo geom;
 
     public WebKitTree(WebEngine engine)
     {
@@ -48,6 +49,7 @@ public final class WebKitTree
 	this.doc = (HTMLDocument)engine.documentProperty().getValue();
 	this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
 	this.body = (HTMLBodyElement)doc.getBody();
+	this.geom = new WebKitGeom(engine).scan();
     }
 
         public WebObject getBody()

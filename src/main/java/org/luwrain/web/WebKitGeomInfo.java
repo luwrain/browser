@@ -29,9 +29,9 @@ import com.sun.webkit.dom.DOMWindowImpl;
 import netscape.javascript.*;
 
 import org.luwrain.core.*;
-import static org.luwrain.web.WebKitScan.*;
+import static org.luwrain.web.WebKitGeom.*;
 
-public final class WebKitScanResult
+public final class WebKitGeomInfo
 {
     final WebEngine engine;
     final JSObject src, root;
@@ -39,7 +39,8 @@ public final class WebKitScanResult
     final DOMWindowImpl window;
 
     int count = 0;
-    WebKitScanResult(WebEngine engine, JSObject src)
+
+    WebKitGeomInfo(WebEngine engine, JSObject src)
     {
 	this.engine = engine;
 	this.src = src;

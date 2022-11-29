@@ -42,7 +42,7 @@ static final String
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
-    private WebKitScanResult scanRes = null;
+    private WebKitGeomInfo scanRes = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -92,7 +92,7 @@ static final String
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    FxThread.runSync(()->{
 		    try {
-			new WebKitScan(webEngine).scan();
+			new WebKitGeom(webEngine).scan();
 		    }
 		    catch(Throwable e)
 		    {
