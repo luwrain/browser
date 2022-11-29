@@ -59,7 +59,7 @@ public final class WebObject
 		final TextImpl textObj = (TextImpl)node;
 		this.el = null;
 		this.tagName = null;
-		this.text = "textObj.text()";
+		this.text = textObj.getWholeText();
 	    } else 
 	{
 	    this.el = null;
@@ -81,7 +81,12 @@ public final class WebObject
 	    return;
 	}
 	for(int i = 0;i < items.getLength();i++)
-	    res.add(new WebObject(tree, items.item(i)));
+	{
+	    final WebObject newObj = new WebObject(tree, items.item(i));
+	    if (newObj.text != null && newObj.text.trim().isEmpty())
+		continue;
+	    res.add(newObj);
+	}
 	});
     if (isNull.get())
 	return null;
@@ -109,10 +114,12 @@ public final class WebObject
 	final StringBuilder b = new StringBuilder();
 	if (el != null && geom != null)
 	{
-	    //	    final ElementImpl e = (ElementImpl)el;
+	    	    final ElementImpl e = (ElementImpl)el;
 	    b.append("lwr-geom: true;");
 	    b.append("lwr-x: ").append(String.valueOf(geom.x)).append("px;");
+	    b.append("lwr-x2: ").append(String.format("%.2f", e.getOffsetLeft())).append("px;");
 	    b.append("lwr-y: ").append(String.valueOf(geom.y)).append("px;");
+	    	    b.append("lwr-y2: ").append(String.format("%.2f", e.getOffsetTop())).append("px;");
 	    b.append("lwr-width: ").append(String.valueOf(geom.width)).append("px;");
 	    b.append("lwr-height: ").append(String.valueOf(geom.height)).append("px;");
 	} else
