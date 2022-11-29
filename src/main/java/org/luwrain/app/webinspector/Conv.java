@@ -22,12 +22,12 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 
-final class Conversations
+final class Conv
 {
     private final Luwrain luwrain;
     private final Set<String> openUrlHistory = new HashSet<String>();
 
-    Conversations(App app)
+    Conv(App app)
     {
 	NullCheck.notNull(app, "app");
 	this.luwrain = app.getLuwrain();

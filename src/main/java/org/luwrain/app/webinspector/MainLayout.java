@@ -26,6 +26,8 @@ import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
 
+import static org.luwrain.core.DefaultEventResponse.*;
+
 
 final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Item>
 {
@@ -43,7 +45,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	    this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
 	    params.name = app.getStrings().appName();
 	    params.model = new ConsoleUtils.ListModel(app.messages);
-	    params.appearance = new ElementsAppearance();
+	    params.appearance = new ConsoleAppearance();
 	    params.inputHandler = this;
 	    params.clickHandler = this;
 	    params.inputPrefix = "WebKit>";
@@ -137,4 +139,18 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     {
 	return false;
     }
+
+    private final class ConsoleAppearance implements ConsoleArea.Appearance
+    {
+	@Override public void announceItem(Object item)
+	{
+	    app.getLuwrain().setEventResponse(text(item.toString()));
+	    return;
+	}
+	@Override public String getTextAppearance(Object item)
+	{
+	    return item.toString();
+	}
+    }
+
 }

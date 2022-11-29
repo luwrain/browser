@@ -29,7 +29,7 @@ final class ElementsModel implements TreeListArea.Model<WebObject>
 
     @Override public boolean getItems(WebObject obj, TreeListArea.Collector<WebObject> collector)
     {
-	//	collector.collect(Arrays.asList(app.getStoring().getFolders().load(obj)));
+	collector.collect(Arrays.asList(obj.getChildren()));
 	return true;
     }
 
@@ -42,7 +42,6 @@ final class ElementsModel implements TreeListArea.Model<WebObject>
 
     @Override public boolean isLeaf(WebObject obj)
     {
-	//	return !app.getStoring().getFolders().hasSubfolders(item);
-	return true;
+	return !obj.hasChildren();
     }
 }

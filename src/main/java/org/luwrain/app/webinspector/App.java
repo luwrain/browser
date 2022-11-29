@@ -47,7 +47,7 @@ public final class App extends AppBase <Strings>implements Application
     Item[] items = new Item[0];
     String[] attrs = new String[0];
     private MainLayout mainLayout = null;
-    private Conversations conv = null;
+    private Conv conv = null;
 
     private     WebEngine webEngine = null;
     private WebView webView = null;
@@ -69,7 +69,7 @@ public final class App extends AppBase <Strings>implements Application
 
     @Override public AreaLayout onAppInit()
     {
-	this.conv = new Conversations(this);
+	this.conv = new Conv(this);
 	FxThread.runSync(()->{
 		this.webView = new WebView();
 		this.webEngine = webView.getEngine();
@@ -112,7 +112,12 @@ public final class App extends AppBase <Strings>implements Application
 	case SUCCEEDED:
 	    	    this.tree = new WebKitTree(webEngine);
 		    print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
-	    	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+	    	    getLuwrain().runUiSafely(()->{
+			    mainLayout.elementsArea.clear();
+			    mainLayout.elementsArea.requery();
+			    getLuwrain().playSound(Sounds.OK);
+			    
+			});
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
@@ -125,7 +130,7 @@ public final class App extends AppBase <Strings>implements Application
 	messages.add(0, message);
     }
 
-    Conversations getConv() { return this.conv; }
+    Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }
     WebEngine getWebEngine() { return webEngine; }
     WebKitTree getTree() { return tree; } 

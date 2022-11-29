@@ -59,4 +59,16 @@ final Node node;
 	    res.add(new WebObject(items.item(i)));
 	return res.toArray(new WebObject[res.size()]);
     }
+
+    public boolean hasChildren()
+    {
+	return node.hasChildNodes();
+    }
+
+    @Override public String toString()
+    {
+	if (tagName != null)
+	    return tagName;
+	return "";
+    }
 }
