@@ -28,9 +28,13 @@ new function ()
 		var res = [];
 		if(node)
 		{
+			if (node.nodeName.toUpperCase() === 'SCRIPT' || node.nodeName.toUpperCase() === 'STYLE') {
+				return res;
+			}
 			node=node.firstChild;
 			while(node!= null)
 			{
+				
 			    res.push(node);
 				res = res.concat(this.nodewalk(node, lvl + 1));
 				node = node.nextSibling;
@@ -42,14 +46,15 @@ new function ()
 	this.scanDOM = function()
 	{
 		this.countVisibleLast = 0;
-		var lst = this.nodewalk(document,0);
-		var res=[];
-		for(var i=0;i<lst.length;i++)
+		var nodeList = this.nodewalk(document,0);
+		var result=[];
+		for(var i=0;i<nodeList.length;i++)
 		{
-			var n={
-				n:lst[i],
-				r:(
-					lst[i].getBoundingClientRect?lst[i].getBoundingClientRect():
+			var nodeData={
+				node:nodeList[i],
+				//Get position and size data
+				rect:(
+					nodeList[i].getBoundingClientRect?nodeList[i].getBoundingClientRect():
 					((function(nnn)
 					{
 						try
@@ -62,15 +67,16 @@ new function ()
 						{
 							return null;
 						};
-					})(lst[i]))
+					})(nodeList[i]))
 				),
-				h:this.getNodeHash(lst[i])
+				hash:this.getNodeHash(nodeList[i]),
+				text:this.getNodeContent(nodeList[i])
 			};
-			if(n.r!=null&&(n.r.width==0||n.r.height==0))
+			if (nodeData.rect != null && (nodeData.rect.width == 0 || nodeData.rect.height==0))
 				this.countVisibleLast++;
-			res.push(n);
+			result.push(nodeData);
 		};
-		return res;
+		return result;
 	};
 	/** set nodes indexes list to observe modification text or position 
 	 * @param nodes array of nodes*/
@@ -121,6 +127,18 @@ new function ()
 	   	 signed int to an unsigned by doing an unsigned bitshift. */
 		return hash >>> 0;
 	}
+
+	/** return node content, scan is NOT recursive */
+	this.getNodeContent = function (node) {
+		var content = '123';
+		switch (node.nodeType) {
+			case 3:
+				content = node.nodeValue;
+				break;
+		}
+
+		return content;
+	}
 	
 	this.onTimeout=function()
 	{
@@ -147,13 +165,13 @@ new function ()
 					modified=true;
 					break;
 				}
-				if(this.dom[index].h!=this.domLast[index].h)
+				if(this.dom[index].hash!=this.domLast[index].hash)
 				{ // hash of elements not equal
 					modified=true;
 					break;
 				}
-				var r=this.dom[index].r;
-				var u=this.domLast[index].r;
+				var r=this.dom[index].rect;
+				var u=this.domLast[index].rect;
 				if(r.top!=u.top||r.height!=u.height||r.left!=u.left||r.width!=u.width)
 				{ // visibility or position changed
 					modified=true;

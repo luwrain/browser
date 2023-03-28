@@ -134,10 +134,14 @@ public final class App extends AppBase <Strings>implements Application
 	}
     }
 
-    void print(String message)
+    public void print(String message)
     {
 	messages.add(0, message);
     }
+
+	public static void suspecting(){
+
+	}
 
     Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }

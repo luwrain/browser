@@ -18,6 +18,12 @@
 package org.luwrain.web;
 
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+import java.io.*;
+
 
 import javafx.scene.web.WebEngine;
 
@@ -40,33 +46,53 @@ public final class WebKitGeomInfo
     private final HTMLDocument doc;
     private final DOMWindowImpl window;
 
-    final Map<Node, Item> nodes = new HashMap<>();
+	Logger logger = Logger.getLogger("MyLogInfo");
+	FileHandler fh;
 
-    WebKitGeomInfo(WebEngine engine, JSObject src)
-    {
-	ensure();
-	this.engine = engine;
-	this.src = src;
-	this.doc = (HTMLDocument)engine.getDocument();
-	this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
-	this.root = (JSObject)src.getMember("dom");
-	Object o;
-	for(int i = 0;!(o = root.getSlot(i)).getClass().equals(String.class);i++)
-	{
-	    final JSObject jsObj = (JSObject)o;
-	    final JSObject rect = (JSObject)jsObj.getMember("r");
-	    final Node node = (Node)jsObj.getMember("n");
-	    int x = -1, y = -1, width = -1, height = -1;
-	    if (rect != null)
-	    {
-		x = intValue(rect.getMember("left"));
-		y = intValue(rect.getMember("top"));
-		width = intValue(rect.getMember("width"));
-		height = intValue(rect.getMember("height"));
-	    }
-	    nodes.put(node, new Item(x, y, width, height));
-	}
-	Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
+    final Map<Node, Item> nodes = new HashMap<>();
+	
+
+    WebKitGeomInfo(WebEngine engine, JSObject src, Logger logg) {
+
+		logg.info("Injection data read start!");
+		
+		ensure();
+		this.engine = engine;
+		this.src = src;
+		this.doc = (HTMLDocument)engine.getDocument();
+		this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
+		this.root = (JSObject)src.getMember("dom");
+		Object o;
+
+
+		for(int i = 0;!(o = root.getSlot(i)).getClass().equals(String.class);i++)
+		{
+
+			final JSObject jsObj = (JSObject)o;
+			final JSObject rect = (JSObject)jsObj.getMember("rect");
+			final String text = (String)jsObj.getMember("text");
+			final Node node = (Node)jsObj.getMember("node");
+			int x = -1, y = -1, width = -1, height = -1;
+			
+			if (rect != null)
+			{
+				x = intValue(rect.getMember("left"));
+				y = intValue(rect.getMember("top"));
+				width = intValue(rect.getMember("width"));
+				height = intValue(rect.getMember("height"));
+				
+			}
+			
+			//logg.info("Trying to get text = " + text.equals("123"));
+			if(text.equals("123") == false && text.isBlank() == false)
+			{
+				
+				logg.info("Got text = " + String.valueOf(text));
+			}
+			nodes.put(node, new Item(x, y, width, height));
+		}
+		Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
+		logg.info("Injection data read finish!");
     }
 
     static int intValue(Object o)
