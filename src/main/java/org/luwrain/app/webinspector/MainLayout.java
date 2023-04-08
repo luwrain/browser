@@ -17,6 +17,8 @@
 
 package org.luwrain.app.webinspector;
 
+import java.util.*;
+
 import netscape.javascript.JSObject;
 
 import org.luwrain.core.*;
@@ -25,6 +27,8 @@ import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
+
+import org.w3c.dom.Node;
 
 import static org.luwrain.core.DefaultEventResponse.*;
 
@@ -41,76 +45,95 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     MainLayout(App app)
     {
-	super(app);
-	this.app = app;
-	    this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
-	    params.name = app.getStrings().appName();
-	    params.model = new ConsoleUtils.ListModel(app.messages);
-	    params.appearance = new ConsoleAppearance();
-	    params.inputHandler = this;
-	    params.clickHandler = this;
-	    params.inputPrefix = "WebKit>";
-		    }));
+		super(app);
+
+		this.app = app;
+
+		this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
+		params.name = app.getStrings().appName();
+		params.model = new ConsoleUtils.ListModel(app.messages);
+		params.appearance = new ConsoleAppearance();
+		params.inputHandler = this;
+		params.clickHandler = this;
+		params.inputPrefix = "WebKit>";
+			}));
+
 		final TreeListArea.Params<WebObject> treeParams = new TreeListArea.Params<>();
-        treeParams.context = getControlContext();
-	treeParams.name = "fixme";
-	treeParams.model = new ElementsModel(app);
-	//	treeParams.leafClickHandler = this;
-	this.elementsArea = new TreeListArea<WebObject>(treeParams){
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    if (event.getType() == SystemEvent.Type.REGULAR)
-			switch(event.getCode())
+		treeParams.context = getControlContext();
+		treeParams.name = "Elements";
+		treeParams.model = new ElementsModel(app);
+		//	treeParams.leafClickHandler = this;
+
+		this.elementsArea = new TreeListArea<WebObject>(treeParams){
+			@Override public boolean onSystemEvent(SystemEvent event)
 			{
-			case REFRESH:
-			app.updateTree();
-			app.getLuwrain().playSound(Sounds.OK);
-			return true;
-			case OK:
-			return onShowStyles();
+				if (event.getType() == SystemEvent.Type.REGULAR)
+				switch(event.getCode())
+				{
+					case REFRESH:
+						app.updateTree();
+						app.getLuwrain().playSound(Sounds.OK);
+						return true;
+					case OK:
+						return onShowStyles();
+				}
+				return super.onSystemEvent(event);
 			}
-		    return super.onSystemEvent(event);
-		}
-	    };
-	this.stylesArea = new SimpleArea(getControlContext(), "fixme");
-	setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, consoleArea, actions(
-						action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
-								  ),
-		      elementsArea, null,
-		      stylesArea, null);
+		};
+		this.stylesArea = new SimpleArea(getControlContext(), "Styles");
+		setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, consoleArea, actions(
+							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
+									),
+				elementsArea, null,
+				stylesArea, null);
     }
 
     @Override public ConsoleArea.InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
-	if (text.trim().equals("dump"))
+	if (text.trim().equals("dump")) //Error
 	    return dump()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;
+
+	//app.print("Opening -> " + text);
 	FxThread.runSync(()->app.getWebEngine().load(text));
 	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
     }
 
+	//Injection??
     private boolean dump()
     {
-	FxThread.runSync(()->{
-		final Object res = app.getWebEngine().executeScript(app.injection);
-		if (res == null)
-		{
-		    app.print("null");
-		    return;
-		}
-		if (!(res instanceof JSObject))
-		{
-		    app.print("Instance of " + res.getClass().getName());
-		    return;
-		}
-		this.jsRes = (JSObject)res;
-		this.scanResult = new ScanResult(app.getWebEngine(), jsRes);
-		app.print("Finished, " + scanResult.count + " items");
-	    });
-	getLuwrain().playSound(Sounds.OK);
-	consoleArea.refresh();
-	return true;
+		FxThread.runSync(()->{
+			final Object res = app.getWebEngine().executeScript(app.injection);
+			if (res == null)
+			{
+				app.print("null");
+				return;
+			}
+			if (!(res instanceof JSObject))
+			{
+				app.print("Instance of " + res.getClass().getName());
+				return;
+			}
+			this.jsRes = (JSObject)res;
+			this.scanResult = new ScanResult(app.getWebEngine(), jsRes);
+			app.print("Finished, " + scanResult.count + " items");
+
+			app.print("Printing elements:");
+			for (Map.Entry<Node, ScanResult.Item> entry : scanResult.getNodes().entrySet()) {
+				app.print("name = " + entry.getKey().getNodeName());
+				app.print("text = " + entry.getValue().text);
+				app.print("X = " + entry.getValue().x);
+				app.print("Y = " + entry.getValue().y);
+				app.print("Width = " + entry.getValue().width);
+				app.print("Height = " + entry.getValue().height);
+				app.print("===============");
+			}
+
+			});
+		getLuwrain().playSound(Sounds.OK);
+		consoleArea.refresh();
+		return true;
     }
 
     @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)
@@ -139,32 +162,36 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     private boolean onShowStyles()
     {
-	final WebObject obj = elementsArea.selected();
-	if (obj == null)
-	    return false;
-	final String text = obj.getStyleAsText();
-	if (text == null)
-	    return false;
-	stylesArea.update((lines)->{
-		lines.clear();
-		final String[] ll = text.split(";", -1);
-		for(String l: ll)
-		    lines.addLine(l);
-	    });
-	setActiveArea(stylesArea);
-	return true;
+		 stylesArea.update((lines)->{
+		 lines.clear();
+		 lines.addLine("Test styles box");
+		 });
+		//final WebObject obj = elementsArea.selected();
+		//if (obj == null)
+		//	return false;
+		//final String text = obj.getStyleAsText();
+		//if (text == null)
+		//	return false;
+		//stylesArea.update((lines)->{
+		//	lines.clear();
+		//	final String[] ll = text.split(";", -1);
+		//	for(String l: ll)
+		//		lines.addLine(l);
+		//	});
+		//setActiveArea(stylesArea);
+		return true;
     }
 
     private final class ConsoleAppearance implements ConsoleArea.Appearance
     {
-	@Override public void announceItem(Object item)
-	{
-	    app.getLuwrain().setEventResponse(text(item.toString()));
-	    return;
-	}
-	@Override public String getTextAppearance(Object item)
-	{
-	    return item.toString();
-	}
+		@Override public void announceItem(Object item)
+		{
+			app.getLuwrain().setEventResponse(text(item.toString()));
+			return;
+		}
+		@Override public String getTextAppearance(Object item)
+		{
+			return item.toString();
+		}
     }
 }

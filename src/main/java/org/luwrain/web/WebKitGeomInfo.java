@@ -46,15 +46,15 @@ public final class WebKitGeomInfo
     private final HTMLDocument doc;
     private final DOMWindowImpl window;
 
-	Logger logger = Logger.getLogger("MyLogInfo");
-	FileHandler fh;
+	//Logger logger = Logger.getLogger("MyLogInfo");
+	//FileHandler fh;
 
     final Map<Node, Item> nodes = new HashMap<>();
 	
 
     WebKitGeomInfo(WebEngine engine, JSObject src, Logger logg) {
 
-		logg.info("Injection data read start!");
+		//logg.info("Injection data read start!");
 		
 		ensure();
 		this.engine = engine;
@@ -87,13 +87,19 @@ public final class WebKitGeomInfo
 			if(text.equals("123") == false && text.isBlank() == false)
 			{
 				
-				logg.info("Got text = " + String.valueOf(text));
+				nodes.put(node, new Item(x, y, width, height, String.valueOf(text)));
+				//logg.info("Got text = " + String.valueOf(text) + " and x = " + x + " y = " + y + " width = " + width + " height = " + height);
 			}
-			nodes.put(node, new Item(x, y, width, height));
+			
 		}
 		Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
-		logg.info("Injection data read finish!");
+		//logg.info("Injection data read finish!");
     }
+
+	public Map<Node, Item> getNodes()
+	{
+		return nodes;
+	}
 
     static int intValue(Object o)
     {
@@ -107,12 +113,14 @@ public final class WebKitGeomInfo
     static public final class Item
     {
 	public final int x, y, width, height;
-	Item(int x, int y, int width, int height)
+	public final String text;
+	Item(int x, int y, int width, int height, String text)
 	{
 	    this.x = x;
 	    this.y = y;
 	    this.width = width;
 	    this.height = height;
+		this.text = text;
 	}
     }
 }

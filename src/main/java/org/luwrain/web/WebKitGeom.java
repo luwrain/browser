@@ -44,52 +44,52 @@ public final class WebKitGeom
 
     public WebKitGeom(WebEngine engine)
     {
-	this.engine = engine;
-	try {
-	    if (injection == null)
-	    {
-		injection = getStringResource(getClass(), INJECTION_NAME);
-		Log.debug(LOG_COMPONENT, "the web injection loaded");
+		this.engine = engine;
+		try {
+			if (injection == null)
+			{
+				injection = getStringResource(getClass(), INJECTION_NAME);
+				Log.debug(LOG_COMPONENT, "the web injection loaded");
 
-		fh  =new FileHandler("C:/Users/Nix/Desktop/luwrain/Log-WebKitGeom.log");
-		logger.addHandler(fh);
-		SimpleFormatter formatter = new java.util.logging.SimpleFormatter();
-		fh.setFormatter(formatter);
+				//fh  =new FileHandler("C:/Users/Nix/Desktop/luwrain/Log-WebKitGeom.log");
+				//logger.addHandler(fh);
+				//SimpleFormatter formatter = new java.util.logging.SimpleFormatter();
+				//fh.setFormatter(formatter);
 
-		logger.info("Injection loaded from file and ready to use!");
-	}
-	}
-	catch(IOException e)
-	{
-	    throw new RuntimeException(e);
-	}
+			//	logger.info("Injection loaded from file and ready to use!");
+			}
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
     }
 
     public WebKitGeomInfo scan()
     {
 		ensure();
 		final Object res = engine.executeScript(injection);
-		logger.info("Injection execution!");
+		//logger.info("Injection execution!");
 
 		
 
 		if (res == null) {
-			logger.info("The result of web scanning is null");
+		//	logger.info("The result of web scanning is null");
 			throw new RuntimeException("The result of web scanning is null");
 		}
 			
 		if (!(res instanceof JSObject)) {
-			logger.info("The result of web scanning is not an instance of JSObject");
+		//	logger.info("The result of web scanning is not an instance of JSObject");
 			throw new RuntimeException("The result of web scanning is not an instance of JSObject");
 		}
 		
-		logger.info("Performing scanning of the web page");
+		//logger.info("Performing scanning of the web page");
 		Log.debug(LOG_COMPONENT, "Performing scanning of the web page");
 		
 		final JSObject jsRes = (JSObject)res;
 
 		//WebKitGeomInfo info = new WebKitGeomInfo(engine, jsRes, logger);
-		logger.info("Returning info");
+		//logger.info("Returning info");
 		return new WebKitGeomInfo(engine, jsRes, logger);
     }
 }

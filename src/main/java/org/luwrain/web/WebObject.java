@@ -43,29 +43,30 @@ public final class WebObject
 
     WebObject(WebKitTree tree, Node node)
     {
-	NullCheck.notNull(tree, "tree");
-	NullCheck.notNull(node, "node");
-	ensure();
-	this.tree = tree;
-	this.node = node;
-	if (node instanceof Element)
-	{
-	    this.el = (Element)node;
-	    this.tagName = this.el.getTagName();
-	    this.text = null;
-	} else
-	    if (node instanceof TextImpl)
-	    {
-		final TextImpl textObj = (TextImpl)node;
-		this.el = null;
-		this.tagName = null;
-		this.text = textObj.getWholeText();
-	    } else 
-	{
-	    this.el = null;
-	    this.tagName = null;
-	    this.text = node.getClass().getName();
-	}
+		
+		NullCheck.notNull(tree, "tree");
+		NullCheck.notNull(node, "node");
+		ensure();
+		this.tree = tree;
+		this.node = node;
+		if (node instanceof Element)
+		{
+			this.el = (Element)node;
+			this.tagName = this.el.getTagName();
+			this.text = null;
+		} else
+			if (node instanceof TextImpl)
+			{
+			final TextImpl textObj = (TextImpl)node;
+			this.el = null;
+			this.tagName = null;
+			this.text = textObj.getWholeText();
+			} else 
+		{
+			this.el = null;
+			this.tagName = null;
+			this.text = node.getClass().getName();
+		}
 
     }
 
@@ -100,33 +101,33 @@ public final class WebObject
 
     public CSSStyleDeclaration getStyle()
     {
-	if (el == null)
-	    return null;
-	return tree.getStyle(el);
+		if (el == null)
+			return null;
+		return tree.getStyle(el);
     }
 
     public String getStyleAsText()
     {
-	final CSSStyleDeclaration style = getStyle();
-	if (style == null)
-	    return null;
-	final WebKitGeomInfo.Item geom = tree.geom.nodes.get(node);
-	final StringBuilder b = new StringBuilder();
-	if (el != null && geom != null)
-	{
-	    	    final ElementImpl e = (ElementImpl)el;
-	    b.append("lwr-geom: true;");
-	    b.append("lwr-x: ").append(String.valueOf(geom.x)).append("px;");
-	    b.append("lwr-x2: ").append(String.format("%.2f", e.getOffsetLeft())).append("px;");
-	    b.append("lwr-y: ").append(String.valueOf(geom.y)).append("px;");
-	    	    b.append("lwr-y2: ").append(String.format("%.2f", e.getOffsetTop())).append("px;");
-	    b.append("lwr-width: ").append(String.valueOf(geom.width)).append("px;");
-	    b.append("lwr-height: ").append(String.valueOf(geom.height)).append("px;");
-	} else
-	{
-	    b.append("lwr-geom: false;");
-	}
-	return new String(b) + style.getCssText();
+		final CSSStyleDeclaration style = getStyle();
+		if (style == null)
+			return null;
+		final WebKitGeomInfo.Item geom = tree.geom.nodes.get(node);
+		final StringBuilder b = new StringBuilder();
+		if (el != null && geom != null)
+		{
+					final ElementImpl e = (ElementImpl)el;
+			b.append("lwr-geom: true;");
+			b.append("lwr-x: ").append(String.valueOf(geom.x)).append("px;");
+			b.append("lwr-x2: ").append(String.format("%.2f", e.getOffsetLeft())).append("px;");
+			b.append("lwr-y: ").append(String.valueOf(geom.y)).append("px;");
+					b.append("lwr-y2: ").append(String.format("%.2f", e.getOffsetTop())).append("px;");
+			b.append("lwr-width: ").append(String.valueOf(geom.width)).append("px;");
+			b.append("lwr-height: ").append(String.valueOf(geom.height)).append("px;");
+		} else
+		{
+			b.append("lwr-geom: false;");
+		}
+		return new String(b) + style.getCssText();
     }
 
     @Override public String toString()

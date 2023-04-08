@@ -47,26 +47,31 @@ public final class WebKitTree
 
     public WebKitTree(WebEngine engine)
     {
-	ensure();
-	this.engine = engine;
-	//	this.doc = (HTMLDocument)engine.getDocument();
-	this.doc = (HTMLDocument)engine.documentProperty().getValue();
-	this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
-	this.body = (HTMLBodyElement)doc.getBody();
-	this.geom = new WebKitGeom(engine).scan();
+        ensure();
+        this.engine = engine;
+        //	this.doc = (HTMLDocument)engine.getDocument();
+        this.doc = (HTMLDocument)engine.documentProperty().getValue();
+        this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
+        this.body = (HTMLBodyElement)doc.getBody();
+        this.geom = new WebKitGeom(engine).scan();
+    }
+
+    public WebKitGeomInfo getGeomInfo()
+    {
+        return geom;
     }
 
     public WebObject getBody()
     {
-	final AtomicReference<WebObject> res = new AtomicReference<>();
-	runSync(()->res.set(new WebObject(this, body)));
-	return res.get();
+        final AtomicReference<WebObject> res = new AtomicReference<>();
+        runSync(()->res.set(new WebObject(this, body)));
+        return res.get();
     }
 
     public 	CSSStyleDeclaration getStyle(Element el)
     {
-	final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
-	runSync(()->res.set(window.getComputedStyle(el, "")));
-	return res.get();
+        final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
+        runSync(()->res.set(window.getComputedStyle(el, "")));
+        return res.get();
     }
 }
