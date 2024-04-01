@@ -92,7 +92,7 @@ static final String
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    FxThread.runSync(()->{
 		    try {
-			new WebKitGeom(webEngine).scan();
+			new WebKitGeomInjection(webEngine).scan();
 		    }
 		    catch(Throwable e)
 		    {

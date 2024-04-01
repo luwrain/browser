@@ -30,7 +30,7 @@ import org.luwrain.core.*;
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.util.ResourceUtils.*;
 
-public final class WebKitGeom
+public final class WebKitGeomInjection
 {
     static final String
 	LOG_COMPONENT = "web",
@@ -42,7 +42,7 @@ public final class WebKitGeom
     static private String injection = null;
     final WebEngine engine;
 
-    public WebKitGeom(WebEngine engine)
+    public WebKitGeomInjection(WebEngine engine)
     {
 		this.engine = engine;
 		try {

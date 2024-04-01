@@ -37,7 +37,7 @@ import netscape.javascript.*;
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
-import static org.luwrain.web.WebKitGeom.*;
+import static org.luwrain.web.WebKitGeomInjection.*;
 
 public final class WebKitGeomInfo
 {
@@ -50,7 +50,6 @@ public final class WebKitGeomInfo
 	//FileHandler fh;
 
     final Map<Node, Item> nodes = new HashMap<>();
-	
 
     WebKitGeomInfo(WebEngine engine, JSObject src, Logger logg) {
 
@@ -80,17 +79,8 @@ public final class WebKitGeomInfo
 				y = intValue(rect.getMember("top"));
 				width = intValue(rect.getMember("width"));
 				height = intValue(rect.getMember("height"));
-				
 			}
-			
-			//logg.info("Trying to get text = " + text.equals("123"));
-			if(text.equals("123") == false && text.isBlank() == false)
-			{
-				
 				nodes.put(node, new Item(x, y, width, height, String.valueOf(text)));
-				//logg.info("Got text = " + String.valueOf(text) + " and x = " + x + " y = " + y + " width = " + width + " height = " + height);
-			}
-			
 		}
 		Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
 		//logg.info("Injection data read finish!");

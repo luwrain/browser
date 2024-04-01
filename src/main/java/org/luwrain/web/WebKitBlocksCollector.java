@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.*;
 import javafx.scene.web.WebEngine;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.html.HTMLBodyElement;
@@ -37,35 +38,37 @@ import org.luwrain.core.*;
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeomInjection.*;
 
-public final class WebKitTree
+public final class WebKitBlocksCollector extends BlocksCollector<Node>
 {
-    private final WebEngine engine;
-    private final HTMLDocument doc;
-    private final DOMWindowImpl window;
-    private final HTMLBodyElement body;
-    final WebKitGeomInfo geom;
+    public final WebEngine engine;
+    public final HTMLDocument doc;
+    public final DOMWindowImpl window;
+    public final HTMLBodyElement body;
+    public final WebKitGeomInfo geom;
 
-    public WebKitTree(WebEngine engine)
+    public WebKitBlocksCollector(WebEngine engine)
     {
         ensure();
         this.engine = engine;
-        //	this.doc = (HTMLDocument)engine.getDocument();
         this.doc = (HTMLDocument)engine.documentProperty().getValue();
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
         this.geom = new WebKitGeomInjection(engine).scan();
     }
 
-    public WebKitGeomInfo getGeomInfo()
+        @Override public List<Node> getChildNodes(Node node)
     {
-        return geom;
+	final var res = new ArrayList<Node>();
+	    	final NodeList items =node.getChildNodes();
+	if (items != null)
+	for(int i = 0;i < items.getLength();i++)
+	    res.add(items.item(i));
+	return res;
     }
 
-    public WebObject getBody()
+    @Override public boolean isMarkupNode(Node node)
     {
-        final AtomicReference<WebObject> res = new AtomicReference<>();
-        runSync(()->res.set(new WebObject(this, body)));
-        return res.get();
+	return false;
     }
 
     public 	CSSStyleDeclaration getStyle(Element el)
