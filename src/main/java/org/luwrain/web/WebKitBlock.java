@@ -1,6 +1,5 @@
 /*
    Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
-   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -15,27 +14,16 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.webinspector;
+package org.luwrain.web;
 
 import java.util.*;
 
-import org.luwrain.core.*;
-import org.luwrain.popups.*;
-
-final class Conv
+public final class WebKitBlock extends BlockGeom.Block
 {
-    private final Luwrain luwrain;
-    private final Set<String> openUrlHistory = new HashSet<String>();
-
-    Conv(App app)
+    public WebKitBlock(int left, int right, int top)
     {
-	NullCheck.notNull(app, "app");
-	this.luwrain = app.getLuwrain();
+	this.left = left;
+	this.right = right;
+	this.top = top;
     }
-
-        String formText(String prevValue)
-    {
-	NullCheck.notNull(prevValue, "prevValue");
-	return Popups.text(luwrain, "Редактирования формы", "Текст в поле:", prevValue);
-    }
-    }
+}

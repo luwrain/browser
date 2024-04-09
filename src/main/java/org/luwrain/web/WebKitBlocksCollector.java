@@ -38,7 +38,7 @@ import org.luwrain.core.*;
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeomInjection.*;
 
-public final class WebKitBlocksCollector extends BlocksCollector<Node>
+public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlock>
 {
     public final WebEngine engine;
     public final HTMLDocument doc;
@@ -71,10 +71,13 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node>
 	return false;
     }
 
+    @Override public WebKitBlock createBlock(Node node)
+    {
+	return null;
+    }
+
     public 	CSSStyleDeclaration getStyle(Element el)
     {
-        final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
-        runSync(()->res.set(window.getComputedStyle(el, "")));
-        return res.get();
+return window.getComputedStyle(el, "");
     }
 }

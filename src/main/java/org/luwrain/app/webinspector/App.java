@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -165,6 +165,6 @@ public final class App extends AppBase <Strings>implements Application
 
     Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }
-    WebEngine getWebEngine() { return webEngine; }
+    WebEngine getEngine() { return webEngine; }
     WebKitTree getTree() { return tree; } 
 }

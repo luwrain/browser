@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -46,7 +46,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     MainLayout(App app)
     {
 		super(app);
-
 		this.app = app;
 
 		this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
@@ -92,11 +91,15 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     {
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
-	if (text.trim().equals("dump")) //Error
+
+	if (text.trim().equals("test"))
+	    return onTest()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;;
+
+		if (text.trim().equals("dump")) //Error
 	    return dump()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;
 
 	//app.print("Opening -> " + text);
-	FxThread.runSync(()->app.getWebEngine().load(text));
+	FxThread.runSync(()->app.getEngine().load(text));
 	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
     }
 
@@ -104,7 +107,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     private boolean dump()
     {
 		FxThread.runSync(()->{
-			final Object res = app.getWebEngine().executeScript(app.injection);
+			final Object res = app.getEngine().executeScript(app.injection);
 			if (res == null)
 			{
 				app.print("null");
@@ -116,7 +119,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 				return;
 			}
 			this.jsRes = (JSObject)res;
-			this.scanResult = new ScanResult(app.getWebEngine(), jsRes);
+			this.scanResult = new ScanResult(app.getEngine(), jsRes);
 			app.print("Finished, " + scanResult.count + " items");
 
 			app.print("Printing elements:");
@@ -134,6 +137,16 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		getLuwrain().playSound(Sounds.OK);
 		consoleArea.refresh();
 		return true;
+    }
+
+    private boolean onTest()
+    {
+	final var c = new WebKitBlocksCollector(app.getEngine());
+
+	FxThread.runSync(()->{
+		app.getEngine().load("");
+		});
+	return false;
     }
 
     @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)

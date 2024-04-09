@@ -20,12 +20,13 @@ import java.util.*;
 
 import static org.luwrain.util.RangeUtils.*;
 
-public abstract class BlocksCollector<N>
+public abstract class BlocksCollector<N, B>
 {
     final LinkedList<N> markupStack = new LinkedList<>();
 
     public abstract List<N> getChildNodes(N node);
     public abstract boolean isMarkupNode(N node);
+    public abstract B createBlock(N node);
 
     public void process(N node)
     {
