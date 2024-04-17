@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.web;
+package org.luwrain.app.webinspector;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -43,29 +43,14 @@ public final class WebKitTree
     private final HTMLDocument doc;
     private final DOMWindowImpl window;
     private final HTMLBodyElement body;
-    final WebKitGeomInfo geom;
 
     public WebKitTree(WebEngine engine)
     {
         ensure();
         this.engine = engine;
-        //	this.doc = (HTMLDocument)engine.getDocument();
         this.doc = (HTMLDocument)engine.documentProperty().getValue();
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
-        this.geom = new WebKitGeomInjection(engine).scan();
-    }
-
-    public WebKitGeomInfo getGeomInfo()
-    {
-        return geom;
-    }
-
-    public WebObject getBody()
-    {
-        final AtomicReference<WebObject> res = new AtomicReference<>();
-        runSync(()->res.set(new WebObject(this, body)));
-        return res.get();
     }
 
     public 	CSSStyleDeclaration getStyle(Element el)

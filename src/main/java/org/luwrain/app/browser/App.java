@@ -42,7 +42,7 @@ static final String
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
-    private WebKitGeomInfo scanRes = null;
+    private WebKitGeomScanner scanRes = null;
 
     public App() { this(null); }
     public App(String arg)

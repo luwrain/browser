@@ -44,7 +44,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
     public final HTMLDocument doc;
     public final DOMWindowImpl window;
     public final HTMLBodyElement body;
-    public final WebKitGeomInfo geom;
+    public final WebKitGeomScanner geom;
 
     public WebKitBlocksCollector(WebEngine engine)
     {
@@ -53,6 +53,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
         this.doc = (HTMLDocument)engine.documentProperty().getValue();
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
+	final Node n = this.body;
         this.geom = new WebKitGeomInjection(engine).scan();
 	Log.debug("proba", "new");
     }

@@ -35,7 +35,7 @@ public final class WebKitGeomScanner
 {
     public final Map<Node, Item> nodes = new HashMap<>();
 
-    WebKitGeomInfoScanner(WebEngine engine, JSObject src)
+    WebKitGeomScanner(WebEngine engine, JSObject src)
     {
 	ensure();
 	final var doc = (HTMLDocument)engine.getDocument();

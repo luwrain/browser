@@ -117,7 +117,8 @@ public final class App extends AppBase <Strings>implements Application
 
 	void printTreeContent(){
 		print("Printing elements:");
-		print("Elements amount = " + tree.getGeomInfo().nodes.size());
+		/*
+				print("Elements amount = " + tree.getGeomInfo().nodes.size());
 		for(Map.Entry<Node,WebKitGeomInfo.Item> entry : tree.getGeomInfo().nodes.entrySet()) {
 			print(entry.getKey().getNodeName());
 			print(entry.getValue().text);
@@ -126,6 +127,7 @@ public final class App extends AppBase <Strings>implements Application
 			print("Width = " + entry.getValue().width);
 			print("Height = " + entry.getValue().height);
 		}
+		*/
 	}
 
 

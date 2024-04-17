@@ -15,7 +15,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.web;
+package org.luwrain.app.webinspector;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -43,7 +43,6 @@ public final class WebObject
 
     WebObject(WebKitTree tree, Node node)
     {
-		
 		NullCheck.notNull(tree, "tree");
 		NullCheck.notNull(node, "node");
 		ensure();
@@ -67,7 +66,6 @@ public final class WebObject
 			this.tagName = null;
 			this.text = node.getClass().getName();
 		}
-
     }
 
     public WebObject[] getChildren()
@@ -108,10 +106,11 @@ public final class WebObject
 
     public String getStyleAsText()
     {
+	/*
 		final CSSStyleDeclaration style = getStyle();
 		if (style == null)
 			return null;
-		final WebKitGeomInfo.Item geom = tree.geom.nodes.get(node);
+		final WebKitGeomScanner.Item geom = tree.geom.nodes.get(node);
 		final StringBuilder b = new StringBuilder();
 		if (el != null && geom != null)
 		{
@@ -128,6 +127,8 @@ public final class WebObject
 			b.append("lwr-geom: false;");
 		}
 		return new String(b) + style.getCssText();
+	*/
+	return "";
     }
 
     @Override public String toString()

@@ -65,29 +65,17 @@ public final class WebKitGeomInjection
 		}
     }
 
-    public WebKitGeomInfo scan()
+    public WebKitGeomScanner scan()
     {
 		ensure();
 		final Object res = engine.executeScript(injection);
 		//logger.info("Injection execution!");
 		if (res == null)
-		{
-		//	logger.info("The result of web scanning is null");
 			throw new RuntimeException("The result of web scanning is null");
-		}
 		if (!(res instanceof JSObject))
-		{
-		//	logger.info("The result of web scanning is not an instance of JSObject");
 			throw new RuntimeException("The result of web scanning is not an instance of JSObject");
-		}
-		
-		//logger.info("Performing scanning of the web page");
 		Log.debug(LOG_COMPONENT, "Performing scanning of the web page");
-		
 		final JSObject jsRes = (JSObject)res;
-
-		//WebKitGeomInfo info = new WebKitGeomInfo(engine, jsRes, logger);
-		//logger.info("Returning info");
-		return new WebKitGeomInfo(engine, jsRes);
+		return new WebKitGeomScanner(engine, jsRes);
     }
 }
