@@ -117,8 +117,8 @@ public final class App extends AppBase <Strings>implements Application
 
 	void printTreeContent(){
 		print("Printing elements:");
-		print("Elements amount = " + tree.getGeomInfo().getNodes().size());
-		for(Map.Entry<Node,WebKitGeomInfo.Item> entry : tree.getGeomInfo().getNodes().entrySet()) {
+		print("Elements amount = " + tree.getGeomInfo().nodes.size());
+		for(Map.Entry<Node,WebKitGeomInfo.Item> entry : tree.getGeomInfo().nodes.entrySet()) {
 			print(entry.getKey().getNodeName());
 			print(entry.getValue().text);
 			print("X = " + entry.getValue().x);
@@ -138,6 +138,7 @@ public final class App extends AppBase <Strings>implements Application
 		switch(newState)
 		{
 			case SUCCEEDED:
+			    new org.luwrain.web.WebKitBlocksCollector(webEngine);
 						this.tree = new WebKitTree(webEngine);
 						//printTreeContent();
 						print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));

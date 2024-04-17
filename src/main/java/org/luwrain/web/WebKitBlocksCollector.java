@@ -54,6 +54,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
         this.geom = new WebKitGeomInjection(engine).scan();
+	Log.debug("proba", "new");
     }
 
         @Override public List<Node> getChildNodes(Node node)

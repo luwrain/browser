@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -70,15 +70,13 @@ public final class WebKitGeomInjection
 		ensure();
 		final Object res = engine.executeScript(injection);
 		//logger.info("Injection execution!");
-
-		
-
-		if (res == null) {
+		if (res == null)
+		{
 		//	logger.info("The result of web scanning is null");
 			throw new RuntimeException("The result of web scanning is null");
 		}
-			
-		if (!(res instanceof JSObject)) {
+		if (!(res instanceof JSObject))
+		{
 		//	logger.info("The result of web scanning is not an instance of JSObject");
 			throw new RuntimeException("The result of web scanning is not an instance of JSObject");
 		}
@@ -90,6 +88,6 @@ public final class WebKitGeomInjection
 
 		//WebKitGeomInfo info = new WebKitGeomInfo(engine, jsRes, logger);
 		//logger.info("Returning info");
-		return new WebKitGeomInfo(engine, jsRes, logger);
+		return new WebKitGeomInfo(engine, jsRes);
     }
 }
