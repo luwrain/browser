@@ -37,8 +37,7 @@ final class ElementsModel implements TreeListArea.Model<WebObject>
     {
 	if (app.getTree() == null)
 	    return null;
-	//	return app.getTree().getBody();
-	return null;
+	return app.getTree().root;
     }
 
     @Override public boolean isLeaf(WebObject obj)

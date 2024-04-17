@@ -32,19 +32,20 @@ import com.sun.webkit.dom.ElementImpl;
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
+import static org.luwrain.core.NullCheck.*;
 
-public final class WebObject
+final class WebObject
 {
-    final WebKitTree tree;
+    final WebTree tree;
     final Node node;
     final Element el;
-    public String tagName;
-    public String text;
+    final String tagName;
+    final String text;
 
-    WebObject(WebKitTree tree, Node node)
+    WebObject(WebTree tree, Node node)
     {
-		NullCheck.notNull(tree, "tree");
-		NullCheck.notNull(node, "node");
+		notNull(tree, "tree");
+		notNull(node, "node");
 		ensure();
 		this.tree = tree;
 		this.node = node;
@@ -68,7 +69,7 @@ public final class WebObject
 		}
     }
 
-    public WebObject[] getChildren()
+    WebObject[] getChildren()
     {
 	final AtomicBoolean isNull = new AtomicBoolean(false);	
 	final List<WebObject> res = new ArrayList<>();
@@ -92,19 +93,19 @@ public final class WebObject
 	return res.toArray(new WebObject[res.size()]);
     }
 
-    public boolean hasChildren()
+    boolean hasChildren()
     {
 	return node.hasChildNodes();
     }
 
-    public CSSStyleDeclaration getStyle()
+    CSSStyleDeclaration getStyle()
     {
 		if (el == null)
 			return null;
 		return tree.getStyle(el);
     }
 
-    public String getStyleAsText()
+    String getStyleAsText()
     {
 	/*
 		final CSSStyleDeclaration style = getStyle();

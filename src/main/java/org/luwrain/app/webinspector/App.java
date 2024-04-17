@@ -53,7 +53,7 @@ public final class App extends AppBase <Strings>implements Application
 
     private WebEngine webEngine = null;
     private WebView webView = null;
-    private WebKitTree tree = null;
+    private WebTree tree = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -107,7 +107,7 @@ public final class App extends AppBase <Strings>implements Application
     void updateTree()
     {
 		FxThread.runSync(()->{
-			this.tree = new WebKitTree(webEngine);
+			this.tree = new WebTree(webEngine);
 			//printTreeContent();
 			});
 		mainLayout.elementsArea.clear();
@@ -141,7 +141,7 @@ public final class App extends AppBase <Strings>implements Application
 		{
 			case SUCCEEDED:
 			    new org.luwrain.web.WebKitBlocksCollector(webEngine);
-						this.tree = new WebKitTree(webEngine);
+						this.tree = new WebTree(webEngine);
 						//printTreeContent();
 						print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
 						getLuwrain().runUiSafely(()->{
@@ -169,5 +169,5 @@ public final class App extends AppBase <Strings>implements Application
     Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }
     WebEngine getEngine() { return webEngine; }
-    WebKitTree getTree() { return tree; } 
+    WebTree getTree() { return tree; } 
 }

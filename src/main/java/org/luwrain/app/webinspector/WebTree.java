@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -37,23 +37,25 @@ import org.luwrain.core.*;
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeomInjection.*;
 
-public final class WebKitTree
+final class WebTree
 {
-    private final WebEngine engine;
-    private final HTMLDocument doc;
-    private final DOMWindowImpl window;
-    private final HTMLBodyElement body;
+    final WebEngine engine;
+    final HTMLDocument doc;
+    final DOMWindowImpl window;
+    final HTMLBodyElement body;
+    final WebObject root;
 
-    public WebKitTree(WebEngine engine)
+WebTree(WebEngine engine)
     {
         ensure();
         this.engine = engine;
         this.doc = (HTMLDocument)engine.documentProperty().getValue();
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
+	this.root = new WebObject(this, this.body);
     }
 
-    public 	CSSStyleDeclaration getStyle(Element el)
+    CSSStyleDeclaration getStyle(Element el)
     {
         final AtomicReference<CSSStyleDeclaration> res = new AtomicReference<>();
         runSync(()->res.set(window.getComputedStyle(el, "")));
