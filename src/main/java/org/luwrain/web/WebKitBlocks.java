@@ -21,6 +21,8 @@ import java.util.*;
 import javafx.scene.web.WebEngine;
 import org.w3c.dom.html.*;
 
+import static org.luwrain.app.webinspector.App.log;
+
 public final class WebKitBlocks
 {
     final WebEngine engine;
@@ -38,5 +40,7 @@ public final class WebKitBlocks
     {
 	final var c = new WebKitBlocksCollector(engine);
 	c.process(body);
+	for(var b: c.blocks)
+	    log(new String(b.textBuilder));
     }
 }

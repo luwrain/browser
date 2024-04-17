@@ -20,6 +20,8 @@ import java.util.*;
 
 public final class WebKitBlock extends BlockGeom.Block
 {
+    final StringBuilder textBuilder = new StringBuilder();
+
     public WebKitBlock(int left, int right, int top)
     {
 	this.left = left;

@@ -22,21 +22,23 @@ import java.util.concurrent.atomic.*;
 
 import javafx.scene.web.WebEngine;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import org.w3c.dom.html.HTMLDocument;
-import org.w3c.dom.html.HTMLBodyElement;
+import org.w3c.dom.*;
+//import org.w3c.dom.NodeList;
+//import org.w3c.dom.Element;
+import org.w3c.dom.html.*;
+//import org.w3c.dom.html.HTMLBodyElement;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.views.DocumentView;
 
-import com.sun.webkit.dom.DOMWindowImpl;
+import com.sun.webkit.dom.*;//DOMWindowImpl;
 import netscape.javascript.*;
 
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.web.WebKitGeomInjection.*;
+
+import static org.luwrain.app.webinspector.App.log;
 
 public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlock>
 {
@@ -73,9 +75,27 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 	return false;
     }
 
+        @Override public boolean isTextNode(Node node)
+    {
+	return node instanceof TextImpl;
+    }
+
+    @Override public void addTextToBlock(Node node, WebKitBlock block)
+    {
+	final TextImpl t = (TextImpl)node;
+	block.textBuilder.append(t.getWholeText());
+	//	log(t.getWholeText());
+    }
+
     @Override public WebKitBlock createBlock(Node node)
     {
-	return null;
+	return new WebKitBlock(0, 0, 10);
+    }
+
+    @Override public boolean saveBlock(WebKitBlock block)
+    {
+	final var text = new String(block.textBuilder);
+	return !text.trim().isEmpty();
     }
 
     public 	CSSStyleDeclaration getStyle(Element el)

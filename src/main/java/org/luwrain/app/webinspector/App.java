@@ -43,6 +43,8 @@ public final class App extends AppBase <Strings>implements Application
     static final String
 	LOG_COMPONENT = "webins";
 
+    static App instance = null;
+
     private final String arg;
     final String injection;
     final List<String> messages = new ArrayList<>();
@@ -67,6 +69,7 @@ public final class App extends AppBase <Strings>implements Application
 		{
 			throw new RuntimeException(e);
 		}
+		this.instance = this;
     }
 
 	//Инициализация вьюшки (и веб движка), главногол лайаута, настройка директории для веб движка и назначение события на смену состояния (загрузка)
@@ -140,14 +143,15 @@ public final class App extends AppBase <Strings>implements Application
 		switch(newState)
 		{
 			case SUCCEEDED:
-			    new org.luwrain.web.WebKitBlocksCollector(webEngine);
+			    new org.luwrain.web.WebKitBlocks(webEngine).process();
+			    message("Обход проведён");
 						this.tree = new WebTree(webEngine);
 						//printTreeContent();
-						print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
+						//						print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
 						getLuwrain().runUiSafely(()->{
 						mainLayout.elementsArea.clear();
 						mainLayout.elementsArea.requery();
-						getLuwrain().playSound(Sounds.OK);
+						//						getLuwrain().playSound(Sounds.OK);
 						
 					});
 				break;
@@ -169,5 +173,11 @@ public final class App extends AppBase <Strings>implements Application
     Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }
     WebEngine getEngine() { return webEngine; }
-    WebTree getTree() { return tree; } 
+    WebTree getTree() { return tree; }
+
+    static public void log(String msg)
+    {
+	if (instance != null)
+	    instance.print(msg);
+    }
 }

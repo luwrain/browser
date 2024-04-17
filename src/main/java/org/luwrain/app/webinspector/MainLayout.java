@@ -141,13 +141,9 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 
     private boolean onTest()
     {
-	final var c = new WebKitBlocksCollector(app.getEngine());
-
-	FxThread.runSync(()->{
-		app.getEngine().load("");
-		});
-	return false;
-    }
+		FxThread.runSync(()->app.getEngine().load("https://marigostra.ru"));
+		return true;
+		    }
 
     @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)
     {
