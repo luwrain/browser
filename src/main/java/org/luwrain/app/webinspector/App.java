@@ -94,12 +94,16 @@ public final class App extends AppBase <Strings>implements Application
 		return true;
     }
 
-    void updateTree()
+    void update()
     {
-runSync(()->this.tree = new WebTree(webEngine));
-		treeLayout.elementsArea.clear();
-		treeLayout.elementsArea.requery();
-    }
+	runSync(()->{
+		final var b = new org.luwrain.web.WebKitBlocks(webEngine);
+b.process();
+this.blocks.clear();
+this.blocks.addAll(b.blocks);
+	    });
+		mainLayout.blocksArea.refresh();
+	    }
 
     private void onStateChanged(ObservableValue<? extends State> ov, State oldState, State newState)
     {

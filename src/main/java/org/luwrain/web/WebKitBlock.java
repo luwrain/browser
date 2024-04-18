@@ -24,6 +24,7 @@ import com.sun.webkit.dom.*;
 
 import static org.luwrain.core.NullCheck.*;
 import static org.luwrain.graphical.FxThread.*;
+import static org.luwrain.app.webinspector.App.log;
 
 public final class WebKitBlock extends BlockGeom.Block
 {
@@ -32,15 +33,26 @@ public final class WebKitBlock extends BlockGeom.Block
     public String text = null;
     StringBuilder textBuilder = new StringBuilder();
 
-    public WebKitBlock(DOMWindowImpl window, NodeImpl node, int left, int right, int top)
+    public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
 	notNull(window, "window");
-	notNull(node, "node");
+	notNull(geom, "geom");
+		notNull(node, "node");
 	this.window = window;
 	this.node = node;
-	this.left = left;
-	this.right = right;
-	this.top = top;
+	final GeomEntry entry = geom.getEntry(node);
+	if (entry != null)
+	{
+	this.left = entry.x;
+	this.right = entry.x + entry.width;
+	this.top = entry.y;
+    } else
+      {
+	  log("No geom for the node " + node.getClass().getSimpleName());
+	  this.left = 0;
+	  this.right = 0;
+	  this.top = 0;
+      }
     }
 
         public String getStyle()

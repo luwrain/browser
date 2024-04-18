@@ -67,7 +67,7 @@ public final class BlockGeom
 
     static public class Block implements Comparable<Block>
     {
-	protected int left, right, top, height;
+	public int left, right, top, height;
 	@Override public  int compareTo(Block b)
 	{
 	    if (top != b.top)

@@ -36,7 +36,6 @@ import netscape.javascript.*;
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
-//import static org.luwrain.web.WebKitGeomInjection.*;
 
 import static org.luwrain.app.webinspector.App.log;
 
@@ -89,7 +88,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 
     @Override public WebKitBlock createBlock(Node node)
     {
-	return new WebKitBlock(window, (NodeImpl)node, 0, 0, 10);
+	return new WebKitBlock(window, geom, (NodeImpl)node);
     }
 
     @Override public boolean saveBlock(WebKitBlock block)

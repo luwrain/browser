@@ -57,7 +57,7 @@ final class WebTreeLayout extends LayoutBase
 				switch(event.getCode())
 				{
 					case REFRESH:
-						app.updateTree();
+						app.update();
 						app.getLuwrain().playSound(Sounds.OK);
 						return true;
 					case OK:

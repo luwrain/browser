@@ -65,7 +65,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				switch(event.getCode())
 				{
 					case REFRESH:
-						app.updateTree();
+						app.update();
 						app.getLuwrain().playSound(Sounds.OK);
 						return true;
 					case OK:
@@ -96,58 +96,43 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
     {
 	if (text.trim().isEmpty())
 	    return ConsoleArea.InputHandler.Result.REJECTED;
-
 	if (text.trim().equals("test"))
 	    return onTest()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;;
-
-		if (text.trim().equals("dump")) //Error
-	    return dump()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;
-
-	//app.print("Opening -> " + text);
-	FxThread.runSync(()->app.getEngine().load(text));
+	//	FxThread.runSync(()->app.getEngine().load(text));
+		app.getLuwrain().showGraphical((graphicalModeControl)->{
+		app.getWebView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			    app.getLuwrain().runUiSafely(()->app.getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}
+		    });
+		app.getWebView().setVisible(true);
+		app.getEngine().load(text);
+		return app.getWebView();
+	    });
 	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
-    }
-
-	//Injection??
-    private boolean dump()
-    {
-	/*
-		FxThread.runSync(()->{
-			final Object res = app.getEngine().executeScript(app.injection);
-			if (res == null)
-			{
-				app.print("null");
-				return;
-			}
-			if (!(res instanceof JSObject))
-			{
-				app.print("Instance of " + res.getClass().getName());
-				return;
-			}
-			this.jsRes = (JSObject)res;
-			this.scanResult = new ScanResult(app.getEngine(), jsRes);
-			app.print("Finished, " + scanResult.count + " items");
-			app.print("Printing elements:");
-			for (Map.Entry<Node, ScanResult.Item> entry : scanResult.getNodes().entrySet()) {
-				app.print("name = " + entry.getKey().getNodeName());
-				app.print("text = " + entry.getValue().text);
-				app.print("X = " + entry.getValue().x);
-				app.print("Y = " + entry.getValue().y);
-				app.print("Width = " + entry.getValue().width);
-				app.print("Height = " + entry.getValue().height);
-				app.print("===============");
-			}
-			});
-		getLuwrain().playSound(Sounds.OK);
-		consoleArea.refresh();
-	*/
-		return true;
     }
 
     private boolean onTest()
     {
-		FxThread.runSync(()->app.getEngine().load("https://marigostra.ru"));
-		return true;
+		app.getLuwrain().showGraphical((graphicalModeControl)->{
+		app.getWebView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			    app.getLuwrain().runUiSafely(()->app.getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}
+		    });
+		app.getWebView().setVisible(true);
+		app.getEngine().load("https://marigostra.ru");
+				return app.getWebView();
+	    });
+				return true;
 		    }
 
     private boolean onBlocksClick(ListArea<WebKitBlock> area, int index, WebKitBlock block)
@@ -156,7 +141,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				 lines.clear();
 				 lines.addLine("");
 				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
-
+				 lines.addLine("(" + block.left + ", " + block.right + ", " + block.top + ")");
 				 final var style = block.getStyle();
 				 if (style != null)
 				     for(var l: style.split(";", -1))
