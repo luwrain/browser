@@ -18,12 +18,19 @@ package org.luwrain.web;
 
 import java.util.*;
 
+import com.sun.webkit.dom.*;
+
+import static org.luwrain.core.NullCheck.*;
+
 public final class WebKitBlock extends BlockGeom.Block
 {
+    public final NodeImpl node;
     final StringBuilder textBuilder = new StringBuilder();
 
-    public WebKitBlock(int left, int right, int top)
+    public WebKitBlock(NodeImpl node, int left, int right, int top)
     {
+	notNull(node, "node");
+	this.node = node;
 	this.left = left;
 	this.right = right;
 	this.top = top;

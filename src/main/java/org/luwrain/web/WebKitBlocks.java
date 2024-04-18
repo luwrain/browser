@@ -40,7 +40,9 @@ public final class WebKitBlocks
     {
 	final var c = new WebKitBlocksCollector(engine);
 	c.process(body);
+	/*
 	for(var b: c.blocks)
 	    log(new String(b.textBuilder));
+	*/
     }
 }

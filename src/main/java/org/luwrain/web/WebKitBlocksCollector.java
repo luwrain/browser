@@ -89,7 +89,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 
     @Override public WebKitBlock createBlock(Node node)
     {
-	return new WebKitBlock(0, 0, 10);
+	return new WebKitBlock((NodeImpl)node, 0, 0, 10);
     }
 
     @Override public boolean saveBlock(WebKitBlock block)
