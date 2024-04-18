@@ -17,27 +17,31 @@
 
 package org.luwrain.web;
 
+import java.util.*;
 import java.io.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+//import java.util.logging.FileHandler;
+//import java.util.logging.Logger;
+//import java.util.logging.SimpleFormatter;
 
-import javafx.scene.web.WebEngine;
+import org.w3c.dom.*;
+import org.w3c.dom.html.*;
+import org.w3c.dom.views.*;
+import com.sun.webkit.dom.*;
 import netscape.javascript.*;
+import javafx.scene.web.WebEngine;
+
 
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.util.ResourceUtils.*;
+import static org.luwrain.app.webinspector.App.log;
 
 public final class WebKitGeomInjection
 {
     static final String
 	LOG_COMPONENT = "web",
 	INJECTION_NAME = "injection.js";
-
-	Logger logger = Logger.getLogger("MyLog");
-	FileHandler fh;
 
     static private String injection = null;
     final WebEngine engine;
@@ -50,13 +54,7 @@ public final class WebKitGeomInjection
 			{
 				injection = getStringResource(getClass(), INJECTION_NAME);
 				Log.debug(LOG_COMPONENT, "the web injection loaded");
-
-				//fh  =new FileHandler("C:/Users/Nix/Desktop/luwrain/Log-WebKitGeom.log");
-				//logger.addHandler(fh);
-				//SimpleFormatter formatter = new java.util.logging.SimpleFormatter();
-				//fh.setFormatter(formatter);
-
-			//	logger.info("Injection loaded from file and ready to use!");
+				log("The injection loaded");
 			}
 		}
 		catch(IOException e)
@@ -69,7 +67,6 @@ public final class WebKitGeomInjection
     {
 		ensure();
 		final Object res = engine.executeScript(injection);
-		//logger.info("Injection execution!");
 		if (res == null)
 			throw new RuntimeException("The result of web scanning is null");
 		if (!(res instanceof JSObject))
@@ -77,5 +74,44 @@ public final class WebKitGeomInjection
 		Log.debug(LOG_COMPONENT, "Performing scanning of the web page");
 		final JSObject jsRes = (JSObject)res;
 		return new WebKitGeomScanner(engine, jsRes);
+    }
+
+    public final class Scanner
+{
+    public final Map<Node, GeomEntry> nodes = new HashMap<>();
+
+    Scanner(WebEngine engine, JSObject src)
+    {
+	ensure();
+	final var doc = (HTMLDocument)engine.getDocument();
+	final var window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
+	final var root = (JSObject)src.getMember("dom");
+	Object o;
+	for(int i = 0;!(o = root.getSlot(i)).getClass().equals(String.class);i++)
+	{
+	    final JSObject jsObj = (JSObject)o;
+	    final JSObject rect = (JSObject)jsObj.getMember("rect");
+	    final String text = (String)jsObj.getMember("text");
+	    final Node node = (Node)jsObj.getMember("node");
+	    int x = -1, y = -1, width = -1, height = -1;
+	    if (rect != null)
+	    {
+		x = intValue(rect.getMember("left"));
+		y = intValue(rect.getMember("top"));
+		width = intValue(rect.getMember("width"));
+		height = intValue(rect.getMember("height"));
+	    }
+	    nodes.put(node, new GeomEntry(x, y, width, height, String.valueOf(text)));
+	}
+	Log.debug(LOG_COMPONENT, "geom scanning completed: " + nodes.size());
+    }
+    static int intValue(Object o)
+    {
+	if(o == null) 
+	    return 0;
+	if(o instanceof Number)
+	    return ((Number)o).intValue();
+	return Double.valueOf(Double.parseDouble(o.toString())).intValue();
+    }
     }
 }

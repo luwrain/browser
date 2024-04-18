@@ -70,6 +70,7 @@ public final class WebKitGeomScanner
 	return Double.valueOf(Double.parseDouble(o.toString())).intValue();
     }
 
+    
     static public final class Item
     {
 	public final int x, y, width, height;
@@ -83,4 +84,5 @@ public final class WebKitGeomScanner
 	    this.text = text;
 	}
     }
+
 }

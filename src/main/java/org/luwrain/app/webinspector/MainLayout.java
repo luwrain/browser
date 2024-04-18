@@ -18,8 +18,8 @@
 package org.luwrain.app.webinspector;
 
 import java.util.*;
-
-import netscape.javascript.JSObject;
+import org.w3c.dom.*;
+import org.w3c.dom.css.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -28,10 +28,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
 
-import org.w3c.dom.Node;
-
 import static org.luwrain.core.DefaultEventResponse.*;
-
 
 final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 {
@@ -40,8 +37,8 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
     final ListArea<WebKitBlock> blocksArea;
     final SimpleArea stylesArea;
 
-    private JSObject jsRes = null;
-    private ScanResult scanResult = null;
+    //    private JSObject jsRes = null;
+    //    private ScanResult scanResult = null;
 
     MainLayout(App app)
     {
@@ -77,7 +74,17 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				return super.onSystemEvent(event);
 			}
 		};
-		this.stylesArea = new SimpleArea(getControlContext(), "Styles");
+		this.stylesArea = new SimpleArea(getControlContext(), "Styles"){
+			@Override public void announceLine(int index, String line)
+			{
+			    if (line.trim().isEmpty())
+			    {
+				app.setEventResponse(hint(Hint.EMPTY_LINE));
+				return;
+			    }
+			    app.setEventResponse(text(getLuwrain().getSpeakableText(line, Luwrain.SpeakableTextType.PROGRAMMING)));
+			}
+		    };
 		setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, consoleArea, actions(
 							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 									),
@@ -149,6 +156,11 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				 lines.clear();
 				 lines.addLine("");
 				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
+
+				 final var style = block.getStyle();
+				 if (style != null)
+				     for(var l: style.split(";", -1))
+				     lines.addLine(l);
 			     });
 			 stylesArea.setHotPoint(0, 0);
 			 setActiveArea(stylesArea);

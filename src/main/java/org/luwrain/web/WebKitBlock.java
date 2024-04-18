@@ -17,23 +17,44 @@
 package org.luwrain.web;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
+import org.w3c.dom.*;
 
 import com.sun.webkit.dom.*;
 
 import static org.luwrain.core.NullCheck.*;
+import static org.luwrain.graphical.FxThread.*;
 
 public final class WebKitBlock extends BlockGeom.Block
 {
     public final NodeImpl node;
+        public final DOMWindowImpl window;
     public String text = null;
     StringBuilder textBuilder = new StringBuilder();
 
-    public WebKitBlock(NodeImpl node, int left, int right, int top)
+    public WebKitBlock(DOMWindowImpl window, NodeImpl node, int left, int right, int top)
     {
+	notNull(window, "window");
 	notNull(node, "node");
+	this.window = window;
 	this.node = node;
 	this.left = left;
 	this.right = right;
 	this.top = top;
+    }
+
+        public String getStyle()
+    {
+	if (node instanceof Element el)
+	{
+        final var res = new AtomicReference<String>();
+        runSync(()->{
+		final var css = window.getComputedStyle(el, "");
+		if (css != null)
+		    res.set(css.getCssText());
+		});
+        return res.get();
+	}
+	return null;
     }
 }
