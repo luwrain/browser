@@ -33,10 +33,10 @@ import org.w3c.dom.Node;
 import static org.luwrain.core.DefaultEventResponse.*;
 
 
-final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Item>
+final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 {
     private final App app;
-    final ConsoleArea<Item> consoleArea;
+    final ConsoleArea<String> consoleArea;
     final ListArea<WebKitBlock> blocksArea;
     final SimpleArea stylesArea;
 
@@ -48,12 +48,11 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		super(app);
 		this.app = app;
 
-		this.consoleArea = new ConsoleArea<Item>(consoleParams(params->{
+		this.consoleArea = new ConsoleArea<String>(consoleParams(params->{
 		params.name = app.getStrings().appName();
 		params.model = new ConsoleUtils.ListModel(app.messages);
 		params.appearance = new ConsoleAppearance();
 		params.inputHandler = this;
-		params.clickHandler = this;
 		params.inputPrefix = "WebKit>";
 			}));
 
@@ -144,12 +143,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		return true;
 		    }
 
-    @Override public boolean onConsoleClick(ConsoleArea area, int index, Item item)
-    {
-	//			    setActiveArea(attrsArea);
-		return false;
-    }
-
     private boolean onBlocksClick(ListArea<WebKitBlock> area, int index, WebKitBlock block)
     {
 			 stylesArea.update((lines)->{
@@ -202,28 +195,15 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		return true;
     }
 
-    private final class ConsoleAppearance implements ConsoleArea.Appearance
+    private final class ConsoleAppearance implements ConsoleArea.Appearance<String>
     {
-		@Override public void announceItem(Object item)
-		{
-			getLuwrain().setEventResponse(listItem(item.toString()));
-			return;
-		}
-		@Override public String getTextAppearance(Object item)
-		{
-			return item.toString();
-		}
+		@Override public void announceItem(String text) { getLuwrain().setEventResponse(listItem(text)); }
+		@Override public String getTextAppearance(String text) { return text; }
     }
 
     private final class BlocksAppearance extends ListUtils.AbstractAppearance<WebKitBlock>
     {
-	@Override public void announceItem(WebKitBlock block, Set<Flags> flags)
-	{
-	    getLuwrain().setEventResponse(listItem(Sounds.LIST_ITEM, block.text, Suggestions.LIST_ITEM));
-	}
-	@Override public String getScreenAppearance(WebKitBlock block, Set<Flags> flags)
-	{
-	    return block.text;
-	}
+	@Override public void announceItem(WebKitBlock block, Set<Flags> flags) { getLuwrain().setEventResponse(listItem(Sounds.LIST_ITEM, block.text, Suggestions.LIST_ITEM)); }
+	@Override public String getScreenAppearance(WebKitBlock block, Set<Flags> flags) { return block.text; }
     }
 }
