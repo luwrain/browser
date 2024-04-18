@@ -29,14 +29,14 @@ import javafx.concurrent.Worker.State;
 import javafx.beans.value.ObservableValue;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
+//import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
 
 import org.w3c.dom.Node;
 
-import static org.luwrain.util.ResourceUtils.*;
+import static org.luwrain.graphical.FxThread.*;
 
 public final class App extends AppBase <Strings>implements Application
 {
@@ -45,38 +45,28 @@ public final class App extends AppBase <Strings>implements Application
 
     static App instance = null;
 
-    private final String arg;
-    final String injection;
     final List<String> messages = new ArrayList<>();
-    Item[] items = new Item[0];
+
     String[] attrs = new String[0];
     private MainLayout mainLayout = null;
+    private WebTreeLayout treeLayout = null;
     private Conv conv = null;
 
     private WebEngine webEngine = null;
     private WebView webView = null;
+    final List<WebKitBlock> blocks = new ArrayList<>();
     private WebTree tree = null;
 
-    public App() { this(null); }
-    public App(String arg)
+    public App()
     {
 		super(Strings.NAME, Strings.class, "luwrain.webinspector");
-		this.arg = arg;
-		try {
-			this.injection = getStringResource(getClass(), "injection.js");
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
 		this.instance = this;
     }
 
-	//Инициализация вьюшки (и веб движка), главногол лайаута, настройка директории для веб движка и назначение события на смену состояния (загрузка)
     @Override public AreaLayout onAppInit()
     {
 		this.conv = new Conv(this);
-		FxThread.runSync(()->{
+		runSync(()->{
 			this.webView = new WebView();
 			this.webEngine = webView.getEngine();
 			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
@@ -92,6 +82,8 @@ public final class App extends AppBase <Strings>implements Application
 			this.webView.setVisible(false);
 			});
 		this.mainLayout = new MainLayout(this);
+		this.treeLayout = new WebTreeLayout(this);
+		//		this.blocks = new WebKitBlocks(webEngine);
 		setAppName(getStrings().appName());
 		return mainLayout.getAreaLayout();
     }
@@ -102,58 +94,31 @@ public final class App extends AppBase <Strings>implements Application
 		return true;
     }
 
-    @Override public void closeApp()
-    {
-		super.closeApp();
-    }
-
     void updateTree()
     {
-		FxThread.runSync(()->{
-			this.tree = new WebTree(webEngine);
-			//printTreeContent();
-			});
-		mainLayout.elementsArea.clear();
-		mainLayout.elementsArea.requery();
-		
+runSync(()->this.tree = new WebTree(webEngine));
+		treeLayout.elementsArea.clear();
+		treeLayout.elementsArea.requery();
     }
-
-	void printTreeContent(){
-		print("Printing elements:");
-		/*
-				print("Elements amount = " + tree.getGeomInfo().nodes.size());
-		for(Map.Entry<Node,WebKitGeomInfo.Item> entry : tree.getGeomInfo().nodes.entrySet()) {
-			print(entry.getKey().getNodeName());
-			print(entry.getValue().text);
-			print("X = " + entry.getValue().x);
-			print("Y = " + entry.getValue().y);
-			print("Width = " + entry.getValue().width);
-			print("Height = " + entry.getValue().height);
-		}
-		*/
-	}
-
 
     private void onStateChanged(ObservableValue<? extends State> ov, State oldState, State newState)
     {
 		if (newState == null)
 			return;
-
 		print(newState.toString());
 		switch(newState)
 		{
-			case SUCCEEDED:
-			    new org.luwrain.web.WebKitBlocks(webEngine).process();
-			    message("Обход проведён");
+		case SUCCEEDED: {
+final var b = new org.luwrain.web.WebKitBlocks(webEngine);
+b.process();
+this.blocks.clear();
+this.blocks.addAll(b.blocks);
 						this.tree = new WebTree(webEngine);
-						//printTreeContent();
-						//						print("Has views 2.0: " + webEngine.getDocument().getImplementation().hasFeature("Views", "2.0"));
 						getLuwrain().runUiSafely(()->{
-						mainLayout.elementsArea.clear();
-						mainLayout.elementsArea.requery();
-						//						getLuwrain().playSound(Sounds.OK);
-						
+mainLayout.blocksArea.refresh();
+												getLuwrain().playSound(Sounds.MESSAGE);
 					});
+		}
 				break;
 					case FAILED:
 				getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
@@ -161,14 +126,10 @@ public final class App extends AppBase <Strings>implements Application
 		}
     }
 
-    public void print(String message)
+    void print(String message)
     {
 		messages.add(0, message);
     }
-
-	public static void suspecting(){
-
-	}
 
     Conv getConv() { return this.conv; }
     WebView getWebView() { return webView; }

@@ -25,7 +25,8 @@ import static org.luwrain.core.NullCheck.*;
 public final class WebKitBlock extends BlockGeom.Block
 {
     public final NodeImpl node;
-    final StringBuilder textBuilder = new StringBuilder();
+    public String text = null;
+    StringBuilder textBuilder = new StringBuilder();
 
     public WebKitBlock(NodeImpl node, int left, int right, int top)
     {

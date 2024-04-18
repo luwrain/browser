@@ -53,21 +53,7 @@ public final class Extension extends EmptyExtension
 		    return v.toArray(new Application[v.size()]);
 		}
 	    },
-	    new Shortcut() {
-		@Override public String getExtObjName() { return "web-ins"; }
-		@Override public Application[] prepareApp(String[] args)
-		{
-		    if (args.length == 0)
-			return new Application[]{new org.luwrain.app.webinspector.App()};
-		    final List<Application> v = new ArrayList<>();
-		    for(String s: args)
-			if (!s.isEmpty())
-			    v.add(new org.luwrain.app.webinspector.App(s));
-		    if (v.isEmpty())
-			return new Application[]{new org.luwrain.app.webinspector.App()};
-		    return v.toArray(new Application[v.size()]);
-		}
-	    },
+	    new SimpleShortcut("web-ins", org.luwrain.app.webinspector.App.class)
 	};
     }
 

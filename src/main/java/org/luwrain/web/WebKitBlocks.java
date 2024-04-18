@@ -25,6 +25,8 @@ import static org.luwrain.app.webinspector.App.log;
 
 public final class WebKitBlocks
 {
+    public final List<WebKitBlock> blocks = new ArrayList<>();
+
     final WebEngine engine;
     final HTMLDocument doc;
     final HTMLBodyElement body;
@@ -38,11 +40,14 @@ public final class WebKitBlocks
 
     public void process()
     {
+	blocks.clear();
 	final var c = new WebKitBlocksCollector(engine);
 	c.process(body);
 	/*
 	for(var b: c.blocks)
 	    log(new String(b.textBuilder));
 	*/
+	    blocks.addAll(c.blocks);
     }
+
 }

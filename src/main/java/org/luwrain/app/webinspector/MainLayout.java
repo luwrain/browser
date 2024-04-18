@@ -37,7 +37,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 {
     private final App app;
     final ConsoleArea<Item> consoleArea;
-    final TreeListArea<WebObject> elementsArea;
+    final ListArea<WebKitBlock> blocksArea;
     final SimpleArea stylesArea;
 
     private JSObject jsRes = null;
@@ -48,7 +48,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		super(app);
 		this.app = app;
 
-		this.consoleArea = new ConsoleArea<Item>(consoleParams((params)->{
+		this.consoleArea = new ConsoleArea<Item>(consoleParams(params->{
 		params.name = app.getStrings().appName();
 		params.model = new ConsoleUtils.ListModel(app.messages);
 		params.appearance = new ConsoleAppearance();
@@ -57,13 +57,12 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		params.inputPrefix = "WebKit>";
 			}));
 
-		final TreeListArea.Params<WebObject> treeParams = new TreeListArea.Params<>();
-		treeParams.context = getControlContext();
-		treeParams.name = "Elements";
-		treeParams.model = new ElementsModel(app);
-		//	treeParams.leafClickHandler = this;
-
-		this.elementsArea = new TreeListArea<WebObject>(treeParams){
+		this.blocksArea = new ListArea<WebKitBlock>(listParams(params->{
+		params.name = "Блоки";
+		params.model = new ListUtils.ListModel(app.blocks);
+		params.appearance = new BlocksAppearance();
+		params.clickHandler = MainLayout.this::onBlocksClick;
+			})){
 			@Override public boolean onSystemEvent(SystemEvent event)
 			{
 				if (event.getType() == SystemEvent.Type.REGULAR)
@@ -83,7 +82,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 		setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, consoleArea, actions(
 							action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), MainLayout.this::actShowGraphical)
 									),
-				elementsArea, null,
+				blocksArea, null,
 				stylesArea, null);
     }
 
@@ -106,6 +105,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 	//Injection??
     private boolean dump()
     {
+	/*
 		FxThread.runSync(()->{
 			final Object res = app.getEngine().executeScript(app.injection);
 			if (res == null)
@@ -121,7 +121,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 			this.jsRes = (JSObject)res;
 			this.scanResult = new ScanResult(app.getEngine(), jsRes);
 			app.print("Finished, " + scanResult.count + " items");
-
 			app.print("Printing elements:");
 			for (Map.Entry<Node, ScanResult.Item> entry : scanResult.getNodes().entrySet()) {
 				app.print("name = " + entry.getKey().getNodeName());
@@ -132,10 +131,10 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
 				app.print("Height = " + entry.getValue().height);
 				app.print("===============");
 			}
-
 			});
 		getLuwrain().playSound(Sounds.OK);
 		consoleArea.refresh();
+	*/
 		return true;
     }
 
@@ -149,7 +148,19 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     {
 	//			    setActiveArea(attrsArea);
 		return false;
-	    };
+    }
+
+    private boolean onBlocksClick(ListArea<WebKitBlock> area, int index, WebKitBlock block)
+    {
+			 stylesArea.update((lines)->{
+				 lines.clear();
+				 lines.addLine("");
+				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
+			     });
+			 stylesArea.setHotPoint(0, 0);
+			 setActiveArea(stylesArea);
+	return true;
+    }
 
     private boolean actShowGraphical()
     {
@@ -195,12 +206,24 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler, C
     {
 		@Override public void announceItem(Object item)
 		{
-			app.getLuwrain().setEventResponse(text(item.toString()));
+			getLuwrain().setEventResponse(listItem(item.toString()));
 			return;
 		}
 		@Override public String getTextAppearance(Object item)
 		{
 			return item.toString();
 		}
+    }
+
+    private final class BlocksAppearance extends ListUtils.AbstractAppearance<WebKitBlock>
+    {
+	@Override public void announceItem(WebKitBlock block, Set<Flags> flags)
+	{
+	    getLuwrain().setEventResponse(listItem(Sounds.LIST_ITEM, block.text, Suggestions.LIST_ITEM));
+	}
+	@Override public String getScreenAppearance(WebKitBlock block, Set<Flags> flags)
+	{
+	    return block.text;
+	}
     }
 }

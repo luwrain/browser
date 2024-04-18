@@ -94,8 +94,9 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 
     @Override public boolean saveBlock(WebKitBlock block)
     {
-	final var text = new String(block.textBuilder);
-	return !text.trim().isEmpty();
+block.text = new String(block.textBuilder);
+block.textBuilder = null;
+	return !block.text.trim().isEmpty();
     }
 
     public 	CSSStyleDeclaration getStyle(Element el)
