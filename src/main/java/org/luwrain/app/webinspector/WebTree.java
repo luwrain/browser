@@ -35,7 +35,7 @@ import netscape.javascript.*;
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
-import static org.luwrain.web.WebKitGeomInjection.*;
+import static org.luwrain.web.WebKitGeom.*;
 
 final class WebTree
 {

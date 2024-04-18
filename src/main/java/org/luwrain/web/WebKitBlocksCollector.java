@@ -36,7 +36,7 @@ import netscape.javascript.*;
 import org.luwrain.core.*;
 
 import static org.luwrain.graphical.FxThread.*;
-import static org.luwrain.web.WebKitGeomInjection.*;
+//import static org.luwrain.web.WebKitGeomInjection.*;
 
 import static org.luwrain.app.webinspector.App.log;
 
@@ -46,7 +46,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
     public final HTMLDocument doc;
     public final DOMWindowImpl window;
     public final HTMLBodyElement body;
-    public final WebKitGeomScanner geom;
+    final WebKitGeom geom;
 
     public WebKitBlocksCollector(WebEngine engine)
     {
@@ -56,7 +56,7 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
         this.window = (DOMWindowImpl)((DocumentView)doc).getDefaultView();
         this.body = (HTMLBodyElement)doc.getBody();
 	final Node n = this.body;
-        this.geom = new WebKitGeomInjection(engine).scan();
+        this.geom = new WebKitGeom(engine);
 	Log.debug("proba", "new");
     }
 
@@ -97,10 +97,5 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 block.text = new String(block.textBuilder);
 block.textBuilder = null;
 	return !block.text.trim().isEmpty();
-    }
-
-    public 	CSSStyleDeclaration getStyle(Element el)
-    {
-return window.getComputedStyle(el, "");
     }
 }

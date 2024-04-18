@@ -42,7 +42,7 @@ static final String
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
-    private WebKitGeomScanner scanRes = null;
+    //    private WebKitGeomScanner scanRes = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -91,6 +91,7 @@ static final String
 	case SUCCEEDED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    FxThread.runSync(()->{
+		    /*
 		    try {
 			new WebKitGeomInjection(webEngine).scan();
 		    }
@@ -98,6 +99,7 @@ static final String
 		    {
 			crash(e);
 		    }
+		    */
 		});
 	    break;
 	    	case FAILED:
