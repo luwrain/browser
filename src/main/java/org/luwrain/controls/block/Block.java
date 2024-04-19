@@ -22,5 +22,5 @@ public interface Block
     int getX();
     int getY();
     int getLineCount();
-    BlockLine getLine();
+    BlockLine getLine(int index);
 }

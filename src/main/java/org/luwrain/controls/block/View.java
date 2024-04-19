@@ -35,12 +35,11 @@ public final class View implements Lines
 	notNull(blocks, "blocks");
 	this.appearance = appearance;
 	this.blocks.addAll(blocks);
-	this.lines = buildLines(blocks, appearance);
+	buildLines();
     }
 
-    Block getBlock(int index) { return blocks[index]; }
     @Override public int getLineCount() {
-	return lines.length > 0?lines.length:1;
+	return Math.max(lines.size(), 1);
     }
 
     @Override public String getLine(int index)
@@ -58,7 +57,7 @@ public final class View implements Lines
 	for(var b: blocks)
 	{
 	    width = Math.max(width, b.getX() + b.getWidth());
-	    height = Math.max(height, b.getY() + b.getLIneCount());
+	    height = Math.max(height, b.getY() + b.getLineCount());
 	}
 	if (width == 0)
 	    return;
@@ -67,7 +66,7 @@ public final class View implements Lines
 	    if (emptyLine.length() * 2 < width)
 		emptyLine = emptyLine + emptyLine; else
 		emptyLine += " ";
-	lines.ensureCapacityOf(height);
+	lines.ensureCapacity(height);
 	while(lines.size() < height)
 	    lines.add(emptyLine);
 	for(var b: blocks)
@@ -77,9 +76,9 @@ public final class View implements Lines
 		if (line.length() > b.getWidth())
 		    line = line.substring(0, b.getWidth());
 		if (line.length() < b.getWidth())
-		    line = line + emptyLine.substring(0, b.getWidth() - line.lenght());
-		final int lineINdex = b.getY() + i;
-		final String origLIne = lines.get(lineiNdex);
+		    line = line + emptyLine.substring(0, b.getWidth() - line.length());
+		final int lineIndex = b.getY() + i;
+		final String origLine = lines.get(lineIndex);
 		lines.set(lineIndex, origLine.substring(0, b.getX()) + line + origLine.substring(b.getX() + b.getWidth()));
 	    }
 		    }

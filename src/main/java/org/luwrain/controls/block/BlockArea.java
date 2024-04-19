@@ -25,6 +25,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 
+import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.NullCheck.*;
 
 public class BlockArea implements Area
@@ -36,12 +37,12 @@ public class BlockArea implements Area
     {
 	void announceFirstBlockLine(Block block, BlockLine blockLine);
 	void announceBlockLine(Block block, BlockLine blockLine);
-	String getBlockLineTextAppearance(Block block, BlockLIne blockLine);
+	String getBlockLineTextAppearance(Block block, BlockLine blockLine);
     }
 
     public interface ClickHandler
     {
-	boolean onClick(BlockArea area, int Block block);
+	boolean onClick(BlockArea area, Block block, int lineIndex, BlockLine line);
     }
 
     static public class Params
@@ -55,12 +56,9 @@ public class BlockArea implements Area
     protected final Appearance appearance;
     protected ClickHandler clickHandler = null;
     protected View view = null;
-    protected View.Iterator it = null;
-
-    protected int
-	rowIndex = 0,
-	hotPointX = 0,
-	itemIndex = 0;
+    protected BlockIterator it = null;
+    int hotPointX = 0;
+    protected final List<Block> blocks = new ArrayList<>();
 
     public BlockArea(Params params)
     {
@@ -78,21 +76,12 @@ public class BlockArea implements Area
 	it = null;
     }
 
-    public void setBlocks(Block[] blocks, int width)
+    public void setBlocks(Block[] blocks)
     {
-	NullCheck.notNull(blocks, "blocks");
-	if (width < 0)
-	    throw new IllegalArgumentException("width (" + width + ") may not be negative");
-	if (blocks.length == 0)
-	{
-	    this.view = null;
-	    this.it = null;
-	    return;
-	}
-	final ViewBuilder builder = new ViewBuilder(blocks);
-	this.view = builder.build(appearance, width);
-	this.it = view.createIterator();
-	this.rowIndex = 0;
+	notNull(blocks, "blocks");
+	this.blocks.clear();
+	this.blocks.addAll(Arrays.asList(blocks));
+	this.view = new View(appearance, this.blocks);
 	context.onAreaNewContent(this);
 	context.onAreaNewHotPoint(this);
 	context.onAreaNewName(this);
@@ -101,21 +90,6 @@ public class BlockArea implements Area
     public boolean isEmpty()
     {
 	return view == null || it == null;
-    }
-
-    public BlockObject getSelectedObj()
-    {
-	if (isEmpty())
-	    return null;
-	final BlockObjFragment[] row = it.getRow(rowIndex);
-	int offset = 0;
-	for(int i = 0;i < row.length;++i)
-	{
-	    if (hotPointX >= offset && hotPointX < offset + row[i].getWidth())
-		return row[i].getBlockObj();
-	    offset += row[i].getWidth();
-	}
-	return null;
     }
 
     @Override public int getHotPointX()
@@ -129,7 +103,7 @@ public class BlockArea implements Area
     {
 	if (isEmpty())
 	    return 0;
-	return it.getY() + rowIndex;
+	return it.getY();
     }
 
     @Override public int getLineCount()
@@ -177,76 +151,63 @@ public class BlockArea implements Area
     {
 	if (isEmpty() || clickHandler == null)
 	    return false;
-	final BlockObject blockObj = getSelectedObj();
-	if (blockObj == null)
-	    return false;
-	return clickHandler.onClick(this, rowIndex, blockObj);
+	return clickHandler.onClick(this, it.getBlock(), it.lineIndex, it.getBlock().getLine(it.lineIndex));
     }
 
     protected boolean onMoveRight(InputEvent event)
     {
-	NullCheck.notNull(event, "event");
+	notNull(event, "event");
 	if (noContent())
 	    return true;
-	final String text = appearance.getRowTextAppearance(it.getRow(rowIndex));
+	final String text = it.getLineText(appearance);
 	if (hotPointX >= text.length())
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    context.setEventResponse(hint(Hint.END_OF_LINE));
 	    return true;
 	}
 	++hotPointX;
 	if (hotPointX >= text.length())
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    context.setEventResponse(hint(Hint.END_OF_LINE));
 	    return true;
 	}
 	context.onAreaNewHotPoint(this);
-	context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
+	context.setEventResponse(letter(text.charAt(hotPointX)));
 	return true;
     }
 
     protected boolean onMoveLeft(InputEvent event)
     {
-	NullCheck.notNull(event, "event");
+	notNull(event, "event");
 	if (noContent())
 	    return true;
-	final String text = appearance.getRowTextAppearance(it.getRow(rowIndex));
+	final String text = it.getLineText(appearance);
 	if (hotPointX == 0)
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.BEGIN_OF_LINE));
+	    context.setEventResponse(hint(Hint.BEGIN_OF_LINE));
 	    return true;
 	}
 	--hotPointX;
 	if (hotPointX >= text.length())
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.END_OF_LINE));
+	    context.setEventResponse(hint(Hint.END_OF_LINE));
 	    return true;
 	}
 	context.onAreaNewHotPoint(this);
-	context.setEventResponse(DefaultEventResponse.letter(text.charAt(hotPointX)));
+	context.setEventResponse(letter(text.charAt(hotPointX)));
 	return true;
     }
 
     protected boolean onMoveUp(InputEvent event)
     {
-	NullCheck.notNull(event, "event");
+	notNull(event, "event");
 	if (noContent())
 	    return true;
-	if (rowIndex > 0)
-	{
-	    --rowIndex;
-	    hotPointX = 0;
-	    context.onAreaNewHotPoint(this);
-	    announceRow();
-	    return true;
-	}
 	if (!it.movePrev())
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_ABOVE));
+	    context.setEventResponse(hint(Hint.NO_ITEMS_ABOVE));
 	    return true;
 	}
-	final int count = it.getRowCount();
-	rowIndex = count > 0?count - 1:0;
 	hotPointX = 0;
 	context.onAreaNewHotPoint(this);
 	announceRow();
@@ -255,23 +216,14 @@ public class BlockArea implements Area
 
     protected boolean onMoveDown(InputEvent event)
     {
-	NullCheck.notNull(event, "event");
+	notNull(event, "event");
 	if (noContent())
 	    return true;
-	if (!it.isLastRow(rowIndex))
-	{
-	    ++rowIndex;
-	    hotPointX = 0;
-	    context.onAreaNewHotPoint(this);
-	    announceRow();
-	    return true;
-	}
 	if (!it.moveNext())
 	{
-	    context.setEventResponse(DefaultEventResponse.hint(Hint.NO_ITEMS_BELOW));
+	    context.setEventResponse(hint(Hint.NO_ITEMS_BELOW));
 	    return true;
 	}
-	rowIndex = 0;
 	hotPointX = 0;
 	context.onAreaNewHotPoint(this);
 	announceRow();
@@ -280,13 +232,13 @@ public class BlockArea implements Area
 
     @Override public boolean onSystemEvent(SystemEvent event)
     {
-	NullCheck.notNull(event, "event");
+	notNull(event, "event");
 	return false;
     }
 
     @Override public boolean onAreaQuery(AreaQuery query)
     {
-	NullCheck.notNull(query, "query");
+	notNull(query, "query");
 	return false;
     }
 
@@ -299,9 +251,9 @@ public class BlockArea implements Area
     {
 	if (isEmpty())
 	    return;
-	if (rowIndex == 0)
-	    appearance.announceFirstRow(it.getBlock(), it.getRow(rowIndex)); else
-	    appearance.announceRow(it.getBlock(), it.getRow(rowIndex));
+	if (it.lineIndex == 0)
+	    appearance.announceFirstBlockLine(it.getBlock(), it.getLine()); else
+	    appearance.announceBlockLine(it.getBlock(), it.getLine());
     }
 
     protected String noContentStr()
@@ -311,7 +263,7 @@ public class BlockArea implements Area
 
     protected void noContentMsg()
     {
-	context.setEventResponse(DefaultEventResponse.hint(Hint.NO_CONTENT));
+	context.setEventResponse(hint(Hint.NO_CONTENT));
     }
 
     protected boolean noContent()

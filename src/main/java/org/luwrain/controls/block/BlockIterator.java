@@ -25,9 +25,9 @@ import static org.luwrain.core.NullCheck.*;
 
 public final class BlockIterator
     {
-	private final BlockArea area;
-	private int blockIndex, lineIndex;
-	
+	private final BlockArea blockArea;
+	int blockIndex, lineIndex;
+
 	BlockIterator(BlockArea blockArea, int blockIndex, int lineIndex)
 	{
 	    notNull(blockArea, "blockArea");
@@ -55,7 +55,7 @@ public final class BlockIterator
 	    if (blockIndex > 0)
 	    {
 		blockIndex--;
-		lineIndex = getBlock().getLIneCount() - 1;
+		lineIndex = getBlock().getLineCount() - 1;
 		return true;
 	    }
 	    return false;
@@ -80,5 +80,25 @@ public final class BlockIterator
 	public Block getBlock()
 	{
 	    return blockArea.blocks.get(blockIndex);
+	}
+
+	public int getX()
+	{
+	    return getBlock().getX();
+	}
+
+	public int getY()
+	{
+	    return getBlock().getY() + lineIndex;
+	}
+
+	public BlockLine getLine()
+	{
+	    return getBlock().getLine(lineIndex);
+	}
+
+	public String getLineText(BlockArea.Appearance appearance)
+	{
+	    return appearance.getBlockLineTextAppearance(getBlock(), getLine());
 	}
 }

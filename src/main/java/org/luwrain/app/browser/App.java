@@ -44,6 +44,7 @@ static final String
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
+    private Runnable firstSwitching = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -71,10 +72,9 @@ static final String
 			this.webView.setVisible(false);
 			});
 		this.mainLayout = new MainLayout(this);
-		this.treeLayout = new WebTreeLayout(this);
 		setAppName(getStrings().appName());
 				getLuwrain().showGraphical((graphicalModeControl)->{
-		getWebView().setOnKeyReleased((event)->{
+		webView.setOnKeyReleased((event)->{
 			switch(event.getCode())
 			{
 			case ESCAPE:
@@ -83,12 +83,11 @@ static final String
 			    break;
 			}});
 		firstSwitching = ()->graphicalModeControl.close();
-		getWebView().setVisible(true);
+		webView.setVisible(true);
 		getEngine().load("https://luwrain.org");
-		return getWebView();
+		return webView;
 	    });
 		return mainLayout.getAreaLayout();
-	return mainLayout.getAreaLayout();
     }
 
     @Override public boolean onEscape()
@@ -115,4 +114,5 @@ static final String
 
     Conv getConv() { return this.conv; }
     WebEngine getEngine() { return webEngine; }
+    WebView getView() { return webView; }
 }
