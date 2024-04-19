@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,8 +14,6 @@
    General Public License for more details.
 */
 
-//LWR_API 1.0
-
 package org.luwrain.controls.block;
 
 import java.util.*;
@@ -23,118 +21,66 @@ import java.io.*;
 
 import org.luwrain.core.*;
 
+import static org.luwrain.core.NullCheck.*;
+
 public final class View implements Lines
 {
-    private final Block[] blocks;
-    private final String[] lines;
+    private final BlockArea.Appearance appearance;
+    private final ArrayList<Block> blocks = new ArrayList<>();
+    private final ArrayList<String> lines = new ArrayList<>();
 
-    View(BlockArea.Appearance appearance, Block[] blocks)
+    View(BlockArea.Appearance appearance, List<Block> blocks)
     {
-	NullCheck.notNull(appearance, "appearance");
-	NullCheck.notNullItems(blocks, "blocks");
-	this.blocks = blocks;
+	notNull(appearance, "appearance");
+	notNull(blocks, "blocks");
+	this.appearance = appearance;
+	this.blocks.addAll(blocks);
 	this.lines = buildLines(blocks, appearance);
     }
 
     Block getBlock(int index) { return blocks[index]; }
-    public int getBlockCount() { return blocks.length; }
-    boolean isEmpty()  { return blocks.length == 0; }
-    @Override public int getLineCount() { return lines.length > 0?lines.length:1; }
+    @Override public int getLineCount() {
+	return lines.length > 0?lines.length:1;
+    }
 
-    @Override public String getLine(int index) { 
+    @Override public String getLine(int index)
+    {
 	if (index < 0)
-	    throw new IllegalArgumentException("index (" + index + ") may not be negative");
-	if (index > lines.length)
+	    throw new IllegalArgumentException("index (" + index + ") can't be negative");
+	if (index >= lines.size())
 	    return "";
-	return lines[index];
+	return lines.get(index);
     }
 
-    Iterator createIterator()
+    private void buildLines()
     {
-	if (isEmpty())
-	    return null;
-	return new Iterator(this, 0);
-    }
-
-    static private String[] buildLines(Block[] blocks, BlockArea.Appearance appearance)
-    {
-	int lineCount = 0;
-	for(Block c: blocks)
-	    lineCount = Math.max(lineCount, c.textY + c.textHeight);
-	//Log.debug(LOG_COMPONENT, "preparing " + lineCount + " lines");
-	final String[] lines = new String[lineCount];
-	for(int i = 0;i < lineCount;++i)
-	    lines[i] = "";
-	for(Block c: blocks)
+	int width = 0, height = 0;
+	for(var b: blocks)
 	{
-	    for(int i = 0;i < c.rows.length;++i)
+	    width = Math.max(width, b.getX() + b.getWidth());
+	    height = Math.max(height, b.getY() + b.getLIneCount());
+	}
+	if (width == 0)
+	    return;
+	String emptyLine = " ";
+	while (emptyLine.length() < width)
+	    if (emptyLine.length() * 2 < width)
+		emptyLine = emptyLine + emptyLine; else
+		emptyLine += " ";
+	lines.ensureCapacityOf(height);
+	while(lines.size() < height)
+	    lines.add(emptyLine);
+	for(var b: blocks)
+	    for(int i = 0;i < b.getLineCount();i++)
 	    {
-		final BlockRow row = c.rows[i];
-		final String text = appearance.getRowTextAppearance(row.getFragments());
-		//if (text.length() > c.textWidth)
-		//Log.warning(LOG_COMPONENT, "row text \'" + text + "\' is longer than the width of the container (" + c.textWidth + ")");
-		final int lineIndex = c.textY + i;
-		lines[lineIndex] = putString(lines[lineIndex], text, c.textX);	
+		String line = appearance.getBlockLineTextAppearance(b, b.getLine(i));
+		if (line.length() > b.getWidth())
+		    line = line.substring(0, b.getWidth());
+		if (line.length() < b.getWidth())
+		    line = line + emptyLine.substring(0, b.getWidth() - line.lenght());
+		final int lineINdex = b.getY() + i;
+		final String origLIne = lines.get(lineiNdex);
+		lines.set(lineIndex, origLine.substring(0, b.getX()) + line + origLine.substring(b.getX() + b.getWidth()));
 	    }
-	}
-	return lines;
-    }
-
-    static private String putString(String s, String fragment, int pos)
-    {
-	final StringBuilder b = new StringBuilder();
-	if (pos > s.length())
-	{
-	    b.append(s);
-	    for(int i = s.length();i < pos;++i)
-		b.append(" ");
-	} else
-	    b.append(s.substring(0, pos));
-	b.append(fragment);
-	if (pos + fragment.length() < s.length())
-	    b.append(s.substring(pos + fragment.length()));
-	return new String(b);
-    }
-
-    static final class Iterator
-    {
-	private final View view;
-	private int pos = 0;
-	private Block block = null;
-	Iterator(View view, int pos)
-	{
-	    NullCheck.notNull(view, "view");
-	    if (pos < 0)
-		throw new IllegalArgumentException("pos (" + pos + ") may not be negative");
-	    this.view = view;
-	    this.pos = pos;
-	    this.block = view.getBlock(this.pos);
-	}
-
-	boolean movePrev()
-	{
-	    if (pos == 0)
-		return false;
-	    --pos;
-	    block = view.getBlock(pos);
-	    return true;
-	}
-
-	boolean moveNext()
-	{
-	    if (pos + 1 >= view.getBlockCount())
-		return false;
-	    ++pos;
-	    block = view.getBlock(pos);
-	    return true;
-	}
-
-	public Block getBlock() { return block; }
-	    int getX() { return block.textX; }
-	    int getY() { return block.textY; }
-	    int getRowCount() { return block.getRowCount(); }
-	    BlockObjFragment[] getRow(int index) { return block.getRow(index); }
-	    boolean isLastRow(int index) { return block.getRowCount() > 0 && index + 1 == block.getRowCount(); }
-	}
-    }
-    
+		    }
+}

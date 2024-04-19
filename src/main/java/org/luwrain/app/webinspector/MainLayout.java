@@ -98,7 +98,8 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 	    return ConsoleArea.InputHandler.Result.REJECTED;
 	if (text.trim().equals("test"))
 	    return onTest()?ConsoleArea.InputHandler.Result.CLEAR_INPUT:ConsoleArea.InputHandler.Result.REJECTED;;
-	//	FxThread.runSync(()->app.getEngine().load(text));
+		FxThread.runSync(()->app.getEngine().load(text));
+		/*
 		app.getLuwrain().showGraphical((graphicalModeControl)->{
 		app.getWebView().setOnKeyReleased((event)->{
 			switch(event.getCode())
@@ -113,6 +114,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		app.getEngine().load(text);
 		return app.getWebView();
 	    });
+		*/
 	return ConsoleArea.InputHandler.Result.CLEAR_INPUT;
     }
 

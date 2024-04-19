@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,11 +14,9 @@
    General Public License for more details.
 */
 
-//LWR_API 1.0
-
 package org.luwrain.controls.block;
 
-public interface BlockObject
+public interface BlockLine
 {
-    String getText();
+    String getBlockLineText();
 }

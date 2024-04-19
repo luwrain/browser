@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -31,6 +31,8 @@ import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
 
+import static org.luwrain.graphical.FxThread.*;
+
 final class App extends AppBase<Strings>
 {
 static final String
@@ -42,7 +44,6 @@ static final String
 
         private     WebEngine webEngine = null;
     private WebView webView = null;
-    //    private WebKitGeomScanner scanRes = null;
 
     public App() { this(null); }
     public App(String arg)
@@ -51,27 +52,42 @@ static final String
 	this.arg = arg != null?arg:"";
     }
 
-
     @Override protected AreaLayout onAppInit()
     {
 	this.conv = new Conv(this);
-		FxThread.runSync(()->{
-		this.webView = new WebView();
-		this.webEngine = webView.getEngine();
-		this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.browser").toFile());
-		this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
-	/*
-	this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
-	this.webEngine.setOnAlert((event)->events.onAlert(event.getData()));
-	this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
-	this.webEngine.setConfirmHandler((param)->events.onConfirm(param));
-	this.webEngine.setOnError((event)->events.onError(event.getMessage()));
-	this.webView.setOnKeyReleased((event)->onKeyReleased(event));
-	*/
-		this.webView.setVisible(false);
+		runSync(()->{
+						this.webView = new WebView();
+			this.webEngine = webView.getEngine();
+			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
+			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
+		/*
+		this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
+		this.webEngine.setOnAlert((event)->events.onAlert(event.getData()));
+		this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
+		this.webEngine.setConfirmHandler((param)->events.onConfirm(param));
+		this.webEngine.setOnError((event)->events.onError(event.getMessage()));
+		this.webView.setOnKeyReleased((event)->onKeyReleased(event));
+		*/
+			this.webView.setVisible(false);
+			});
+		this.mainLayout = new MainLayout(this);
+		this.treeLayout = new WebTreeLayout(this);
+		setAppName(getStrings().appName());
+				getLuwrain().showGraphical((graphicalModeControl)->{
+		getWebView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			     getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}});
+		firstSwitching = ()->graphicalModeControl.close();
+		getWebView().setVisible(true);
+		getEngine().load("https://luwrain.org");
+		return getWebView();
 	    });
-	this.mainLayout = new MainLayout(this);
-	setAppName(getStrings().appName());
+		return mainLayout.getAreaLayout();
 	return mainLayout.getAreaLayout();
     }
 
@@ -90,17 +106,6 @@ static final String
 	{
 	case SUCCEEDED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
-	    FxThread.runSync(()->{
-		    /*
-		    try {
-			new WebKitGeomInjection(webEngine).scan();
-		    }
-		    catch(Throwable e)
-		    {
-			crash(e);
-		    }
-		    */
-		});
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));

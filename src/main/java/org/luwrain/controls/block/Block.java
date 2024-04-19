@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,96 +14,13 @@
    General Public License for more details.
 */
 
-//LWR_API 1.0
-
 package org.luwrain.controls.block;
 
-import java.util.*;
-import java.awt.Rectangle;
-
-import org.luwrain.core.*;
-
-import static org.luwrain.util.RangeUtils.*;
-
-public class Block
+public interface Block
 {
-    protected int
-	textX = -1,textY = -1,
-	textWidth = -1, textHeight = -1;
-
-    protected final BlockObject[] objs;
-    protected BlockRow[] rows = new BlockRow[0];
-
-    final List<Block> vertDepOn = new ArrayList<>();
-    boolean actualTextY = false;
-
-    public Block(BlockObject[] objs)
-    {
-	NullCheck.notNullItems(objs, "objs");
-	if (objs.length == 0)
-	    throw new IllegalArgumentException("The block may not be without objects");
-	this.objs = objs;
-    }
-
-    public BlockObject[] getObjs()
-    {
-	return objs.clone();
-    }
-
-    public final BlockRow[] getRows()
-    {
-	return rows.clone();
-    }
-
-        public final int getRowCount()
-    {
-	return rows.length;
-    }
-
-    public final void setRows(BlockRow[] rows)
-    {
-	NullCheck.notNullItems(rows, "rows");
-	this.rows = rows.clone();
-	this.textHeight = rows.length;
-    }
-
-    public final BlockObjFragment[] getRow(int index)
-    {
-	if (rows == null)
-	    throw new IllegalStateException("The block still does not have any rows");
-	return rows[index].getFragments();
-    }
-
-        public final boolean intersectsText(Block c)
-    {
-	NullCheck.notNull(c, "c");
-	final int sq1 = getTextSquare();
-	final int sq2 = c.getTextSquare();
-	if (sq1 == 0 && sq2 == 0)
-	    return textX == c.textX && textY == c.textY;
-	if (sq1 == 0)
-	    return between(textX, c.textX, c.textX + c.textWidth) && between(textY, c.textY, c.textY + c.textHeight);
-	if (sq2 == 0)
-	    return between(c.textX, textX, textX + textWidth) && between(c.textY, textY, textY + textHeight);
-	return intersects(textX, textWidth, c.textX, c.textWidth) &&
-	intersects(textY, textHeight, c.textY, c.textHeight);
-    }
-
-        public final int getTextSquare()
-    {
-	return textWidth * textHeight;
-    }
-
-    public final void calcActualTextY()
-    {
-	if (actualTextY)
-	    return;
-	for(Block c: vertDepOn)
-	    c.calcActualTextY();
-	int maxPos = 0;
-	for(Block c: vertDepOn)
-	    maxPos = Math.max(maxPos, c.textY + c.textHeight);
-	this.textY = maxPos + 1;
-	actualTextY = true;
-    }
+    int getWidth();
+    int getX();
+    int getY();
+    int getLineCount();
+    BlockLine getLine();
 }

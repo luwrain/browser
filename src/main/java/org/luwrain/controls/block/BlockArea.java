@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,8 +14,6 @@
    General Public License for more details.
 */
 
-//LWR_API 1.0
-
 package org.luwrain.controls.block;
 
 import java.io.*;
@@ -27,6 +25,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 
+import static org.luwrain.core.NullCheck.*;
+
 public class BlockArea implements Area
 {
     static private final int
@@ -34,14 +34,14 @@ public class BlockArea implements Area
 
     public interface Appearance
     {
-	void announceFirstRow(Block block, BlockObjFragment[] fragments);
-	void announceRow(Block block, BlockObjFragment[] fragments);
-	String getRowTextAppearance(BlockObjFragment[] fragments);
+	void announceFirstBlockLine(Block block, BlockLine blockLine);
+	void announceBlockLine(Block block, BlockLine blockLine);
+	String getBlockLineTextAppearance(Block block, BlockLIne blockLine);
     }
 
     public interface ClickHandler
     {
-	boolean onClick(BlockArea area, int rowIndex, BlockObject webObj);
+	boolean onClick(BlockArea area, int Block block);
     }
 
     static public class Params
@@ -64,9 +64,9 @@ public class BlockArea implements Area
 
     public BlockArea(Params params)
     {
-	NullCheck.notNull(params, "params");
-	NullCheck.notNull(params.context, "params.context");
-	NullCheck.notNull(params.appearance, "params.appearance");
+	notNull(params, "params");
+	notNull(params.context, "params.context");
+	notNull(params.appearance, "params.appearance");
 	this.context = params.context;
 	this.appearance = params.appearance;
 	this.clickHandler = params.clickHandler;

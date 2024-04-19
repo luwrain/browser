@@ -46,16 +46,15 @@ public final class App extends AppBase <Strings>implements Application
     static App instance = null;
 
     final List<String> messages = new ArrayList<>();
-
-    String[] attrs = new String[0];
     private MainLayout mainLayout = null;
     private WebTreeLayout treeLayout = null;
     private Conv conv = null;
 
     private WebEngine webEngine = null;
     private WebView webView = null;
+    private Runnable firstSwitching = null;
     final List<WebKitBlock> blocks = new ArrayList<>();
-    private WebTree tree = null;
+        private WebTree tree = null;
 
     public App()
     {
@@ -83,8 +82,21 @@ public final class App extends AppBase <Strings>implements Application
 			});
 		this.mainLayout = new MainLayout(this);
 		this.treeLayout = new WebTreeLayout(this);
-		//		this.blocks = new WebKitBlocks(webEngine);
 		setAppName(getStrings().appName());
+				getLuwrain().showGraphical((graphicalModeControl)->{
+		getWebView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			     getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}});
+		firstSwitching = ()->graphicalModeControl.close();
+		getWebView().setVisible(true);
+		getEngine().load("https://luwrain.org");
+		return getWebView();
+	    });
 		return mainLayout.getAreaLayout();
     }
 
@@ -109,7 +121,7 @@ this.blocks.addAll(b.blocks);
     {
 		if (newState == null)
 			return;
-		print(newState.toString());
+		print("New state: " + newState.toString());
 		switch(newState)
 		{
 		case SUCCEEDED: {
@@ -117,13 +129,19 @@ final var b = new org.luwrain.web.WebKitBlocks(webEngine);
 b.process();
 this.blocks.clear();
 this.blocks.addAll(b.blocks);
-						this.tree = new WebTree(webEngine);
 						getLuwrain().runUiSafely(()->{
 mainLayout.blocksArea.refresh();
 												getLuwrain().playSound(Sounds.MESSAGE);
 					});
-		}
+						print("The page is loaded");
+						if (firstSwitching != null)
+{
+firstSwitching.run();
+	firstSwitching = null;
+}
+
 				break;
+		}
 					case FAILED:
 				getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
 				break;
@@ -133,6 +151,8 @@ mainLayout.blocksArea.refresh();
     void print(String message)
     {
 		messages.add(0, message);
+		if (mainLayout != null)
+		    getLuwrain().runUiSafely(()->mainLayout.consoleArea.refresh());
     }
 
     Conv getConv() { return this.conv; }
