@@ -22,32 +22,30 @@ import java.net.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
+import org.luwrain.controls.block.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
+
+import static org.luwrain.core.DefaultEventResponse.*;
+import static org.luwrain.app.browser.TestBlocks.*;
 
 final class MainLayout extends LayoutBase
 {
     final App app;
-    final NavigationArea webArea;
+    final BlockArea webArea;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	this.webArea = new NavigationArea(getControlContext()){
-		@Override public String getLine(int index)
-		{
-		    return "";
-		}
-		@Override public int getLineCount()
-		{
-		    return 1;
-		}
-		@Override public String getAreaName()
-		{
-		    return "web";
-		}
+
+	final var params = new BlockArea.Params();
+	params.context = getControlContext();
+	params.appearance = new Appearance();
+	this.webArea = new BlockArea(params){
 	    };
+	webArea.setBlocks(getTestBlocks());
+	
 	setAreaLayout(webArea, actions(
 				       action("open-url", app.getStrings().actionOpenUrl(), new InputEvent(InputEvent.Special.F6), this::actOpenUrl)
 ));
@@ -61,4 +59,24 @@ final class MainLayout extends LayoutBase
 	FxThread.runSync(()->app.getEngine().load(url));
 	return true;
     }
+
+        private final class Appearance implements BlockArea.Appearance
+    {
+	@Override public void announceFirstBlockLine(Block block, BlockLine blockLine)
+	{
+	    	    final var webLine = (WebLine)blockLine;
+		    app.setEventResponse(text(webLine.text));
+	}
+	@Override public void announceBlockLine(Block block, BlockLine blockLine)
+	{
+	    	    final var webLine = (WebLine)blockLine;
+		    		    app.setEventResponse(text(webLine.text));
+	}
+	@Override public String getBlockLineTextAppearance(Block block, BlockLine blockLine)
+	{
+	    final var webLine = (WebLine)blockLine;
+	    return webLine.text;
+	}
+    }
+
 }

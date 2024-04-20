@@ -27,9 +27,12 @@ import org.luwrain.controls.*;
 
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.NullCheck.*;
+import static org.luwrain.core.Log.*;
 
 public class BlockArea implements Area
 {
+    static final String
+	LOG_COMPONENT = "blocks";
     static private final int
 	MIN_VISIBLE_WIDTH = 20;
 
@@ -82,9 +85,12 @@ public class BlockArea implements Area
 	this.blocks.clear();
 	this.blocks.addAll(Arrays.asList(blocks));
 	this.view = new View(appearance, this.blocks);
+	this.it = new BlockIterator(this);
+	this.hotPointX = 0;
 	context.onAreaNewContent(this);
 	context.onAreaNewHotPoint(this);
 	context.onAreaNewName(this);
+	debug(LOG_COMPONENT, "Setting " + this.blocks.size() + " blocks");
     }
 
     public boolean isEmpty()

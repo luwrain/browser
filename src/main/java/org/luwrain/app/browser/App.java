@@ -38,6 +38,8 @@ final class App extends AppBase<Strings>
 static final String
     LOG_COMPONENT = "browser";
 
+    static private final boolean LOAD_INITIAL = false;
+
     private final String arg;
     private Conv conv = null;
     private MainLayout mainLayout = null;
@@ -73,6 +75,7 @@ static final String
 			});
 		this.mainLayout = new MainLayout(this);
 		setAppName(getStrings().appName());
+		if (LOAD_INITIAL)
 				getLuwrain().showGraphical((graphicalModeControl)->{
 		webView.setOnKeyReleased((event)->{
 			switch(event.getCode())
@@ -104,6 +107,11 @@ static final String
 	switch(newState)
 	{
 	case SUCCEEDED:
+	    if (firstSwitching != null)
+	    {
+		firstSwitching.run();
+		firstSwitching = null;
+	    }
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
 	    break;
 	    	case FAILED:

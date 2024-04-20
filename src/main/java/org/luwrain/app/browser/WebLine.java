@@ -1,5 +1,6 @@
 /*
    Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
 
@@ -14,9 +15,21 @@
    General Public License for more details.
 */
 
-package org.luwrain.controls.block;
+package org.luwrain.app.browser;
 
-public interface BlockLine
+import java.util.*;
+
+import org.luwrain.controls.block.*;
+
+import static org.luwrain.core.NullCheck.*;
+
+final class WebLine implements BlockLine
 {
-    //    String getBlockLineText();
+    final String text;
+
+    WebLine(String text)
+    {
+	notNull(text, "text");
+	this.text = text;
+    }
 }
