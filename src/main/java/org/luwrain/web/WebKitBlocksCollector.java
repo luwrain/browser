@@ -82,7 +82,8 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
     @Override public void addTextToBlock(Node node, WebKitBlock block)
     {
 	final TextImpl t = (TextImpl)node;
-	block.textBuilder.append(t.getWholeText());
+	//	block.textBuilder.append(t.getWholeText());
+	block.runs.add(new WebKitBlock.Run(t.getWholeText()));
 	//	log(t.getWholeText());
     }
 
@@ -93,8 +94,10 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 
     @Override public boolean saveBlock(WebKitBlock block)
     {
-block.text = new String(block.textBuilder);
-block.textBuilder = null;
+	final var b = new StringBuilder();
+	for(var r: block.runs)
+	    b.append(r.text);
+	block.text = new String(b);
 	return !block.text.trim().isEmpty();
     }
 }

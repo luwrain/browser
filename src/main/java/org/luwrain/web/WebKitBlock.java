@@ -25,13 +25,15 @@ import com.sun.webkit.dom.*;
 import static org.luwrain.core.NullCheck.*;
 import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.app.webinspector.App.log;
+import static java.lang.Character.*;
 
 public final class WebKitBlock extends BlockGeom.Block
 {
     public final NodeImpl node;
         public final DOMWindowImpl window;
     public String text = null;
-    StringBuilder textBuilder = new StringBuilder();
+    //    StringBuilder textBuilder = new StringBuilder();
+    final List<Run> runs = new ArrayList<>();
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
@@ -55,6 +57,11 @@ public final class WebKitBlock extends BlockGeom.Block
       }
     }
 
+    voi dbuildLines()
+    {
+	
+    }
+
         public String getStyle()
     {
 	if (node instanceof Element el)
@@ -68,5 +75,25 @@ public final class WebKitBlock extends BlockGeom.Block
         return res.get();
 	}
 	return null;
+    }
+
+    static public final class Run
+    {
+	public final String text;
+	Run(String text)
+	{
+	    notNull(text, "text");
+	    this.text = text;
+	}
+	List<Integer> getBreaks()
+	{
+	    final var res = new ArrayList<Integer>();
+	    for(int i = 1;i < text.length();i++)
+	    {
+		final char ch = text.charAt(i), prevCh = text.charAt(i - 1);
+		if (!isSpace(ch) && isSpace(prevCh))
+		    res.add(Integer.valueOf(i));
+	    }
+	    return res;
     }
 }
