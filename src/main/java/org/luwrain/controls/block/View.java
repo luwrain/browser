@@ -29,7 +29,7 @@ public final class View implements Lines
     private final ArrayList<Block> blocks = new ArrayList<>();
     private final ArrayList<String> lines = new ArrayList<>();
 
-    View(BlockArea.Appearance appearance, List<Block> blocks)
+    public View(BlockArea.Appearance appearance, List<Block> blocks)
     {
 	notNull(appearance, "appearance");
 	notNull(blocks, "blocks");
