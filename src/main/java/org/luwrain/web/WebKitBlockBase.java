@@ -43,25 +43,46 @@ public final class WebKitBlockBase extends BlockGeom.Block
 	{
 	    final int len = r.text.length();
 	    final var breaks = r.getBreaks();
-	    System.out.println(Arrays.toString(breaks));
 	    int continueFrom = 0;
 	    while(continueFrom < len)
 	    {
-		//No need to break the run any more
+		//No space left at all, we need to create new line
+		if (spaceLeft == 0)
+		{
+				    this.lines.add(new Line(fragments));
+		    fragments.clear();
+		    spaceLeft = availableWidth;
+		    continue;
+	    }
+		//No need to break the run any more, we have the room for the entire remaining part
 		if (len - continueFrom <= spaceLeft)
 		{
 		    fragments.add(new Fragment(r, continueFrom, len));
+		    spaceLeft -= len - continueFrom;
 		    continueFrom = len;
 		    continue;
 		}
+		if (breaks.length == 0)
+		{
+		    fragments.add(new Fragment(r, continueFrom, continueFrom + spaceLeft));
+		    		    continueFrom += spaceLeft;
+		    spaceLeft = 0;
+		    continue;
+		}
 		int newBreak = findNextBreak(breaks, continueFrom, len, spaceLeft);
-		//		System.out.println("Break " + newBreak);
 		//No room for breaking even on the closest break
 		if (newBreak < 0)
 		{
+		    if (spaceLeft == availableWidth)
+		    {
+			if (!fragments.isEmpty())
+			    throw new IllegalStateException("having fragments without consumed space");
+			lines.add(new Line(Arrays.asList(new Fragment(r, continueFrom, continueFrom + spaceLeft))));
+			continueFrom += spaceLeft;
+			continue;
+		    }
 		    this.lines.add(new Line(fragments));
 		    fragments.clear();
-		    //FIXME:spaceLeft = availableSpace
 		    spaceLeft = availableWidth;
 		    continue;
 		}

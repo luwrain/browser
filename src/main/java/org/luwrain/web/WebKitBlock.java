@@ -27,14 +27,11 @@ import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.app.webinspector.App.log;
 import static java.lang.Character.*;
 
-public final class WebKitBlock extends BlockGeom.Block
+public final class WebKitBlock extends WebKitBlockBase
 {
     public final NodeImpl node;
         public final DOMWindowImpl window;
     public String text = null;
-    //    StringBuilder textBuilder = new StringBuilder();
-    public final List<Run> runs = new ArrayList<>();
-    public final List<Line> lines = new ArrayList<>();
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
