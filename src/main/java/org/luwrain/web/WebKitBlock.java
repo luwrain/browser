@@ -33,7 +33,8 @@ public final class WebKitBlock extends BlockGeom.Block
         public final DOMWindowImpl window;
     public String text = null;
     //    StringBuilder textBuilder = new StringBuilder();
-    final List<Run> runs = new ArrayList<>();
+    public final List<Run> runs = new ArrayList<>();
+    public final List<Line> lines = new ArrayList<>();
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
@@ -57,9 +58,36 @@ public final class WebKitBlock extends BlockGeom.Block
       }
     }
 
-    voi dbuildLines()
+    void buildLines()
     {
-	
+	final int availableWidth = this.right - this.left;
+	int spaceLeft = availableWidth;
+	for(final var r: runs)
+	{
+	    final var len = r.text.length();
+	    final var breaks = r.getBreaks();
+	    int continueFrom = 0;
+	    while(continueFrom < len)
+	    {
+		int newBreak = findNextBreak(breaks, continueFrom, len, spaceLeft);
+		//New fragment continueFrom to break
+		spaceLeft -= newBreak - continueFrom;
+	    }
+	}
+    }
+
+    int findNextBreak(int[]   breaks, int continueFrom, int wholeLen, int availableSpace)
+    {
+	if (wholeLen - continueFrom <= availableSpace)
+	    return -1;
+	int left;
+	//Searching the closest break to continueWith located on the left (there are no breaks more to continueWith).
+	//If continueWith has the same location as one of the breaks, we have to choose the corresponding break.
+	for(left = 0;left + 1 < breaks.length && breaks[left + 1] <= continueFrom;left++);
+	int right = breaks.length - 1;
+	while(right > left && breaks[right] - continueFrom > availableSpace)
+	      right--;
+	      return right > left?breaks[right]:continueFrom + availableSpace;
     }
 
         public String getStyle()
@@ -85,7 +113,7 @@ public final class WebKitBlock extends BlockGeom.Block
 	    notNull(text, "text");
 	    this.text = text;
 	}
-	List<Integer> getBreaks()
+	int[] getBreaks()
 	{
 	    final var res = new ArrayList<Integer>();
 	    for(int i = 1;i < text.length();i++)
@@ -94,6 +122,38 @@ public final class WebKitBlock extends BlockGeom.Block
 		if (!isSpace(ch) && isSpace(prevCh))
 		    res.add(Integer.valueOf(i));
 	    }
-	    return res;
+	    final int[] intRes = new int[res.size()];
+	    for(int i = 0;i < intRes.length;i++)
+		intRes[i] = res.get(i).intValue();
+	    return intRes;
     }
+    }
+	
+	static public final class Fragment
+	{
+	    public final Run run;
+	    public final int fromPos, toPos;
+	    Fragment(Run run, int fromPos, int toPos)
+	    {
+		notNull(run, "run");
+		if (fromPos < 0 || toPos < 0)
+		    throw new IllegalArgumentException("fromPos (" + fromPos + ") and toPos (" + toPos + ") can't be negative");
+		if (fromPos > toPos)
+		    throw new IllegalArgumentException("fromPos ( " + fromPos + ") must be less than toPos (" + toPos + ")");
+		this.run = run;
+		this.fromPos = fromPos;
+		this.toPos = toPos;
+	    }
+	}
+
+	static public final class Line
+	{
+	    public final Fragment[] fragments;
+	    Line(List<Fragment> fragments)
+	    {
+		notNull(fragments, "fragments");
+		this.fragments = fragments.toArray(new Fragment[fragments.size()]);
+	    }
+	}
+	    
 }
