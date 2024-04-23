@@ -27,7 +27,9 @@ import static org.luwrain.graphical.FxThread.*;
 import static org.luwrain.app.webinspector.App.log;
 import static java.lang.Character.*;
 
-public final class WebKitBlockBase extends BlockGeom.Block
+import static org.luwrain.core.Log.*;
+
+class WebKitBlockBase extends BlockGeom.Block
 {
     public String text = null;
     public final List<Run> runs = new ArrayList<>();
@@ -35,8 +37,13 @@ public final class WebKitBlockBase extends BlockGeom.Block
 
     void buildLines()
     {
+	System.out.println("calculating for width=" + (this.right - this.left) + " and " + runs.size() + " runs");
+	for(var r: runs)
+	    System.out.println(r.text);
 	this.lines.clear();
 	final int availableWidth = this.right - this.left;
+	if (availableWidth <= 0)
+	    throw new IllegalStateException("The width of the block is equal to zero");
 	int spaceLeft = availableWidth;
 	final var fragments = new ArrayList<Fragment>();
 	for(final var r: runs)
@@ -90,13 +97,6 @@ public final class WebKitBlockBase extends BlockGeom.Block
 		fragments.add(new Fragment(r, continueFrom, newBreak));
 		spaceLeft -= newBreak - continueFrom;
 		continueFrom = newBreak;
-
-		//				System.out.println("continueFrom=" + continueFrom);
-		//		System.out.println("spaceLeft=" + spaceLeft);
-
-
-		
-		//		stop();
 	    }
 	}
 	if (!fragments.isEmpty())

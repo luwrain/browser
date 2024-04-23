@@ -23,10 +23,7 @@ import java.util.concurrent.atomic.*;
 import javafx.scene.web.WebEngine;
 
 import org.w3c.dom.*;
-//import org.w3c.dom.NodeList;
-//import org.w3c.dom.Element;
 import org.w3c.dom.html.*;
-//import org.w3c.dom.html.HTMLBodyElement;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.views.DocumentView;
 
@@ -71,6 +68,22 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 
     @Override public boolean isMarkupNode(Node node)
     {
+
+	//true
+	if (node instanceof HTMLAnchorElementImpl) return true;
+
+	//false
+	if (node instanceof CommentImpl) return false;
+	if (node instanceof HTMLLIElementImpl) return false;
+	if (node instanceof HTMLUListElementImpl) return false;
+	if (node instanceof  HTMLButtonElementImpl) return false;
+	if (node instanceof HTMLDivElementImpl) return false;
+	if (node instanceof HTMLBRElementImpl) return false;
+
+
+if (!(node instanceof HTMLElementImpl) &&
+    !(node instanceof ElementImpl))
+	log("Unclassified: " + node.getClass().getSimpleName());
 	return false;
     }
 

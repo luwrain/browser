@@ -40,14 +40,14 @@ public final class WebKitBlocks
 
     public void process()
     {
+	log("Starting processing");
 	blocks.clear();
 	final var c = new WebKitBlocksCollector(engine);
+	log("Collecting blocks");
 	c.process(body);
-	/*
-	for(var b: c.blocks)
-	    log(new String(b.textBuilder));
-	*/
 	    blocks.addAll(c.blocks);
+	    //	    for(final var b: blocks)
+	    //		b.buildLines();
     }
 
 }
