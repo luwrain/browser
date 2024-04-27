@@ -3,7 +3,7 @@
 
    This file is part of LUWRAIN.
 
-пт   LUWRAIN is free software; you can redistribute it and/or
+   LUWRAIN is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
    License as published by the Free Software Foundation; either
    version 3 of the License, or (at your option) any later version.
@@ -29,10 +29,14 @@ import static java.lang.Character.*;
 
 public final class WebKitBlock extends WebKitBlockBase
 {
+static private final int
+    MIN_BLOCK_WIDTH = 5;
+
     public final NodeImpl node;
         public final DOMWindowImpl window;
     public String text = null;
     final boolean visible;
+    private int srcLeft, srcRight, srcTop;
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
@@ -60,6 +64,16 @@ public final class WebKitBlock extends WebKitBlockBase
     public boolean isVisible()
     {
 	return this.visible;
+    }
+
+    void rescale(float scale)
+    {
+	srcLeft = left;
+	srcRight = right;
+	srcTop = top;
+	left = Float.valueOf(scale * left).intValue();
+	right = Math.max(Float.valueOf(scale * right).intValue(), left + MIN_BLOCK_WIDTH );
+				top = Float.valueOf(scale * top).intValue();
     }
 
         public String getStyle()

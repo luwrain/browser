@@ -144,10 +144,31 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				 lines.addLine("");
 				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
 				 lines.addLine("(" + block.left + ", " + block.right + ", " + block.top + ")");
+				 lines.addLine("");
+				 lines.addLine("" + block.runs.size() + " runs, " + block.lines.size() + " lines");
+				 lines.addLine("Runs:");
+				 for(var r: block.runs)
+				     lines.addLine(r.toString().replaceAll("\u00a0", " "));
+
+				 lines.addLine("");
+				 lines.addLine("Строки:");
+				 for(var l: block.lines)
+				 {
+				     final var b = new StringBuilder();
+				     for(var f: l.fragments)
+					 b.append("'").append(f.text()).append("',");
+					 final var s = new String(b);
+				     if (!s.isEmpty())
+					 lines.addLine(s.substring(0, s.length() - 1).replaceAll("\u00a0", " "));
+					 }
+
+				 lines.addLine("");
+				 lines.addLine("Стиль:");
 				 final var style = block.getStyle();
 				 if (style != null)
 				     for(var l: style.split(";", -1))
-				     lines.addLine(l);
+					 lines.addLine(l);
+
 			     });
 			 stylesArea.setHotPoint(0, 0);
 			 setActiveArea(stylesArea);
@@ -178,19 +199,6 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 		 lines.clear();
 		 lines.addLine("Test styles box");
 		 });
-		//final WebObject obj = elementsArea.selected();
-		//if (obj == null)
-		//	return false;
-		//final String text = obj.getStyleAsText();
-		//if (text == null)
-		//	return false;
-		//stylesArea.update((lines)->{
-		//	lines.clear();
-		//	final String[] ll = text.split(";", -1);
-		//	for(String l: ll)
-		//		lines.addLine(l);
-		//	});
-		//setActiveArea(stylesArea);
 		return true;
     }
 

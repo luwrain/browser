@@ -110,7 +110,7 @@ public final class App extends AppBase <Strings>implements Application
     {
 	runSync(()->{
 		final var b = new org.luwrain.web.WebKitBlocks(webEngine);
-b.process();
+b.process(100);
 this.blocks.clear();
 this.blocks.addAll(b.blocks);
 	    });
@@ -126,7 +126,7 @@ this.blocks.addAll(b.blocks);
 		{
 		case SUCCEEDED: {
 final var b = new org.luwrain.web.WebKitBlocks(webEngine);
-b.process();
+b.process(100);
 this.blocks.clear();
 this.blocks.addAll(b.blocks);
 						getLuwrain().runUiSafely(()->{

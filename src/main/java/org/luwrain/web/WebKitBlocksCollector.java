@@ -79,10 +79,40 @@ public final class WebKitBlocksCollector extends BlocksCollector<Node, WebKitBlo
 	if (node instanceof  HTMLButtonElementImpl) return false;
 	if (node instanceof HTMLDivElementImpl) return false;
 	if (node instanceof HTMLBRElementImpl) return false;
+	if (node instanceof HTMLElementImpl el)
+	{
+	    switch(el.getTagName())
+	    {
+	    case "BR":
+	    case "EM":
+	    case "B":
+	    case "SPAN":
+	    case "STRONG":
+	    case "IMG":
+		return true;
+	    }
+	    switch (el.getTagName())
+	    {
+	    case "BODY":
+	    case "LINK":
+	    case "STYLE":
+	    case "P":
+	    case "HR":
+	    case "INPUT":
+	    case "SCRIPT":
+	    case "NOSCRIPT":
+	    case "TEXTAREA":
+	    case "H1":
+	    case "H2":
+	    case "H3":
+		return false;
+	    }
+	    log("Unmatched element " + el.getTagName() );
+	    return false;
+	}
 
 
-if (!(node instanceof HTMLElementImpl) &&
-    !(node instanceof ElementImpl))
+if (!(node instanceof ElementImpl))
 	log("Unclassified: " + node.getClass().getSimpleName());
 	return false;
     }

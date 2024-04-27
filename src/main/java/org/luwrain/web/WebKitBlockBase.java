@@ -29,7 +29,7 @@ import static java.lang.Character.*;
 
 import static org.luwrain.core.Log.*;
 
-class WebKitBlockBase extends BlockGeom.Block
+public class WebKitBlockBase extends BlockGeom.Block
 {
     public String text = null;
     public final List<Run> runs = new ArrayList<>();
@@ -139,8 +139,12 @@ class WebKitBlockBase extends BlockGeom.Block
 		intRes[i] = res.get(i).intValue();
 	    return intRes;
     }
+	@Override public String toString()
+	{
+	    return text;
+	}
     }
-	
+
 	static public final class Fragment
 	{
 	    public final Run run;
@@ -161,6 +165,10 @@ class WebKitBlockBase extends BlockGeom.Block
 	    public String text()
 	    {
 		return run.text.substring(fromPos, toPos);
+	    }
+	    @Override public String toString()
+	    {
+		return text();
 	    }
 	}
 

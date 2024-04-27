@@ -38,16 +38,30 @@ public final class WebKitBlocks
         this.body = (HTMLBodyElement)doc.getBody();
     }
 
-    public void process()
+    public void process(int desiredWidth)
     {
-	log("Starting processing");
-	blocks.clear();
-	final var c = new WebKitBlocksCollector(engine);
-	log("Collecting blocks");
-	c.process(body);
+	try {
+	    if (desiredWidth <= 0)
+		throw new IllegalArgumentException("desiredWidth (" + desiredWidth + ") must be a positive number");
+	    blocks.clear();
+	    final var c = new WebKitBlocksCollector(engine);
+	    c.process(body);
 	    blocks.addAll(c.blocks);
-	    //	    for(final var b: blocks)
-	    //		b.buildLines();
+	    int maxWidth = 0;
+	    for(var b: blocks)
+		maxWidth = Math.max(maxWidth, b.right);
+	    final float scale = Float.valueOf(desiredWidth) / maxWidth;
+	    log("Scale is " + String.format("%.2f", scale));
+	    blocks.parallelStream().forEach(b->b.rescale(scale));
+	    log("Building lines");
+	    for(final var b: blocks)
+		b.buildLines();
+	    log("Building of lines completed");
+	}
+    catch(Throwable e)
+    {
+	log("Exception: " + e.getClass().getSimpleName());
+	log("Message: " + e.getMessage());
     }
-
+    }
 }
