@@ -20,11 +20,15 @@ package org.luwrain.app.browser;
 import java.util.*;
 
 import org.luwrain.controls.block.*;
+import org.luwrain.web.*;
+
+import static org.luwrain.core.NullCheck.*;
 
 final class WebBlock implements Block
 {
     final int x, y, width;
-    final List<WebLine> lines = new ArrayList<>();
+    final ArrayList<WebLine> lines = new ArrayList<>();
+    final WebKitBlock srcBlock;
 
     WebBlock(int x, int y, int width, List<WebLine> lines)
     {
@@ -38,6 +42,18 @@ final class WebBlock implements Block
 	this.y = y;
 	this.width = width;
 	this.lines.addAll(lines);
+	this.srcBlock = null;
+    }
+
+    WebBlock(WebKitBlock srcBlock)
+    {
+	notNull(srcBlock, "srcBlock");
+	this.x = srcBlock.getLeft();
+	this.y = srcBlock.getTop();
+	this.width = srcBlock.getWidth();
+	lines.ensureCapacity(srcBlock.lines.size());
+	srcBlock.lines.forEach(b->lines.add(new WebLine(b)));
+	this.srcBlock = srcBlock;
     }
 
     @Override public int getWidth()

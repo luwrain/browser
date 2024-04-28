@@ -37,9 +37,7 @@ public class WebKitBlockBase extends BlockGeom.Block
 
     void buildLines()
     {
-	System.out.println("calculating for width=" + (this.right - this.left) + " and " + runs.size() + " runs");
 	for(var r: runs)
-	    System.out.println(r.text);
 	this.lines.clear();
 	final int availableWidth = this.right - this.left;
 	if (availableWidth <= 0)
@@ -101,6 +99,7 @@ public class WebKitBlockBase extends BlockGeom.Block
 	}
 	if (!fragments.isEmpty())
 	    lines.add(new Line(fragments));
+	this.height = lines.size();
     }
 
     int findNextBreak(int[]   breaks, int continueFrom, int wholeLen, int availableSpace)
@@ -116,6 +115,13 @@ public class WebKitBlockBase extends BlockGeom.Block
 	      right--;
 	      return right > left?breaks[right]:-1;
     }
+
+    public int getLeft() { return left; }
+    public int getRight() { return right; }
+    public int getWidth() { return right - left; }
+        public int getTop() { return top; }
+    public int getBottom() { return top + lines.size(); }
+    public int getHeight() { return lines.size(); }
 
     static public final class Run
     {

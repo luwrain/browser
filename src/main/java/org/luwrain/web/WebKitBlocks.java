@@ -38,7 +38,7 @@ public final class WebKitBlocks
         this.body = (HTMLBodyElement)doc.getBody();
     }
 
-    public void process(int desiredWidth)
+    public List<WebKitBlock> process(int desiredWidth)
     {
 	try {
 	    if (desiredWidth <= 0)
@@ -54,14 +54,16 @@ public final class WebKitBlocks
 	    log("Scale is " + String.format("%.2f", scale));
 	    blocks.parallelStream().forEach(b->b.rescale(scale));
 	    log("Building lines");
-	    for(final var b: blocks)
-		b.buildLines();
+	    blocks.forEach(b->b.buildLines());//FIXME:parallelStream
 	    log("Building of lines completed");
+	    new BlockGeom(blocks).process();
+	    return blocks;
 	}
     catch(Throwable e)
     {
 	log("Exception: " + e.getClass().getSimpleName());
 	log("Message: " + e.getMessage());
+	return Arrays.asList();
     }
     }
 }

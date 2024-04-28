@@ -38,7 +38,7 @@ final class App extends AppBase<Strings>
 static final String
     LOG_COMPONENT = "browser";
 
-    static private final boolean LOAD_INITIAL = false;
+    static private final boolean LOAD_INITIAL = true;
 
     private final String arg;
     private Conv conv = null;
@@ -61,7 +61,7 @@ static final String
 		runSync(()->{
 						this.webView = new WebView();
 			this.webEngine = webView.getEngine();
-			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
+			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.browser").toFile());
 			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
 		/*
 		this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
@@ -112,7 +112,14 @@ static final String
 		firstSwitching.run();
 		firstSwitching = null;
 	    }
-	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.OK));
+	    final var blocks = new WebKitBlocks(webEngine).process(100);
+	    getLuwrain().runUiSafely(()->{
+		    final var b = new ArrayList<WebBlock>();
+		    b.ensureCapacity(blocks.size());
+		    blocks.forEach(i->b.add(new WebBlock(i)));
+		    mainLayout.webArea.setBlocks(b.toArray(new WebBlock[b.size()]));
+		    getLuwrain().playSound(Sounds.OK);
+		});
 	    break;
 	    	case FAILED:
 	    getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));

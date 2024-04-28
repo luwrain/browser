@@ -16,18 +16,23 @@
 
 package org.luwrain.web;
 
+import java.util.*;
+import static java.util.Arrays.*;
+
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.luwrain.web.BlockGeom.Block;
 
 public class BlockGeomTest
 {
     @Test public void main()
     {
-	final var b = new BlockGeom(new BlockGeom.Block[]{
-				new Block(1, 4, 3, 5),
-		new Block(3, 5, 1, 5),
-		new Block(1, 5, 1, 5),
-	    });
+	final var b = new BlockGeom(asList(
+				     new Block(1, 4, 3, 5),
+				     new Block(3, 5, 1, 5),
+				     new Block(1, 5, 1, 5)
+					   ));
 	b.process();
 	assertNotNull(b.blocks);
 	assertEquals(3, b.blocks.length);

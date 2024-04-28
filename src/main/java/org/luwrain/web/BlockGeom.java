@@ -25,10 +25,11 @@ public final class BlockGeom
     public final Block[] blocks;
     private final int count;
     private int[][] matrix = null;
-    public BlockGeom(Block[] blocks)
+
+    public BlockGeom(List<? extends Block> blocks)
     {
-	this.blocks = blocks;
-	this.count = blocks.length;
+	this.blocks = blocks.toArray(new Block[blocks.size()]);
+	this.count = blocks.size();
     }
 
     	public void process()
@@ -67,7 +68,7 @@ public final class BlockGeom
 
     static public class Block implements Comparable<Block>
     {
-	public int left, right, top, height;
+	int left, right, top, height;
 	@Override public  int compareTo(Block b)
 	{
 	    if (top != b.top)

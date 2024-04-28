@@ -143,7 +143,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 				 lines.clear();
 				 lines.addLine("");
 				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
-				 lines.addLine("(" + block.left + ", " + block.right + ", " + block.top + ")");
+				 lines.addLine("(" + block.getLeft() + ", " + block.getRight() + ", " + block.getTop() + ")");
 				 lines.addLine("");
 				 lines.addLine("" + block.runs.size() + " runs, " + block.lines.size() + " lines");
 				 lines.addLine("Runs:");

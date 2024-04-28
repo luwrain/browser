@@ -36,7 +36,7 @@ static private final int
         public final DOMWindowImpl window;
     public String text = null;
     final boolean visible;
-    private int srcLeft, srcRight, srcTop;
+    public final int srcLeft, srcRight, srcTop, srcBottom;
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
@@ -48,16 +48,21 @@ static private final int
 	final GeomEntry entry = geom.getEntry(node);
 	if (entry != null)
 	{
-	this.left = entry.x;
-	this.right = entry.x + entry.width;
-	this.top = entry.y;
+	this.srcLeft = entry.x;
+	this.srcRight = entry.x + entry.width;
+	this.srcTop = entry.y;
+	this.srcBottom = entry.y + entry.height;
     } else
       {
 	  log("No geom for the node " + node.getClass().getSimpleName());
-	  this.left = 0;
-	  this.right = 0;
-	  this.top = 0;
+	  this.srcLeft = 0;
+	  this.srcRight = 0;
+	  this.srcTop = 0;
+	  this.srcBottom = 0;
       }
+	this.left = this.srcLeft;
+	this.right = this.srcRight;
+	this.top = this.srcTop;
 	this.visible = (this.right - this.left) > 0;
     }
 
@@ -68,9 +73,6 @@ static private final int
 
     void rescale(float scale)
     {
-	srcLeft = left;
-	srcRight = right;
-	srcTop = top;
 	left = Float.valueOf(scale * left).intValue();
 	right = Math.max(Float.valueOf(scale * right).intValue(), left + MIN_BLOCK_WIDTH );
 				top = Float.valueOf(scale * top).intValue();
