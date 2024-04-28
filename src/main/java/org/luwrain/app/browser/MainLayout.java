@@ -25,6 +25,7 @@ import org.luwrain.controls.*;
 import org.luwrain.controls.block.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
+import org.luwrain.app.browser.layouts.*;
 
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.app.browser.TestBlocks.*;
@@ -42,6 +43,16 @@ final class MainLayout extends LayoutBase
 	params.context = getControlContext();
 	params.appearance = new Appearance();
 	this.webArea = new BlockArea(params){
+		@Override public boolean onSystemEvent(SystemEvent event)
+		{
+		    if (event.getType() == SystemEvent.Type.REGULAR)
+			switch(event.getCode())
+			{
+			case PROPERTIES:
+			    return onShowInfo();
+			}
+		    return super.onSystemEvent(event);
+		}
 	    };
 	webArea.setBlocks(getTestBlocks());
 	setAreaLayout(webArea, actions(
@@ -56,6 +67,18 @@ final class MainLayout extends LayoutBase
 	if (url == null)
 	    return false;
 	FxThread.runSync(()->app.getEngine().load(url));
+	return true;
+    }
+
+    private boolean onShowInfo()
+    {
+	final var infoLayout = new InfoLayout(app, ()->{
+		app.setAreaLayout(MainLayout.this);
+		getLuwrain().announceActiveArea();
+		return true;
+	});
+	app.setAreaLayout(infoLayout);
+	getLuwrain().announceActiveArea();
 	return true;
     }
 
@@ -77,7 +100,6 @@ final class MainLayout extends LayoutBase
 	return true;
     }
 
-
         private final class Appearance implements BlockArea.Appearance
     {
 	@Override public void announceFirstBlockLine(Block block, BlockLine blockLine)
@@ -96,5 +118,4 @@ final class MainLayout extends LayoutBase
 	    return webLine.text;
 	}
     }
-
 }

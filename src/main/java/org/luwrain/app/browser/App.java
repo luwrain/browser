@@ -33,7 +33,7 @@ import org.luwrain.web.*;
 
 import static org.luwrain.graphical.FxThread.*;
 
-final class App extends AppBase<Strings>
+public final class App extends AppBase<Strings>
 {
 static final String
     LOG_COMPONENT = "browser";
@@ -112,13 +112,14 @@ static final String
 		firstSwitching.run();
 		firstSwitching = null;
 	    }
+	    final var title = webEngine.getTitle();
 	    final var blocks = new WebKitBlocks(webEngine).process(100);
 	    getLuwrain().runUiSafely(()->{
 		    final var b = new ArrayList<WebBlock>();
 		    b.ensureCapacity(blocks.size());
 		    blocks.forEach(i->{ if (i.visible) b.add(new WebBlock(i)); });
 		    mainLayout.webArea.setBlocks(b.toArray(new WebBlock[b.size()]));
-		    Log.debug(LOG_COMPONENT, "web page ready");
+		    setAppName(title);
 		    getLuwrain().playSound(Sounds.OK);
 		});
 	    break;
@@ -129,6 +130,6 @@ static final String
     }
 
     Conv getConv() { return this.conv; }
-    WebEngine getEngine() { return webEngine; }
-    WebView getView() { return webView; }
+    public WebEngine getEngine() { return webEngine; }
+    public WebView getView() { return webView; }
 }

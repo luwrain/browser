@@ -70,14 +70,17 @@ public final class App extends AppBase <Strings>implements Application
 			this.webEngine = webView.getEngine();
 			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.webins").toFile());
 			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
+					this.webEngine.setOnError(event->print("ERROR: " + event.getMessage()));
+					this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->print("Progress " + String.valueOf(n)));
+							this.webEngine.setOnAlert(event->print("ALERT: " + event.getData()));
 		/*
-		this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
-		this.webEngine.setOnAlert((event)->events.onAlert(event.getData()));
 		this.webEngine.setPromptHandler((event)->events.onPrompt(event.getMessage(),event.getDefaultValue()));
 		this.webEngine.setConfirmHandler((param)->events.onConfirm(param));
-		this.webEngine.setOnError((event)->events.onError(event.getMessage()));
-		this.webView.setOnKeyReleased((event)->onKeyReleased(event));
 		*/
+							com.sun.javafx.webkit.WebConsoleListener.setDefaultListener((view, message, lineNum, source)->{
+					print("Console message");
+					print(message);
+				    });
 			this.webView.setVisible(false);
 			});
 		this.mainLayout = new MainLayout(this);
@@ -139,11 +142,11 @@ mainLayout.blocksArea.refresh();
 firstSwitching.run();
 	firstSwitching = null;
 }
-
 				break;
 		}
 					case FAILED:
 				getLuwrain().runUiSafely(()->getLuwrain().playSound(Sounds.ERROR));
+
 				break;
 		}
     }
