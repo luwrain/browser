@@ -38,17 +38,16 @@ final class MainLayout extends LayoutBase
     {
 	super(app);
 	this.app = app;
-
 	final var params = new BlockArea.Params();
 	params.context = getControlContext();
 	params.appearance = new Appearance();
 	this.webArea = new BlockArea(params){
 	    };
 	webArea.setBlocks(getTestBlocks());
-	
 	setAreaLayout(webArea, actions(
-				       action("open-url", app.getStrings().actionOpenUrl(), new InputEvent(InputEvent.Special.F6), this::actOpenUrl)
-));
+				       action("open-url", app.getStrings().actionOpenUrl(), new InputEvent(InputEvent.Special.F6), this::actOpenUrl),
+				       action("show-graphical", app.getStrings().actionShowGraphical(), new InputEvent(InputEvent.Special.F10), this::actShowGraphical)
+				       ));
     }
 
     private boolean actOpenUrl()
@@ -59,6 +58,25 @@ final class MainLayout extends LayoutBase
 	FxThread.runSync(()->app.getEngine().load(url));
 	return true;
     }
+
+        private boolean actShowGraphical()
+    {
+	getLuwrain().showGraphical((graphicalModeControl)->{
+		app.getView().setOnKeyReleased((event)->{
+			switch(event.getCode())
+			{
+			case ESCAPE:
+			    app.getLuwrain().runUiSafely(()->app.getLuwrain().playSound(Sounds.OK));
+			    graphicalModeControl.close();
+			    break;
+			}
+		    });
+		app.getView().setVisible(true);
+		return app.getView();
+	    });
+	return true;
+    }
+
 
         private final class Appearance implements BlockArea.Appearance
     {

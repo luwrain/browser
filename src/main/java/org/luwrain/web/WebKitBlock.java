@@ -32,19 +32,27 @@ public final class WebKitBlock extends WebKitBlockBase
 static private final int
     MIN_BLOCK_WIDTH = 5;
 
-    public final NodeImpl node;
-        public final DOMWindowImpl window;
+    public final String className, tagName;
+        public final int srcLeft, srcRight, srcTop, srcBottom;
+        public final boolean visible;
+    final NodeImpl node;
+        final DOMWindowImpl window;
     public String text = null;
-    final boolean visible;
-    public final int srcLeft, srcRight, srcTop, srcBottom;
+
+
 
     public WebKitBlock(DOMWindowImpl window, WebKitGeom geom, NodeImpl node)
     {
 	notNull(window, "window");
 	notNull(geom, "geom");
 		notNull(node, "node");
+		ensure();
 	this.window = window;
 	this.node = node;
+	this.className = node.getClass().getSimpleName();
+	if (node instanceof HTMLElementImpl el)
+	    tagName = el.getTagName(); else
+	    tagName = null;
 	final GeomEntry entry = geom.getEntry(node);
 	if (entry != null)
 	{

@@ -142,8 +142,11 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 			 stylesArea.update((lines)->{
 				 lines.clear();
 				 lines.addLine("");
-				 lines.addLine("Класс: " + block.node.getClass().getSimpleName());
-				 lines.addLine("(" + block.getLeft() + ", " + block.getRight() + ", " + block.getTop() + ")");
+				 lines.addLine("Класс: " + block.className);
+				 lines.addLine("Тег: " + block.tagName);
+				 lines.addLine("Текстовые размеры: " + block.getLeft() + ", " + block.getRight() + ", " + block.getTop() + ", " + block.getBottom());
+				 lines.addLine("Исходные размеры: " + block.srcLeft + ", " + block.srcRight + ", " + block.srcTop + ", " + block.srcBottom);
+				 lines.addLine("Видимый: " + (block.visible?"да":"нет"));
 				 lines.addLine("");
 				 lines.addLine("" + block.runs.size() + " runs, " + block.lines.size() + " lines");
 				 lines.addLine("Runs:");

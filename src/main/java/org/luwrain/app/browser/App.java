@@ -116,8 +116,9 @@ static final String
 	    getLuwrain().runUiSafely(()->{
 		    final var b = new ArrayList<WebBlock>();
 		    b.ensureCapacity(blocks.size());
-		    blocks.forEach(i->b.add(new WebBlock(i)));
+		    blocks.forEach(i->{ if (i.visible) b.add(new WebBlock(i)); });
 		    mainLayout.webArea.setBlocks(b.toArray(new WebBlock[b.size()]));
+		    Log.debug(LOG_COMPONENT, "web page ready");
 		    getLuwrain().playSound(Sounds.OK);
 		});
 	    break;
