@@ -16,26 +16,36 @@
 
 package org.luwrain.web;
 
+import java.io.IOException;
 import java.util.*;
 
+import javafx.concurrent.Worker;
 import javafx.scene.web.WebEngine;
+import netscape.javascript.JSObject;
 import org.w3c.dom.html.*;
 
 import static org.luwrain.app.webinspector.App.log;
+import static org.luwrain.util.ResourceUtils.getStringResource;
 
 public final class WebKitBlocks
 {
+	static private final String MUTATION_OBSERVER_INJECTION = "mutation_observer_injection.js";
+	static private String mutationObserverInjection = null;
+
     public final List<WebKitBlock> blocks = new ArrayList<>();
 
     final WebEngine engine;
     final HTMLDocument doc;
     final HTMLBodyElement body;
 
+	private boolean needsToBeUpdated = false;
+
     public WebKitBlocks(WebEngine engine)
     {
-	this.engine = engine;
-	        this.doc = (HTMLDocument)engine.documentProperty().getValue();
+		this.engine = engine;
+		this.doc = (HTMLDocument)engine.documentProperty().getValue();
         this.body = (HTMLBodyElement)doc.getBody();
+		enableMutationObserver();
     }
 
     public List<WebKitBlock> process(int desiredWidth)
@@ -66,4 +76,42 @@ public final class WebKitBlocks
 	return Arrays.asList();
     }
     }
+
+	public void enableMutationObserver()
+	{
+		try {
+			if (mutationObserverInjection == null)
+			{
+				mutationObserverInjection = getStringResource(getClass(), MUTATION_OBSERVER_INJECTION);
+				engine.getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) ->
+				{
+					if (newState == Worker.State.SUCCEEDED)
+					{
+						JSObject jsObject = (JSObject) engine.executeScript("window");
+						jsObject.setMember("webKitBlocks", this);
+
+						engine.executeScript(mutationObserverInjection);
+					}
+				});
+			}
+		}
+		catch (IOException e)
+		{
+			log("Can not enable mutation observer injection: " + e.getMessage());
+		}
+		catch (NullPointerException e)
+		{
+			log("Can not find mutation observer injection resource " + MUTATION_OBSERVER_INJECTION);
+		}
+	}
+
+	public boolean isNeedsToBeUpdated()
+	{
+		return needsToBeUpdated;
+	}
+
+	public void setNeedsToBeUpdated(boolean needsToBeUpdated)
+	{
+		this.needsToBeUpdated = needsToBeUpdated;
+	}
 }
