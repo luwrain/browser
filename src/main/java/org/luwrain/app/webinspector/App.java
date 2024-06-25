@@ -20,7 +20,6 @@ package org.luwrain.app.webinspector;
 import java.io.*;
 import java.util.*;
 
-//import org.w3c.dom.Document;
 import org.w3c.dom.css.DocumentCSS;
 
 import javafx.scene.web.WebEngine;
@@ -29,7 +28,7 @@ import javafx.concurrent.Worker.State;
 import javafx.beans.value.ObservableValue;
 
 import org.luwrain.core.*;
-//import org.luwrain.core.events.*;
+import org.luwrain.core.annotations.*;
 import org.luwrain.app.base.*;
 import org.luwrain.graphical.*;
 import org.luwrain.web.*;
@@ -38,6 +37,7 @@ import org.w3c.dom.Node;
 
 import static org.luwrain.graphical.FxThread.*;
 
+@AppNoArgs(name = "web-ins", i18n = { "en=Web-inspector", "ru=Веб-инспектор" })
 public final class App extends AppBase <Strings>implements Application
 {
     static final String

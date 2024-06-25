@@ -17,9 +17,13 @@
 
 package org.luwrain.app.browser;
 
+import org.luwrain.core.annotations.*;
+
+@ResourceStrings(name = "luwrain.browser", resource = "strings.properties", langs = { "en", "ru" })
 public interface Strings
 {
-    static final String NAME = "luwrain.browser";
+    static final String
+	NAME = "luwrain.browser";
 
     String actionHistoryPrev();
     String actionOpenUrl();

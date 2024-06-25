@@ -19,17 +19,19 @@ package org.luwrain.app.browser;
 
 import java.util.*;
 
+import com.google.auto.service.*;
+
 import org.luwrain.core.*;
 import org.luwrain.settings.browser.SettingsFactory;
 import org.luwrain.i18n.*;
 
+@AutoService(org.luwrain.core.Extension.class)
 public final class Extension extends EmptyExtension
 {
     @Override public Command[] getCommands(Luwrain luwrain)
     {
 	return new Command[]{
 	    new SimpleShortcutCommand("browser"),
-	    new SimpleShortcutCommand("web-ins"),
 	    new SimpleShortcutCommand("chromite"),
 	};
     }
@@ -52,8 +54,7 @@ public final class Extension extends EmptyExtension
 			return new Application[]{new org.luwrain.app.browser.App()};
 		    return v.toArray(new Application[v.size()]);
 		}
-	    },
-	    new SimpleShortcut("web-ins", org.luwrain.app.webinspector.App.class)
+	    }
 	};
     }
 
@@ -61,16 +62,6 @@ public final class Extension extends EmptyExtension
     {
 	i18nExt.addCommandTitle(Lang.EN, "browser", "Internet");
 	i18nExt.addCommandTitle(Lang.RU, "browser", "Интернет");
-	i18nExt.addCommandTitle(Lang.EN, "web-ins", "Web inspector");
-	i18nExt.addCommandTitle(Lang.RU, "web-ins", "Веб-инспектор");
-	try {
-	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings-main.properties").create(Lang.EN, Strings.class));
-	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings-main.properties").create(Lang.RU, Strings.class));
-	}
-	catch(java.io.IOException e)
-	{
-	    throw new RuntimeException(e);
-	}
     }
 
     @Override public org.luwrain.cpanel.Factory[] getControlPanelFactories(Luwrain luwrain)

@@ -28,28 +28,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-            </manifest>
-      	    <manifestSections>
-              <manifestSection>
-                <name>org/luwrain</name>
-                <manifestEntries>
-                  <Extensions>org.luwrain.app.browser.Extension</Extensions>
-                </manifestEntries>
-              </manifestSection>
-            </manifestSections>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

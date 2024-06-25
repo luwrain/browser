@@ -17,6 +17,9 @@
 
 package org.luwrain.app.webinspector;
 
+import org.luwrain.core.annotations.*;
+
+@ResourceStrings(name = "luwrain.webinspector", resource = "strings.properties", langs = { "en", "ru" })
 public interface Strings
 {
     static final String NAME = "luwrain.webinspector";
