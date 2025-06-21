@@ -1,0 +1,22 @@
+
+plugins {
+  id 'java'
+  id 'io.freefair.lombok' version '8.6'
+  id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+dependencies {
+  implementation libraries.base
+  implementation libraries.apacheBase
+  implementation (project(':luwrain-base'))
+  implementation (project(':luwrain'))
+  implementation (project(':luwrain-interaction-javafx'))
+  implementation 'com.github.kklisura.cdt:cdt-java-client:4.0.0'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+  testImplementation libraries.junit
+}
+
+javafx { 
+  version = "17"
+  modules = [ 'javafx.controls', 'javafx.web' ]
+}
