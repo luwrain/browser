@@ -10,7 +10,7 @@ dependencies {
   implementation libraries.apacheBase
   implementation (project(':luwrain-base'))
   implementation (project(':luwrain'))
-  implementation (project(':luwrain-interaction-javafx'))
+  implementation project(':luwrain-javafx')
   implementation 'com.github.kklisura.cdt:cdt-java-client:4.0.0'
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
   testImplementation libraries.junit
