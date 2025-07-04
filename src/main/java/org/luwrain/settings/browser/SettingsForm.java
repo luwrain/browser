@@ -37,7 +37,7 @@ final class SettingsForm extends FormArea implements SectionArea
 	NullCheck.notNull(strings, "strings");
 	this.controlPanel = controlPanel;
 	this.luwrain = controlPanel.getCoreInterface();
-	this.registry = luwrain.getRegistry();
+	this.registry = null;//FIXME:newreg luwrain.getRegistry();
 	this.sett = Settings.create(registry);
 	this.strings = strings;
 	fillForm();

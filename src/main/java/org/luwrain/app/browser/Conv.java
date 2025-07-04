@@ -34,7 +34,7 @@ final class Conv
     Conv(App app)
     {
 	this.luwrain = app.getLuwrain();
-	this.sett = Settings.create(luwrain.getRegistry());
+	this.sett = null;//FIXME:newreg Settings.create(luwrain.getRegistry());
     }
 
     String openUrl(String initialValue)
