@@ -51,7 +51,7 @@ static final String
     public App() { this(null); }
     public App(String arg)
     {
-	super(Strings.NAME, Strings.class);
+	super(Strings.class);
 	this.arg = arg != null?arg:"";
     }
 

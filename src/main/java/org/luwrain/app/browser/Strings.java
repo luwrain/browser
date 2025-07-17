@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-20255 Michael Pozhidaev <msp@luwrain.org>
    Copyright 2015-2016 Roman Volovodov <gr.rPman@gmail.com>
 
    This file is part of LUWRAIN.
@@ -19,12 +19,9 @@ package org.luwrain.app.browser;
 
 import org.luwrain.core.annotations.*;
 
-@ResourceStrings(name = "luwrain.browser", resource = "strings.properties", langs = { "en", "ru" })
+@ResourceStrings(langs = { "en", "ru" })
 public interface Strings
 {
-    static final String
-	NAME = "luwrain.browser";
-
     String actionHistoryPrev();
     String actionOpenUrl();
     String actionRefresh();

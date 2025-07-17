@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 
 import static org.luwrain.graphical.FxThread.*;
 
-@AppNoArgs(name = "web-ins", i18n = { "en=Web-inspector", "ru=Веб-инспектор" })
+@AppNoArgs(name = "web-ins", title = { "en=Web-inspector", "ru=Веб-инспектор" })
 public final class App extends AppBase <Strings>implements Application
 {
     static final String
@@ -58,7 +58,7 @@ public final class App extends AppBase <Strings>implements Application
 
     public App()
     {
-		super(Strings.NAME, Strings.class, "luwrain.webinspector");
+		super(Strings.class, "luwrain.webinspector");
 		this.instance = this;
     }
 
