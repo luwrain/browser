@@ -39,9 +39,8 @@ public final class Extension extends EmptyExtension
     @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
 	return new ExtensionObject[]{
-	    new SimpleShortcut("chromite", org.luwrain.app.chromite.App.class),
-	    new Shortcut() {
-		@Override public String getExtObjName() { return "browser"; }
+	    new DefaultShortcut("chromite", org.luwrain.app.chromite.App.class),
+	    new DefaultShortcut("browser", org.luwrain.app.browser.App.class) {
 		@Override public Application[] prepareApp(String[] args)
 		{
 		    if (args.length == 0)
