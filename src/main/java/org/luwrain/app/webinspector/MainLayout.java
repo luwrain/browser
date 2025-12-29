@@ -141,20 +141,20 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
     {
 			 stylesArea.update((lines)->{
 				 lines.clear();
-				 lines.addLine("");
-				 lines.addLine("Класс: " + block.className);
-				 lines.addLine("Тег: " + block.tagName);
-				 lines.addLine("Текстовые размеры: " + block.getLeft() + ", " + block.getRight() + ", " + block.getTop() + ", " + block.getBottom());
-				 lines.addLine("Исходные размеры: " + block.srcLeft + ", " + block.srcRight + ", " + block.srcTop + ", " + block.srcBottom);
-				 lines.addLine("Видимый: " + (block.visible?"да":"нет"));
-				 lines.addLine("");
-				 lines.addLine("" + block.runs.size() + " runs, " + block.lines.size() + " lines");
-				 lines.addLine("Runs:");
+				 lines.add("");
+				 lines.add("Класс: " + block.className);
+				 lines.add("Тег: " + block.tagName);
+				 lines.add("Текстовые размеры: " + block.getLeft() + ", " + block.getRight() + ", " + block.getTop() + ", " + block.getBottom());
+				 lines.add("Исходные размеры: " + block.srcLeft + ", " + block.srcRight + ", " + block.srcTop + ", " + block.srcBottom);
+				 lines.add("Видимый: " + (block.visible?"да":"нет"));
+				 lines.add("");
+				 lines.add("" + block.runs.size() + " runs, " + block.lines.size() + " lines");
+				 lines.add("Runs:");
 				 for(var r: block.runs)
-				     lines.addLine(r.toString().replaceAll("\u00a0", " "));
+				     lines.add(r.toString().replaceAll("\u00a0", " "));
 
-				 lines.addLine("");
-				 lines.addLine("Строки:");
+				 lines.add("");
+				 lines.add("Строки:");
 				 for(var l: block.lines)
 				 {
 				     final var b = new StringBuilder();
@@ -162,15 +162,15 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
 					 b.append("'").append(f.text()).append("',");
 					 final var s = new String(b);
 				     if (!s.isEmpty())
-					 lines.addLine(s.substring(0, s.length() - 1).replaceAll("\u00a0", " "));
+					 lines.add(s.substring(0, s.length() - 1).replaceAll("\u00a0", " "));
 					 }
 
-				 lines.addLine("");
-				 lines.addLine("Стиль:");
+				 lines.add("");
+				 lines.add("Стиль:");
 				 final var style = block.getStyle();
 				 if (style != null)
 				     for(var l: style.split(";", -1))
-					 lines.addLine(l);
+					 lines.add(l);
 
 			     });
 			 stylesArea.setHotPoint(0, 0);
@@ -200,7 +200,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.InputHandler
     {
 		 stylesArea.update((lines)->{
 		 lines.clear();
-		 lines.addLine("Test styles box");
+		 lines.add("Test styles box");
 		 });
 		return true;
     }

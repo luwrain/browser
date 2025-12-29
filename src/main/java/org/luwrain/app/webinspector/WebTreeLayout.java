@@ -75,7 +75,7 @@ final class WebTreeLayout extends LayoutBase
     {
 		 stylesArea.update((lines)->{
 		 lines.clear();
-		 lines.addLine("Test styles box");
+		 lines.add("Test styles box");
 		 });
 		//final WebObject obj = elementsArea.selected();
 		//if (obj == null)
@@ -87,7 +87,7 @@ final class WebTreeLayout extends LayoutBase
 		//	lines.clear();
 		//	final String[] ll = text.split(";", -1);
 		//	for(String l: ll)
-		//		lines.addLine(l);
+		//		lines.add(l);
 		//	});
 		//setActiveArea(stylesArea);
 		return true;

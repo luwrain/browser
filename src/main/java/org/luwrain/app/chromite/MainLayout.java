@@ -56,11 +56,11 @@ final TreeArea treeArea;
 	    final Element el = (Element)obj;
 	    attrArea.update(lines->{
 		    lines.clear();
-		    lines.addLine("X: " + String.valueOf(el.getX()));
-		    		    lines.addLine("Y: " + String.valueOf(el.getY()));
-				    		    		    lines.addLine("Width: " + String.valueOf(el.getWidth()));
-								    				    		    		    lines.addLine("Height: " + String.valueOf(el.getHeight()));
-																    lines.addLine("");
+		    lines.add("X: " + String.valueOf(el.getX()));
+		    		    lines.add("Y: " + String.valueOf(el.getY()));
+				    		    		    lines.add("Width: " + String.valueOf(el.getWidth()));
+								    				    		    		    lines.add("Height: " + String.valueOf(el.getHeight()));
+																    lines.add("");
 		});
 	    setActiveArea(attrArea);
 	    return true;
