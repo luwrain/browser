@@ -2,7 +2,8 @@
 plugins {
   id 'java'
   id 'io.freefair.lombok' version '8.6'
-  id 'org.openjfx.javafxplugin' version '0.0.13'
+//  id 'org.openjfx.javafxplugin' version '0.0.13'
+  id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 dependencies {
@@ -16,7 +17,11 @@ dependencies {
   testImplementation libraries.junit
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
 javafx { 
-  version = "17"
+  version = ver.javafx
   modules = [ 'javafx.controls', 'javafx.web' ]
 }
