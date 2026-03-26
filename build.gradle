@@ -1,8 +1,8 @@
 
 plugins {
-  id 'java'
+  id 'java-library'
+  id "maven-publish"
   id 'io.freefair.lombok' version '8.6'
-//  id 'org.openjfx.javafxplugin' version '0.0.13'
   id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
@@ -18,10 +18,28 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 javafx { 
   version = ver.javafx
   modules = [ 'javafx.controls', 'javafx.web' ]
 }
+
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      groupId = 'org.luwrain'
+      artifactId = 'luwrain-browser'
+      version = ver.lwr
+      from components.java
+    }
+  }
+  repositories {
+    maven {
+      url = uri(mavenDestRepo)
+    }
+  }
+}
+
