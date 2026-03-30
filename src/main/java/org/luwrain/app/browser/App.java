@@ -48,7 +48,7 @@ static final String
 		runSync(()->{
 						this.webView = new WebView();
 			this.webEngine = webView.getEngine();
-			this.webEngine.setUserDataDirectory(getLuwrain().getAppDataDir("luwrain.browser").toFile());
+			this.webEngine.setUserDataDirectory(new File(getLuwrain().getPath("var:luwrain.browser")));
 			this.webEngine.getLoadWorker().stateProperty().addListener((ov,oldState,newState)->onStateChanged(ov, oldState, newState));
 		/*
 		this.webEngine.getLoadWorker().progressProperty().addListener((ov,o,n)->events.onProgress(n));
