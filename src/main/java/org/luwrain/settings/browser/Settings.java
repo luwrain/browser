@@ -21,6 +21,6 @@ public interface Settings
     {
 	NullCheck.notNull(registry, "registry");
 	registry.addDirectory(PATH);
-	return RegistryProxy.create(registry, PATH, Settings.class);
+	return null;
     }
 }
