@@ -18,10 +18,6 @@ dependencies {
   testImplementation libraries.junit
 }
 
-tasks.named('test') {
-  useJUnitPlatform()
-}
-
 javafx { 
   version = ver.javafx
   modules = [ 'javafx.controls', 'javafx.web' ]
